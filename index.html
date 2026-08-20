@@ -27,32 +27,25 @@
     ========================================== */
 
     :root {
-
-      /* Primary */
       --primary: #2563EB;
       --primary-dark: #1D4ED8;
 
-      /* Soft blue surfaces */
       --primary-soft: #E1EEFF;
       --primary-pale: #EAF2FC;
 
-      /* Typography */
       --navy: #0F172A;
       --text: #172033;
       --muted: #64748B;
       --muted-light: #94A3B8;
 
-      /* Surfaces */
       --background: #EEF4FB;
       --sidebar-bg: #F8FBFF;
       --topbar-bg: #F5F9FF;
       --white: #FFFFFF;
 
-      /* Borders */
       --border: #D4E1F0;
       --border-light: #E8EFF7;
 
-      /* Status */
       --success: #16A34A;
       --success-soft: #ECFDF3;
 
@@ -62,10 +55,8 @@
       --danger: #DC2626;
       --danger-soft: #FEF2F2;
 
-      /* Shape */
       --radius: 14px;
 
-      /* Shadow */
       --shadow:
         0 4px 18px rgba(37, 99, 235, 0.07);
 
@@ -90,11 +81,8 @@
 
     body {
       font-family: "Poppins", sans-serif;
-
       background: var(--background);
-
       color: var(--text);
-
       min-height: 100vh;
 
       -webkit-font-smoothing: antialiased;
@@ -125,7 +113,6 @@
 
     .app {
       display: flex;
-
       min-height: 100vh;
     }
 
@@ -135,18 +122,15 @@
     ========================================== */
 
     .sidebar {
-
       width: 250px;
 
       background: var(--sidebar-bg);
 
-      border-right:
-        1px solid var(--border);
+      border-right: 1px solid var(--border);
 
       min-height: 100vh;
 
       position: fixed;
-
       left: 0;
       top: 0;
       bottom: 0;
@@ -154,36 +138,30 @@
       z-index: 1000;
 
       display: flex;
-
       flex-direction: column;
 
-      transition:
-        transform 0.25s ease;
+      transition: transform 0.25s ease;
     }
 
 
     /* BRAND */
 
     .brand {
-
-      height: 82px;
+      height: 74px;
 
       display: flex;
-
       align-items: center;
 
-      padding: 0 20px;
+      padding: 0 18px;
 
-      border-bottom:
-        1px solid var(--border);
+      border-bottom: 1px solid var(--border);
     }
 
     .brand-mark {
+      width: 38px;
+      height: 38px;
 
-      width: 40px;
-      height: 40px;
-
-      border-radius: 12px;
+      border-radius: 11px;
 
       background:
         linear-gradient(
@@ -194,53 +172,60 @@
         );
 
       display: flex;
-
       align-items: center;
       justify-content: center;
 
       color: var(--white);
 
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
 
-      margin-right: 11px;
+      flex-shrink: 0;
+
+      margin-right: 10px;
 
       box-shadow:
-        0 5px 12px
-        rgba(37, 99, 235, 0.20);
+        0 5px 12px rgba(37, 99, 235, 0.20);
+    }
+
+    .brand-text {
+      height: 40px;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .brand-text strong {
-
       display: block;
 
       color: var(--navy);
 
       font-size: 15px;
-
       font-weight: 700;
+
+      line-height: 20px;
 
       letter-spacing: -0.2px;
     }
 
     .brand-text span {
-
       display: block;
 
       color: var(--muted);
 
       font-size: 10px;
-
       font-weight: 400;
 
-      margin-top: 2px;
+      line-height: 14px;
+
+      margin-top: 1px;
     }
 
 
     /* SIDEBAR CONTENT */
 
     .sidebar-content {
-
       padding: 18px 13px;
 
       flex: 1;
@@ -252,13 +237,10 @@
     /* SECTION TITLE */
 
     .nav-section-title {
-
       font-size: 10px;
-
       font-weight: 600;
 
       text-transform: uppercase;
-
       letter-spacing: 0.08em;
 
       color: var(--muted-light);
@@ -272,15 +254,12 @@
     /* NAV ITEM */
 
     .nav-item {
-
       display: flex;
-
       align-items: center;
 
       gap: 12px;
 
       width: 100%;
-
       min-height: 44px;
 
       padding: 0 12px;
@@ -292,7 +271,6 @@
       color: #475569;
 
       font-size: 12px;
-
       font-weight: 500;
 
       background: transparent;
@@ -303,67 +281,62 @@
     }
 
     .nav-item:hover {
-
       background: var(--primary-pale);
-
       color: var(--primary);
     }
 
     .nav-item.active {
-
       background: var(--primary-soft);
-
       color: var(--primary);
 
       font-weight: 600;
     }
 
     .nav-icon {
-
       width: 20px;
+      height: 20px;
 
-      text-align: center;
-
-      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
 
       color: inherit;
 
       flex-shrink: 0;
     }
 
+    .nav-icon svg {
+      width: 15px;
+      height: 15px;
+    }
+
 
     /* SIDEBAR ADMIN */
 
     .sidebar-bottom {
-
       padding: 14px;
 
-      border-top:
-        1px solid var(--border);
+      border-top: 1px solid var(--border);
     }
 
     .admin-card {
-
       background: #EFF6FF;
 
-      border:
-        1px solid #D7E7FB;
+      border: 1px solid #D7E7FB;
 
       border-radius: 12px;
 
-      padding: 11px;
+      padding: 10px;
 
       display: flex;
-
       align-items: center;
 
       gap: 10px;
     }
 
     .admin-avatar {
-
-      width: 35px;
-      height: 35px;
+      width: 34px;
+      height: 34px;
 
       border-radius: 50%;
 
@@ -372,49 +345,49 @@
       color: var(--primary);
 
       display: flex;
-
       justify-content: center;
-
       align-items: center;
 
       font-size: 11px;
-
       font-weight: 600;
+
+      flex-shrink: 0;
     }
 
     .admin-info {
-
       min-width: 0;
+
+      height: 34px;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .admin-info strong {
-
       display: block;
 
       color: var(--navy);
 
       font-size: 11px;
-
       font-weight: 600;
 
+      line-height: 15px;
+
       white-space: nowrap;
-
       overflow: hidden;
-
       text-overflow: ellipsis;
     }
 
     .admin-info span {
-
       display: block;
 
       color: var(--muted);
 
       font-size: 10px;
-
       font-weight: 400;
 
-      margin-top: 2px;
+      line-height: 14px;
     }
 
 
@@ -423,7 +396,6 @@
     ========================================== */
 
     .main {
-
       margin-left: 250px;
 
       flex: 1;
@@ -437,14 +409,12 @@
     ========================================== */
 
     .topbar {
-
-      height: 72px;
+      height: 74px;
 
       background:
         rgba(245, 249, 255, 0.97);
 
-      border-bottom:
-        1px solid var(--border);
+      border-bottom: 1px solid var(--border);
 
       display: flex;
 
@@ -464,7 +434,6 @@
     }
 
     .topbar-left {
-
       display: flex;
 
       align-items: center;
@@ -472,8 +441,43 @@
       gap: 12px;
     }
 
-    .mobile-menu {
 
+    /* TITLE GROUP */
+
+    .page-title-group {
+      height: 40px;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .page-title {
+      font-size: 16px;
+      font-weight: 700;
+
+      color: var(--navy);
+
+      line-height: 20px;
+
+      letter-spacing: -0.3px;
+    }
+
+    .page-subtitle {
+      font-size: 11px;
+      font-weight: 400;
+
+      color: var(--muted);
+
+      line-height: 14px;
+
+      margin-top: 1px;
+    }
+
+
+    /* MOBILE MENU */
+
+    .mobile-menu {
       display: none;
 
       width: 38px;
@@ -483,11 +487,9 @@
 
       background: var(--white);
 
-      border:
-        1px solid var(--border);
+      border: 1px solid var(--border);
 
       align-items: center;
-
       justify-content: center;
 
       font-size: 17px;
@@ -496,37 +498,10 @@
     }
 
 
-    /* PAGE TITLE */
-
-    .page-title {
-
-      font-size: 16px;
-
-      font-weight: 700;
-
-      color: var(--navy);
-
-      letter-spacing: -0.3px;
-    }
-
-    .page-subtitle {
-
-      font-size: 11px;
-
-      color: var(--muted);
-
-      font-weight: 400;
-
-      margin-top: 2px;
-    }
-
-
     /* TOPBAR RIGHT */
 
     .topbar-right {
-
       display: flex;
-
       align-items: center;
 
       gap: 9px;
@@ -536,14 +511,12 @@
     /* SEARCH */
 
     .search-box {
-
       width: 270px;
       height: 40px;
 
       background: var(--white);
 
-      border:
-        1px solid var(--border);
+      border: 1px solid var(--border);
 
       border-radius: 9px;
 
@@ -556,19 +529,28 @@
       gap: 8px;
     }
 
-    .search-box span {
+    .search-icon {
+      width: 16px;
+      height: 16px;
 
       color: var(--muted-light);
 
-      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      flex-shrink: 0;
+    }
+
+    .search-icon svg {
+      width: 14px;
+      height: 14px;
     }
 
     .search-box input {
-
       flex: 1;
 
       border: none;
-
       outline: none;
 
       background: transparent;
@@ -576,12 +558,10 @@
       color: var(--text);
 
       font-size: 11px;
-
       font-weight: 400;
     }
 
     .search-box input::placeholder {
-
       color: #94A3B8;
     }
 
@@ -589,46 +569,42 @@
     /* ICON BUTTON */
 
     .icon-button {
-
       width: 40px;
       height: 40px;
 
       border-radius: 9px;
 
-      border:
-        1px solid var(--border);
+      border: 1px solid var(--border);
 
       background: var(--white);
 
       display: flex;
 
       align-items: center;
-
       justify-content: center;
 
       color: #475569;
 
-      transition:
-        0.15s ease;
+      transition: 0.15s ease;
     }
 
     .icon-button:hover {
+      border-color: #BCD3F5;
 
-      border-color:
-        #BCD3F5;
+      background: var(--primary-pale);
 
-      background:
-        var(--primary-pale);
+      color: var(--primary);
+    }
 
-      color:
-        var(--primary);
+    .icon-button svg {
+      width: 16px;
+      height: 16px;
     }
 
 
     /* USER AVATAR */
 
     .user-avatar {
-
       width: 38px;
       height: 38px;
 
@@ -641,11 +617,9 @@
       display: flex;
 
       justify-content: center;
-
       align-items: center;
 
       font-size: 11px;
-
       font-weight: 600;
     }
 
@@ -655,7 +629,6 @@
     ========================================== */
 
     .content {
-
       padding: 30px;
 
       max-width: 1600px;
@@ -667,39 +640,39 @@
     /* WELCOME */
 
     .welcome {
-
       margin-bottom: 24px;
     }
 
     .welcome h1 {
-
       font-size: 24px;
 
       color: var(--navy);
 
       font-weight: 700;
 
+      line-height: 31px;
+
       letter-spacing: -0.7px;
 
-      margin-bottom: 5px;
+      margin-bottom: 4px;
     }
 
     .welcome p {
-
       font-size: 12px;
 
       color: var(--muted);
 
       font-weight: 400;
+
+      line-height: 18px;
     }
 
 
     /* =========================================
-       STAT CARDS
+       STATISTICS
     ========================================== */
 
     .stats-grid {
-
       display: grid;
 
       grid-template-columns:
@@ -711,20 +684,15 @@
     }
 
     .stat-card {
+      background: var(--white);
 
-      background:
-        var(--white);
+      border: 1px solid var(--border);
 
-      border:
-        1px solid var(--border);
-
-      border-radius:
-        var(--radius);
+      border-radius: var(--radius);
 
       padding: 18px;
 
-      box-shadow:
-        var(--shadow);
+      box-shadow: var(--shadow);
 
       transition:
         transform 0.15s ease,
@@ -732,16 +700,12 @@
     }
 
     .stat-card:hover {
+      transform: translateY(-1px);
 
-      transform:
-        translateY(-1px);
-
-      box-shadow:
-        var(--shadow-hover);
+      box-shadow: var(--shadow-hover);
     }
 
     .stat-top {
-
       display: flex;
 
       align-items: center;
@@ -752,31 +716,30 @@
     }
 
     .stat-label {
-
       color: var(--muted);
 
       font-size: 10px;
 
       font-weight: 600;
 
-      text-transform:
-        uppercase;
+      text-transform: uppercase;
 
       letter-spacing: 0.04em;
+
+      line-height: 14px;
     }
 
-    .stat-icon {
+    /* UNIQUE STAT ICON */
 
+    .stat-icon {
       width: 34px;
       height: 34px;
 
       border-radius: 9px;
 
-      background:
-        var(--primary-soft);
+      background: var(--primary-soft);
 
-      color:
-        var(--primary);
+      color: var(--primary);
 
       display: flex;
 
@@ -784,31 +747,38 @@
 
       justify-content: center;
 
-      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .stat-icon svg {
+      width: 18px;
+      height: 18px;
+
+      stroke-width: 1.9;
     }
 
     .stat-number {
-
       font-size: 27px;
 
-      color:
-        var(--navy);
+      color: var(--navy);
 
       font-weight: 700;
+
+      line-height: 34px;
 
       letter-spacing: -1px;
     }
 
     .stat-meta {
-
       font-size: 11px;
 
-      color:
-        var(--muted);
+      color: var(--muted);
 
       font-weight: 400;
 
-      margin-top: 6px;
+      line-height: 17px;
+
+      margin-top: 5px;
     }
 
 
@@ -817,7 +787,6 @@
     ========================================== */
 
     .dashboard-grid {
-
       display: grid;
 
       grid-template-columns:
@@ -831,32 +800,24 @@
     /* CARD */
 
     .card {
+      background: var(--white);
 
-      background:
-        var(--white);
+      border: 1px solid var(--border);
 
-      border:
-        1px solid var(--border);
+      border-radius: var(--radius);
 
-      border-radius:
-        var(--radius);
+      box-shadow: var(--shadow);
 
-      box-shadow:
-        var(--shadow);
-
-      overflow:
-        hidden;
+      overflow: hidden;
     }
 
 
     /* CARD HEADER */
 
     .card-header {
-
       padding: 18px 20px;
 
-      border-bottom:
-        1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
 
       display: flex;
 
@@ -866,27 +827,26 @@
     }
 
     .card-header h2 {
-
       font-size: 14px;
 
-      color:
-        var(--navy);
+      color: var(--navy);
 
       font-weight: 600;
+
+      line-height: 20px;
     }
 
     .card-header span {
-
-      color:
-        var(--muted);
+      color: var(--muted);
 
       font-size: 11px;
 
       font-weight: 400;
+
+      line-height: 16px;
     }
 
     .card-body {
-
       padding: 0;
     }
 
@@ -896,7 +856,6 @@
     ========================================== */
 
     .appointment-row {
-
       padding: 15px 20px;
 
       display: flex;
@@ -907,18 +866,14 @@
 
       gap: 15px;
 
-      border-bottom:
-        1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
     }
 
     .appointment-row:last-child {
-
-      border-bottom:
-        none;
+      border-bottom: none;
     }
 
     .appointment-left {
-
       display: flex;
 
       align-items: center;
@@ -929,58 +884,55 @@
     }
 
     .appointment-time {
-
       width: 52px;
 
       font-size: 11px;
 
       font-weight: 600;
 
-      color:
-        var(--navy);
+      line-height: 16px;
+
+      color: var(--navy);
 
       flex-shrink: 0;
     }
 
     .patient-avatar {
-
       width: 38px;
       height: 38px;
 
       border-radius: 10px;
 
-      background:
-        var(--primary-soft);
+      background: var(--primary-soft);
 
-      color:
-        var(--primary);
+      color: var(--primary);
 
       display: flex;
 
       justify-content: center;
-
       align-items: center;
 
       font-size: 10px;
 
       font-weight: 600;
+
+      flex-shrink: 0;
     }
 
     .appointment-info {
-
       min-width: 0;
     }
 
     .appointment-info strong {
-
       display: block;
 
       font-size: 12px;
 
-      color:
-        var(--navy);
+      color: var(--navy);
 
       font-weight: 600;
+
+      line-height: 17px;
 
       white-space: nowrap;
 
@@ -990,24 +942,23 @@
     }
 
     .appointment-info span {
-
       display: block;
 
       font-size: 10px;
 
-      color:
-        var(--muted);
+      color: var(--muted);
 
       font-weight: 400;
 
-      margin-top: 3px;
+      line-height: 15px;
+
+      margin-top: 2px;
     }
 
 
     /* STATUS */
 
     .status {
-
       display: inline-flex;
 
       align-items: center;
@@ -1018,36 +969,29 @@
 
       font-size: 9px;
 
+      line-height: 12px;
+
       font-weight: 600;
 
       white-space: nowrap;
     }
 
     .status.upcoming {
+      background: var(--primary-soft);
 
-      background:
-        var(--primary-soft);
-
-      color:
-        var(--primary);
+      color: var(--primary);
     }
 
     .status.completed {
+      background: var(--success-soft);
 
-      background:
-        var(--success-soft);
-
-      color:
-        var(--success);
+      color: var(--success);
     }
 
     .status.alert {
+      background: var(--warning-soft);
 
-      background:
-        var(--warning-soft);
-
-      color:
-        var(--warning);
+      color: var(--warning);
     }
 
 
@@ -1056,11 +1000,9 @@
     ========================================== */
 
     .follow-row {
-
       padding: 15px 20px;
 
-      border-bottom:
-        1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
 
       display: flex;
 
@@ -1070,80 +1012,67 @@
     }
 
     .follow-row:last-child {
-
-      border-bottom:
-        none;
+      border-bottom: none;
     }
 
     .priority-dot {
-
       width: 8px;
       height: 8px;
 
       border-radius: 50%;
 
-      margin-top: 6px;
+      margin-top: 5px;
 
       flex-shrink: 0;
     }
 
     .priority-high {
-
-      background:
-        var(--danger);
+      background: var(--danger);
     }
 
     .priority-medium {
-
-      background:
-        var(--warning);
+      background: var(--warning);
     }
 
     .follow-content {
-
       flex: 1;
 
       min-width: 0;
     }
 
     .follow-content strong {
-
       display: block;
 
       font-size: 12px;
 
-      color:
-        var(--navy);
+      color: var(--navy);
 
       font-weight: 600;
+
+      line-height: 17px;
     }
 
     .follow-content span {
-
       display: block;
 
-      color:
-        var(--muted);
+      color: var(--muted);
 
       font-size: 10px;
 
       font-weight: 400;
 
-      margin-top: 4px;
+      line-height: 15px;
 
-      line-height: 1.55;
+      margin-top: 3px;
     }
 
     .follow-action {
-
       width: 31px;
       height: 31px;
 
-      background:
-        var(--white);
+      background: var(--white);
 
-      border:
-        1px solid var(--border);
+      border: 1px solid var(--border);
 
       border-radius: 8px;
 
@@ -1153,22 +1082,45 @@
 
       justify-content: center;
 
-      color:
-        var(--primary);
+      color: var(--primary);
 
       font-weight: 600;
 
-      transition:
-        0.15s ease;
+      transition: 0.15s ease;
+
+      flex-shrink: 0;
     }
 
     .follow-action:hover {
+      background: var(--primary-soft);
 
-      background:
-        var(--primary-soft);
+      border-color: #BFD4F8;
+    }
 
-      border-color:
-        #BFD4F8;
+    .follow-action svg {
+      width: 15px;
+      height: 15px;
+    }
+
+
+    /* =========================================
+       MOBILE OVERLAY
+    ========================================== */
+
+    .overlay {
+      display: none;
+
+      position: fixed;
+
+      inset: 0;
+
+      background: rgba(15, 23, 42, 0.35);
+
+      z-index: 950;
+    }
+
+    .overlay.show {
+      display: block;
     }
 
 
@@ -1179,7 +1131,6 @@
     @media (max-width: 1200px) {
 
       .stats-grid {
-
         grid-template-columns:
           repeat(3, minmax(0, 1fr));
       }
@@ -1189,36 +1140,27 @@
     @media (max-width: 900px) {
 
       .sidebar {
-
-        transform:
-          translateX(-100%);
+        transform: translateX(-100%);
       }
 
       .sidebar.open {
-
-        transform:
-          translateX(0);
+        transform: translateX(0);
       }
 
       .main {
-
         margin-left: 0;
       }
 
       .mobile-menu {
-
         display: flex;
       }
 
       .search-box {
-
         width: 200px;
       }
 
       .dashboard-grid {
-
-        grid-template-columns:
-          1fr;
+        grid-template-columns: 1fr;
       }
     }
 
@@ -1226,41 +1168,31 @@
     @media (max-width: 680px) {
 
       .topbar {
-
-        padding:
-          0 15px;
+        padding: 0 15px;
       }
 
-      .topbar-right
-      .icon-button {
-
+      .topbar-right .icon-button {
         display: none;
       }
 
       .search-box {
-
         display: none;
       }
 
       .content {
-
-        padding:
-          20px 15px;
+        padding: 20px 15px;
       }
 
       .stats-grid {
-
         grid-template-columns:
           repeat(2, minmax(0, 1fr));
       }
 
       .stat-number {
-
         font-size: 23px;
       }
 
       .welcome h1 {
-
         font-size: 21px;
       }
     }
@@ -1269,47 +1201,16 @@
     @media (max-width: 420px) {
 
       .stats-grid {
-
-        grid-template-columns:
-          1fr;
+        grid-template-columns: 1fr;
       }
 
       .appointment-row {
-
-        align-items:
-          flex-start;
+        align-items: flex-start;
       }
 
       .status {
-
-        display:
-          none;
+        display: none;
       }
-    }
-
-
-    /* =========================================
-       MOBILE OVERLAY
-    ========================================== */
-
-    .overlay {
-
-      display: none;
-
-      position: fixed;
-
-      inset: 0;
-
-      background:
-        rgba(15, 23, 42, 0.35);
-
-      z-index: 950;
-    }
-
-    .overlay.show {
-
-      display:
-        block;
     }
 
   </style>
@@ -1321,9 +1222,9 @@
   <div class="app">
 
 
-    <!-- =====================================
+    <!-- =========================================
          SIDEBAR
-    ====================================== -->
+    ========================================== -->
 
     <aside
       class="sidebar"
@@ -1370,7 +1271,20 @@
         >
 
           <span class="nav-icon">
-            ⌂
+
+            <!-- Dashboard -->
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 12l9-9 9 9"></path>
+              <path d="M5 10v10h14V10"></path>
+              <path d="M9 20v-6h6v6"></path>
+            </svg>
+
           </span>
 
           Dashboard
@@ -1383,7 +1297,22 @@
         >
 
           <span class="nav-icon">
-            ◉
+
+            <!-- Patients -->
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="9" cy="8" r="3"></circle>
+              <path d="M3.5 20a5.5 5.5 0 0111 0"></path>
+              <path d="M15 5.5a3 3 0 010 5"></path>
+              <path d="M17 13.5a5.5 5.5 0 013.5 5"></path>
+            </svg>
+
           </span>
 
           Patients
@@ -1396,7 +1325,46 @@
         >
 
           <span class="nav-icon">
-            ▣
+
+            <!-- Calendar -->
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect
+                x="3"
+                y="4"
+                width="18"
+                height="17"
+                rx="2"
+              ></rect>
+
+              <line
+                x1="16"
+                y1="2"
+                x2="16"
+                y2="6"
+              ></line>
+
+              <line
+                x1="8"
+                y1="2"
+                x2="8"
+                y2="6"
+              ></line>
+
+              <line
+                x1="3"
+                y1="10"
+                x2="21"
+                y2="10"
+              ></line>
+            </svg>
+
           </span>
 
           Appointments
@@ -1419,7 +1387,25 @@
         >
 
           <span class="nav-icon">
-            ◌
+
+            <!-- Treatment / Syringe -->
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M14 4l6 6"></path>
+              <path d="M13 5l6 6"></path>
+              <path d="M5 19l5-5"></path>
+              <path d="M3 21l2-2"></path>
+              <path d="M9 15l-4-4"></path>
+              <path d="M11 13l-4-4"></path>
+              <path d="M7 17l-4-4"></path>
+            </svg>
+
           </span>
 
           Treatments
@@ -1432,7 +1418,22 @@
         >
 
           <span class="nav-icon">
-            ↗
+
+            <!-- Progress -->
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 19V5"></path>
+              <path d="M4 19h16"></path>
+              <path d="M7 15l4-4 3 2 5-6"></path>
+              <path d="M16 7h3v3"></path>
+            </svg>
+
           </span>
 
           Progress
@@ -1445,7 +1446,26 @@
         >
 
           <span class="nav-icon">
-            !
+
+            <!-- Follow Up -->
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="9"
+              ></circle>
+
+              <path d="M12 8v5"></path>
+              <path d="M12 16h.01"></path>
+            </svg>
+
           </span>
 
           Follow-Up
@@ -1468,7 +1488,29 @@
         >
 
           <span class="nav-icon">
-            ▤
+
+            <!-- Reports -->
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect
+                x="4"
+                y="4"
+                width="16"
+                height="17"
+                rx="2"
+              ></rect>
+
+              <path d="M8 16v-3"></path>
+              <path d="M12 16V9"></path>
+              <path d="M16 16v-5"></path>
+            </svg>
+
           </span>
 
           Reports
@@ -1481,7 +1523,25 @@
         >
 
           <span class="nav-icon">
-            ⚙
+
+            <!-- Settings -->
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="3"
+              ></circle>
+
+              <path d="M19.4 15a1.7 1.7 0 00.34 1.88l.06.06-1.8 1.8-.06-.06a1.7 1.7 0 00-1.88-.34 1.7 1.7 0 00-1.03 1.55V20H12v-.09a1.7 1.7 0 00-1.03-1.55 1.7 1.7 0 00-1.88.34l-.06.06-1.8-1.8.06-.06A1.7 1.7 0 007.63 15a1.7 1.7 0 00-1.55-1.03H6V11h.09a1.7 1.7 0 001.55-1.03 1.7 1.7 0 00-.34-1.88l-.06-.06 1.8-1.8.06.06a1.7 1.7 0 001.88.34A1.7 1.7 0 0012 4.09V4h3v.09a1.7 1.7 0 001.03 1.55 1.7 1.7 0 001.88-.34l.06-.06 1.8 1.8-.06.06A1.7 1.7 0 0019.4 9c.1.5.5.88 1.03.97H20v3h.09c-.53.09-.93.47-1.03 1.03z"></path>
+            </svg>
+
           </span>
 
           Settings
@@ -1528,9 +1588,9 @@
     ></div>
 
 
-    <!-- =====================================
-         MAIN CONTENT
-    ====================================== -->
+    <!-- =========================================
+         MAIN
+    ========================================== -->
 
     <main class="main">
 
@@ -1538,7 +1598,6 @@
       <!-- TOPBAR -->
 
       <header class="topbar">
-
 
         <div class="topbar-left">
 
@@ -1550,13 +1609,25 @@
             id="mobileMenu"
             aria-label="Open menu"
           >
-            ☰
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <path d="M4 7h16"></path>
+              <path d="M4 12h16"></path>
+              <path d="M4 17h16"></path>
+            </svg>
+
           </button>
 
 
           <!-- PAGE TITLE -->
 
-          <div>
+          <div class="page-title-group">
 
             <div class="page-title">
               Dashboard
@@ -1571,7 +1642,7 @@
         </div>
 
 
-        <!-- RIGHT SIDE -->
+        <!-- TOPBAR RIGHT -->
 
         <div class="topbar-right">
 
@@ -1580,8 +1651,26 @@
 
           <div class="search-box">
 
-            <span>
-              ⌕
+            <span class="search-icon">
+
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <circle
+                  cx="11"
+                  cy="11"
+                  r="7"
+                ></circle>
+
+                <path
+                  d="M20 20l-4-4"
+                ></path>
+              </svg>
+
             </span>
 
             <input
@@ -1593,13 +1682,30 @@
           </div>
 
 
-          <!-- NOTIFICATIONS -->
+          <!-- NOTIFICATION -->
 
           <button
             class="icon-button"
             aria-label="Notifications"
           >
-            ♧
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M18 8a6 6 0 00-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"
+              ></path>
+
+              <path
+                d="M10 21h4"
+              ></path>
+            </svg>
+
           </button>
 
 
@@ -1609,7 +1715,26 @@
             class="icon-button"
             aria-label="Activity"
           >
-            ◔
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="9"
+              ></circle>
+
+              <path
+                d="M12 7v5l3 2"
+              ></path>
+            </svg>
+
           </button>
 
 
@@ -1624,9 +1749,9 @@
       </header>
 
 
-      <!-- =====================================
-           PAGE CONTENT
-      ====================================== -->
+      <!-- =========================================
+           CONTENT
+      ========================================== -->
 
       <section class="content">
 
@@ -1646,9 +1771,9 @@
         </div>
 
 
-        <!-- =================================
-             STATISTICS
-        ================================== -->
+        <!-- =====================================
+             STAT CARDS
+        ====================================== -->
 
         <div class="stats-grid">
 
@@ -1664,7 +1789,34 @@
               </span>
 
               <div class="stat-icon">
-                ◉
+
+                <!-- USERS ICON -->
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle
+                    cx="9"
+                    cy="8"
+                    r="3"
+                  ></circle>
+
+                  <path
+                    d="M3.5 20a5.5 5.5 0 0111 0"
+                  ></path>
+
+                  <path
+                    d="M15 5.5a3 3 0 010 5"
+                  ></path>
+
+                  <path
+                    d="M17 13.5a5.5 5.5 0 013.5 5"
+                  ></path>
+                </svg>
+
               </div>
 
             </div>
@@ -1691,7 +1843,30 @@
               </span>
 
               <div class="stat-icon">
-                ●
+
+                <!-- USER CHECK ICON -->
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle
+                    cx="9"
+                    cy="8"
+                    r="3"
+                  ></circle>
+
+                  <path
+                    d="M3.5 20a5.5 5.5 0 0111 0"
+                  ></path>
+
+                  <path
+                    d="M16 15l2 2 4-4"
+                  ></path>
+                </svg>
+
               </div>
 
             </div>
@@ -1707,7 +1882,7 @@
           </div>
 
 
-          <!-- FOLLOW-UP -->
+          <!-- DUE FOLLOW-UP -->
 
           <div class="stat-card">
 
@@ -1718,7 +1893,55 @@
               </span>
 
               <div class="stat-icon">
-                !
+
+                <!-- CALENDAR CLOCK ICON -->
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect
+                    x="3"
+                    y="4"
+                    width="18"
+                    height="17"
+                    rx="2"
+                  ></rect>
+
+                  <line
+                    x1="8"
+                    y1="2"
+                    x2="8"
+                    y2="6"
+                  ></line>
+
+                  <line
+                    x1="16"
+                    y1="2"
+                    x2="16"
+                    y2="6"
+                  ></line>
+
+                  <line
+                    x1="3"
+                    y1="9"
+                    x2="21"
+                    y2="9"
+                  ></line>
+
+                  <circle
+                    cx="16"
+                    cy="15"
+                    r="3"
+                  ></circle>
+
+                  <path
+                    d="M16 13.5v1.7l1.1.8"
+                  ></path>
+                </svg>
+
               </div>
 
             </div>
@@ -1745,7 +1968,53 @@
               </span>
 
               <div class="stat-icon">
-                ○
+
+                <!-- CALENDAR X ICON -->
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect
+                    x="3"
+                    y="4"
+                    width="18"
+                    height="17"
+                    rx="2"
+                  ></rect>
+
+                  <line
+                    x1="8"
+                    y1="2"
+                    x2="8"
+                    y2="6"
+                  ></line>
+
+                  <line
+                    x1="16"
+                    y1="2"
+                    x2="16"
+                    y2="6"
+                  ></line>
+
+                  <line
+                    x1="3"
+                    y1="9"
+                    x2="21"
+                    y2="9"
+                  ></line>
+
+                  <path
+                    d="M9 13l6 6"
+                  ></path>
+
+                  <path
+                    d="M15 13l-6 6"
+                  ></path>
+                </svg>
+
               </div>
 
             </div>
@@ -1772,7 +2041,34 @@
               </span>
 
               <div class="stat-icon">
-                ✓
+
+                <!-- TARGET ICON -->
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="9"
+                  ></circle>
+
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="5"
+                  ></circle>
+
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="1.5"
+                  ></circle>
+                </svg>
+
               </div>
 
             </div>
@@ -1790,16 +2086,16 @@
         </div>
 
 
-        <!-- =================================
+        <!-- =====================================
              LOWER DASHBOARD
-        ================================== -->
+        ====================================== -->
 
         <div class="dashboard-grid">
 
 
-          <!-- =================================
+          <!-- =====================================
                TODAY'S APPOINTMENTS
-          ================================== -->
+          ====================================== -->
 
           <div class="card">
 
@@ -1972,9 +2268,9 @@
           </div>
 
 
-          <!-- =================================
+          <!-- =====================================
                PATIENTS NEEDING ATTENTION
-          ================================== -->
+          ====================================== -->
 
           <div class="card">
 
@@ -2027,7 +2323,19 @@
                   class="follow-action"
                   aria-label="Open patient"
                 >
-                  →
+
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12h13"></path>
+                    <path d="M13 6l6 6-6 6"></path>
+                  </svg>
+
                 </button>
 
               </div>
@@ -2057,7 +2365,19 @@
                   class="follow-action"
                   aria-label="Open patient"
                 >
-                  →
+
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12h13"></path>
+                    <path d="M13 6l6 6-6 6"></path>
+                  </svg>
+
                 </button>
 
               </div>
@@ -2087,7 +2407,19 @@
                   class="follow-action"
                   aria-label="Open patient"
                 >
-                  →
+
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12h13"></path>
+                    <path d="M13 6l6 6-6 6"></path>
+                  </svg>
+
                 </button>
 
               </div>
@@ -2117,7 +2449,19 @@
                   class="follow-action"
                   aria-label="Open patient"
                 >
-                  →
+
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12h13"></path>
+                    <path d="M13 6l6 6-6 6"></path>
+                  </svg>
+
                 </button>
 
               </div>
