@@ -3,6966 +3,2067 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Patient Profile | Getwell Weight Loss Admin</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link
-  href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
-  rel="stylesheet"
->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-:root {
+:root{
   --primary:#2563EB;
   --primary-dark:#1D4ED8;
   --primary-soft:#E1EEFF;
-  --primary-pale:#EAF2FC;
-
+  --background:#EEF4FB;
+  --sidebar:#F8FBFF;
   --navy:#0F172A;
   --text:#172033;
   --muted:#64748B;
   --muted-light:#94A3B8;
-
-  --background:#EEF4FB;
-  --sidebar-bg:#F8FBFF;
-  --white:#FFFFFF;
-
+  --white:#fff;
   --border:#D4E1F0;
   --border-light:#E8EFF7;
-
   --success:#16A34A;
   --success-soft:#ECFDF3;
-
-  --warning:#D97706;
-  --warning-soft:#FFF7ED;
-
   --danger:#DC2626;
-  --danger-soft:#FEF2F2;
-
   --radius:14px;
   --shadow:0 4px 18px rgba(37,99,235,.07);
 }
-
-/* =========================
-   RESET
-========================= */
-
-* {
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
-html {
-  scroll-behavior:smooth;
-}
-
-body {
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
   font-family:"Poppins",sans-serif;
   background:var(--background);
   color:var(--text);
   min-height:100vh;
-  -webkit-font-smoothing:antialiased;
+  -webkit-font-smoothing:antialiased
+}
+button,input,select,textarea{font-family:"Poppins",sans-serif}
+button{cursor:pointer}
+a{text-decoration:none;color:inherit}
+
+.app{display:flex;min-height:100vh}
+
+.sidebar{
+  width:250px;position:fixed;left:0;top:0;bottom:0;z-index:1000;
+  background:var(--sidebar);border-right:1px solid var(--border);
+  display:flex;flex-direction:column
+}
+.brand{height:74px;padding:0 18px;border-bottom:1px solid var(--border);display:flex;align-items:center}
+.brand-mark{
+  width:38px;height:38px;border-radius:11px;margin-right:10px;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:17px;font-weight:700;
+  background:linear-gradient(135deg,#2563EB,#3B82F6 60%,#60A5FA);
+  box-shadow:0 5px 12px rgba(37,99,235,.20)
+}
+.brand-text strong{display:block;color:var(--navy);font-size:15px;font-weight:700;line-height:20px}
+.brand-text span{display:block;color:var(--muted);font-size:10px;line-height:14px}
+.sidebar-content{padding:18px 13px;flex:1;overflow-y:auto}
+.nav-section-title{
+  padding:8px 11px 7px;color:var(--muted-light);
+  font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em
+}
+.nav-item{
+  width:100%;min-height:44px;margin-bottom:4px;padding:0 12px;
+  display:flex;align-items:center;gap:12px;
+  border:none;border-radius:10px;background:transparent;color:#475569;
+  font-size:12px;font-weight:500;text-align:left
+}
+.nav-item:hover,.nav-item.active{background:var(--primary-soft);color:var(--primary)}
+.nav-item.active{font-weight:600}
+.nav-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar-bottom{padding:14px;border-top:1px solid var(--border)}
+.admin-card{
+  display:flex;align-items:center;gap:10px;padding:10px;
+  background:#EFF6FF;border:1px solid #D7E7FB;border-radius:12px
+}
+.admin-avatar{
+  width:34px;height:34px;border-radius:50%;background:#DCEAFF;color:var(--primary);
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600
+}
+.admin-info strong{display:block;color:var(--navy);font-size:11px}
+.admin-info span{display:block;color:var(--muted);font-size:10px}
+
+.main{margin-left:250px;flex:1;min-width:0}
+.topbar{
+  height:74px;position:sticky;top:0;z-index:900;
+  background:rgba(245,249,255,.97);border-bottom:1px solid var(--border);
+  padding:0 28px;display:flex;align-items:center;justify-content:space-between;
+  backdrop-filter:blur(10px)
+}
+.topbar-left,.topbar-right{display:flex;align-items:center}
+.topbar-left{gap:12px}.topbar-right{gap:9px}
+.mobile-menu{display:none;width:38px;height:38px;border:1px solid var(--border);border-radius:9px;background:#fff}
+.page-title{font-size:16px;font-weight:700;line-height:20px;color:var(--navy)}
+.page-subtitle{font-size:11px;color:var(--muted);line-height:14px}
+.search-box{
+  width:270px;height:40px;padding:0 12px;display:flex;align-items:center;gap:8px;
+  background:#fff;border:1px solid var(--border);border-radius:9px
+}
+.search-box input{flex:1;border:0;outline:0;background:transparent;font-size:11px}
+.icon-button{
+  width:40px;height:40px;border:1px solid var(--border);border-radius:9px;
+  background:#fff;color:#475569;display:flex;align-items:center;justify-content:center
+}
+.user-avatar{
+  width:38px;height:38px;border-radius:50%;background:var(--navy);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600
 }
 
-button,
-input,
-select,
-textarea {
-  font-family:"Poppins",sans-serif;
+.content{max-width:1600px;margin:auto;padding:30px}
+.back-link{display:inline-flex;align-items:center;gap:7px;margin-bottom:18px;color:var(--muted);font-size:11px}
+
+.patient-hero{
+  margin-bottom:20px;padding:22px 24px;background:#fff;border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  display:flex;align-items:center;justify-content:space-between;gap:24px
 }
-
-button {
-  border:none;
-  cursor:pointer;
+.patient-main{display:flex;align-items:center;gap:16px;min-width:0}
+.patient-large-avatar{
+  width:68px;height:68px;flex-shrink:0;border-radius:17px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#E1EEFF,#D6E7FF);
+  color:var(--primary);font-size:20px;font-weight:600
 }
-
-a {
-  color:inherit;
-  text-decoration:none;
+.patient-heading h1{font-size:20px;font-weight:700;color:var(--navy);line-height:28px}
+.patient-heading-meta{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:4px}
+.patient-id,.patient-program{font-size:10px;color:var(--muted)}
+.hero-separator{color:#CBD5E1}
+.hero-right{display:flex;align-items:center;gap:20px}
+.hero-details{display:flex;align-items:center;gap:24px}
+.hero-detail{display:flex;flex-direction:column;align-items:flex-end}
+.hero-detail-label{font-size:9px;color:var(--muted)}
+.hero-detail-value{font-size:11px;font-weight:600;color:var(--navy)}
+.status-pill{
+  display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;
+  font-size:9px;font-weight:600
 }
+.status-active{color:var(--success);background:var(--success-soft)}
+.status-completed{color:var(--primary);background:var(--primary-soft)}
+.status-inactive{color:var(--muted);background:#F1F5F9}
+.status-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
 
-
-/* =========================
-   APP
-========================= */
-
-.app {
-  display:flex;
-  min-height:100vh;
+.primary-button,.secondary-button,.edit-button{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px
 }
-
-
-/* =========================
-   SIDEBAR
-========================= */
-
-.sidebar {
-  width:250px;
-  background:var(--sidebar-bg);
-  border-right:1px solid var(--border);
-
-  position:fixed;
-  left:0;
-  top:0;
-  bottom:0;
-
-  z-index:1000;
-
-  display:flex;
-  flex-direction:column;
-
-  transition:transform .25s ease;
+.primary-button{
+  height:40px;padding:0 14px;border:0;border-radius:8px;background:var(--primary);
+  color:#fff;font-size:10px;font-weight:600
 }
-
-.brand {
-  height:74px;
-  padding:0 18px;
-
-  display:flex;
-  align-items:center;
-
-  border-bottom:1px solid var(--border);
+.primary-button:hover{background:var(--primary-dark)}
+.secondary-button,.edit-button{
+  background:#fff;color:var(--primary);border:1px solid var(--border);border-radius:8px
 }
+.secondary-button{height:40px;padding:0 14px;font-size:10px;font-weight:500}
+.edit-button{height:32px;padding:0 10px;font-size:9px;font-weight:500}
+.edit-button:hover,.secondary-button:hover{background:var(--primary-soft)}
 
-.brand-mark {
-  width:38px;
-  height:38px;
-  border-radius:11px;
-
-  background:linear-gradient(
-    135deg,
-    #2563EB,
-    #3B82F6 60%,
-    #60A5FA
-  );
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:#fff;
-  font-size:17px;
-  font-weight:700;
-
-  margin-right:10px;
-
-  box-shadow:0 5px 12px rgba(37,99,235,.20);
+.kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px}
+.kpi-card{
+  padding:17px 18px;background:#fff;border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow)
 }
+.kpi-label{font-size:10px;color:var(--muted)}
+.kpi-value-row{display:flex;align-items:baseline;gap:5px;margin-top:5px}
+.kpi-value{font-size:22px;font-weight:700;color:var(--navy)}
+.kpi-unit{font-size:10px;color:var(--muted)}
+.kpi-change{margin-top:4px;font-size:9px;font-weight:600;color:var(--success)}
+.kpi-goal{margin-top:7px}.kpi-goal-bar{height:5px;overflow:hidden;background:#E8EFF7;border-radius:999px}
+.kpi-goal-fill{height:100%;background:linear-gradient(90deg,#2563EB,#60A5FA)}
+.kpi-goal-meta{display:flex;justify-content:space-between;margin-top:4px;font-size:9px;color:var(--muted)}
 
-.brand-text strong {
-  display:block;
-  color:var(--navy);
-  font-size:15px;
-  font-weight:700;
-  line-height:20px;
+.upcoming-card{
+  min-height:82px;margin-bottom:20px;padding:18px 20px;
+  background:linear-gradient(135deg,#F8FBFF,#EEF6FF);border:1px solid #CBDDF4;
+  border-radius:var(--radius);display:flex;align-items:center;justify-content:space-between;gap:20px
 }
-
-.brand-text span {
-  display:block;
-  color:var(--muted);
-  font-size:10px;
-  line-height:14px;
+.upcoming-left{display:flex;align-items:center;gap:14px}
+.upcoming-icon{
+  width:44px;height:44px;flex-shrink:0;border-radius:12px;background:var(--primary-soft);
+  color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:18px
 }
+.upcoming-label{font-size:9px;font-weight:600;color:var(--primary);text-transform:uppercase}
+.upcoming-date{font-size:13px;font-weight:600;color:var(--navy)}
+.upcoming-details{font-size:10px;color:var(--muted)}
+.upcoming-actions{display:flex;align-items:center;gap:7px}
 
-.sidebar-content {
-  padding:18px 13px;
-  flex:1;
-  overflow-y:auto;
+.tabs-card{
+  margin-bottom:20px;background:#fff;border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden
 }
-
-.nav-section-title {
-  padding:8px 11px;
-  margin-bottom:4px;
-
-  color:var(--muted-light);
-  font-size:10px;
-  font-weight:600;
-
-  text-transform:uppercase;
-  letter-spacing:.08em;
+.tabs{display:flex;overflow-x:auto;padding:0 10px}
+.tab-button{
+  position:relative;min-height:54px;padding:0 15px;border:0;background:transparent;
+  color:var(--muted);font-size:10px;font-weight:500;white-space:nowrap
 }
-
-.nav-item {
-  width:100%;
-  min-height:44px;
-
-  display:flex;
-  align-items:center;
-  gap:12px;
-
-  padding:0 12px;
-  margin-bottom:4px;
-
-  border-radius:10px;
-
-  color:#475569;
-  background:transparent;
-
-  font-size:12px;
-  font-weight:500;
-
-  text-align:left;
-
-  transition:.15s ease;
+.tab-button.active{color:var(--primary);font-weight:600}
+.tab-button.active::after{
+  content:"";position:absolute;left:15px;right:15px;bottom:0;height:2px;background:var(--primary)
 }
+/* safer than display:none for the tab system */
+.tab-panel[hidden]{display:none!important}
 
-.nav-item:hover {
-  background:var(--primary-pale);
-  color:var(--primary);
+.card{
+  margin-bottom:20px;background:#fff;border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden
 }
-
-.nav-item.active {
-  background:var(--primary-soft);
-  color:var(--primary);
-  font-weight:600;
+.card-header{
+  padding:17px 20px;border-bottom:1px solid var(--border-light);
+  display:flex;align-items:center;justify-content:space-between;gap:14px
 }
-
-.nav-icon {
-  width:20px;
-  height:20px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  flex-shrink:0;
-}
-
-.nav-icon svg {
-  width:15px;
-  height:15px;
-}
-
-.sidebar-bottom {
-  padding:14px;
-  border-top:1px solid var(--border);
-}
-
-.admin-card {
-  display:flex;
-  align-items:center;
-  gap:10px;
-
-  padding:10px;
-
-  background:#EFF6FF;
-  border:1px solid #D7E7FB;
-  border-radius:12px;
-}
-
-.admin-avatar {
-  width:34px;
-  height:34px;
-  border-radius:50%;
-
-  background:#DCEAFF;
-  color:var(--primary);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  font-size:11px;
-  font-weight:600;
-}
-
-.admin-info strong {
-  display:block;
-  color:var(--navy);
-  font-size:11px;
-}
-
-.admin-info span {
-  display:block;
-  color:var(--muted);
-  font-size:10px;
-}
-
-
-/* =========================
-   MAIN
-========================= */
-
-.main {
-  margin-left:250px;
-  flex:1;
-  min-width:0;
-}
-
-.topbar {
-  height:74px;
-
-  background:rgba(245,249,255,.97);
-  border-bottom:1px solid var(--border);
-
-  position:sticky;
-  top:0;
-  z-index:900;
-
-  padding:0 28px;
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-
-  backdrop-filter:blur(10px);
-}
-
-.topbar-left,
-.topbar-right {
-  display:flex;
-  align-items:center;
-}
-
-.topbar-left {
-  gap:12px;
-}
-
-.topbar-right {
-  gap:9px;
-}
-
-.mobile-menu {
-  display:none;
-
-  width:38px;
-  height:38px;
-
-  border-radius:9px;
-  border:1px solid var(--border);
-
-  background:#fff;
-  color:var(--navy);
-}
-
-.page-title {
-  color:var(--navy);
-  font-size:16px;
-  font-weight:700;
-  line-height:20px;
-}
-
-.page-subtitle {
-  color:var(--muted);
-  font-size:11px;
-  line-height:14px;
-}
-
-.search-box {
-  width:270px;
-  height:40px;
-
-  display:flex;
-  align-items:center;
-  gap:8px;
-
-  padding:0 12px;
-
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:9px;
-}
-
-.search-box svg {
-  width:14px;
-  height:14px;
-  color:var(--muted-light);
-}
-
-.search-box input {
-  flex:1;
-
-  border:none;
-  outline:none;
-
-  background:transparent;
-
-  font-size:11px;
-  color:var(--text);
-}
-
-.icon-button {
-  width:40px;
-  height:40px;
-
-  border:1px solid var(--border);
-  border-radius:9px;
-
-  background:#fff;
-  color:#475569;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.user-avatar {
-  width:38px;
-  height:38px;
-
-  border-radius:50%;
-
-  background:var(--navy);
-  color:#fff;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  font-size:11px;
-  font-weight:600;
-}
-
-
-/* =========================
-   CONTENT
-========================= */
-
-.content {
-  max-width:1600px;
-  margin:0 auto;
-  padding:30px;
-}
-
-.back-link {
-  display:inline-flex;
-  align-items:center;
-  gap:7px;
-
-  margin-bottom:18px;
-
-  color:var(--muted);
-  font-size:11px;
-  font-weight:500;
-}
-
-
-/* =========================
-   PATIENT HERO
-========================= */
-
-.patient-hero {
-  margin-bottom:20px;
-  padding:22px 24px;
-
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-
-  box-shadow:var(--shadow);
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-
-  gap:24px;
-}
-
-.patient-main {
-  display:flex;
-  align-items:center;
-  gap:16px;
-
-  min-width:0;
-}
-
-.patient-large-avatar {
-  width:68px;
-  height:68px;
-
-  flex-shrink:0;
-
-  border-radius:17px;
-
-  background:linear-gradient(
-    135deg,
-    #E1EEFF,
-    #D6E7FF
-  );
-
-  color:var(--primary);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  font-size:20px;
-  font-weight:600;
-}
-
-.patient-heading h1 {
-  color:var(--navy);
-  font-size:20px;
-  font-weight:700;
-  line-height:28px;
-}
-
-.patient-heading-meta {
-  margin-top:4px;
-
-  display:flex;
-  align-items:center;
-  flex-wrap:wrap;
-  gap:8px;
-}
-
-.patient-id,
-.patient-program {
-  color:var(--muted);
-  font-size:10px;
-}
-
-.hero-separator {
-  color:#CBD5E1;
-}
-
-.status-pill {
-  display:inline-flex;
-  align-items:center;
-  gap:5px;
-
-  padding:5px 9px;
-
-  border-radius:999px;
-
-  font-size:9px;
-  font-weight:600;
-}
-
-.status-active {
-  color:var(--success);
-  background:var(--success-soft);
-}
-
-.status-completed {
-  color:var(--primary);
-  background:var(--primary-soft);
-}
-
-.status-inactive {
-  color:var(--muted);
-  background:#F1F5F9;
-}
-
-.status-dot {
-  width:5px;
-  height:5px;
-  border-radius:50%;
-  background:currentColor;
-}
-
-.hero-right {
-  display:flex;
-  align-items:center;
+.card-header h2{font-size:14px;font-weight:600;color:var(--navy)}
+.card-header p{margin-top:2px;font-size:10px;color:var(--muted)}
+.card-body{padding:20px}
+
+.overview-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.55fr) minmax(320px,1fr);
   gap:20px;
-}
-
-.hero-details {
-  display:flex;
-  align-items:center;
-  gap:24px;
-}
-
-.hero-detail {
-  display:flex;
-  flex-direction:column;
-  align-items:flex-end;
-}
-
-.hero-detail-label {
-  color:var(--muted);
-  font-size:9px;
-}
-
-.hero-detail-value {
-  color:var(--navy);
-  font-size:11px;
-  font-weight:600;
-}
-
-
-/* =========================
-   BUTTONS
-========================= */
-
-.primary-button,
-.secondary-button,
-.edit-button {
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:7px;
-}
-
-.primary-button {
-  height:40px;
-  padding:0 14px;
-
-  border-radius:8px;
-
-  background:var(--primary);
-  color:#fff;
-
-  font-size:10px;
-  font-weight:600;
-}
-
-.primary-button:hover {
-  background:var(--primary-dark);
-}
-
-.secondary-button {
-  height:40px;
-  padding:0 14px;
-
-  border-radius:8px;
-
-  border:1px solid var(--border);
-
-  background:#fff;
-  color:var(--primary);
-
-  font-size:10px;
-  font-weight:500;
-}
-
-.secondary-button:hover {
-  background:var(--primary-pale);
-}
-
-.edit-button {
-  height:32px;
-  padding:0 10px;
-
-  border-radius:7px;
-
-  border:1px solid var(--border);
-
-  background:#fff;
-  color:var(--primary);
-
-  font-size:9px;
-  font-weight:500;
-}
-
-.edit-button:hover {
-  background:var(--primary-soft);
-}
-
-
-/* =========================
-   KPI
-========================= */
-
-.kpi-grid {
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-
-  gap:14px;
-
-  margin-bottom:20px;
-}
-
-.kpi-card {
-  padding:17px 18px;
-
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-
-  box-shadow:var(--shadow);
-}
-
-.kpi-label {
-  color:var(--muted);
-  font-size:10px;
-}
-
-.kpi-value-row {
-  display:flex;
-  align-items:baseline;
-  gap:5px;
-
-  margin-top:5px;
-}
-
-.kpi-value {
-  color:var(--navy);
-  font-size:22px;
-  font-weight:700;
-}
-
-.kpi-unit {
-  color:var(--muted);
-  font-size:10px;
-}
-
-.kpi-change {
-  margin-top:4px;
-
-  color:var(--success);
-  font-size:9px;
-  font-weight:600;
-}
-
-.kpi-goal {
-  margin-top:7px;
-}
-
-.kpi-goal-bar {
-  height:5px;
-
-  overflow:hidden;
-
-  background:#E8EFF7;
-  border-radius:999px;
-}
-
-.kpi-goal-fill {
-  height:100%;
-
-  background:linear-gradient(
-    90deg,
-    #2563EB,
-    #60A5FA
-  );
-}
-
-.kpi-goal-meta {
-  display:flex;
-  justify-content:space-between;
-
-  margin-top:4px;
-
-  color:var(--muted);
-  font-size:9px;
-}
-
-
-/* =========================
-   UPCOMING
-========================= */
-
-.upcoming-card {
-  min-height:82px;
-
-  margin-bottom:20px;
-  padding:18px 20px;
-
-  background:linear-gradient(
-    135deg,
-    #F8FBFF,
-    #EEF6FF
-  );
-
-  border:1px solid #CBDDF4;
-  border-radius:var(--radius);
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-
-  gap:20px;
-}
-
-.upcoming-left {
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
-
-.upcoming-icon {
-  width:44px;
-  height:44px;
-
-  flex-shrink:0;
-
-  border-radius:12px;
-
-  background:var(--primary-soft);
-  color:var(--primary);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.upcoming-icon svg {
-  width:21px;
-  height:21px;
-}
-
-.upcoming-label {
-  color:var(--primary);
-  font-size:9px;
-  font-weight:600;
-  text-transform:uppercase;
-}
-
-.upcoming-date {
-  color:var(--navy);
-  font-size:13px;
-  font-weight:600;
-}
-
-.upcoming-details {
-  color:var(--muted);
-  font-size:10px;
-}
-
-.upcoming-actions {
-  display:flex;
-  align-items:center;
-  gap:7px;
-}
-
-
-/* =========================
-   TABS
-========================= */
-
-.tabs-card {
-  margin-bottom:20px;
-
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-
-  box-shadow:var(--shadow);
-
-  overflow:hidden;
-}
-
-.tabs {
-  display:flex;
-  overflow-x:auto;
-
-  padding:0 10px;
-}
-
-.tab-button {
-  position:relative;
-
-  min-height:54px;
-
-  padding:0 15px;
-
-  background:transparent;
-
-  color:var(--muted);
-
-  white-space:nowrap;
-
-  font-size:10px;
-  font-weight:500;
-}
-
-.tab-button.active {
-  color:var(--primary);
-  font-weight:600;
-}
-
-.tab-button.active::after {
-  content:"";
-
-  position:absolute;
-
-  left:15px;
-  right:15px;
-  bottom:0;
-
-  height:2px;
-
-  background:var(--primary);
-}
-
-.tab-panel {
-  width:100%;
-  display:none;
-}
-
-.tab-panel.active {
-  display:block;
-}
-
-
-/* =========================
-   CARD
-========================= */
-
-.card {
-  margin-bottom:20px;
-
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-
-  box-shadow:var(--shadow);
-
-  overflow:hidden;
-}
-
-.card-header {
-  padding:17px 20px;
-
-  border-bottom:1px solid var(--border-light);
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-
-  gap:14px;
-}
-
-.card-header h2 {
-  color:var(--navy);
-  font-size:14px;
-  font-weight:600;
-}
-
-.card-header p {
-  margin-top:2px;
-
-  color:var(--muted);
-  font-size:10px;
-}
-
-.card-body {
-  padding:20px;
-}
-
-
-/* =========================
-   OVERVIEW
-========================= */
-
-.overview-grid {
-  display:grid;
-
-  grid-template-columns:
-    minmax(0,1.55fr)
-    minmax(320px,1fr);
-
-  gap:20px;
-}
-
-.visit-list {
-  display:flex;
-  flex-direction:column;
-}
-
-.visit-row {
-  min-height:64px;
-
-  display:grid;
-
-  grid-template-columns:
-    115px 1fr auto;
-
-  align-items:center;
-
-  gap:14px;
-
-  border-bottom:1px solid var(--border-light);
-
-  cursor:pointer;
-}
-
-.visit-row:hover {
-  background:#F8FBFF;
-}
-
-.visit-date strong,
-.visit-main strong {
-  display:block;
-
-  color:var(--navy);
-
-  font-size:11px;
-  font-weight:600;
-}
-
-.visit-date span,
-.visit-main span {
-  display:block;
-
-  margin-top:2px;
-
-  color:var(--muted);
-  font-size:9px;
-}
-
-.visit-arrow {
-  width:30px;
-  height:30px;
-
-  border:1px solid var(--border);
-  border-radius:8px;
-
-  background:#fff;
-  color:var(--primary);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-
-/* =========================
-   MEASUREMENTS
-========================= */
-
-.measurement-grid {
-  display:grid;
-
-  grid-template-columns:
-    repeat(2,minmax(0,1fr));
-
-  gap:10px;
-}
-
-.measurement-item {
-  padding:12px;
-
-  background:#F8FBFF;
-
-  border:1px solid var(--border-light);
-  border-radius:10px;
-}
-
-.measurement-label {
-  display:block;
-
-  color:var(--muted);
-  font-size:9px;
-}
-
-.measurement-value {
-  display:block;
-
-  margin-top:3px;
-
-  color:var(--navy);
-  font-size:14px;
-  font-weight:600;
-}
-
-.measurement-change {
-  display:block;
-
-  margin-top:2px;
-
-  color:var(--success);
-  font-size:9px;
-}
-
-
-/* =========================
-   CHART
-========================= */
-
-.chart-summary {
-  margin-bottom:15px;
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-.chart-summary strong {
-  color:var(--navy);
-  font-size:24px;
-  font-weight:700;
-}
-
-.chart-summary span {
-  color:var(--muted);
-  font-size:10px;
-}
-
-.chart-loss {
-  color:var(--success);
-  font-size:10px;
-  font-weight:600;
-}
-
-.chart-container {
-  height:250px;
-  position:relative;
-}
-
-.chart-grid-line {
-  position:absolute;
-  left:42px;
-  right:5px;
-
-  border-top:1px dashed #DCE6F2;
-}
-
-.chart-y-label {
-  position:absolute;
-  left:0;
-
-  width:34px;
-
-  color:var(--muted-light);
-  font-size:9px;
-
-  text-align:right;
-  transform:translateY(-50%);
-}
-
-.chart-line {
-  position:absolute;
-
-  left:55px;
-  right:5px;
-  top:0;
-  bottom:0;
-}
-
-.chart-svg {
-  width:100%;
-  height:100%;
-}
-
-.chart-axis-labels {
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-
-  margin-left:55px;
-
-  color:var(--muted-light);
-  font-size:9px;
-}
-
-.chart-axis-labels span {
-  text-align:center;
-}
-
-
-/* =========================
-   TREATMENT
-========================= */
-
-.treatment-grid {
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-}
-
-.treatment-item {
-  padding:11px;
-
-  background:#fff;
-
-  border:1px solid var(--border-light);
-  border-radius:9px;
-}
-
-.treatment-item span {
-  display:block;
-  color:var(--muted);
-  font-size:9px;
-}
-
-.treatment-item strong {
-  display:block;
-  margin-top:3px;
-
-  color:var(--navy);
-  font-size:11px;
-  font-weight:600;
-}
-
-
-/* =========================
-   DETAIL
-========================= */
-
-.visit-detail-grid {
-  display:grid;
-
-  grid-template-columns:
-    minmax(0,1.25fr)
-    minmax(350px,1fr);
-
-  gap:20px;
-}
-
-.detail-block {
-  margin-bottom:14px;
-  padding:15px;
-
-  background:#F8FBFF;
-
-  border:1px solid var(--border-light);
-  border-radius:11px;
-}
-
-.detail-block:last-child {
-  margin-bottom:0;
-}
-
-.detail-title {
-  color:var(--navy);
-  font-size:13px;
-  font-weight:600;
-}
-
-.detail-subtitle {
-  margin-top:3px;
-
-  color:var(--muted);
-  font-size:9px;
-}
-
-
-/* =========================
-   FILE CARDS
-========================= */
-
-.visit-files {
-  display:grid;
-  grid-template-columns:1fr;
-  gap:12px;
-}
-
-.file-card {
-  min-height:150px;
-
-  padding:18px;
-
-  border:1px dashed #BFD3EB;
-  border-radius:11px;
-
-  background:#F9FCFF;
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-
-  text-align:center;
-}
-
-.file-icon {
-  width:42px;
-  height:42px;
-
-  margin-bottom:8px;
-
-  border-radius:11px;
-
-  background:var(--primary-soft);
-  color:var(--primary);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.file-icon svg {
-  width:19px;
-  height:19px;
-}
-
-.file-card strong {
-  color:var(--navy);
-  font-size:10px;
-  font-weight:600;
-}
-
-.file-card span {
-  margin-top:3px;
-
-  color:var(--muted);
-  font-size:8px;
-}
-
-.file-actions {
-  margin-top:10px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:7px;
-}
-
-.hidden-file {
-  display:none;
-}
-
-.upload-button {
-  height:32px;
-  padding:0 11px;
-
-  margin-top:10px;
-
-  border:1px solid var(--border);
-  border-radius:8px;
-
-  background:#fff;
-  color:var(--primary);
-
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-
-  font-size:9px;
-  font-weight:500;
-
-  cursor:pointer;
-}
-
-.selected-file {
-  max-width:100%;
-  margin-top:7px;
-
-  color:var(--success);
-  font-size:8px;
-
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-
-
-/* =========================
-   BODY PHOTO UPLOAD
-========================= */
-
-.full-body-grid {
-  width:100%;
-
-  display:grid;
-
-  grid-template-columns:
-    repeat(3,1fr);
-
-  gap:12px;
-}
-
-.photo-upload-box {
-  min-height:155px;
-
-  padding:15px;
-
-  border:1px dashed #BFD3EB;
-  border-radius:11px;
-
-  background:#F9FCFF;
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-
-  text-align:center;
-}
-
-.photo-upload-box strong {
-  color:var(--navy);
-  font-size:10px;
-  font-weight:600;
-}
-
-.photo-upload-box span {
-  margin-top:3px;
-
-  color:var(--muted);
-  font-size:8px;
-}
-
-.photo-preview {
-  width:100%;
-
-  aspect-ratio:3/4;
-
-  margin-top:8px;
-
-  border-radius:9px;
-
-  background:
-    linear-gradient(
-      145deg,
-      #DCEAFE,
-      #EDF5FF
-    );
-
-  overflow:hidden;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.photo-preview img {
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-
-/* =========================
-   MEDIA BY VISIT
-========================= */
-
-.visit-media-list {
-  display:flex;
-  flex-direction:column;
-}
-
-.media-visit {
-  display:grid;
-
-  grid-template-columns:
-    145px
-    minmax(240px,1fr)
-    minmax(190px,220px);
-
-  align-items:center;
-  gap:18px;
-
-  padding:15px 0;
-
-  border-bottom:1px solid var(--border-light);
-}
-
-.media-visit:last-child {
-  border-bottom:none;
-}
-
-.media-date strong {
-  display:block;
-
-  color:var(--navy);
-  font-size:11px;
-  font-weight:600;
-}
-
-.media-date span {
-  display:block;
-
-  margin-top:2px;
-
-  color:var(--muted);
-  font-size:9px;
-}
-
-.mini-photo-row {
-  display:flex;
-  gap:7px;
-}
-
-.mini-photo {
-  width:54px;
-  height:68px;
-
-  border-radius:7px;
-
-  border:1px solid var(--border);
-
-  background:
-    linear-gradient(
-      145deg,
-      #DCEAFE,
-      #EDF5FF
-    );
-
-  color:var(--muted-light);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  font-size:7px;
-
-  overflow:hidden;
-}
-
-.mini-photo img {
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.media-files {
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-
-.file-link {
-  min-height:30px;
-
-  padding:0 8px;
-
-  border:1px solid var(--border);
-  border-radius:7px;
-
-  background:#F8FBFF;
-  color:var(--primary);
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-
-  font-size:8px;
-}
-
-
-/* =========================
-   COMPARISON
-========================= */
-
-.comparison-toolbar {
-  display:grid;
-
-  grid-template-columns:
-    1fr 1fr auto;
-
-  align-items:end;
-
-  gap:12px;
-
-  margin-bottom:18px;
-  padding:15px;
-
-  background:#F8FBFF;
-
-  border:1px solid var(--border-light);
-  border-radius:12px;
-}
-
-.form-field {
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-
-.form-field label {
-  color:var(--text);
-  font-size:10px;
-  font-weight:500;
-}
-
-.form-field select {
-  height:40px;
-
-  padding:0 10px;
-
-  border:1px solid var(--border);
-  border-radius:8px;
-
-  background:#fff;
-
-  color:var(--text);
-
-  outline:none;
-
-  font-size:10px;
-}
-
-.comparison-result {
-  display:none;
-}
-
-.comparison-result.show {
-  display:block;
-}
-
-.comparison-heading {
-  margin-bottom:14px;
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-.comparison-heading strong {
-  color:var(--navy);
-  font-size:13px;
-}
-
-.comparison-heading span {
-  color:var(--muted);
-  font-size:9px;
-}
-
-.comparison-table {
-  width:100%;
-  border-collapse:collapse;
-}
-
-.comparison-table th {
-  padding:11px 12px;
-
-  background:#F8FBFF;
-
-  border-bottom:1px solid var(--border);
-
-  color:var(--muted);
-
-  font-size:9px;
-  font-weight:600;
-
-  text-align:left;
-}
-
-.comparison-table td {
-  padding:12px;
-
-  border-bottom:1px solid var(--border-light);
-
-  color:var(--text);
-
-  font-size:10px;
-}
-
-.change-good {
-  color:var(--success);
-  font-weight:600;
-}
-
-.change-neutral {
-  color:var(--muted);
-}
-
-.change-bad {
-  color:var(--danger);
-  font-weight:600;
-}
-
-
-/* =========================
-   SIMPLE ROWS
-========================= */
-
-.simple-list {
-  display:flex;
-  flex-direction:column;
-}
-
-.simple-row {
-  display:grid;
-
-  grid-template-columns:
-    120px 1fr auto;
-
-  align-items:center;
-
-  gap:14px;
-
-  padding:14px 0;
-
-  border-bottom:1px solid var(--border-light);
-}
-
-.simple-row:last-child {
-  border-bottom:none;
-}
-
-.simple-row strong {
-  display:block;
-
-  color:var(--navy);
-
-  font-size:11px;
-  font-weight:600;
-}
-
-.simple-row span {
-  display:block;
-
-  margin-top:2px;
-
-  color:var(--muted);
-  font-size:9px;
-}
-
-
-/* =========================
-   MODAL
-========================= */
-
-.modal-overlay {
-  position:fixed;
-  inset:0;
-
-  z-index:3000;
-
-  display:none;
-
-  padding:20px;
-
-  background:rgba(15,23,42,.42);
-
-  align-items:center;
-  justify-content:center;
-}
-
-.modal-overlay.show {
-  display:flex;
-}
-
-.modal {
-  width:100%;
-  max-width:850px;
-  max-height:92vh;
-
-  overflow-y:auto;
-
-  background:#fff;
-
-  border:1px solid var(--border);
-  border-radius:16px;
-
-  box-shadow:
-    0 20px 50px rgba(15,23,42,.18);
-}
-
-.modal-small {
-  max-width:650px;
-}
-
-.modal-header {
-  padding:18px 20px;
-
-  border-bottom:1px solid var(--border-light);
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-.modal-header h2 {
-  color:var(--navy);
-  font-size:15px;
-  font-weight:600;
-}
-
-.modal-header span {
-  display:block;
-  margin-top:2px;
-
-  color:var(--muted);
-  font-size:9px;
-}
-
-.modal-close {
-  width:32px;
-  height:32px;
-
-  border-radius:8px;
-  border:1px solid var(--border);
-
-  background:#F8FAFC;
-  color:var(--muted);
-
-  font-size:16px;
-}
-
-.modal-body {
-  padding:20px;
-}
-
-.modal-footer {
-  padding:15px 20px;
-
-  border-top:1px solid var(--border-light);
-
-  display:flex;
-  justify-content:flex-end;
-  gap:8px;
-}
-
-.form-grid {
-  display:grid;
-
-  grid-template-columns:
-    repeat(2,minmax(0,1fr));
-
-  gap:14px;
-}
-
-.form-group {
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-
-.form-group.full {
-  grid-column:1/-1;
-}
-
-.form-group label {
-  color:var(--text);
-  font-size:10px;
-  font-weight:500;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width:100%;
-
-  border:1px solid var(--border);
-  border-radius:8px;
-
-  background:#fff;
-
-  color:var(--text);
-
-  outline:none;
-
-  font-size:10px;
-}
-
-.form-group input,
-.form-group select {
-  height:40px;
-  padding:0 10px;
-}
-
-.form-group textarea {
-  min-height:90px;
-  padding:10px;
-
-  resize:vertical;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  border-color:#9CC0F2;
-
-  box-shadow:
-    0 0 0 3px rgba(37,99,235,.08);
-}
-
-.readonly-field {
-  background:#F1F5F9 !important;
-  color:var(--muted) !important;
-}
-
-
-/* =========================
-   MOBILE
-========================= */
-
-.mobile-overlay {
-  display:none;
-
-  position:fixed;
-  inset:0;
-
-  z-index:950;
-
-  background:rgba(15,23,42,.35);
-}
-
-.mobile-overlay.show {
-  display:block;
-}
-
-@media(max-width:1200px) {
-
-  .kpi-grid {
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .overview-grid {
-    grid-template-columns:1fr;
-  }
-}
-
-@media(max-width:900px) {
-
-  .sidebar {
-    transform:translateX(-100%);
-  }
-
-  .sidebar.open {
-    transform:translateX(0);
-  }
-
-  .main {
-    margin-left:0;
-  }
-
-  .mobile-menu {
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  .patient-hero {
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .hero-right {
-    width:100%;
-  }
-
-  .hero-details {
-    flex:1;
-  }
-
-  .visit-detail-grid {
-    grid-template-columns:1fr;
-  }
-
-  .media-visit {
-    grid-template-columns:1fr;
-  }
-}
-
-@media(max-width:680px) {
-
-  .topbar {
-    padding:0 15px;
-  }
-
-  .topbar-right .icon-button {
-    display:none;
-  }
-
-  .search-box {
-    display:none;
-  }
-
-  .content {
-    padding:20px 15px;
-  }
-
-  .patient-hero {
-    padding:18px;
-  }
-
-  .hero-right {
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .hero-details {
-    width:100%;
-    flex-wrap:wrap;
-  }
-
-  .kpi-grid {
-    grid-template-columns:1fr;
-  }
-
-  .upcoming-card {
-    flex-direction:column;
-    align-items:stretch;
-  }
-
-  .upcoming-actions {
-    width:100%;
-  }
-
-  .upcoming-actions button {
-    flex:1;
-  }
-
-  .comparison-toolbar {
-    grid-template-columns:1fr;
-  }
-
-  .full-body-grid {
-    grid-template-columns:1fr;
-  }
-
-  .form-grid {
-    grid-template-columns:1fr;
-  }
-
-  .form-group.full {
-    grid-column:auto;
-  }
-
-  .treatment-grid {
-    grid-template-columns:1fr;
-  }
-
-  .measurement-grid {
-    grid-template-columns:1fr;
-  }
+  align-items:start
+}
+.visit-list{display:flex;flex-direction:column}
+.visit-row{
+  min-height:64px;display:grid;grid-template-columns:115px 1fr auto;
+  align-items:center;gap:14px;border-bottom:1px solid var(--border-light);cursor:pointer
+}
+.visit-row:hover{background:#F8FBFF}
+.visit-date strong,.visit-main strong{display:block;font-size:11px;font-weight:600;color:var(--navy)}
+.visit-date span,.visit-main span{display:block;margin-top:2px;font-size:9px;color:var(--muted)}
+.visit-arrow{
+  width:30px;height:30px;border:1px solid var(--border);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;background:#fff;color:var(--primary)
+}
+
+.measurement-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px
+}
+.measurement-item{
+  padding:12px;background:#F8FBFF;border:1px solid var(--border-light);border-radius:10px
+}
+.measurement-label{display:block;font-size:9px;color:var(--muted)}
+.measurement-value{display:block;margin-top:3px;font-size:14px;font-weight:600;color:var(--navy)}
+.measurement-change{display:block;margin-top:2px;font-size:9px;color:var(--success)}
+
+.chart-summary{margin-bottom:15px;display:flex;align-items:center;justify-content:space-between}
+.chart-summary strong{font-size:24px;color:var(--navy)}
+.chart-summary span{font-size:10px;color:var(--muted)}
+.chart-loss{font-size:10px;font-weight:600;color:var(--success)}
+.chart-container{height:250px;position:relative}
+.chart-grid-line{position:absolute;left:42px;right:5px;border-top:1px dashed #DCE6F2}
+.chart-y-label{position:absolute;left:0;width:34px;font-size:9px;color:var(--muted-light);text-align:right;transform:translateY(-50%)}
+.chart-line{position:absolute;left:55px;right:5px;top:0;bottom:0}
+.chart-svg{width:100%;height:100%}
+.chart-axis-labels{display:grid;grid-template-columns:repeat(5,1fr);margin-left:55px;color:var(--muted-light);font-size:9px}
+.chart-axis-labels span{text-align:center}
+
+.visit-detail-grid{
+  display:grid;grid-template-columns:minmax(0,1.1fr) minmax(350px,1fr);
+  gap:20px;align-items:start
+}
+.detail-block{margin-bottom:14px;padding:15px;background:#F8FBFF;border:1px solid var(--border-light);border-radius:11px}
+.detail-title{font-size:13px;font-weight:600;color:var(--navy)}
+.detail-subtitle{margin-top:3px;font-size:9px;color:var(--muted)}
+
+.treatment-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.treatment-item{padding:11px;background:#fff;border:1px solid var(--border-light);border-radius:9px}
+.treatment-item span{display:block;font-size:9px;color:var(--muted)}
+.treatment-item strong{display:block;margin-top:3px;font-size:11px;font-weight:600;color:var(--navy)}
+
+.file-card{
+  min-height:150px;padding:18px;border:1px dashed #BFD3EB;border-radius:11px;
+  background:#F9FCFF;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center
+}
+.file-icon{
+  width:42px;height:42px;margin-bottom:8px;border-radius:11px;background:var(--primary-soft);
+  color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:18px
+}
+.file-card strong{font-size:10px;font-weight:600;color:var(--navy)}
+.file-card span{margin-top:3px;font-size:8px;color:var(--muted)}
+.file-actions{margin-top:10px;display:flex;justify-content:center;gap:7px}
+
+.comparison-toolbar{
+  display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;
+  padding:15px;margin-bottom:18px;background:#F8FBFF;border:1px solid var(--border-light);border-radius:12px
+}
+.form-field{display:flex;flex-direction:column;gap:6px}
+.form-field label{font-size:10px;font-weight:500;color:var(--text)}
+.form-field select{
+  height:40px;padding:0 10px;border:1px solid var(--border);border-radius:8px;
+  background:#fff;color:var(--text);font-size:10px;outline:0
+}
+.comparison-result{display:none}
+.comparison-result.show{display:block}
+.comparison-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.comparison-heading strong{font-size:13px;color:var(--navy)}
+.comparison-heading span{font-size:9px;color:var(--muted)}
+.comparison-table{width:100%;border-collapse:collapse}
+.comparison-table th{padding:11px 12px;background:#F8FBFF;border-bottom:1px solid var(--border);font-size:9px;font-weight:600;color:var(--muted);text-align:left}
+.comparison-table td{padding:12px;border-bottom:1px solid var(--border-light);font-size:10px;color:var(--text)}
+.change-good{color:var(--success);font-weight:600}
+.change-neutral{color:var(--muted)}
+.change-bad{color:var(--danger);font-weight:600}
+
+.visit-media-list{display:flex;flex-direction:column}
+.media-visit{
+  display:grid;grid-template-columns:145px minmax(240px,1fr) minmax(190px,220px);
+  align-items:center;gap:18px;padding:15px 0;border-bottom:1px solid var(--border-light)
+}
+.media-visit:last-child{border-bottom:none}
+.media-date strong{display:block;font-size:11px;color:var(--navy)}
+.media-date span{display:block;margin-top:2px;font-size:9px;color:var(--muted)}
+.mini-photo-row{display:flex;gap:7px}
+.mini-photo{
+  width:54px;height:68px;border-radius:7px;border:1px solid var(--border);
+  background:linear-gradient(145deg,#DCEAFE,#EDF5FF);
+  display:flex;align-items:center;justify-content:center;color:var(--muted-light);font-size:7px
+}
+.media-files{display:flex;flex-direction:column;gap:6px}
+.file-link{
+  min-height:30px;padding:0 8px;border:1px solid var(--border);border-radius:7px;
+  background:#F8FBFF;color:var(--primary);display:flex;align-items:center;justify-content:space-between;font-size:8px
+}
+
+.simple-list{display:flex;flex-direction:column}
+.simple-row{
+  display:grid;grid-template-columns:120px 1fr auto;gap:14px;align-items:center;
+  padding:14px 0;border-bottom:1px solid var(--border-light)
+}
+.simple-row:last-child{border-bottom:none}
+.simple-row strong{display:block;font-size:11px;font-weight:600;color:var(--navy)}
+.simple-row span{display:block;margin-top:2px;font-size:9px;color:var(--muted)}
+
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+.form-group label{font-size:10px;font-weight:500;color:var(--text)}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);outline:0;font-size:10px
+}
+.form-group input,.form-group select{height:40px;padding:0 10px}
+.form-group textarea{min-height:90px;padding:10px;resize:vertical}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+  border-color:#9CC0F2;box-shadow:0 0 0 3px rgba(37,99,235,.08)
+}
+.readonly-field{background:#F1F5F9!important;color:var(--muted)!important}
+
+.hidden-file{display:none}
+.upload-button{
+  height:32px;padding:0 11px;margin-top:10px;border:1px solid var(--border);border-radius:8px;
+  background:#fff;color:var(--primary);display:inline-flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:500;cursor:pointer
+}
+.selected-file{margin-top:7px;max-width:100%;font-size:8px;color:var(--success);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.full-body-grid{width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.photo-upload-box{
+  min-height:155px;padding:15px;border:1px dashed #BFD3EB;border-radius:11px;background:#F9FCFF;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center
+}
+.photo-upload-box strong{font-size:10px;font-weight:600;color:var(--navy)}
+.photo-upload-box span{margin-top:3px;font-size:8px;color:var(--muted)}
+.photo-preview{
+  width:100%;aspect-ratio:3/4;margin-top:8px;border-radius:9px;overflow:hidden;
+  background:linear-gradient(145deg,#DCEAFE,#EDF5FF);display:none
+}
+.photo-preview img{width:100%;height:100%;object-fit:cover}
+
+.modal-overlay{
+  position:fixed;inset:0;z-index:3000;padding:20px;background:rgba(15,23,42,.42);
+  display:none;align-items:center;justify-content:center
+}
+.modal-overlay.show{display:flex}
+.modal{
+  width:100%;max-width:850px;max-height:92vh;overflow-y:auto;background:#fff;
+  border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 50px rgba(15,23,42,.18)
+}
+.modal-small{max-width:650px}
+.modal-header{padding:18px 20px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between}
+.modal-header h2{font-size:15px;font-weight:600;color:var(--navy)}
+.modal-header span{display:block;margin-top:2px;font-size:9px;color:var(--muted)}
+.modal-close{
+  width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:#F8FAFC;color:var(--muted)
+}
+.modal-body{padding:20px}
+.modal-footer{padding:15px 20px;border-top:1px solid var(--border-light);display:flex;justify-content:flex-end;gap:8px}
+
+.mobile-overlay{display:none;position:fixed;inset:0;z-index:950;background:rgba(15,23,42,.35)}
+
+@media(max-width:1200px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:950px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .mobile-menu{display:flex;align-items:center;justify-content:center}
+  .patient-hero{flex-direction:column;align-items:flex-start}
+  .hero-right{width:100%}
+  .hero-details{flex:1}
+  .overview-grid{grid-template-columns:1fr}
+  .visit-detail-grid{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  .topbar{padding:0 15px}
+  .search-box,.topbar-right .icon-button{display:none}
+  .content{padding:20px 15px}
+  .kpi-grid{grid-template-columns:1fr}
+  .hero-right,.hero-details{flex-wrap:wrap}
+  .upcoming-card{flex-direction:column;align-items:stretch}
+  .upcoming-actions button{flex:1}
+  .comparison-toolbar{grid-template-columns:1fr}
+  .full-body-grid{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .form-group.full{grid-column:auto}
+  .treatment-grid,.measurement-grid{grid-template-columns:1fr}
+  .media-visit{grid-template-columns:1fr}
 }
 </style>
 </head>
 
-
 <body>
-
 <div class="app">
 
-<!-- =====================================================
-     SIDEBAR
-====================================================== -->
-
 <aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="brand-mark">G</div>
+    <div class="brand-text">
+      <strong>GETWELL</strong>
+      <span>Weight Loss Admin</span>
+    </div>
+  </div>
 
-<div class="brand">
+  <div class="sidebar-content">
+    <div class="nav-section-title">Main</div>
 
-<div class="brand-mark">G</div>
+    <a class="nav-item" href="index.html">
+      <span class="nav-icon">⌂</span>Dashboard
+    </a>
 
-<div class="brand-text">
-<strong>GETWELL</strong>
-<span>Weight Loss Admin</span>
-</div>
+    <a class="nav-item active" href="patients.html">
+      <span class="nav-icon">♙</span>Patients
+    </a>
 
-</div>
+    <a class="nav-item" href="appointments.html">
+      <span class="nav-icon">▣</span>Appointments
+    </a>
 
+    <div class="nav-section-title" style="margin-top:14px">Program</div>
 
-<div class="sidebar-content">
+    <button class="nav-item" onclick="showComingSoon('Treatments')">
+      <span class="nav-icon">💉</span>Treatments
+    </button>
 
-<div class="nav-section-title">
-Main
-</div>
+    <button class="nav-item" onclick="showComingSoon('Progress')">
+      <span class="nav-icon">↗</span>Progress
+    </button>
 
+    <button class="nav-item" onclick="showComingSoon('Follow-Up')">
+      <span class="nav-icon">!</span>Follow-Up
+    </button>
 
-<a class="nav-item" href="index.html">
+    <div class="nav-section-title" style="margin-top:14px">Management</div>
 
-<span class="nav-icon">
+    <button class="nav-item" onclick="showComingSoon('Reports')">
+      <span class="nav-icon">▣</span>Reports
+    </button>
 
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-<path d="M3 12l9-9 9 9"></path>
-<path d="M5 10v10h14V10"></path>
-</svg>
+    <button class="nav-item" onclick="showComingSoon('Settings')">
+      <span class="nav-icon">⚙</span>Settings
+    </button>
+  </div>
 
-</span>
-
-Dashboard
-
-</a>
-
-
-<a class="nav-item active" href="patients.html">
-
-<span class="nav-icon">
-
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-<circle cx="9" cy="8" r="3"></circle>
-<path d="M3.5 20a5.5 5.5 0 0111 0"></path>
-</svg>
-
-</span>
-
-Patients
-
-</a>
-
-
-<a class="nav-item" href="appointments.html">
-
-<span class="nav-icon">
-
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-<rect x="3" y="4" width="18" height="17" rx="2"></rect>
-<line x1="8" y1="2" x2="8" y2="6"></line>
-<line x1="16" y1="2" x2="16" y2="6"></line>
-<line x1="3" y1="10" x2="21" y2="10"></line>
-</svg>
-
-</span>
-
-Appointments
-
-</a>
-
-
-<div class="nav-section-title" style="margin-top:14px;">
-Program
-</div>
-
-
-<button class="nav-item" onclick="showComingSoon('Treatments')">
-<span class="nav-icon">💉</span>
-Treatments
-</button>
-
-
-<button class="nav-item" onclick="showComingSoon('Progress')">
-<span class="nav-icon">↗</span>
-Progress
-</button>
-
-
-<button class="nav-item" onclick="showComingSoon('Follow-Up')">
-<span class="nav-icon">!</span>
-Follow-Up
-</button>
-
-
-<div class="nav-section-title" style="margin-top:14px;">
-Management
-</div>
-
-
-<button class="nav-item" onclick="showComingSoon('Reports')">
-<span class="nav-icon">▣</span>
-Reports
-</button>
-
-
-<button class="nav-item" onclick="showComingSoon('Settings')">
-<span class="nav-icon">⚙</span>
-Settings
-</button>
-
-</div>
-
-
-<div class="sidebar-bottom">
-
-<div class="admin-card">
-
-<div class="admin-avatar">A</div>
-
-<div class="admin-info">
-<strong>Administrator</strong>
-<span>Weight Loss Program</span>
-</div>
-
-</div>
-
-</div>
-
+  <div class="sidebar-bottom">
+    <div class="admin-card">
+      <div class="admin-avatar">A</div>
+      <div class="admin-info">
+        <strong>Administrator</strong>
+        <span>Weight Loss Program</span>
+      </div>
+    </div>
+  </div>
 </aside>
-
 
 <div class="mobile-overlay" id="mobileOverlay"></div>
 
-
-<!-- =====================================================
-     MAIN
-====================================================== -->
-
 <main class="main">
 
-
 <header class="topbar">
+  <div class="topbar-left">
+    <button class="mobile-menu" id="mobileMenu">☰</button>
+    <div>
+      <div class="page-title">Patient Profile</div>
+      <div class="page-subtitle">Weight Loss Program Management</div>
+    </div>
+  </div>
 
-<div class="topbar-left">
-
-<button class="mobile-menu" id="mobileMenu">
-☰
-</button>
-
-
-<div>
-
-<div class="page-title">
-Patient Profile
-</div>
-
-<div class="page-subtitle">
-Weight Loss Program Management
-</div>
-
-</div>
-
-</div>
-
-
-<div class="topbar-right">
-
-<div class="search-box">
-
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-<circle cx="11" cy="11" r="7"></circle>
-<path d="M20 20l-4-4"></path>
-</svg>
-
-<input
-type="text"
-placeholder="Search patient, ID or phone..."
->
-
-</div>
-
-
-<button class="icon-button">
-🔔
-</button>
-
-
-<button class="icon-button">
-◷
-</button>
-
-
-<div class="user-avatar">
-A
-</div>
-
-</div>
-
+  <div class="topbar-right">
+    <div class="search-box">
+      <span>⌕</span>
+      <input type="text" placeholder="Search patient, ID or phone...">
+    </div>
+    <button class="icon-button">🔔</button>
+    <button class="icon-button">◷</button>
+    <div class="user-avatar">A</div>
+  </div>
 </header>
-
 
 <section class="content">
 
-
-<a href="patients.html" class="back-link">
-← Back to Patients
-</a>
-
-
-<!-- =====================================================
-     PATIENT HEADER
-====================================================== -->
+<a href="patients.html" class="back-link">← Back to Patients</a>
 
 <div class="patient-hero">
 
+  <div class="patient-main">
+    <div class="patient-large-avatar" id="patientInitials">AA</div>
 
-<div class="patient-main">
+    <div class="patient-heading">
+      <h1 id="patientName">AISYAH ABDULLAH</h1>
 
-<div class="patient-large-avatar" id="patientInitials">
-MA
-</div>
+      <div class="patient-heading-meta">
+        <span class="patient-id" id="patientId">GW0001</span>
+        <span class="hero-separator">•</span>
+        <span class="patient-program">Weight Loss Program</span>
+        <span class="hero-separator">•</span>
 
+        <span class="status-pill status-active" id="statusPill">
+          <span class="status-dot"></span>
+          <span id="patientStatus">Active</span>
+        </span>
+      </div>
+    </div>
+  </div>
 
-<div class="patient-heading">
+  <div class="hero-right">
+    <div class="hero-details">
+      <div class="hero-detail">
+        <span class="hero-detail-label">Program Started</span>
+        <span class="hero-detail-value" id="startDate">15 Jun 2026</span>
+      </div>
 
-<h1 id="patientName">
-MOHD AIZUDDIN BIN ABDUL MALEK
-</h1>
+      <div class="hero-detail">
+        <span class="hero-detail-label">Doctor</span>
+        <span class="hero-detail-value" id="doctor">Dr Aaron</span>
+      </div>
 
+      <div class="hero-detail">
+        <span class="hero-detail-label">Last Visit</span>
+        <span class="hero-detail-value" id="lastVisit">20 Aug 2026</span>
+      </div>
+    </div>
 
-<div class="patient-heading-meta">
-
-<span class="patient-id" id="patientId">
-GW0002
-</span>
-
-<span class="hero-separator">•</span>
-
-<span class="patient-program">
-Weight Loss Program
-</span>
-
-<span class="hero-separator">•</span>
-
-<span class="status-pill status-active" id="statusPill">
-
-<span class="status-dot"></span>
-
-<span id="patientStatus">
-Active
-</span>
-
-</span>
-
-</div>
-
-</div>
+    <button class="edit-button" onclick="openPatientEdit()">✎ Edit Patient</button>
+  </div>
 
 </div>
 
-
-<div class="hero-right">
-
-<div class="hero-details">
-
-<div class="hero-detail">
-
-<span class="hero-detail-label">
-Program Started
-</span>
-
-<span class="hero-detail-value" id="startDate">
-12 Jun 2026
-</span>
-
-</div>
-
-
-<div class="hero-detail">
-
-<span class="hero-detail-label">
-Doctor
-</span>
-
-<span class="hero-detail-value" id="doctor">
-Dr Aaron
-</span>
-
-</div>
-
-
-<div class="hero-detail">
-
-<span class="hero-detail-label">
-Last Visit
-</span>
-
-<span class="hero-detail-value" id="lastVisit">
-20 Aug 2026
-</span>
-
-</div>
-
-</div>
-
-
-<button class="edit-button" onclick="openPatientEdit()">
-✎ Edit Patient
-</button>
-
-</div>
-
-</div>
-
-
-<!-- =====================================================
-     KPI
-====================================================== -->
 
 <div class="kpi-grid">
 
+  <div class="kpi-card">
+    <span class="kpi-label">Starting Weight</span>
+    <div class="kpi-value-row">
+      <span class="kpi-value" id="startingWeight">78.0</span>
+      <span class="kpi-unit">kg</span>
+    </div>
+    <div class="kpi-change">Program baseline</div>
+  </div>
 
-<div class="kpi-card">
+  <div class="kpi-card">
+    <span class="kpi-label">Current Weight</span>
+    <div class="kpi-value-row">
+      <span class="kpi-value" id="currentWeight">72.4</span>
+      <span class="kpi-unit">kg</span>
+    </div>
+    <div class="kpi-change">↓ <span id="totalLoss">5.6 kg lost</span></div>
+  </div>
 
-<span class="kpi-label">
-Starting Weight
-</span>
+  <div class="kpi-card">
+    <span class="kpi-label">Goal Weight</span>
+    <div class="kpi-value-row">
+      <span class="kpi-value" id="goalWeight">65.0</span>
+      <span class="kpi-unit">kg</span>
+    </div>
 
-<div class="kpi-value-row">
+    <div class="kpi-goal">
+      <div class="kpi-goal-bar">
+        <div class="kpi-goal-fill" id="goalFill" style="width:43%"></div>
+      </div>
+      <div class="kpi-goal-meta">
+        <span id="goalProgress">43% achieved</span>
+        <span id="remainingWeight">7.4 kg remaining</span>
+      </div>
+    </div>
+  </div>
 
-<span class="kpi-value" id="startingWeight">
-89.0
-</span>
-
-<span class="kpi-unit">
-kg
-</span>
-
-</div>
-
-<div class="kpi-change">
-Program baseline
-</div>
-
-</div>
-
-
-<div class="kpi-card">
-
-<span class="kpi-label">
-Current Weight
-</span>
-
-<div class="kpi-value-row">
-
-<span class="kpi-value" id="currentWeight">
-81.2
-</span>
-
-<span class="kpi-unit">
-kg
-</span>
-
-</div>
-
-<div class="kpi-change">
-↓ <span id="totalLoss">7.8 kg lost</span>
-</div>
+  <div class="kpi-card">
+    <span class="kpi-label">Program Duration</span>
+    <div class="kpi-value-row">
+      <span class="kpi-value" id="duration">10</span>
+      <span class="kpi-unit">weeks</span>
+    </div>
+    <div class="kpi-change">Currently active</div>
+  </div>
 
 </div>
 
-
-<div class="kpi-card">
-
-<span class="kpi-label">
-Goal Weight
-</span>
-
-<div class="kpi-value-row">
-
-<span class="kpi-value" id="goalWeight">
-70.0
-</span>
-
-<span class="kpi-unit">
-kg
-</span>
-
-</div>
-
-<div class="kpi-goal">
-
-<div class="kpi-goal-bar">
-
-<div
-class="kpi-goal-fill"
-id="goalFill"
-style="width:69%"
-></div>
-
-</div>
-
-<div class="kpi-goal-meta">
-
-<span id="goalProgress">
-69% achieved
-</span>
-
-<span id="remainingWeight">
-11.2 kg remaining
-</span>
-
-</div>
-
-</div>
-
-</div>
-
-
-<div class="kpi-card">
-
-<span class="kpi-label">
-Program Duration
-</span>
-
-<div class="kpi-value-row">
-
-<span class="kpi-value" id="duration">
-10
-</span>
-
-<span class="kpi-unit">
-weeks
-</span>
-
-</div>
-
-<div class="kpi-change">
-Currently active
-</div>
-
-</div>
-
-</div>
-
-
-<!-- =====================================================
-     UPCOMING APPOINTMENT
-====================================================== -->
 
 <div class="upcoming-card">
 
+  <div class="upcoming-left">
+    <div class="upcoming-icon">▣</div>
+    <div>
+      <div class="upcoming-label">Upcoming Appointment</div>
+      <div class="upcoming-date" id="upcomingDateText">27 August 2026 · 10:30 AM</div>
+      <div class="upcoming-details" id="upcomingDetailsText">Body Composition Review · Week 11</div>
+    </div>
+  </div>
 
-<div class="upcoming-left">
-
-<div class="upcoming-icon">
-
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-<rect x="3" y="4" width="18" height="17" rx="2"></rect>
-<line x1="8" y1="2" x2="8" y2="6"></line>
-<line x1="16" y1="2" x2="16" y2="6"></line>
-<line x1="3" y1="10" x2="21" y2="10"></line>
-</svg>
-
-</div>
-
-
-<div>
-
-<div class="upcoming-label">
-Upcoming Appointment
-</div>
-
-<div class="upcoming-date" id="upcomingDateText">
-27 August 2026 · 10:30 AM
-</div>
-
-<div class="upcoming-details" id="upcomingDetailsText">
-Body Composition Review · Week 11
-</div>
+  <div class="upcoming-actions">
+    <button class="edit-button" onclick="openAppointmentEdit()">✎ Edit</button>
+    <button class="secondary-button" onclick="activateTab('appointments')">View Appointment →</button>
+  </div>
 
 </div>
 
-</div>
-
-
-<div class="upcoming-actions">
-
-<button
-class="edit-button"
-onclick="openAppointmentEdit()"
->
-✎ Edit
-</button>
-
-<button
-class="secondary-button"
-onclick="activateTab('appointments')"
->
-View Appointment →
-</button>
-
-</div>
-
-</div>
-
-
-<!-- =====================================================
-     TABS
-====================================================== -->
 
 <div class="tabs-card">
+  <div class="tabs">
 
-<div class="tabs">
+    <button class="tab-button active" data-tab="overview">Overview</button>
+    <button class="tab-button" data-tab="visits">Visits</button>
+    <button class="tab-button" data-tab="composition">Body Composition</button>
+    
+    <button class="tab-button" data-tab="files">Files & Photos</button>
+    <button class="tab-button" data-tab="appointments">Appointments</button>
+    <button class="tab-button" data-tab="treatments">Treatments</button>
+    <button class="tab-button" data-tab="notes">Notes</button>
 
-<button class="tab-button active" data-tab="overview">
-Overview
-</button>
-
-<button class="tab-button" data-tab="visits">
-Visits
-</button>
-
-<button class="tab-button" data-tab="composition">
-Body Composition
-</button>
-
-<button class="tab-button" data-tab="photos">
-Progress Photos
-</button>
-
-<button class="tab-button" data-tab="files">
-Files
-</button>
-
-<button class="tab-button" data-tab="appointments">
-Appointments
-</button>
-
-<button class="tab-button" data-tab="treatments">
-Treatments
-</button>
-
-<button class="tab-button" data-tab="notes">
-Notes
-</button>
-
-</div>
-
+  </div>
 </div>
 
 
-<!-- =====================================================
+<!-- ==============================
      OVERVIEW
-====================================================== -->
+================================ -->
 
-<div class="tab-panel active" id="overview">
+<section class="tab-panel" id="overview">
 
-<div class="overview-grid">
+  <div class="overview-grid">
 
+    <div>
 
-<div>
+      <div class="card">
 
+        <div class="card-header">
 
-<div class="card">
+          <div>
+            <h2>Recent Visits</h2>
+            <p>Select a visit to view its complete record.</p>
+          </div>
 
-<div class="card-header">
+          <button class="primary-button" onclick="openAddVisitModal()">+ Add Visit</button>
 
-<div>
+        </div>
 
-<h2>
-Recent Visits
-</h2>
+        <div class="card-body">
+          <div class="visit-list" id="overviewVisitList"></div>
+        </div>
 
-<p>
-Select a visit to view its complete record.
-</p>
+      </div>
 
-</div>
 
-<button
-class="primary-button"
-onclick="openAddVisitModal()"
->
-+ Add Visit
-</button>
+      <div class="card">
 
-</div>
+        <div class="card-header">
+          <div>
+            <h2>Weight Progress</h2>
+            <p>Overall weight trend throughout the program.</p>
+          </div>
+        </div>
 
+        <div class="card-body">
 
-<div class="card-body">
+          <div class="chart-summary">
+            <div>
+              <strong id="chartCurrentWeight">72.4 kg</strong>
+              <span>Current</span>
+            </div>
 
-<div class="visit-list" id="overviewVisitList">
-</div>
+            <div class="chart-loss">
+              ↓ <span id="chartTotalLoss">5.6</span> kg overall
+            </div>
+          </div>
 
-</div>
+          <div class="chart-container">
 
-</div>
+            <div class="chart-grid-line" style="top:20px"></div>
+            <div class="chart-grid-line" style="top:72px"></div>
+            <div class="chart-grid-line" style="top:124px"></div>
+            <div class="chart-grid-line" style="top:176px"></div>
+            <div class="chart-grid-line" style="top:228px"></div>
 
+            <div class="chart-y-label" style="top:20px">80</div>
+            <div class="chart-y-label" style="top:72px">78</div>
+            <div class="chart-y-label" style="top:124px">76</div>
+            <div class="chart-y-label" style="top:176px">74</div>
+            <div class="chart-y-label" style="top:228px">72</div>
 
-<div class="card">
+            <div class="chart-line">
+              <svg class="chart-svg" viewBox="0 0 500 250" preserveAspectRatio="none">
+                <path d="M20 25 L135 75 L250 130 L365 180 L480 218 L480 250 L20 250 Z" fill="#2563EB" opacity=".10"></path>
+                <path d="M20 25 L135 75 L250 130 L365 180 L480 218"
+                  fill="none" stroke="#2563EB" stroke-width="3"
+                  stroke-linecap="round" stroke-linejoin="round"></path>
 
-<div class="card-header">
+                <circle cx="20" cy="25" r="5" fill="#fff" stroke="#2563EB" stroke-width="3"></circle>
+                <circle cx="135" cy="75" r="5" fill="#fff" stroke="#2563EB" stroke-width="3"></circle>
+                <circle cx="250" cy="130" r="5" fill="#fff" stroke="#2563EB" stroke-width="3"></circle>
+                <circle cx="365" cy="180" r="5" fill="#fff" stroke="#2563EB" stroke-width="3"></circle>
+                <circle cx="480" cy="218" r="6" fill="#2563EB" stroke="#fff" stroke-width="3"></circle>
+              </svg>
+            </div>
+          </div>
 
-<div>
+          <div class="chart-axis-labels">
+            <span>Jun</span><span>Jul</span><span>Jul</span><span>Aug</span><span>Aug</span>
+          </div>
 
-<h2>
-Weight Progress
-</h2>
+        </div>
+      </div>
 
-<p>
-Overall weight trend throughout the program.
-</p>
+    </div>
 
-</div>
 
-</div>
+    <div>
 
+      <div class="card">
 
-<div class="card-body">
+        <div class="card-header">
 
-<div class="chart-summary">
+          <div>
+            <h2>Latest Body Composition</h2>
+            <p>Latest Arboleaf measurement.</p>
+          </div>
 
-<div>
+          <div style="display:flex;align-items:center;gap:7px">
+            <span id="latestMeasurementDate">20 Aug 2026</span>
+            <button class="edit-button" onclick="openMeasurementEdit()">✎ Edit</button>
+          </div>
 
-<strong id="chartCurrentWeight">
-81.2 kg
-</strong>
+        </div>
 
-<span>
-Current
-</span>
+        <div class="card-body">
+          <div class="measurement-grid" id="latestMeasurementGrid"></div>
+        </div>
 
-</div>
+      </div>
 
-<div class="chart-loss">
-↓ <span id="chartTotalLoss">7.8</span> kg overall
-</div>
 
-</div>
+      <div class="card">
 
+        <div class="card-header">
 
-<div class="chart-container">
+          <div>
+            <h2>Program Snapshot</h2>
+            <p>Current program details.</p>
+          </div>
 
-<div class="chart-grid-line" style="top:20px;"></div>
-<div class="chart-grid-line" style="top:72px;"></div>
-<div class="chart-grid-line" style="top:124px;"></div>
-<div class="chart-grid-line" style="top:176px;"></div>
-<div class="chart-grid-line" style="top:228px;"></div>
+          <button class="edit-button" onclick="openPatientEdit()">✎ Edit</button>
 
-<div class="chart-y-label" style="top:20px;">90</div>
-<div class="chart-y-label" style="top:72px;">87</div>
-<div class="chart-y-label" style="top:124px;">84</div>
-<div class="chart-y-label" style="top:176px;">81</div>
-<div class="chart-y-label" style="top:228px;">78</div>
+        </div>
 
+        <div class="card-body">
 
-<div class="chart-line">
+          <div class="measurement-grid">
 
-<svg
-class="chart-svg"
-viewBox="0 0 500 250"
-preserveAspectRatio="none"
->
+            <div class="measurement-item">
+              <span class="measurement-label">Height</span>
+              <span class="measurement-value" id="snapshotHeight">158 cm</span>
+            </div>
 
-<path
-d="
-M20 35
-L135 80
-L250 130
-L365 178
-L480 215
-L480 250
-L20 250
-Z
-"
-fill="#2563EB"
-opacity=".10"
-></path>
+            <div class="measurement-item">
+              <span class="measurement-label">Program Week</span>
+              <span class="measurement-value">Week 10</span>
+            </div>
 
+            <div class="measurement-item">
+              <span class="measurement-label">Goal Weight</span>
+              <span class="measurement-value" id="snapshotGoal">65.0 kg</span>
+            </div>
 
-<path
-d="
-M20 35
-L135 80
-L250 130
-L365 178
-L480 215
-"
-fill="none"
-stroke="#2563EB"
-stroke-width="3"
-stroke-linecap="round"
-stroke-linejoin="round"
-></path>
+            <div class="measurement-item">
+              <span class="measurement-label">Remaining</span>
+              <span class="measurement-value" id="snapshotRemaining">7.4 kg</span>
+            </div>
 
+          </div>
 
-<circle cx="20" cy="35" r="5" fill="#fff" stroke="#2563EB" stroke-width="3"></circle>
-<circle cx="135" cy="80" r="5" fill="#fff" stroke="#2563EB" stroke-width="3"></circle>
-<circle cx="250" cy="130" r="5" fill="#fff" stroke="#2563EB" stroke-width="3"></circle>
-<circle cx="365" cy="178" r="5" fill="#fff" stroke="#2563EB" stroke-width="3"></circle>
-<circle cx="480" cy="215" r="6" fill="#2563EB" stroke="#fff" stroke-width="3"></circle>
+        </div>
+      </div>
 
-</svg>
+    </div>
 
-</div>
+  </div>
 
-</div>
+</section>
 
 
-<div class="chart-axis-labels">
-<span>Jun</span>
-<span>Jul</span>
-<span>Jul</span>
-<span>Aug</span>
-<span>Aug</span>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-
-<div>
-
-
-<div class="card">
-
-<div class="card-header">
-
-<div>
-
-<h2>
-Latest Body Composition
-</h2>
-
-<p>
-Latest Arboleaf measurement.
-</p>
-
-</div>
-
-<div style="display:flex;align-items:center;gap:7px;">
-
-<span>
-20 Aug 2026
-</span>
-
-<button class="edit-button" onclick="openMeasurementEdit()">
-✎ Edit
-</button>
-
-</div>
-
-</div>
-
-
-<div class="card-body">
-
-<div class="measurement-grid" id="latestMeasurementGrid">
-</div>
-
-</div>
-
-</div>
-
-
-<div class="card">
-
-<div class="card-header">
-
-<div>
-
-<h2>
-Program Snapshot
-</h2>
-
-<p>
-Current program details.
-</p>
-
-</div>
-
-<button class="edit-button" onclick="openPatientEdit()">
-✎ Edit
-</button>
-
-</div>
-
-
-<div class="card-body">
-
-<div class="measurement-grid">
-
-<div class="measurement-item">
-
-<span class="measurement-label">
-Height
-</span>
-
-<span class="measurement-value" id="snapshotHeight">
-169 cm
-</span>
-
-</div>
-
-
-<div class="measurement-item">
-
-<span class="measurement-label">
-Program Week
-</span>
-
-<span class="measurement-value">
-Week 10
-</span>
-
-</div>
-
-
-<div class="measurement-item">
-
-<span class="measurement-label">
-Goal Weight
-</span>
-
-<span class="measurement-value">
-70.0 kg
-</span>
-
-</div>
-
-
-<div class="measurement-item">
-
-<span class="measurement-label">
-Remaining
-</span>
-
-<span class="measurement-value">
-11.2 kg
-</span>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-
-</div>
-
-</div>
-
-
-<!-- =====================================================
+<!-- ==============================
      VISITS
-====================================================== -->
+================================ -->
 
-<div class="tab-panel" id="visits">
+<section class="tab-panel" id="visits" hidden>
 
+  <div class="card">
 
-<div class="card">
+    <div class="card-header">
 
-<div class="card-header">
+      <div>
+        <h2>Visit Records</h2>
+        <p>Each visit contains treatment, notes and attached files.</p>
+      </div>
 
-<div>
+      <button class="primary-button" onclick="openAddVisitModal()">+ Add Visit</button>
 
-<h2>
-Visit Records
-</h2>
+    </div>
 
-<p>
-Every visit contains its own record.
-</p>
+    <div class="card-body">
 
-</div>
+      <div class="visit-detail-grid">
 
-<button
-class="primary-button"
-onclick="openAddVisitModal()"
->
-+ Add Visit
-</button>
+        <div>
+          <div class="detail-title">Visit History</div>
+          <div class="detail-subtitle">Select a visit.</div>
+          <div class="visit-list" id="fullVisitList" style="margin-top:10px"></div>
+        </div>
 
-</div>
 
+        <div>
 
-<div class="card-body">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
+            <div>
+              <div class="detail-title">Selected Visit</div>
+              <div class="detail-subtitle" id="selectedVisitLabel">No visit selected</div>
+            </div>
 
+            <button class="edit-button" onclick="openVisitEdit()">✎ Edit Visit</button>
+          </div>
 
-<div class="visit-detail-grid">
 
+          <div class="detail-block">
 
-<div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <div class="detail-title">Treatment & Medication</div>
+              <button class="edit-button" onclick="openTreatmentEdit()">✎ Edit</button>
+            </div>
 
-<div class="detail-title">
-Visits
-</div>
+            <div class="treatment-grid" id="selectedTreatmentGrid"></div>
 
-<div class="detail-subtitle">
-Select a visit.
-</div>
+          </div>
 
 
-<div class="visit-list" id="fullVisitList">
-</div>
+          <div class="detail-block">
 
-</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <div class="detail-title">Visit Notes</div>
+              <button class="edit-button" onclick="openNotesEdit()">✎ Edit</button>
+            </div>
 
+            <p id="selectedVisitNotes" style="font-size:10px;line-height:18px;color:var(--text)">
+              No visit selected.
+            </p>
 
-<div>
+          </div>
 
 
-<div style="
-display:flex;
-align-items:flex-start;
-justify-content:space-between;
-margin-bottom:14px;
-">
+          <!-- IMPORTANT:
+               There is intentionally NO body-composition
+               section in Visits anymore. -->
 
-<div>
+          <div class="detail-block">
 
-<div class="detail-title">
-Selected Visit
-</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <div class="detail-title">Selected Visit Files</div>
+              <button class="edit-button" onclick="openVisitFilesEdit()">✎ Edit</button>
+            </div>
 
-<div class="detail-subtitle" id="selectedVisitLabel">
-20 Aug 2026 · Visit #10
-</div>
+            <div class="file-card">
 
-</div>
+              <div class="file-icon">📄</div>
 
-<button
-class="edit-button"
-onclick="openVisitEdit()"
->
-✎ Edit Visit
-</button>
+              <strong>Arboleaf PDF</strong>
 
-</div>
+              <span id="selectedPdfName">No PDF selected</span>
 
+              <div class="file-actions">
 
-<div class="detail-block">
+                <button class="edit-button" onclick="showComingSoon('PDF viewer')">View</button>
 
-<div style="
-display:flex;
-align-items:center;
-justify-content:space-between;
-margin-bottom:12px;
-">
+                <button class="edit-button" onclick="openVisitFilesEdit()">Replace</button>
 
-<div class="detail-title">
-Treatment & Medication
-</div>
+              </div>
 
-<button
-class="edit-button"
-onclick="openTreatmentEdit()"
->
-✎ Edit
-</button>
+            </div>
 
-</div>
 
+            <div class="file-card" style="margin-top:12px">
 
-<div
-class="treatment-grid"
-id="selectedTreatmentGrid"
->
-</div>
+              <div class="file-icon">🖼</div>
 
-</div>
+              <strong>Full Body Photos</strong>
 
+              <span>Front · Side · Back</span>
 
-<div class="detail-block">
+              <div class="file-actions">
 
-<div style="
-display:flex;
-align-items:center;
-justify-content:space-between;
-margin-bottom:12px;
-">
+                <button class="edit-button" onclick="activateTab('files')">View</button>
+                <button class="edit-button" onclick="openVisitFilesEdit()">Edit</button>
 
-<div class="detail-title">
-Visit Notes
-</div>
+              </div>
 
-<button
-class="edit-button"
-onclick="openNotesEdit()"
->
-✎ Edit
-</button>
+            </div>
 
-</div>
+          </div>
 
+        </div>
 
-<p
-id="selectedVisitNotes"
-style="
-font-size:10px;
-line-height:18px;
-color:var(--text);
-"
->
-Patient completed body composition measurement.
-Progress reviewed and treatment tolerated well.
-</p>
+      </div>
 
-</div>
+    </div>
 
+  </div>
 
-<div class="detail-block">
+</section>
 
-<div style="
-display:flex;
-align-items:center;
-justify-content:space-between;
-margin-bottom:12px;
-">
 
-<div class="detail-title">
-Selected Visit Files
-</div>
-
-<button
-class="edit-button"
-onclick="openVisitFilesEdit()"
->
-✎ Edit
-</button>
-
-</div>
-
-
-<div class="visit-files">
-
-
-<div class="file-card">
-
-<div class="file-icon">
-📄
-</div>
-
-<strong>
-Arboleaf PDF
-</strong>
-
-<span id="selectedPdfName">
-Arboleaf report for this visit
-</span>
-
-<div class="file-actions">
-
-<button
-class="edit-button"
-onclick="showComingSoon('PDF viewer')"
->
-View
-</button>
-
-<button
-class="edit-button"
-onclick="openVisitFilesEdit()"
->
-Replace
-</button>
-
-</div>
-
-</div>
-
-
-<div class="file-card">
-
-<div class="file-icon">
-🖼
-</div>
-
-<strong>
-Full Body Photos
-</strong>
-
-<span>
-Front · Side · Back
-</span>
-
-<div class="file-actions">
-
-<button
-class="edit-button"
-onclick="activateTab('photos')"
->
-View
-</button>
-
-<button
-class="edit-button"
-onclick="openVisitFilesEdit()"
->
-Edit
-</button>
-
-</div>
-
-</div>
-
-
-</div>
-
-</div>
-
-
-<div class="detail-block">
-
-<div style="
-display:flex;
-align-items:center;
-justify-content:space-between;
-margin-bottom:12px;
-">
-
-<div class="detail-title">
-Body Composition
-</div>
-
-<button
-class="edit-button"
-onclick="openMeasurementEdit()"
->
-✎ Edit
-</button>
-
-</div>
-
-
-<div
-class="measurement-grid"
-id="selectedVisitMeasurementGrid"
->
-</div>
-
-</div>
-
-</div>
-
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- =====================================================
+<!-- ==============================
      BODY COMPOSITION
-====================================================== -->
+================================ -->
 
-<div class="tab-panel" id="composition">
+<section class="tab-panel" id="composition" hidden>
 
+  <div class="card">
 
-<div class="card">
+    <div class="card-header">
 
-<div class="card-header">
+      <div>
+        <h2>Body Composition Comparison</h2>
+        <p>Choose any two dates that have an Arboleaf measurement.</p>
+      </div>
 
-<div>
+    </div>
 
-<h2>
-Body Composition Comparison
-</h2>
+    <div class="card-body">
 
-<p>
-Choose any two dates with an Arboleaf measurement.
-</p>
+      <div class="comparison-toolbar">
 
-</div>
+        <div class="form-field">
+          <label>Compare From</label>
+          <select id="compareFrom"></select>
+        </div>
 
-</div>
+        <div class="form-field">
+          <label>Compare To</label>
+          <select id="compareTo"></select>
+        </div>
 
+        <button class="primary-button" onclick="generateComparison()">
+          Generate Comparison
+        </button>
 
-<div class="card-body">
+      </div>
 
 
-<div class="comparison-toolbar">
+      <div class="comparison-result" id="comparisonResult">
 
+        <div class="comparison-heading">
+          <strong id="comparisonTitle">13 Aug 2026 → 20 Aug 2026</strong>
+          <span>Overall body composition change</span>
+        </div>
 
-<div class="form-field">
+        <div style="overflow-x:auto">
 
-<label>
-Compare From
-</label>
+          <table class="comparison-table">
 
-<select id="compareFrom">
-</select>
+            <thead>
+              <tr>
+                <th>Measurement</th>
+                <th id="fromHeader">13 Aug 2026</th>
+                <th id="toHeader">20 Aug 2026</th>
+                <th>Change</th>
+              </tr>
+            </thead>
 
-</div>
+            <tbody id="comparisonBody"></tbody>
 
+          </table>
 
-<div class="form-field">
+        </div>
 
-<label>
-Compare To
-</label>
+      </div>
 
-<select id="compareTo">
-</select>
+    </div>
 
-</div>
+  </div>
 
 
-<button
-class="primary-button"
-onclick="generateComparison()"
->
-Generate Comparison
-</button>
+  <div class="card">
 
-</div>
+    <div class="card-header">
 
+      <div>
+        <h2>Measurement History</h2>
+        <p>All Arboleaf measurements by visit.</p>
+      </div>
 
-<div
-class="comparison-result"
-id="comparisonResult"
->
+    </div>
 
-<div class="comparison-heading">
+    <div class="card-body">
 
-<strong id="comparisonTitle">
-13 Aug 2026 → 20 Aug 2026
-</strong>
+      <div style="overflow-x:auto">
 
-<span>
-Overall body composition change
-</span>
+        <table class="comparison-table">
 
-</div>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Weight</th>
+              <th>Body Fat</th>
+              <th>BMI</th>
+              <th>Skeletal Muscle</th>
+              <th>Visceral Fat</th>
+              <th></th>
+            </tr>
+          </thead>
 
+          <tbody id="measurementHistoryBody"></tbody>
 
-<div style="overflow-x:auto;">
+        </table>
 
-<table class="comparison-table">
+      </div>
 
-<thead>
+    </div>
 
-<tr>
+  </div>
 
-<th>
-Measurement
-</th>
+</section>
 
-<th id="fromHeader">
-13 Aug 2026
-</th>
 
-<th id="toHeader">
-20 Aug 2026
-</th>
-
-<th>
-Change
-</th>
-
-</tr>
-
-</thead>
-
-<tbody id="comparisonBody">
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-
-<div class="card">
-
-<div class="card-header">
-
-<div>
-
-<h2>
-Measurement History
-</h2>
-
-<p>
-All Arboleaf measurements by visit.
-</p>
-
-</div>
-
-</div>
-
-
-<div class="card-body">
-
-<div style="overflow-x:auto;">
-
-<table class="comparison-table">
-
-<thead>
-
-<tr>
-
-<th>Date</th>
-<th>Weight</th>
-<th>Body Fat</th>
-<th>BMI</th>
-<th>Skeletal Muscle</th>
-<th>Visceral Fat</th>
-<th></th>
-
-</tr>
-
-</thead>
-
-<tbody id="measurementHistoryBody">
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- =====================================================
+<!-- ==============================
      PROGRESS PHOTOS
-====================================================== -->
+================================ -->
 
-<div class="tab-panel" id="photos">
+<!-- ==============================
+     FILES & PHOTOS
+================================ -->
 
+<section class="tab-panel" id="files" hidden>
 
-<div class="card">
+  <div class="card">
 
-<div class="card-header">
+    <div class="card-header">
 
-<div>
+      <div>
+        <h2>Files & Photos by Visit</h2>
+        <p>Each visit keeps its Arboleaf PDF and full-body photos together.</p>
+      </div>
 
-<h2>
-Progress Photos by Visit
-</h2>
+    </div>
 
-<p>
-Front, side and back photos remain grouped by visit.
-</p>
+    <div class="card-body">
+      <div class="visit-media-list" id="fileVisitList"></div>
+    </div>
 
-</div>
+  </div>
 
-</div>
-
-
-<div class="card-body">
-
-<div
-class="visit-media-list"
-id="photoVisitList"
->
-</div>
-
-</div>
-
-</div>
+</section>
 
 
-</div>
-
-
-<!-- =====================================================
-     FILES
-====================================================== -->
-
-<div class="tab-panel" id="files">
-
-
-<div class="card">
-
-<div class="card-header">
-
-<div>
-
-<h2>
-Files by Visit
-</h2>
-
-<p>
-One Arboleaf PDF per visit.
-</p>
-
-</div>
-
-</div>
-
-
-<div class="card-body">
-
-<div
-class="visit-media-list"
-id="fileVisitList"
->
-</div>
-
-</div>
-
-</div>
-
-
-</div>
-
-
-<!-- =====================================================
+<!-- ==============================
      APPOINTMENTS
-====================================================== -->
+================================ -->
 
-<div class="tab-panel" id="appointments">
+<section class="tab-panel" id="appointments" hidden>
 
+  <div class="card">
 
-<div class="card">
+    <div class="card-header">
 
-<div class="card-header">
+      <div>
+        <h2>Patient Appointments</h2>
+        <p>Appointments belonging to this patient.</p>
+      </div>
 
-<div>
+      <button class="edit-button" onclick="openAppointmentEdit()">✎ Edit Upcoming</button>
 
-<h2>
-Patient Appointments
-</h2>
+    </div>
 
-<p>
-Appointments belonging to this patient.
-</p>
+    <div class="card-body">
 
-</div>
+      <div class="simple-list">
 
-<button
-class="edit-button"
-onclick="openAppointmentEdit()"
->
-✎ Edit Upcoming
-</button>
+        <div class="simple-row">
 
-</div>
+          <div>
+            <strong id="appointmentRowDate">27 Aug 2026</strong>
+            <span id="appointmentRowTime">10:30 AM</span>
+          </div>
 
+          <div>
+            <strong id="appointmentRowType">Body Composition Review</strong>
+            <span id="appointmentRowWeek">Week 11</span>
+          </div>
 
-<div class="card-body">
+          <span class="status-pill status-active">
+            <span class="status-dot"></span>Upcoming
+          </span>
 
-<div class="simple-list">
-
-
-<div class="simple-row">
-
-<div>
-
-<strong id="appointmentRowDate">
-27 Aug 2026
-</strong>
-
-<span id="appointmentRowTime">
-10:30 AM
-</span>
-
-</div>
+        </div>
 
 
-<div>
+        <div class="simple-row">
 
-<strong id="appointmentRowType">
-Body Composition Review
-</strong>
+          <div>
+            <strong>20 Aug 2026</strong>
+            <span>10:30 AM</span>
+          </div>
 
-<span id="appointmentRowWeek">
-Week 11
-</span>
+          <div>
+            <strong>Body Composition Review</strong>
+            <span>Week 10</span>
+          </div>
 
-</div>
+          <span class="status-pill status-completed">
+            <span class="status-dot"></span>Completed
+          </span>
 
-
-<span class="status-pill status-active">
-<span class="status-dot"></span>
-Upcoming
-</span>
-
-</div>
+        </div>
 
 
-<div class="simple-row">
+        <div class="simple-row">
 
-<div>
+          <div>
+            <strong>13 Aug 2026</strong>
+            <span>10:30 AM</span>
+          </div>
 
-<strong>
-20 Aug 2026
-</strong>
+          <div>
+            <strong>Weekly Follow-Up</strong>
+            <span>Week 9</span>
+          </div>
 
-<span>
-10:30 AM
-</span>
+          <span class="status-pill status-completed">
+            <span class="status-dot"></span>Completed
+          </span>
 
-</div>
+        </div>
 
+      </div>
 
-<div>
+    </div>
 
-<strong>
-Body Composition Review
-</strong>
+  </div>
 
-<span>
-Week 10
-</span>
-
-</div>
-
-
-<span class="status-pill status-completed">
-<span class="status-dot"></span>
-Completed
-</span>
-
-</div>
+</section>
 
 
-<div class="simple-row">
-
-<div>
-
-<strong>
-13 Aug 2026
-</strong>
-
-<span>
-10:30 AM
-</span>
-
-</div>
-
-
-<div>
-
-<strong>
-Weekly Follow-Up
-</strong>
-
-<span>
-Week 9
-</span>
-
-</div>
-
-
-<span class="status-pill status-completed">
-<span class="status-dot"></span>
-Completed
-</span>
-
-</div>
-
-
-</div>
-
-</div>
-
-</div>
-
-
-</div>
-
-
-<!-- =====================================================
+<!-- ==============================
      TREATMENTS
-====================================================== -->
+================================ -->
 
-<div class="tab-panel" id="treatments">
+<section class="tab-panel" id="treatments" hidden>
 
+  <div class="card">
 
-<div class="card">
+    <div class="card-header">
 
-<div class="card-header">
+      <div>
+        <h2>Treatment History</h2>
+        <p>Treatment and medication recorded by visit.</p>
+      </div>
 
-<div>
+      <button class="edit-button" onclick="openTreatmentEdit()">✎ Edit Latest</button>
 
-<h2>
-Treatment History
-</h2>
+    </div>
 
-<p>
-Treatments and medication recorded by visit.
-</p>
+    <div class="card-body">
+      <div class="simple-list" id="treatmentHistoryList"></div>
+    </div>
 
-</div>
+  </div>
 
-<button
-class="edit-button"
-onclick="openTreatmentEdit()"
->
-✎ Edit Latest
-</button>
-
-</div>
+</section>
 
 
-<div class="card-body">
-
-<div
-class="simple-list"
-id="treatmentHistoryList"
->
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- =====================================================
+<!-- ==============================
      NOTES
-====================================================== -->
+================================ -->
 
-<div class="tab-panel" id="notes">
+<section class="tab-panel" id="notes" hidden>
 
+  <div class="card">
 
-<div class="card">
+    <div class="card-header">
 
-<div class="card-header">
+      <div>
+        <h2>Patient Notes</h2>
+        <p>Notes associated with patient visits.</p>
+      </div>
 
-<div>
+      <button class="edit-button" onclick="openNotesEdit()">✎ Edit Latest</button>
 
-<h2>
-Patient Notes
-</h2>
+    </div>
 
-<p>
-Notes associated with patient visits.
-</p>
+    <div class="card-body">
+      <div class="simple-list" id="patientNotesList"></div>
+    </div>
 
-</div>
+  </div>
 
-<button
-class="edit-button"
-onclick="openNotesEdit()"
->
-✎ Edit Latest
-</button>
-
-</div>
-
-
-<div class="card-body">
-
-<div
-class="simple-list"
-id="patientNotesList"
->
-</div>
-
-</div>
-
-</div>
-
-</div>
-
+</section>
 
 </section>
 
 </main>
-
 </div>
 
 
-<!-- =====================================================
-     MODALS
-====================================================== -->
-
-<!-- PATIENT EDIT -->
+<!-- ==============================
+     PATIENT EDIT MODAL
+================================ -->
 
 <div class="modal-overlay" id="patientEditModal">
 
 <div class="modal">
 
-<div class="modal-header">
+  <div class="modal-header">
+    <div>
+      <h2>Edit Patient</h2>
+      <span>Update patient profile information.</span>
+    </div>
+    <button class="modal-close" onclick="closeModal('patientEditModal')">✕</button>
+  </div>
 
-<div>
+  <div class="modal-body">
 
-<h2>
-Edit Patient
-</h2>
+    <div class="form-grid">
 
-<span>
-Update patient profile information.
-</span>
+      <div class="form-group full">
+        <label>Full Name</label>
+        <input id="editPatientName">
+      </div>
+
+      <div class="form-group">
+        <label>Patient ID</label>
+        <input id="editPatientId" class="readonly-field" readonly>
+      </div>
+
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input id="editPatientPhone">
+      </div>
+
+      <div class="form-group">
+        <label>Date of Birth</label>
+        <input type="date" id="editPatientDob">
+      </div>
+
+      <div class="form-group">
+        <label>Gender</label>
+        <select id="editPatientGender">
+          <option>Male</option>
+          <option>Female</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Height (cm)</label>
+        <input type="number" id="editPatientHeight">
+      </div>
+
+      <div class="form-group">
+        <label>Starting Weight (kg)</label>
+        <input type="number" step=".1" id="editPatientStartWeight">
+      </div>
+
+      <div class="form-group">
+        <label>Goal Weight (kg)</label>
+        <input type="number" step=".1" id="editPatientGoalWeight">
+      </div>
+
+      <div class="form-group">
+        <label>Doctor</label>
+        <select id="editPatientDoctor">
+          <option>Dr Aaron</option>
+          <option>Dr Locum</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Program Status</label>
+        <select id="editPatientStatus">
+          <option>Active</option>
+          <option>Completed</option>
+          <option>Inactive</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Arboleaf Username</label>
+        <input id="editArboleafUsername" placeholder="Reference only">
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="modal-footer">
+    <button class="secondary-button" onclick="closeModal('patientEditModal')">Cancel</button>
+    <button class="primary-button" onclick="savePatientEdit()">Save Changes</button>
+  </div>
 
 </div>
-
-<button
-class="modal-close"
-onclick="closeModal('patientEditModal')"
->
-✕
-</button>
-
-</div>
-
-
-<div class="modal-body">
-
-<div class="form-grid">
-
-
-<div class="form-group full">
-
-<label>
-Full Name
-</label>
-
-<input id="editPatientName">
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Patient ID
-</label>
-
-<input
-id="editPatientId"
-class="readonly-field"
-readonly
->
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Phone Number
-</label>
-
-<input
-id="editPatientPhone"
->
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Date of Birth
-</label>
-
-<input
-type="date"
-id="editPatientDob"
->
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Gender
-</label>
-
-<select id="editPatientGender">
-
-<option>Male</option>
-<option>Female</option>
-
-</select>
-
 </div>
 
 
-<div class="form-group">
-
-<label>
-Height (cm)
-</label>
-
-<input
-type="number"
-id="editPatientHeight"
->
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Starting Weight (kg)
-</label>
-
-<input
-type="number"
-step=".1"
-id="editPatientStartWeight"
->
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Goal Weight (kg)
-</label>
-
-<input
-type="number"
-step=".1"
-id="editPatientGoalWeight"
->
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Program Start Date
-</label>
-
-<input
-type="date"
-id="editPatientStartDate"
->
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Doctor
-</label>
-
-<select id="editPatientDoctor">
-<option>Dr Aaron</option>
-<option>Dr Locum</option>
-</select>
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Program Status
-</label>
-
-<select id="editPatientStatus">
-
-<option>Active</option>
-<option>Completed</option>
-<option>Inactive</option>
-
-</select>
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Arboleaf Username
-</label>
-
-<input
-id="editArboleafUsername"
-placeholder="Reference only"
->
-
-</div>
-
-</div>
-
-</div>
-
-
-<div class="modal-footer">
-
-<button
-class="secondary-button"
-onclick="closeModal('patientEditModal')"
->
-Cancel
-</button>
-
-<button
-class="primary-button"
-onclick="savePatientEdit()"
->
-Save Changes
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- VISIT EDIT -->
+<!-- ==============================
+     VISIT EDIT
+================================ -->
 
 <div class="modal-overlay" id="visitEditModal">
 
 <div class="modal modal-small">
 
-<div class="modal-header">
+  <div class="modal-header">
+    <div>
+      <h2>Edit Visit</h2>
+      <span id="editVisitSubtitle">Visit record</span>
+    </div>
+    <button class="modal-close" onclick="closeModal('visitEditModal')">✕</button>
+  </div>
 
-<div>
+  <div class="modal-body">
 
-<h2>
-Edit Visit
-</h2>
+    <div class="form-grid">
 
-<span id="editVisitSubtitle">
-Visit record
-</span>
+      <div class="form-group">
+        <label>Visit Date</label>
+        <input type="date" id="editVisitDate">
+      </div>
 
-</div>
+      <div class="form-group">
+        <label>Visit Number</label>
+        <input id="editVisitNumber">
+      </div>
 
-<button
-class="modal-close"
-onclick="closeModal('visitEditModal')"
->
-✕
-</button>
+      <div class="form-group">
+        <label>Visit Type</label>
+        <select id="editVisitType">
+          <option>Body Composition Review</option>
+          <option>Weekly Follow-Up</option>
+          <option>Review</option>
+          <option>Goal Review</option>
+        </select>
+      </div>
 
-</div>
+      <div class="form-group">
+        <label>Visit Status</label>
+        <select id="editVisitStatus">
+          <option>Completed</option>
+          <option>Pending</option>
+          <option>Cancelled</option>
+          <option>Missed</option>
+        </select>
+      </div>
 
+    </div>
 
-<div class="modal-body">
+  </div>
 
-<div class="form-grid">
-
-
-<div class="form-group">
-
-<label>
-Visit Date
-</label>
-
-<input
-type="date"
-id="editVisitDate"
->
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Visit Number
-</label>
-
-<input
-id="editVisitNumber"
->
+  <div class="modal-footer">
+    <button class="secondary-button" onclick="closeModal('visitEditModal')">Cancel</button>
+    <button class="primary-button" onclick="saveVisitEdit()">Save Changes</button>
+  </div>
 
 </div>
-
-
-<div class="form-group">
-
-<label>
-Visit Type
-</label>
-
-<select id="editVisitType">
-
-<option>Body Composition Review</option>
-<option>Weekly Follow-Up</option>
-<option>Review</option>
-<option>Goal Review</option>
-
-</select>
-
 </div>
 
 
-<div class="form-group">
-
-<label>
-Visit Status
-</label>
-
-<select id="editVisitStatus">
-
-<option>Completed</option>
-<option>Pending</option>
-<option>Cancelled</option>
-<option>Missed</option>
-
-</select>
-
-</div>
-
-</div>
-
-</div>
-
-
-<div class="modal-footer">
-
-<button
-class="secondary-button"
-onclick="closeModal('visitEditModal')"
->
-Cancel
-</button>
-
-<button
-class="primary-button"
-onclick="saveVisitEdit()"
->
-Save Changes
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- MEASUREMENT EDIT -->
+<!-- ==============================
+     MEASUREMENT EDIT
+================================ -->
 
 <div class="modal-overlay" id="measurementEditModal">
 
 <div class="modal">
 
-<div class="modal-header">
+  <div class="modal-header">
+    <div>
+      <h2>Edit Body Composition</h2>
+      <span id="measurementEditSubtitle">Selected visit measurement</span>
+    </div>
+    <button class="modal-close" onclick="closeModal('measurementEditModal')">✕</button>
+  </div>
 
-<div>
+  <div class="modal-body">
+    <div class="form-grid" id="measurementEditGrid"></div>
+  </div>
 
-<h2>
-Edit Body Composition
-</h2>
-
-<span id="measurementEditSubtitle">
-Selected visit measurement
-</span>
+  <div class="modal-footer">
+    <button class="secondary-button" onclick="closeModal('measurementEditModal')">Cancel</button>
+    <button class="primary-button" onclick="saveMeasurementEdit()">Save Changes</button>
+  </div>
 
 </div>
-
-<button
-class="modal-close"
-onclick="closeModal('measurementEditModal')"
->
-✕
-</button>
-
 </div>
 
 
-<div class="modal-body">
-
-<div
-class="form-grid"
-id="measurementEditGrid"
->
-</div>
-
-</div>
-
-
-<div class="modal-footer">
-
-<button
-class="secondary-button"
-onclick="closeModal('measurementEditModal')"
->
-Cancel
-</button>
-
-<button
-class="primary-button"
-onclick="saveMeasurementEdit()"
->
-Save Changes
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- TREATMENT EDIT -->
+<!-- ==============================
+     TREATMENT EDIT
+================================ -->
 
 <div class="modal-overlay" id="treatmentEditModal">
 
 <div class="modal modal-small">
 
-<div class="modal-header">
+  <div class="modal-header">
+    <div>
+      <h2>Edit Treatment & Medication</h2>
+      <span>Selected visit</span>
+    </div>
+    <button class="modal-close" onclick="closeModal('treatmentEditModal')">✕</button>
+  </div>
 
-<div>
+  <div class="modal-body">
 
-<h2>
-Edit Treatment & Medication
-</h2>
+    <div class="form-grid">
 
-<span>
-Selected visit
-</span>
+      <div class="form-group">
+        <label>Injection / Treatment</label>
+        <select id="editInjection">
+          <option>Tirzepatide</option>
+          <option>Semaglutide</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Dose</label>
+        <input id="editDose" placeholder="e.g. 2.5 mg">
+      </div>
+
+      <div class="form-group">
+        <label>Medication</label>
+        <input id="editMedication">
+      </div>
+
+      <div class="form-group">
+        <label>Additional Treatment</label>
+        <input id="editAdditionalTreatment">
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="modal-footer">
+    <button class="secondary-button" onclick="closeModal('treatmentEditModal')">Cancel</button>
+    <button class="primary-button" onclick="saveTreatmentEdit()">Save Changes</button>
+  </div>
 
 </div>
-
-<button
-class="modal-close"
-onclick="closeModal('treatmentEditModal')"
->
-✕
-</button>
-
-</div>
-
-
-<div class="modal-body">
-
-<div class="form-grid">
-
-
-<div class="form-group">
-
-<label>
-Injection / Treatment
-</label>
-
-<select id="editInjection">
-
-<option>Tirzepatide</option>
-<option>Semaglutide</option>
-<option>Other</option>
-
-</select>
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Dose
-</label>
-
-<input
-id="editDose"
-placeholder="e.g. 2.5 mg"
->
-
 </div>
 
 
-<div class="form-group">
-
-<label>
-Medication
-</label>
-
-<input
-id="editMedication"
->
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Additional Treatment
-</label>
-
-<input
-id="editAdditionalTreatment"
->
-
-</div>
-
-
-</div>
-
-</div>
-
-
-<div class="modal-footer">
-
-<button
-class="secondary-button"
-onclick="closeModal('treatmentEditModal')"
->
-Cancel
-</button>
-
-<button
-class="primary-button"
-onclick="saveTreatmentEdit()"
->
-Save Changes
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- NOTES EDIT -->
+<!-- ==============================
+     NOTES EDIT
+================================ -->
 
 <div class="modal-overlay" id="notesEditModal">
 
 <div class="modal modal-small">
 
-<div class="modal-header">
+  <div class="modal-header">
+    <div>
+      <h2>Edit Notes</h2>
+      <span>Notes for selected visit</span>
+    </div>
+    <button class="modal-close" onclick="closeModal('notesEditModal')">✕</button>
+  </div>
 
-<div>
+  <div class="modal-body">
 
-<h2>
-Edit Notes
-</h2>
+    <div class="form-group">
+      <label>Visit Notes</label>
+      <textarea id="editVisitNotes"></textarea>
+    </div>
 
-<span>
-Notes for selected visit
-</span>
+  </div>
 
-</div>
-
-<button
-class="modal-close"
-onclick="closeModal('notesEditModal')"
->
-✕
-</button>
-
-</div>
-
-
-<div class="modal-body">
-
-<div class="form-group">
-
-<label>
-Visit Notes
-</label>
-
-<textarea id="editVisitNotes"></textarea>
+  <div class="modal-footer">
+    <button class="secondary-button" onclick="closeModal('notesEditModal')">Cancel</button>
+    <button class="primary-button" onclick="saveNotesEdit()">Save Changes</button>
+  </div>
 
 </div>
-
 </div>
 
 
-<div class="modal-footer">
-
-<button
-class="secondary-button"
-onclick="closeModal('notesEditModal')"
->
-Cancel
-</button>
-
-<button
-class="primary-button"
-onclick="saveNotesEdit()"
->
-Save Changes
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- APPOINTMENT EDIT -->
+<!-- ==============================
+     APPOINTMENT EDIT
+================================ -->
 
 <div class="modal-overlay" id="appointmentEditModal">
 
 <div class="modal modal-small">
 
-<div class="modal-header">
+  <div class="modal-header">
+    <div>
+      <h2>Edit Appointment</h2>
+      <span>Upcoming appointment</span>
+    </div>
+    <button class="modal-close" onclick="closeModal('appointmentEditModal')">✕</button>
+  </div>
 
-<div>
+  <div class="modal-body">
 
-<h2>
-Edit Appointment
-</h2>
+    <div class="form-grid">
 
-<span>
-Upcoming appointment
-</span>
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="editAppointmentDate" value="2026-08-27">
+      </div>
+
+      <div class="form-group">
+        <label>Time</label>
+        <input type="time" id="editAppointmentTime" value="10:30">
+      </div>
+
+      <div class="form-group">
+        <label>Appointment Type</label>
+        <select id="editAppointmentType">
+          <option>Body Composition Review</option>
+          <option>Weekly Follow-Up</option>
+          <option>Doctor Review</option>
+          <option>Treatment</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Week</label>
+        <input id="editAppointmentWeek" value="Week 11">
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="modal-footer">
+    <button class="secondary-button" onclick="closeModal('appointmentEditModal')">Cancel</button>
+    <button class="primary-button" onclick="saveAppointmentEdit()">Save Changes</button>
+  </div>
 
 </div>
-
-<button
-class="modal-close"
-onclick="closeModal('appointmentEditModal')"
->
-✕
-</button>
-
-</div>
-
-
-<div class="modal-body">
-
-<div class="form-grid">
-
-
-<div class="form-group">
-
-<label>
-Date
-</label>
-
-<input
-type="date"
-id="editAppointmentDate"
-value="2026-08-27"
->
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Time
-</label>
-
-<input
-type="time"
-id="editAppointmentTime"
-value="10:30"
->
-
 </div>
 
 
-<div class="form-group">
-
-<label>
-Appointment Type
-</label>
-
-<select id="editAppointmentType">
-
-<option>Body Composition Review</option>
-<option>Weekly Follow-Up</option>
-<option>Doctor Review</option>
-<option>Treatment</option>
-
-</select>
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Week
-</label>
-
-<input
-id="editAppointmentWeek"
-value="Week 11"
->
-
-</div>
-
-</div>
-
-</div>
-
-
-<div class="modal-footer">
-
-<button
-class="secondary-button"
-onclick="closeModal('appointmentEditModal')"
->
-Cancel
-</button>
-
-<button
-class="primary-button"
-onclick="saveAppointmentEdit()"
->
-Save Changes
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- FILE EDIT -->
+<!-- ==============================
+     FILE EDIT
+================================ -->
 
 <div class="modal-overlay" id="filesEditModal">
 
 <div class="modal">
 
-<div class="modal-header">
+  <div class="modal-header">
+    <div>
+      <h2>Edit Visit Files</h2>
+      <span>Replace the PDF or individual full-body photos.</span>
+    </div>
+    <button class="modal-close" onclick="closeModal('filesEditModal')">✕</button>
+  </div>
 
-<div>
+  <div class="modal-body">
 
-<h2>
-Edit Visit Files
-</h2>
+    <div class="form-group">
 
-<span>
-Replace individual files without changing the visit.
-</span>
+      <label>Arboleaf PDF</label>
 
-</div>
+      <div class="file-card">
 
-<button
-class="modal-close"
-onclick="closeModal('filesEditModal')"
->
-✕
-</button>
+        <div class="file-icon">📄</div>
 
-</div>
+        <strong>Replace Arboleaf PDF</strong>
+        <span>Original body composition report</span>
 
+        <label for="replacePdf" class="upload-button">Choose PDF</label>
 
-<div class="modal-body">
+        <input
+          type="file"
+          id="replacePdf"
+          class="hidden-file"
+          accept="application/pdf"
+          onchange="showSelectedFile(this,'replacePdfName')"
+        >
 
+        <div class="selected-file" id="replacePdfName"></div>
 
-<div class="form-group full">
+      </div>
 
-<label>
-Arboleaf PDF
-</label>
-
-<div class="file-card">
-
-<div class="file-icon">
-📄
-</div>
-
-<strong>
-Replace Arboleaf PDF
-</strong>
-
-<span>
-Original body composition report
-</span>
-
-<label
-for="replacePdf"
-class="upload-button"
->
-Choose PDF
-</label>
-
-<input
-type="file"
-id="replacePdf"
-class="hidden-file"
-accept="application/pdf"
-onchange="showSelectedFile(this,'replacePdfName')"
->
-
-<div
-class="selected-file"
-id="replacePdfName"
->
-</div>
-
-</div>
-
-</div>
+    </div>
 
 
-<div
-class="form-group full"
-style="margin-top:15px;"
->
+    <div class="form-group" style="margin-top:15px">
 
-<label>
-Full Body Photos
-</label>
+      <label>Full Body Photos</label>
+
+      <div class="full-body-grid">
+
+        <div class="photo-upload-box">
+
+          <div class="file-icon">🖼</div>
+
+          <strong>Front</strong>
+          <span>Replace front photo</span>
+
+          <label for="replaceFront" class="upload-button">Upload Photo</label>
+
+          <input
+            type="file"
+            id="replaceFront"
+            class="hidden-file"
+            accept="image/*"
+            onchange="previewPhoto(this,'replaceFrontPreview')"
+          >
+
+          <div class="photo-preview" id="replaceFrontPreview"></div>
+
+        </div>
 
 
-<div class="full-body-grid">
+        <div class="photo-upload-box">
+
+          <div class="file-icon">🖼</div>
+
+          <strong>Side</strong>
+          <span>Replace side photo</span>
+
+          <label for="replaceSide" class="upload-button">Upload Photo</label>
+
+          <input
+            type="file"
+            id="replaceSide"
+            class="hidden-file"
+            accept="image/*"
+            onchange="previewPhoto(this,'replaceSidePreview')"
+          >
+
+          <div class="photo-preview" id="replaceSidePreview"></div>
+
+        </div>
 
 
-<div class="photo-upload-box">
+        <div class="photo-upload-box">
 
-<div class="file-icon">
-🖼
-</div>
+          <div class="file-icon">🖼</div>
 
-<strong>
-Front
-</strong>
+          <strong>Back</strong>
+          <span>Replace back photo</span>
 
-<span>
-Replace front photo
-</span>
+          <label for="replaceBack" class="upload-button">Upload Photo</label>
 
-<label
-for="replaceFront"
-class="upload-button"
->
-Upload Photo
-</label>
+          <input
+            type="file"
+            id="replaceBack"
+            class="hidden-file"
+            accept="image/*"
+            onchange="previewPhoto(this,'replaceBackPreview')"
+          >
 
-<input
-type="file"
-id="replaceFront"
-class="hidden-file"
-accept="image/*"
-onchange="previewPhoto(this,'replaceFrontPreview')"
->
+          <div class="photo-preview" id="replaceBackPreview"></div>
 
-<div
-class="photo-preview"
-id="replaceFrontPreview"
-style="display:none;"
->
-</div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="modal-footer">
+    <button class="secondary-button" onclick="closeModal('filesEditModal')">Cancel</button>
+    <button class="primary-button" onclick="saveFilesEdit()">Save Changes</button>
+  </div>
 
 </div>
-
-
-<div class="photo-upload-box">
-
-<div class="file-icon">
-🖼
-</div>
-
-<strong>
-Side
-</strong>
-
-<span>
-Replace side photo
-</span>
-
-<label
-for="replaceSide"
-class="upload-button"
->
-Upload Photo
-</label>
-
-<input
-type="file"
-id="replaceSide"
-class="hidden-file"
-accept="image/*"
-onchange="previewPhoto(this,'replaceSidePreview')"
->
-
-<div
-class="photo-preview"
-id="replaceSidePreview"
-style="display:none;"
->
-</div>
-
 </div>
 
 
-<div class="photo-upload-box">
-
-<div class="file-icon">
-🖼
-</div>
-
-<strong>
-Back
-</strong>
-
-<span>
-Replace back photo
-</span>
-
-<label
-for="replaceBack"
-class="upload-button"
->
-Upload Photo
-</label>
-
-<input
-type="file"
-id="replaceBack"
-class="hidden-file"
-accept="image/*"
-onchange="previewPhoto(this,'replaceBackPreview')"
->
-
-<div
-class="photo-preview"
-id="replaceBackPreview"
-style="display:none;"
->
-</div>
-
-</div>
-
-
-</div>
-
-</div>
-
-</div>
-
-
-<div class="modal-footer">
-
-<button
-class="secondary-button"
-onclick="closeModal('filesEditModal')"
->
-Cancel
-</button>
-
-<button
-class="primary-button"
-onclick="saveFilesEdit()"
->
-Save Changes
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ADD VISIT -->
+<!-- ==============================
+     ADD VISIT
+================================ -->
 
 <div class="modal-overlay" id="addVisitModal">
 
 <div class="modal">
 
-<div class="modal-header">
+  <div class="modal-header">
 
-<div>
+    <div>
+      <h2>Add Visit Record</h2>
+      <span id="addVisitPatient">Patient visit</span>
+    </div>
 
-<h2>
-Add Visit Record
-</h2>
+    <button class="modal-close" onclick="closeModal('addVisitModal')">✕</button>
 
-<span id="addVisitPatient">
-Patient visit
-</span>
-
-</div>
-
-<button
-class="modal-close"
-onclick="closeModal('addVisitModal')"
->
-✕
-</button>
-
-</div>
+  </div>
 
 
-<div class="modal-body">
+  <div class="modal-body">
 
-<div class="form-grid">
+    <div class="form-grid">
 
+      <div class="form-group">
+        <label>Visit Date</label>
+        <input type="date" id="newVisitDate">
+      </div>
 
-<div class="form-group">
-
-<label>
-Visit Date
-</label>
-
-<input
-type="date"
-id="newVisitDate"
->
-
-</div>
+      <div class="form-group">
+        <label>Visit Number</label>
+        <input id="newVisitNumber">
+      </div>
 
 
-<div class="form-group">
+      <div class="form-group full">
 
-<label>
-Visit Number
-</label>
+        <label>Arboleaf PDF</label>
 
-<input
-id="newVisitNumber"
-value="Visit #11"
->
+        <div class="file-card">
 
-</div>
+          <div class="file-icon">📄</div>
 
+          <strong>Arboleaf Body Composition Report</strong>
+          <span>Upload the original PDF generated by Arboleaf.</span>
 
-<!-- PDF -->
+          <label for="newVisitPdf" class="upload-button">Upload PDF</label>
 
-<div class="form-group full">
+          <input
+            type="file"
+            id="newVisitPdf"
+            class="hidden-file"
+            accept="application/pdf"
+            onchange="showSelectedFile(this,'newVisitPdfName')"
+          >
 
-<label>
-Arboleaf PDF
-</label>
+          <div class="selected-file" id="newVisitPdfName"></div>
 
-<div class="file-card">
+        </div>
 
-<div class="file-icon">
-📄
-</div>
-
-<strong>
-Arboleaf Body Composition Report
-</strong>
-
-<span>
-Upload the original PDF generated by Arboleaf.
-</span>
-
-<label
-for="newVisitPdf"
-class="upload-button"
->
-Upload PDF
-</label>
-
-<input
-type="file"
-id="newVisitPdf"
-class="hidden-file"
-accept="application/pdf"
-onchange="showSelectedFile(this,'newVisitPdfName')"
->
-
-<div
-class="selected-file"
-id="newVisitPdfName"
->
-</div>
-
-</div>
-
-</div>
+      </div>
 
 
-<!-- PHOTOS -->
+      <div class="form-group full">
 
-<div class="form-group full">
+        <label>Full Body Photos</label>
 
-<label>
-Full Body Photos
-</label>
+        <div class="full-body-grid">
 
+          <div class="photo-upload-box">
 
-<div class="full-body-grid">
+            <div class="file-icon">🖼</div>
 
+            <strong>Front</strong>
+            <span>Full-body front photo</span>
 
-<div class="photo-upload-box">
+            <label for="newFront" class="upload-button">Upload Photo</label>
 
-<div class="file-icon">
-🖼
-</div>
+            <input
+              type="file"
+              id="newFront"
+              class="hidden-file"
+              accept="image/*"
+              onchange="previewPhoto(this,'newFrontPreview')"
+            >
 
-<strong>
-Front
-</strong>
+            <div class="photo-preview" id="newFrontPreview"></div>
 
-<span>
-Full-body front photo
-</span>
-
-<label
-for="newFront"
-class="upload-button"
->
-Upload Photo
-</label>
-
-<input
-id="newFront"
-type="file"
-class="hidden-file"
-accept="image/*"
-onchange="previewPhoto(this,'newFrontPreview')"
->
-
-<div
-class="photo-preview"
-id="newFrontPreview"
-style="display:none;"
->
-</div>
-
-</div>
+          </div>
 
 
-<div class="photo-upload-box">
+          <div class="photo-upload-box">
 
-<div class="file-icon">
-🖼
-</div>
+            <div class="file-icon">🖼</div>
 
-<strong>
-Side
-</strong>
+            <strong>Side</strong>
+            <span>Full-body side photo</span>
 
-<span>
-Full-body side photo
-</span>
+            <label for="newSide" class="upload-button">Upload Photo</label>
 
-<label
-for="newSide"
-class="upload-button"
->
-Upload Photo
-</label>
+            <input
+              type="file"
+              id="newSide"
+              class="hidden-file"
+              accept="image/*"
+              onchange="previewPhoto(this,'newSidePreview')"
+            >
 
-<input
-id="newSide"
-type="file"
-class="hidden-file"
-accept="image/*"
-onchange="previewPhoto(this,'newSidePreview')"
->
+            <div class="photo-preview" id="newSidePreview"></div>
 
-<div
-class="photo-preview"
-id="newSidePreview"
-style="display:none;"
->
-</div>
+          </div>
+
+
+          <div class="photo-upload-box">
+
+            <div class="file-icon">🖼</div>
+
+            <strong>Back</strong>
+            <span>Full-body back photo</span>
+
+            <label for="newBack" class="upload-button">Upload Photo</label>
+
+            <input
+              type="file"
+              id="newBack"
+              class="hidden-file"
+              accept="image/*"
+              onchange="previewPhoto(this,'newBackPreview')"
+            >
+
+            <div class="photo-preview" id="newBackPreview"></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="form-group">
+        <label>Injection / Treatment</label>
+
+        <select id="newInjection">
+          <option>Tirzepatide</option>
+          <option>Semaglutide</option>
+          <option>Other</option>
+        </select>
+
+      </div>
+
+      <div class="form-group">
+        <label>Dose</label>
+        <input id="newDose" placeholder="e.g. 2.5 mg">
+      </div>
+
+      <div class="form-group">
+        <label>Medication</label>
+        <input id="newMedication" placeholder="Medication / supplement">
+      </div>
+
+      <div class="form-group">
+        <label>Additional Treatment</label>
+        <input id="newAdditionalTreatment" placeholder="Optional">
+      </div>
+
+      <div class="form-group full">
+        <label>Visit Notes</label>
+        <textarea id="newVisitNotes" placeholder="Enter visit notes..."></textarea>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="modal-footer">
+
+    <button class="secondary-button" onclick="closeModal('addVisitModal')">Cancel</button>
+
+    <button class="primary-button" onclick="saveNewVisit()">Save Visit</button>
+
+  </div>
 
 </div>
-
-
-<div class="photo-upload-box">
-
-<div class="file-icon">
-🖼
-</div>
-
-<strong>
-Back
-</strong>
-
-<span>
-Full-body back photo
-</span>
-
-<label
-for="newBack"
-class="upload-button"
->
-Upload Photo
-</label>
-
-<input
-id="newBack"
-type="file"
-class="hidden-file"
-accept="image/*"
-onchange="previewPhoto(this,'newBackPreview')"
->
-
-<div
-class="photo-preview"
-id="newBackPreview"
-style="display:none;"
->
-</div>
-
-</div>
-
-
-</div>
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Injection / Treatment
-</label>
-
-<select id="newInjection">
-
-<option>Tirzepatide</option>
-<option>Semaglutide</option>
-<option>Other</option>
-
-</select>
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Dose
-</label>
-
-<input
-id="newDose"
-placeholder="e.g. 2.5 mg"
->
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Medication
-</label>
-
-<input
-id="newMedication"
-placeholder="Medication / supplement"
->
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Additional Treatment
-</label>
-
-<input
-id="newAdditionalTreatment"
-placeholder="Optional"
->
-
-</div>
-
-
-<div class="form-group full">
-
-<label>
-Visit Notes
-</label>
-
-<textarea
-id="newVisitNotes"
-placeholder="Enter visit notes..."
-></textarea>
-
-</div>
-
-</div>
-
-</div>
-
-
-<div class="modal-footer">
-
-<button
-class="secondary-button"
-onclick="closeModal('addVisitModal')"
->
-Cancel
-</button>
-
-<button
-class="primary-button"
-onclick="saveNewVisit()"
->
-Save Visit
-</button>
-
-</div>
-
-</div>
-
 </div>
 
 
 <script>
-
 /* =========================================================
    DEMO DATA
 ========================================================= */
 
-const demoPatients = {
+const patients={
+  GW0001:{
+    id:"GW0001",
+    name:"AISYAH ABDULLAH",
+    initials:"AA",
+    status:"Active",
+    startDate:"15 Jun 2026",
+    doctor:"Dr Aaron",
+    lastVisit:"20 Aug 2026",
+    height:"158",
+    startingWeight:"78.0",
+    currentWeight:"72.4",
+    goalWeight:"65.0",
+    totalLoss:"5.6",
+    remaining:"7.4",
+    progress:"43",
+    duration:"10",
+    phone:"",
+    dob:"",
+    gender:"Female",
+    arboleafUsername:"",
+    measurements:{
+      "2026-08-06":{
+        weight:73.5,bodyFat:28.8,bmi:29.4,skeletalMuscle:34.4,muscleMass:55.5,
+        protein:13.7,bmr:1610,fatFreeWeight:52.3,subcutaneousFat:25.2,visceralFat:12,
+        bodyWater:51.5,boneMass:2.96
+      },
+      "2026-08-13":{
+        weight:73.0,bodyFat:28.0,bmi:29.2,skeletalMuscle:34.6,muscleMass:55.8,
+        protein:13.8,bmr:1615,fatFreeWeight:52.6,subcutaneousFat:24.8,visceralFat:12,
+        bodyWater:51.9,boneMass:2.97
+      },
+      "2026-08-20":{
+        weight:72.4,bodyFat:27.4,bmi:28.6,skeletalMuscle:34.8,muscleMass:56.0,
+        protein:13.9,bmr:1620,fatFreeWeight:52.6,subcutaneousFat:24.3,visceralFat:11,
+        bodyWater:52.4,boneMass:2.98
+      }
+    },
+    visits:[
+      {
+        id:"GW0001-V10",date:"20 Aug 2026",dateKey:"2026-08-20",
+        visit:"Visit #10",type:"Body Composition Review",
+        weight:"72.4 kg",change:"-0.6 kg",
+        injection:"Tirzepatide",dose:"2.5 mg",
+        medication:"None recorded",additionalTreatment:"None recorded",
+        notes:"Patient completed body composition measurement. Progress reviewed and treatment tolerated well.",
+        pdfName:"Arboleaf_20Aug2026.pdf",status:"Completed"
+      },
+      {
+        id:"GW0001-V9",date:"13 Aug 2026",dateKey:"2026-08-13",
+        visit:"Visit #9",type:"Weekly Follow-Up",
+        weight:"73.0 kg",change:"-0.5 kg",
+        injection:"Tirzepatide",dose:"2.5 mg",
+        medication:"None recorded",additionalTreatment:"None recorded",
+        notes:"Weekly follow-up completed.",
+        pdfName:"Arboleaf_13Aug2026.pdf",status:"Completed"
+      },
+      {
+        id:"GW0001-V8",date:"06 Aug 2026",dateKey:"2026-08-06",
+        visit:"Visit #8",type:"Body Composition Review",
+        weight:"73.5 kg",change:"-0.7 kg",
+        injection:"Tirzepatide",dose:"2.5 mg",
+        medication:"None recorded",additionalTreatment:"None recorded",
+        notes:"Body composition reviewed.",
+        pdfName:"Arboleaf_06Aug2026.pdf",status:"Completed"
+      }
+    ]
+  },
 
-GW0001: {
-
-id:"GW0001",
-name:"AISYAH ABDULLAH",
-initials:"AA",
-
-status:"Active",
-
-startDate:"15 Jun 2026",
-doctor:"Dr Aaron",
-lastVisit:"20 Aug 2026",
-
-height:"169",
-
-startingWeight:"78.0",
-currentWeight:"72.4",
-goalWeight:"65.0",
-
-totalLoss:"5.6",
-remaining:"7.4",
-progress:"43",
-duration:"10",
-
-phone:"",
-dob:"",
-gender:"Female",
-arboleafUsername:"",
-
-measurements:{
-
-"2026-08-06":{
-weight:73.5,
-bodyFat:28.8,
-bmi:29.2,
-skeletalMuscle:34.4,
-muscleMass:55.5,
-protein:13.7,
-bmr:1610,
-fatFreeWeight:52.3,
-subcutaneousFat:25.2,
-visceralFat:12,
-bodyWater:51.5,
-boneMass:2.96
-},
-
-"2026-08-13":{
-weight:73.0,
-bodyFat:28.0,
-bmi:28.9,
-skeletalMuscle:34.6,
-muscleMass:55.8,
-protein:13.8,
-bmr:1615,
-fatFreeWeight:52.6,
-subcutaneousFat:24.8,
-visceralFat:12,
-bodyWater:51.9,
-boneMass:2.97
-},
-
-"2026-08-20":{
-weight:72.4,
-bodyFat:27.4,
-bmi:28.6,
-skeletalMuscle:34.8,
-muscleMass:56.0,
-protein:13.9,
-bmr:1620,
-fatFreeWeight:52.6,
-subcutaneousFat:24.3,
-visceralFat:11,
-bodyWater:52.4,
-boneMass:2.98
-}
-
-},
-
-visits:[]
-
-},
-
-
-GW0002: {
-
-id:"GW0002",
-name:"MOHD AIZUDDIN BIN ABDUL MALEK",
-initials:"MA",
-
-status:"Active",
-
-startDate:"12 Jun 2026",
-doctor:"Dr Aaron",
-lastVisit:"20 Aug 2026",
-
-height:"169",
-
-startingWeight:"89.0",
-currentWeight:"81.2",
-goalWeight:"70.0",
-
-totalLoss:"7.8",
-remaining:"11.2",
-progress:"69",
-duration:"10",
-
-phone:"",
-dob:"",
-gender:"Male",
-arboleafUsername:"izzvape433",
-
-measurements:{
-
-"2026-07-30":{
-weight:83.2,
-bodyFat:29.0,
-bmi:29.1,
-skeletalMuscle:34.6,
-muscleMass:55.9,
-protein:13.7,
-bmr:1620,
-fatFreeWeight:59.1,
-subcutaneousFat:25.3,
-visceralFat:13,
-bodyWater:51.8,
-boneMass:3.00
-},
-
-"2026-08-06":{
-weight:82.5,
-bodyFat:28.5,
-bmi:28.9,
-skeletalMuscle:34.7,
-muscleMass:56.0,
-protein:13.8,
-bmr:1624,
-fatFreeWeight:58.9,
-subcutaneousFat:25.1,
-visceralFat:12,
-bodyWater:52.0,
-boneMass:3.01
-},
-
-"2026-08-13":{
-weight:82.0,
-bodyFat:28.0,
-bmi:28.7,
-skeletalMuscle:34.9,
-muscleMass:56.2,
-protein:13.9,
-bmr:1632,
-fatFreeWeight:59.0,
-subcutaneousFat:24.6,
-visceralFat:12,
-bodyWater:52.4,
-boneMass:3.03
-},
-
-"2026-08-20":{
-weight:81.2,
-bodyFat:27.4,
-bmi:28.4,
-skeletalMuscle:35.1,
-muscleMass:56.4,
-protein:14.0,
-bmr:1642,
-fatFreeWeight:58.9,
-subcutaneousFat:24.1,
-visceralFat:11,
-bodyWater:52.8,
-boneMass:3.05
-}
-
-},
-
-visits:[
-
-{
-id:"GW0002-V10",
-date:"20 Aug 2026",
-dateKey:"2026-08-20",
-
-visit:"Visit #10",
-type:"Body Composition Review",
-
-weight:"81.2 kg",
-change:"-0.8 kg",
-
-injection:"Tirzepatide",
-dose:"2.5 mg",
-medication:"None recorded",
-additionalTreatment:"None recorded",
-
-notes:
-"Patient completed body composition measurement. Progress reviewed and treatment tolerated well.",
-
-pdfName:"Arboleaf_20Aug2026.pdf",
-
-status:"Completed"
-},
-
-{
-id:"GW0002-V9",
-date:"13 Aug 2026",
-dateKey:"2026-08-13",
-
-visit:"Visit #9",
-type:"Weekly Follow-Up",
-
-weight:"82.0 kg",
-change:"-0.5 kg",
-
-injection:"Tirzepatide",
-dose:"2.5 mg",
-medication:"None recorded",
-additionalTreatment:"None recorded",
-
-notes:
-"Weekly follow-up completed.",
-
-pdfName:"Arboleaf_13Aug2026.pdf",
-
-status:"Completed"
-},
-
-{
-id:"GW0002-V8",
-date:"06 Aug 2026",
-dateKey:"2026-08-06",
-
-visit:"Visit #8",
-type:"Body Composition Review",
-
-weight:"82.5 kg",
-change:"-0.7 kg",
-
-injection:"Tirzepatide",
-dose:"2.5 mg",
-medication:"None recorded",
-additionalTreatment:"None recorded",
-
-notes:
-"Body composition reviewed.",
-
-pdfName:"Arboleaf_06Aug2026.pdf",
-
-status:"Completed"
-},
-
-{
-id:"GW0002-V7",
-date:"30 Jul 2026",
-dateKey:"2026-07-30",
-
-visit:"Visit #7",
-type:"Body Composition Review",
-
-weight:"83.2 kg",
-change:"-0.6 kg",
-
-injection:"Tirzepatide",
-dose:"2.5 mg",
-medication:"None recorded",
-additionalTreatment:"None recorded",
-
-notes:
-"Body composition reviewed.",
-
-pdfName:"Arboleaf_30Jul2026.pdf",
-
-status:"Completed"
-}
-
-]
-
-}
-
+  GW0002:{
+    id:"GW0002",
+    name:"MOHD AIZUDDIN BIN ABDUL MALEK",
+    initials:"MA",
+    status:"Active",
+    startDate:"12 Jun 2026",
+    doctor:"Dr Aaron",
+    lastVisit:"20 Aug 2026",
+    height:"169",
+    startingWeight:"89.0",
+    currentWeight:"81.2",
+    goalWeight:"70.0",
+    totalLoss:"7.8",
+    remaining:"11.2",
+    progress:"69",
+    duration:"10",
+    phone:"",
+    dob:"",
+    gender:"Male",
+    arboleafUsername:"izzvape433",
+    measurements:{
+      "2026-07-30":{
+        weight:83.2,bodyFat:29.0,bmi:29.1,skeletalMuscle:34.6,muscleMass:55.9,
+        protein:13.7,bmr:1620,fatFreeWeight:59.1,subcutaneousFat:25.3,visceralFat:13,
+        bodyWater:51.8,boneMass:3.00
+      },
+      "2026-08-06":{
+        weight:82.5,bodyFat:28.5,bmi:28.9,skeletalMuscle:34.7,muscleMass:56.0,
+        protein:13.8,bmr:1624,fatFreeWeight:58.9,subcutaneousFat:25.1,visceralFat:12,
+        bodyWater:52.0,boneMass:3.01
+      },
+      "2026-08-13":{
+        weight:82.0,bodyFat:28.0,bmi:28.7,skeletalMuscle:34.9,muscleMass:56.2,
+        protein:13.9,bmr:1632,fatFreeWeight:59.0,subcutaneousFat:24.6,visceralFat:12,
+        bodyWater:52.4,boneMass:3.03
+      },
+      "2026-08-20":{
+        weight:81.2,bodyFat:27.4,bmi:28.4,skeletalMuscle:35.1,muscleMass:56.4,
+        protein:14.0,bmr:1642,fatFreeWeight:58.9,subcutaneousFat:24.1,visceralFat:11,
+        bodyWater:52.8,boneMass:3.05
+      }
+    },
+    visits:[
+      {
+        id:"GW0002-V10",date:"20 Aug 2026",dateKey:"2026-08-20",
+        visit:"Visit #10",type:"Body Composition Review",
+        weight:"81.2 kg",change:"-0.8 kg",
+        injection:"Tirzepatide",dose:"2.5 mg",
+        medication:"None recorded",additionalTreatment:"None recorded",
+        notes:"Patient completed body composition measurement. Progress reviewed and treatment tolerated well.",
+        pdfName:"Arboleaf_20Aug2026.pdf",status:"Completed"
+      },
+      {
+        id:"GW0002-V9",date:"13 Aug 2026",dateKey:"2026-08-13",
+        visit:"Visit #9",type:"Weekly Follow-Up",
+        weight:"82.0 kg",change:"-0.5 kg",
+        injection:"Tirzepatide",dose:"2.5 mg",
+        medication:"None recorded",additionalTreatment:"None recorded",
+        notes:"Weekly follow-up completed.",
+        pdfName:"Arboleaf_13Aug2026.pdf",status:"Completed"
+      }
+    ]
+  }
 };
 
-
-/* =========================================================
-   FALLBACK PATIENTS
-========================================================= */
-
-demoPatients.GW0003 = {
-id:"GW0003",
-name:"BRANDON WILBERT",
-initials:"BW",
-status:"Active",
-startDate:"18 Jun 2026",
-doctor:"Dr Aaron",
-lastVisit:"19 Aug 2026",
-height:"175",
-startingWeight:"81.7",
-currentWeight:"76.8",
-goalWeight:"68.0",
-totalLoss:"4.9",
-remaining:"8.8",
-progress:"55",
-duration:"9",
-phone:"",
-dob:"",
-gender:"Male",
-arboleafUsername:"",
-measurements:{},
-visits:[]
+patients.GW0003={
+  id:"GW0003",name:"BRANDON WILBERT",initials:"BW",status:"Active",
+  startDate:"18 Jun 2026",doctor:"Dr Aaron",lastVisit:"19 Aug 2026",height:"175",
+  startingWeight:"81.7",currentWeight:"76.8",goalWeight:"68.0",
+  totalLoss:"4.9",remaining:"8.8",progress:"55",duration:"9",
+  phone:"",dob:"",gender:"Male",arboleafUsername:"",measurements:{},visits:[]
 };
 
-demoPatients.GW0004 = {
-id:"GW0004",
-name:"SARAH ZAKARIA",
-initials:"SZ",
-status:"Active",
-startDate:"24 Jun 2026",
-doctor:"Dr Aaron",
-lastVisit:"18 Aug 2026",
-height:"165",
-startingWeight:"72.6",
-currentWeight:"69.5",
-goalWeight:"62.0",
-totalLoss:"3.1",
-remaining:"7.5",
-progress:"41",
-duration:"8",
-phone:"",
-dob:"",
-gender:"Female",
-arboleafUsername:"",
-measurements:{},
-visits:[]
+patients.GW0004={
+  id:"GW0004",name:"SARAH ZAKARIA",initials:"SZ",status:"Active",
+  startDate:"24 Jun 2026",doctor:"Dr Aaron",lastVisit:"18 Aug 2026",height:"165",
+  startingWeight:"72.6",currentWeight:"69.5",goalWeight:"62.0",
+  totalLoss:"3.1",remaining:"7.5",progress:"41",duration:"8",
+  phone:"",dob:"",gender:"Female",arboleafUsername:"",measurements:{},visits:[]
 };
 
-demoPatients.GW0005 = {
-id:"GW0005",
-name:"DANIEL MALIK",
-initials:"DM",
-status:"Completed",
-startDate:"08 May 2026",
-doctor:"Dr Aaron",
-lastVisit:"15 Aug 2026",
-height:"170",
-startingWeight:"79.4",
-currentWeight:"68.0",
-goalWeight:"68.0",
-totalLoss:"11.4",
-remaining:"0",
-progress:"100",
-duration:"14",
-phone:"",
-dob:"",
-gender:"Male",
-arboleafUsername:"",
-measurements:{},
-visits:[]
+patients.GW0005={
+  id:"GW0005",name:"DANIEL MALIK",initials:"DM",status:"Completed",
+  startDate:"08 May 2026",doctor:"Dr Aaron",lastVisit:"15 Aug 2026",height:"170",
+  startingWeight:"79.4",currentWeight:"68.0",goalWeight:"68.0",
+  totalLoss:"11.4",remaining:"0",progress:"100",duration:"14",
+  phone:"",dob:"",gender:"Male",arboleafUsername:"",measurements:{},visits:[]
 };
 
-demoPatients.GW0006 = {
-id:"GW0006",
-name:"AMINAH HASSAN",
-initials:"AH",
-status:"Inactive",
-startDate:"10 Jul 2026",
-doctor:"Dr Aaron",
-lastVisit:"02 Aug 2026",
-height:"160",
-startingWeight:"84.4",
-currentWeight:"83.2",
-goalWeight:"70.0",
-totalLoss:"1.2",
-remaining:"13.2",
-progress:"9",
-duration:"4",
-phone:"",
-dob:"",
-gender:"Female",
-arboleafUsername:"",
-measurements:{},
-visits:[]
+patients.GW0006={
+  id:"GW0006",name:"AMINAH HASSAN",initials:"AH",status:"Inactive",
+  startDate:"10 Jul 2026",doctor:"Dr Aaron",lastVisit:"02 Aug 2026",height:"160",
+  startingWeight:"84.4",currentWeight:"83.2",goalWeight:"70.0",
+  totalLoss:"1.2",remaining:"13.2",progress:"9",duration:"4",
+  phone:"",dob:"",gender:"Female",arboleafUsername:"",measurements:{},visits:[]
 };
 
+const params=new URLSearchParams(location.search);
+const patient=patients[params.get("patient")] || patients.GW0001;
 
-/* =========================================================
-   LOAD PATIENT
-========================================================= */
+let selectedVisit=patient.visits[0] || null;
 
-const params =
-new URLSearchParams(
-window.location.search
-);
-
-const patientId =
-params.get("patient");
-
-const patient =
-demoPatients[patientId] ||
-demoPatients.GW0002;
-
-let selectedVisit =
-patient.visits[0] || null;
-
-
-/* =========================================================
-   TABS
-========================================================= */
-
-function activateTab(tab) {
-
-document.querySelectorAll(".tab-button")
-.forEach(button => {
-
-button.classList.toggle(
-"active",
-button.dataset.tab === tab
-);
-
-});
-
-
-document.querySelectorAll(".tab-panel")
-.forEach(panel => {
-
-panel.classList.toggle(
-"active",
-panel.id === tab
-);
-
-});
-
-window.scrollTo({
-top:0,
-behavior:"smooth"
-});
-
-}
-
-
-document.querySelectorAll(".tab-button")
-.forEach(button => {
-
-button.addEventListener(
-"click",
-() => activateTab(button.dataset.tab)
-);
-
-});
-
-
-/* =========================================================
-   PATIENT DISPLAY
-========================================================= */
-
-function refreshPatientDisplay() {
-
-document.title =
-patient.name +
-" | Getwell Weight Loss Admin";
-
-document.getElementById("patientInitials").textContent =
-patient.initials;
-
-document.getElementById("patientName").textContent =
-patient.name;
-
-document.getElementById("patientId").textContent =
-patient.id;
-
-document.getElementById("patientStatus").textContent =
-patient.status;
-
-document.getElementById("startDate").textContent =
-patient.startDate;
-
-document.getElementById("doctor").textContent =
-patient.doctor;
-
-document.getElementById("lastVisit").textContent =
-patient.lastVisit;
-
-document.getElementById("startingWeight").textContent =
-patient.startingWeight;
-
-document.getElementById("currentWeight").textContent =
-patient.currentWeight;
-
-document.getElementById("goalWeight").textContent =
-patient.goalWeight;
-
-document.getElementById("totalLoss").textContent =
-patient.totalLoss + " kg lost";
-
-document.getElementById("goalFill").style.width =
-patient.progress + "%";
-
-document.getElementById("goalProgress").textContent =
-patient.progress + "% achieved";
-
-document.getElementById("remainingWeight").textContent =
-patient.remaining + " kg remaining";
-
-document.getElementById("duration").textContent =
-patient.duration;
-
-document.getElementById("snapshotHeight").textContent =
-patient.height + " cm";
-
-document.getElementById("chartCurrentWeight").textContent =
-patient.currentWeight + " kg";
-
-document.getElementById("chartTotalLoss").textContent =
-patient.totalLoss;
-
-
-const pill =
-document.getElementById("statusPill");
-
-pill.className = "status-pill";
-
-if(patient.status === "Completed") {
-pill.classList.add("status-completed");
-}
-else if(patient.status === "Inactive") {
-pill.classList.add("status-inactive");
-}
-else {
-pill.classList.add("status-active");
-}
-
-pill.innerHTML = `
-<span class="status-dot"></span>
-<span>${patient.status}</span>
-`;
-
-}
-
-refreshPatientDisplay();
-
-
-/* =========================================================
-   VISITS
-========================================================= */
-
-function renderVisitLists() {
-
-const html =
-(patient.visits || [])
-.map(
-visit => `
-
-<div
-class="visit-row"
-onclick="selectVisit('${visit.id}')"
->
-
-<div class="visit-date">
-
-<strong>
-${visit.date}
-</strong>
-
-<span>
-${visit.visit}
-</span>
-
-</div>
-
-
-<div class="visit-main">
-
-<strong>
-${visit.type}
-</strong>
-
-<span>
-Weight ${visit.weight} · ${visit.change}
-</span>
-
-</div>
-
-
-<div class="visit-arrow">
-→
-</div>
-
-</div>
-
-`
-)
-.join("");
-
-document.getElementById("overviewVisitList").innerHTML =
-html;
-
-document.getElementById("fullVisitList").innerHTML =
-html;
-
-}
-
-renderVisitLists();
-
-
-function selectVisit(visitId) {
-
-const found =
-patient.visits.find(
-visit => visit.id === visitId
-);
-
-if(!found) return;
-
-selectedVisit = found;
-
-document.getElementById("selectedVisitLabel").textContent =
-selectedVisit.date +
-" · " +
-selectedVisit.visit;
-
-refreshSelectedVisit();
-
-activateTab("visits");
-
-}
-
-
-/* =========================================================
-   SELECTED VISIT
-========================================================= */
-
-function refreshSelectedVisit() {
-
-if(!selectedVisit) {
-
-document.getElementById(
-"selectedVisitLabel"
-).textContent =
-"No visit selected";
-
-return;
-
-}
-
-
-document.getElementById(
-"selectedPdfName"
-).textContent =
-selectedVisit.pdfName ||
-"No Arboleaf PDF uploaded";
-
-
-document.getElementById(
-"selectedVisitNotes"
-).textContent =
-selectedVisit.notes ||
-"No notes recorded.";
-
-
-document.getElementById(
-"selectedTreatmentGrid"
-).innerHTML = `
-
-<div class="treatment-item">
-<span>Injection</span>
-<strong>${selectedVisit.injection || "None recorded"}</strong>
-</div>
-
-<div class="treatment-item">
-<span>Dose</span>
-<strong>${selectedVisit.dose || "—"}</strong>
-</div>
-
-<div class="treatment-item">
-<span>Medication</span>
-<strong>${selectedVisit.medication || "None recorded"}</strong>
-</div>
-
-<div class="treatment-item">
-<span>Additional Treatment</span>
-<strong>${selectedVisit.additionalTreatment || "None recorded"}</strong>
-</div>
-
-`;
-
-
-const measurement =
-patient.measurements[
-selectedVisit.dateKey
-];
-
-
-if(measurement) {
-
-document.getElementById(
-"selectedVisitMeasurementGrid"
-).innerHTML =
-renderMeasurementCards(
-measurement
-);
-
-}
-else {
-
-document.getElementById(
-"selectedVisitMeasurementGrid"
-).innerHTML = `
-<div class="measurement-item">
-<span class="measurement-label">
-Body Composition
-</span>
-<span class="measurement-value">
-Not recorded
-</span>
-</div>
-`;
-
-}
-
-}
-
-
-/* =========================================================
-   MEASUREMENT CARDS
-========================================================= */
-
-function renderMeasurementCards(data) {
-
-const fields = [
-["weight","Weight","kg"],
-["bodyFat","Body Fat","%"],
-["bmi","BMI",""],
-["skeletalMuscle","Skeletal Muscle","kg"],
-["visceralFat","Visceral Fat",""],
-["bodyWater","Body Water","%"]
-];
-
-return fields.map(
-field => `
-
-<div class="measurement-item">
-
-<span class="measurement-label">
-${field[1]}
-</span>
-
-<span class="measurement-value">
-${formatNumber(data[field[0]])} ${field[2]}
-</span>
-
-</div>
-
-`
-).join("");
-
-}
-
-
-/* =========================================================
-   LATEST MEASUREMENT
-========================================================= */
-
-function renderLatestMeasurement() {
-
-const dates =
-Object.keys(
-patient.measurements || {}
-).sort();
-
-if(!dates.length) {
-
-document.getElementById(
-"latestMeasurementGrid"
-).innerHTML = `
-<div class="measurement-item">
-<span class="measurement-label">
-Arboleaf
-</span>
-<span class="measurement-value">
-No measurement yet
-</span>
-</div>
-`;
-
-return;
-
-}
-
-const latestKey =
-dates[dates.length - 1];
-
-const latest =
-patient.measurements[
-latestKey
-];
-
-document.getElementById(
-"latestMeasurementGrid"
-).innerHTML =
-renderMeasurementCards(latest);
-
-}
-
-renderLatestMeasurement();
-
-
-/* =========================================================
-   BODY COMPOSITION DATE SELECTORS
-========================================================= */
-
-function populateComparisonDates() {
-
-const from =
-document.getElementById("compareFrom");
-
-const to =
-document.getElementById("compareTo");
-
-const dates =
-Object.keys(
-patient.measurements || {}
-).sort();
-
-from.innerHTML = "";
-to.innerHTML = "";
-
-dates.forEach(
-date => {
-
-const visit =
-patient.visits.find(
-item => item.dateKey === date
-);
-
-if(!visit) return;
-
-const option1 =
-document.createElement("option");
-
-option1.value = date;
-option1.textContent =
-visit.date + " · " + visit.visit;
-
-from.appendChild(option1);
-
-
-const option2 =
-document.createElement("option");
-
-option2.value = date;
-option2.textContent =
-visit.date + " · " + visit.visit;
-
-to.appendChild(option2);
-
-});
-
-
-if(dates.length >= 2) {
-
-from.value =
-dates[dates.length - 2];
-
-to.value =
-dates[dates.length - 1];
-
-}
-
-}
-
-populateComparisonDates();
-
-
-/* =========================================================
-   COMPARISON
-========================================================= */
-
-const comparisonFields = [
-
-["weight","Weight","kg"],
-["bodyFat","Body Fat","%"],
-["bmi","BMI",""],
-["skeletalMuscle","Skeletal Muscle","kg"],
-["muscleMass","Muscle Mass","kg"],
-["protein","Protein","kg"],
-["bmr","BMR","kcal"],
-["fatFreeWeight","Fat-Free Body Weight","kg"],
-["subcutaneousFat","Subcutaneous Fat","%"],
-["visceralFat","Visceral Fat",""],
-["bodyWater","Body Water","%"],
-["boneMass","Bone Mass","kg"]
-
-];
-
-
-function isImprovement(metric,change) {
-
-const lowerIsBetter = [
-"weight",
-"bodyFat",
-"bmi",
-"subcutaneousFat",
-"visceralFat"
-];
-
-if(lowerIsBetter.includes(metric)) {
-return change < 0;
-}
-
-return change > 0;
-
-}
-
-
-function generateComparison() {
-
-const fromKey =
-document.getElementById("compareFrom").value;
-
-const toKey =
-document.getElementById("compareTo").value;
-
-const from =
-patient.measurements[fromKey];
-
-const to =
-patient.measurements[toKey];
-
-if(!from || !to) {
-
-alert(
-"Both dates must contain an Arboleaf measurement."
-);
-
-return;
-
-}
-
-const fromVisit =
-patient.visits.find(
-visit => visit.dateKey === fromKey
-);
-
-const toVisit =
-patient.visits.find(
-visit => visit.dateKey === toKey
-);
-
-
-document.getElementById("comparisonTitle").textContent =
-fromVisit.date +
-" → " +
-toVisit.date;
-
-document.getElementById("fromHeader").textContent =
-fromVisit.date;
-
-document.getElementById("toHeader").textContent =
-toVisit.date;
-
-
-document.getElementById("comparisonBody").innerHTML =
-comparisonFields
-.map(
-field => {
-
-const oldValue =
-Number(from[field[0]]);
-
-const newValue =
-Number(to[field[0]]);
-
-const change =
-newValue - oldValue;
-
-const sign =
-change > 0 ? "+" : "";
-
-const className =
-change === 0
-? "change-neutral"
-: isImprovement(
-field[0],
-change
-)
-? "change-good"
-: "change-bad";
-
-return `
-
-<tr>
-
-<td>
-<strong>${field[1]}</strong>
-</td>
-
-<td>
-${formatNumber(oldValue)} ${field[2]}
-</td>
-
-<td>
-${formatNumber(newValue)} ${field[2]}
-</td>
-
-<td class="${className}">
-${sign}${formatNumber(change)} ${field[2]}
-</td>
-
-</tr>
-
-`;
-
-}
-)
-.join("");
-
-
-document
-.getElementById("comparisonResult")
-.classList
-.add("show");
-
-}
-
-
-/* =========================================================
-   MEASUREMENT HISTORY
-========================================================= */
-
-function renderMeasurementHistory() {
-
-const dates =
-Object.keys(
-patient.measurements || {}
-).sort().reverse();
-
-document.getElementById(
-"measurementHistoryBody"
-).innerHTML =
-
-dates.map(
-date => {
-
-const data =
-patient.measurements[date];
-
-const visit =
-patient.visits.find(
-item => item.dateKey === date
-);
-
-return `
-
-<tr>
-
-<td>
-${visit ? visit.date : date}
-</td>
-
-<td>
-${formatNumber(data.weight)} kg
-</td>
-
-<td>
-${formatNumber(data.bodyFat)}%
-</td>
-
-<td>
-${formatNumber(data.bmi)}
-</td>
-
-<td>
-${formatNumber(data.skeletalMuscle)} kg
-</td>
-
-<td>
-${formatNumber(data.visceralFat)}
-</td>
-
-<td>
-
-<button
-class="edit-button"
-onclick="openMeasurementEdit('${date}')"
->
-✎ Edit
-</button>
-
-</td>
-
-</tr>
-
-`;
-
-}
-)
-.join("");
-
-}
-
-renderMeasurementHistory();
-
-
-/* =========================================================
-   PROGRESS PHOTOS
-========================================================= */
-
-function renderPhotoVisits() {
-
-const container =
-document.getElementById(
-"photoVisitList"
-);
-
-container.innerHTML = "";
-
-(patient.visits || [])
-.forEach(
-visit => {
-
-container.innerHTML += `
-
-<div class="media-visit">
-
-
-<div class="media-date">
-
-<strong>
-${visit.date}
-</strong>
-
-<span>
-${visit.visit}
-</span>
-
-</div>
-
-
-<div class="mini-photo-row">
-
-<div class="mini-photo">
-Front
-</div>
-
-<div class="mini-photo">
-Side
-</div>
-
-<div class="mini-photo">
-Back
-</div>
-
-</div>
-
-
-<div class="media-files">
-
-<button
-class="file-link"
-onclick="
-selectVisit('${visit.id}');
-openVisitFilesEdit();
-"
->
-
-<span>
-✎ Edit Photos
-</span>
-
-<span>→</span>
-
-</button>
-
-
-<button
-class="file-link"
-onclick="
-selectVisit('${visit.id}');
-activateTab('visits');
-"
->
-
-<span>
-Open Visit
-</span>
-
-<span>→</span>
-
-</button>
-
-</div>
-
-</div>
-
-`;
-
-});
-
-}
-
-renderPhotoVisits();
-
-
-/* =========================================================
-   FILES
-========================================================= */
-
-function renderFileVisits() {
-
-const container =
-document.getElementById(
-"fileVisitList"
-);
-
-container.innerHTML = "";
-
-(patient.visits || [])
-.forEach(
-visit => {
-
-container.innerHTML += `
-
-<div class="media-visit">
-
-
-<div class="media-date">
-
-<strong>
-${visit.date}
-</strong>
-
-<span>
-${visit.visit}
-</span>
-
-</div>
-
-
-<div>
-
-<strong style="
-font-size:10px;
-color:var(--navy);
-">
-Arboleaf PDF
-</strong>
-
-<span style="
-display:block;
-margin-top:3px;
-color:var(--muted);
-font-size:9px;
-">
-${visit.pdfName || "No PDF uploaded"}
-</span>
-
-</div>
-
-
-<div class="media-files">
-
-<button
-class="file-link"
-onclick="
-selectVisit('${visit.id}');
-openVisitFilesEdit();
-"
->
-
-<span>
-✎ Edit File
-</span>
-
-<span>→</span>
-
-</button>
-
-</div>
-
-
-</div>
-
-`;
-
-});
-
-}
-
-renderFileVisits();
-
-
-/* =========================================================
-   TREATMENT HISTORY
-========================================================= */
-
-function renderTreatmentHistory() {
-
-document.getElementById(
-"treatmentHistoryList"
-).innerHTML =
-
-(patient.visits || [])
-.map(
-visit => `
-
-<div class="simple-row">
-
-<div>
-
-<strong>
-${visit.date}
-</strong>
-
-<span>
-${visit.visit}
-</span>
-
-</div>
-
-
-<div>
-
-<strong>
-${visit.injection || "None recorded"}
-</strong>
-
-<span>
-${visit.dose || "—"}
-${visit.medication && visit.medication !== "None recorded"
-? " · " + visit.medication
-: ""}
-</span>
-
-</div>
-
-
-<button
-class="edit-button"
-onclick="
-selectVisit('${visit.id}');
-openTreatmentEdit();
-"
->
-✎ Edit
-</button>
-
-</div>
-
-`
-)
-.join("");
-
-}
-
-renderTreatmentHistory();
-
-
-/* =========================================================
-   NOTES
-========================================================= */
-
-function renderPatientNotes() {
-
-document.getElementById(
-"patientNotesList"
-).innerHTML =
-
-(patient.visits || [])
-.map(
-visit => `
-
-<div class="simple-row">
-
-<div>
-
-<strong>
-${visit.date}
-</strong>
-
-<span>
-${visit.visit}
-</span>
-
-</div>
-
-
-<div>
-
-<strong>
-Visit Note
-</strong>
-
-<span>
-${visit.notes || "No note recorded."}
-</span>
-
-</div>
-
-
-<button
-class="edit-button"
-onclick="
-selectVisit('${visit.id}');
-openNotesEdit();
-"
->
-✎ Edit
-</button>
-
-</div>
-
-`
-)
-.join("");
-
-}
-
-renderPatientNotes();
-
-
-/* =========================================================
-   PATIENT EDIT
-========================================================= */
-
-function openPatientEdit() {
-
-document.getElementById(
-"editPatientName"
-).value =
-patient.name;
-
-document.getElementById(
-"editPatientId"
-).value =
-patient.id;
-
-document.getElementById(
-"editPatientPhone"
-).value =
-patient.phone || "";
-
-document.getElementById(
-"editPatientDob"
-).value =
-patient.dob || "";
-
-document.getElementById(
-"editPatientGender"
-).value =
-patient.gender || "Male";
-
-document.getElementById(
-"editPatientHeight"
-).value =
-patient.height || "";
-
-document.getElementById(
-"editPatientStartWeight"
-).value =
-patient.startingWeight || "";
-
-document.getElementById(
-"editPatientGoalWeight"
-).value =
-patient.goalWeight || "";
-
-document.getElementById(
-"editPatientDoctor"
-).value =
-patient.doctor || "Dr Aaron";
-
-document.getElementById(
-"editPatientStatus"
-).value =
-patient.status || "Active";
-
-document.getElementById(
-"editArboleafUsername"
-).value =
-patient.arboleafUsername || "";
-
-openModal("patientEditModal");
-
-}
-
-
-function savePatientEdit() {
-
-patient.name =
-document.getElementById(
-"editPatientName"
-).value.trim();
-
-patient.phone =
-document.getElementById(
-"editPatientPhone"
-).value;
-
-patient.dob =
-document.getElementById(
-"editPatientDob"
-).value;
-
-patient.gender =
-document.getElementById(
-"editPatientGender"
-).value;
-
-patient.height =
-document.getElementById(
-"editPatientHeight"
-).value;
-
-patient.startingWeight =
-document.getElementById(
-"editPatientStartWeight"
-).value;
-
-patient.goalWeight =
-document.getElementById(
-"editPatientGoalWeight"
-).value;
-
-patient.doctor =
-document.getElementById(
-"editPatientDoctor"
-).value;
-
-patient.status =
-document.getElementById(
-"editPatientStatus"
-).value;
-
-patient.arboleafUsername =
-document.getElementById(
-"editArboleafUsername"
-).value;
-
-refreshPatientDisplay();
-
-closeModal("patientEditModal");
-
-alert(
-"Patient changes saved in the current UI."
-);
-
-}
-
-
-/* =========================================================
-   VISIT EDIT
-========================================================= */
-
-function openVisitEdit() {
-
-if(!selectedVisit) return;
-
-document.getElementById(
-"editVisitSubtitle"
-).textContent =
-selectedVisit.date +
-" · " +
-selectedVisit.visit;
-
-document.getElementById(
-"editVisitNumber"
-).value =
-selectedVisit.visit;
-
-document.getElementById(
-"editVisitType"
-).value =
-selectedVisit.type;
-
-document.getElementById(
-"editVisitStatus"
-).value =
-selectedVisit.status || "Completed";
-
-document.getElementById(
-"editVisitDate"
-).value =
-selectedVisit.dateKey;
-
-openModal("visitEditModal");
-
-}
-
-
-function saveVisitEdit() {
-
-if(!selectedVisit) return;
-
-const newDate =
-document.getElementById(
-"editVisitDate"
-).value;
-
-const oldDateKey =
-selectedVisit.dateKey;
-
-const newDateKey =
-newDate;
-
-if(
-oldDateKey !== newDateKey &&
-patient.measurements[oldDateKey]
-) {
-
-patient.measurements[newDateKey] =
-patient.measurements[oldDateKey];
-
-delete patient.measurements[oldDateKey];
-
-}
-
-selectedVisit.dateKey =
-newDateKey;
-
-selectedVisit.date =
-formatDateForDisplay(
-newDate
-);
-
-selectedVisit.visit =
-document.getElementById(
-"editVisitNumber"
-).value;
-
-selectedVisit.type =
-document.getElementById(
-"editVisitType"
-).value;
-
-selectedVisit.status =
-document.getElementById(
-"editVisitStatus"
-).value;
-
-refreshSelectedVisit();
-
-renderVisitLists();
-
-renderMeasurementHistory();
-
-populateComparisonDates();
-
-renderPhotoVisits();
-
-renderFileVisits();
-
-closeModal("visitEditModal");
-
-alert(
-"Visit changes saved in the current UI."
-);
-
-}
-
-
-/* =========================================================
-   MEASUREMENT EDIT
-========================================================= */
-
-function openMeasurementEdit(
-dateKey
-) {
-
-const key =
-dateKey ||
-(
-selectedVisit
-? selectedVisit.dateKey
-: Object.keys(patient.measurements).slice(-1)[0]
-);
-
-const data =
-patient.measurements[key];
-
-if(!data) {
-
-alert(
-"No Arboleaf measurement is attached to this visit."
-);
-
-return;
-
-}
-
-document.getElementById(
-"measurementEditSubtitle"
-).textContent =
-key;
-
-
-const fields = [
-
-["weight","Weight"],
-["bodyFat","Body Fat"],
-["bmi","BMI"],
-["skeletalMuscle","Skeletal Muscle"],
-["muscleMass","Muscle Mass"],
-["protein","Protein"],
-["bmr","BMR"],
-["fatFreeWeight","Fat-Free Body Weight"],
-["subcutaneousFat","Subcutaneous Fat"],
-["visceralFat","Visceral Fat"],
-["bodyWater","Body Water"],
-["boneMass","Bone Mass"]
-
-];
-
-
-document.getElementById(
-"measurementEditGrid"
-).innerHTML =
-
-fields.map(
-field => `
-
-<div class="form-group">
-
-<label>
-${field[1]}
-</label>
-
-<input
-type="number"
-step="0.01"
-id="editMeasurement_${field[0]}"
-value="${data[field[0]] ?? ""}"
->
-
-</div>
-
-`
-)
-.join("");
-
-document.getElementById(
-"measurementEditGrid"
-).dataset.date =
-key;
-
-openModal(
-"measurementEditModal"
-);
-
-}
-
-
-function saveMeasurementEdit() {
-
-const grid =
-document.getElementById(
-"measurementEditGrid"
-);
-
-const date =
-grid.dataset.date;
-
-const data =
-patient.measurements[date];
-
-if(!data) return;
-
-const fields = [
-"weight",
-"bodyFat",
-"bmi",
-"skeletalMuscle",
-"muscleMass",
-"protein",
-"bmr",
-"fatFreeWeight",
-"subcutaneousFat",
-"visceralFat",
-"bodyWater",
-"boneMass"
-];
-
-fields.forEach(
-field => {
-
-const input =
-document.getElementById(
-"editMeasurement_" + field
-);
-
-if(
-input &&
-input.value !== ""
-) {
-
-data[field] =
-Number(input.value);
-
-}
-
-});
-
-renderLatestMeasurement();
-
-renderMeasurementHistory();
-
-refreshSelectedVisit();
-
-closeModal(
-"measurementEditModal"
-);
-
-alert(
-"Body composition changes saved in the current UI."
-);
-
-}
-
-
-/* =========================================================
-   TREATMENT EDIT
-========================================================= */
-
-function openTreatmentEdit() {
-
-if(!selectedVisit) return;
-
-document.getElementById(
-"editInjection"
-).value =
-selectedVisit.injection ||
-"Tirzepatide";
-
-document.getElementById(
-"editDose"
-).value =
-selectedVisit.dose || "";
-
-document.getElementById(
-"editMedication"
-).value =
-selectedVisit.medication || "";
-
-document.getElementById(
-"editAdditionalTreatment"
-).value =
-selectedVisit.additionalTreatment || "";
-
-openModal(
-"treatmentEditModal"
-);
-
-}
-
-
-function saveTreatmentEdit() {
-
-if(!selectedVisit) return;
-
-selectedVisit.injection =
-document.getElementById(
-"editInjection"
-).value;
-
-selectedVisit.dose =
-document.getElementById(
-"editDose"
-).value;
-
-selectedVisit.medication =
-document.getElementById(
-"editMedication"
-).value;
-
-selectedVisit.additionalTreatment =
-document.getElementById(
-"editAdditionalTreatment"
-).value;
-
-refreshSelectedVisit();
-
-renderTreatmentHistory();
-
-closeModal(
-"treatmentEditModal"
-);
-
-alert(
-"Treatment changes saved in the current UI."
-);
-
-}
-
-
-/* =========================================================
-   NOTES EDIT
-========================================================= */
-
-function openNotesEdit() {
-
-if(!selectedVisit) return;
-
-document.getElementById(
-"editVisitNotes"
-).value =
-selectedVisit.notes || "";
-
-openModal(
-"notesEditModal"
-);
-
-}
-
-
-function saveNotesEdit() {
-
-if(!selectedVisit) return;
-
-selectedVisit.notes =
-document.getElementById(
-"editVisitNotes"
-).value;
-
-refreshSelectedVisit();
-
-renderPatientNotes();
-
-closeModal(
-"notesEditModal"
-);
-
-alert(
-"Notes changes saved in the current UI."
-);
-
-}
-
-
-/* =========================================================
-   APPOINTMENT
-========================================================= */
-
-let appointment = {
+let appointment={
   date:"2026-08-27",
   time:"10:30",
   type:"Body Composition Review",
@@ -6970,134 +2071,633 @@ let appointment = {
 };
 
 
-function renderAppointment() {
+/* =========================================================
+   TABS
+========================================================= */
 
-const date =
-new Date(
-appointment.date + "T00:00:00"
-);
+const tabButtons=document.querySelectorAll(".tab-button");
+const tabPanels=document.querySelectorAll(".tab-panel");
 
-const formatted =
-date.toLocaleDateString(
-"en-GB",
-{
-day:"2-digit",
-month:"long",
-year:"numeric"
-}
-);
-
-document.getElementById(
-"upcomingDateText"
-).textContent =
-formatted +
-" · " +
-formatTime(
-appointment.time
-);
-
-document.getElementById(
-"upcomingDetailsText"
-).textContent =
-appointment.type +
-" · " +
-appointment.week;
-
-document.getElementById(
-"appointmentRowDate"
-).textContent =
-date.toLocaleDateString(
-"en-GB",
-{
-day:"2-digit",
-month:"short",
-year:"numeric"
-}
-);
-
-document.getElementById(
-"appointmentRowTime"
-).textContent =
-formatTime(
-appointment.time
-);
-
-document.getElementById(
-"appointmentRowType"
-).textContent =
-appointment.type;
-
-document.getElementById(
-"appointmentRowWeek"
-).textContent =
-appointment.week;
-
+function activateTab(tab){
+  tabButtons.forEach(btn=>btn.classList.toggle("active",btn.dataset.tab===tab));
+  tabPanels.forEach(panel=>panel.hidden=panel.id!==tab);
 }
 
-renderAppointment();
+tabButtons.forEach(btn=>{
+  btn.addEventListener("click",()=>activateTab(btn.dataset.tab));
+});
 
 
-function openAppointmentEdit() {
+/* =========================================================
+   MODALS
+========================================================= */
 
-document.getElementById(
-"editAppointmentDate"
-).value =
-appointment.date;
+function openModal(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.classList.add("show");
+  document.body.style.overflow="hidden";
+}
 
-document.getElementById(
-"editAppointmentTime"
-).value =
-appointment.time;
+function closeModal(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.classList.remove("show");
+  document.body.style.overflow="";
+}
 
-document.getElementById(
-"editAppointmentType"
-).value =
-appointment.type;
+document.querySelectorAll(".modal-overlay").forEach(overlay=>{
+  overlay.addEventListener("click",e=>{
+    if(e.target===overlay)closeModal(overlay.id);
+  });
+});
 
-document.getElementById(
-"editAppointmentWeek"
-).value =
-appointment.week;
 
-openModal(
-"appointmentEditModal"
-);
+/* =========================================================
+   PATIENT DISPLAY
+========================================================= */
 
+function refreshPatient(){
+  document.title=patient.name+" | Getwell Weight Loss Admin";
+  document.getElementById("patientInitials").textContent=patient.initials;
+  document.getElementById("patientName").textContent=patient.name;
+  document.getElementById("patientId").textContent=patient.id;
+  document.getElementById("patientStatus").textContent=patient.status;
+  document.getElementById("startDate").textContent=patient.startDate;
+  document.getElementById("doctor").textContent=patient.doctor;
+  document.getElementById("lastVisit").textContent=patient.lastVisit;
+  document.getElementById("startingWeight").textContent=patient.startingWeight;
+  document.getElementById("currentWeight").textContent=patient.currentWeight;
+  document.getElementById("goalWeight").textContent=patient.goalWeight;
+  document.getElementById("totalLoss").textContent=patient.totalLoss+" kg lost";
+  document.getElementById("goalFill").style.width=patient.progress+"%";
+  document.getElementById("goalProgress").textContent=patient.progress+"% achieved";
+  document.getElementById("remainingWeight").textContent=patient.remaining+" kg remaining";
+  document.getElementById("duration").textContent=patient.duration;
+  document.getElementById("snapshotHeight").textContent=patient.height+" cm";
+  document.getElementById("snapshotGoal").textContent=patient.goalWeight+" kg";
+  document.getElementById("snapshotRemaining").textContent=patient.remaining+" kg";
+  document.getElementById("chartCurrentWeight").textContent=patient.currentWeight+" kg";
+  document.getElementById("chartTotalLoss").textContent=patient.totalLoss;
+
+  const pill=document.getElementById("statusPill");
+  pill.className="status-pill "+(
+    patient.status==="Completed"?"status-completed":
+    patient.status==="Inactive"?"status-inactive":"status-active"
+  );
+  pill.innerHTML='<span class="status-dot"></span>'+patient.status;
 }
 
 
-function saveAppointmentEdit() {
+/* =========================================================
+   VISITS
+========================================================= */
 
-appointment.date =
-document.getElementById(
-"editAppointmentDate"
-).value;
+function renderVisits(){
+  const html=(patient.visits||[]).map(v=>`
+    <div class="visit-row" onclick="selectVisit('${v.id}')">
+      <div class="visit-date">
+        <strong>${v.date}</strong>
+        <span>${v.visit}</span>
+      </div>
+      <div class="visit-main">
+        <strong>${v.type}</strong>
+        <span>Weight ${v.weight} · ${v.change}</span>
+      </div>
+      <div class="visit-arrow">→</div>
+    </div>
+  `).join("");
 
-appointment.time =
-document.getElementById(
-"editAppointmentTime"
-).value;
+  document.getElementById("overviewVisitList").innerHTML=html || emptyMessage("No visits recorded yet.");
+  document.getElementById("fullVisitList").innerHTML=html || emptyMessage("No visits recorded yet.");
+}
 
-appointment.type =
-document.getElementById(
-"editAppointmentType"
-).value;
+function selectVisit(id){
+  selectedVisit=patient.visits.find(v=>v.id===id)||null;
+  refreshSelectedVisit();
+  activateTab("visits");
+}
 
-appointment.week =
-document.getElementById(
-"editAppointmentWeek"
-).value;
+function refreshSelectedVisit(){
 
-renderAppointment();
+  if(!selectedVisit){
+    document.getElementById("selectedVisitLabel").textContent="No visit selected";
+    document.getElementById("selectedTreatmentGrid").innerHTML="";
+    document.getElementById("selectedVisitNotes").textContent="No visit selected.";
+    document.getElementById("selectedPdfName").textContent="No PDF selected";
+    return;
+  }
 
-closeModal(
-"appointmentEditModal"
-);
+  document.getElementById("selectedVisitLabel").textContent=selectedVisit.date+" · "+selectedVisit.visit;
+  document.getElementById("selectedPdfName").textContent=selectedVisit.pdfName||"No Arboleaf PDF uploaded";
+  document.getElementById("selectedVisitNotes").textContent=selectedVisit.notes||"No notes recorded.";
 
-alert(
-"Appointment changes saved in the current UI."
-);
+  document.getElementById("selectedTreatmentGrid").innerHTML=`
+    <div class="treatment-item"><span>Injection</span><strong>${selectedVisit.injection||"None recorded"}</strong></div>
+    <div class="treatment-item"><span>Dose</span><strong>${selectedVisit.dose||"—"}</strong></div>
+    <div class="treatment-item"><span>Medication</span><strong>${selectedVisit.medication||"None recorded"}</strong></div>
+    <div class="treatment-item"><span>Additional Treatment</span><strong>${selectedVisit.additionalTreatment||"None recorded"}</strong></div>
+  `;
+}
 
+
+/* =========================================================
+   BODY COMPOSITION
+========================================================= */
+
+const allMetrics=[
+  ["weight","Weight","kg"],
+  ["bodyFat","Body Fat","%"],
+  ["bmi","BMI",""],
+  ["skeletalMuscle","Skeletal Muscle","kg"],
+  ["muscleMass","Muscle Mass","kg"],
+  ["protein","Protein","kg"],
+  ["bmr","BMR","kcal"],
+  ["fatFreeWeight","Fat-Free Body Weight","kg"],
+  ["subcutaneousFat","Subcutaneous Fat","%"],
+  ["visceralFat","Visceral Fat",""],
+  ["bodyWater","Body Water","%"],
+  ["boneMass","Bone Mass","kg"]
+];
+
+function renderLatestMeasurement(){
+  const dates=Object.keys(patient.measurements||{}).sort();
+
+  if(!dates.length){
+    document.getElementById("latestMeasurementGrid").innerHTML=`
+      <div class="measurement-item">
+        <span class="measurement-label">Arboleaf</span>
+        <span class="measurement-value">No measurement yet</span>
+      </div>
+    `;
+    return;
+  }
+
+  const key=dates[dates.length-1];
+  const m=patient.measurements[key];
+
+  document.getElementById("latestMeasurementDate").textContent=
+    formatDateForDisplay(key);
+
+  document.getElementById("latestMeasurementGrid").innerHTML=renderMeasurementCards(m);
+}
+
+function renderMeasurementCards(m){
+  const fields=[
+    ["weight","Weight","kg"],
+    ["bodyFat","Body Fat","%"],
+    ["bmi","BMI",""],
+    ["skeletalMuscle","Skeletal Muscle","kg"],
+    ["visceralFat","Visceral Fat",""],
+    ["bodyWater","Body Water","%"]
+  ];
+
+  return fields.map(f=>`
+    <div class="measurement-item">
+      <span class="measurement-label">${f[1]}</span>
+      <span class="measurement-value">${formatNumber(m[f[0]])} ${f[2]}</span>
+    </div>
+  `).join("");
+}
+
+function populateComparisonDates(){
+
+  const from=document.getElementById("compareFrom");
+  const to=document.getElementById("compareTo");
+
+  const dates=Object.keys(patient.measurements||{}).sort();
+
+  from.innerHTML="";
+  to.innerHTML="";
+
+  dates.forEach(date=>{
+    const visit=patient.visits.find(v=>v.dateKey===date);
+    if(!visit)return;
+
+    const a=document.createElement("option");
+    a.value=date;
+    a.textContent=visit.date+" · "+visit.visit;
+    from.appendChild(a);
+
+    const b=document.createElement("option");
+    b.value=date;
+    b.textContent=visit.date+" · "+visit.visit;
+    to.appendChild(b);
+  });
+
+  if(dates.length>=2){
+    from.value=dates[dates.length-2];
+    to.value=dates[dates.length-1];
+  }
+}
+
+function isImprovement(metric,change){
+  const lower=["weight","bodyFat","bmi","subcutaneousFat","visceralFat"];
+  return lower.includes(metric)?change<0:change>0;
+}
+
+function generateComparison(){
+
+  const fromKey=document.getElementById("compareFrom").value;
+  const toKey=document.getElementById("compareTo").value;
+
+  const from=patient.measurements[fromKey];
+  const to=patient.measurements[toKey];
+
+  if(!from||!to){
+    alert("Both dates must contain an Arboleaf measurement.");
+    return;
+  }
+
+  const fromVisit=patient.visits.find(v=>v.dateKey===fromKey);
+  const toVisit=patient.visits.find(v=>v.dateKey===toKey);
+
+  document.getElementById("comparisonTitle").textContent=
+    fromVisit.date+" → "+toVisit.date;
+
+  document.getElementById("fromHeader").textContent=fromVisit.date;
+  document.getElementById("toHeader").textContent=toVisit.date;
+
+  document.getElementById("comparisonBody").innerHTML=
+    allMetrics.map(m=>{
+      const oldValue=Number(from[m[0]]);
+      const newValue=Number(to[m[0]]);
+      const change=newValue-oldValue;
+      const sign=change>0?"+":"";
+      const cls=change===0?"change-neutral":isImprovement(m[0],change)?"change-good":"change-bad";
+
+      return `
+        <tr>
+          <td><strong>${m[1]}</strong></td>
+          <td>${formatNumber(oldValue)} ${m[2]}</td>
+          <td>${formatNumber(newValue)} ${m[2]}</td>
+          <td class="${cls}">${sign}${formatNumber(change)} ${m[2]}</td>
+        </tr>
+      `;
+    }).join("");
+
+  document.getElementById("comparisonResult").classList.add("show");
+}
+
+function renderMeasurementHistory(){
+
+  const dates=Object.keys(patient.measurements||{}).sort().reverse();
+
+  document.getElementById("measurementHistoryBody").innerHTML=
+    dates.length?dates.map(date=>{
+      const m=patient.measurements[date];
+      const visit=patient.visits.find(v=>v.dateKey===date);
+
+      return `
+        <tr>
+          <td>${visit?visit.date:date}</td>
+          <td>${formatNumber(m.weight)} kg</td>
+          <td>${formatNumber(m.bodyFat)}%</td>
+          <td>${formatNumber(m.bmi)}</td>
+          <td>${formatNumber(m.skeletalMuscle)} kg</td>
+          <td>${formatNumber(m.visceralFat)}</td>
+          <td><button class="edit-button" onclick="openMeasurementEdit('${date}')">✎ Edit</button></td>
+        </tr>
+      `;
+    }).join(""):`
+      <tr><td colspan="7">No Arboleaf measurements recorded.</td></tr>
+    `;
+}
+
+
+/* =========================================================
+   PHOTOS / FILES
+========================================================= */
+
+function renderFileVisits(){
+  document.getElementById("fileVisitList").innerHTML=
+    patient.visits.length?patient.visits.map(v=>`
+      <div class="media-visit">
+        <div class="media-date">
+          <strong>${v.date}</strong>
+          <span>${v.visit}</span>
+        </div>
+
+        <div>
+          <div style="font-size:10px;font-weight:600;color:var(--navy);margin-bottom:7px">
+            Full Body Photos
+          </div>
+          <div class="mini-photo-row">
+            <div class="mini-photo">Front</div>
+            <div class="mini-photo">Side</div>
+            <div class="mini-photo">Back</div>
+          </div>
+          <div style="font-size:9px;color:var(--muted);margin-top:7px">
+            Photos stored with this visit
+          </div>
+        </div>
+
+        <div class="media-files">
+          <button class="file-link" onclick="selectVisit('${v.id}');openVisitFilesEdit()">
+            <span>📄 ${v.pdfName||"No PDF uploaded"}</span>
+            <span>✎</span>
+          </button>
+          <button class="file-link" onclick="selectVisit('${v.id}');openVisitFilesEdit()">
+            <span>🖼 Edit Photos</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+    `).join(""):emptyMessage("No files or photos recorded yet.");
+}
+
+
+/* =========================================================
+   TREATMENT / NOTES
+========================================================= */
+
+function renderTreatmentHistory(){
+  document.getElementById("treatmentHistoryList").innerHTML=
+    patient.visits.length?patient.visits.map(v=>`
+      <div class="simple-row">
+        <div>
+          <strong>${v.date}</strong>
+          <span>${v.visit}</span>
+        </div>
+        <div>
+          <strong>${v.injection||"None recorded"}</strong>
+          <span>${v.dose||"—"}${v.medication&&v.medication!=="None recorded"?" · "+v.medication:""}</span>
+        </div>
+        <button class="edit-button" onclick="selectVisit('${v.id}');openTreatmentEdit()">✎ Edit</button>
+      </div>
+    `).join(""):emptyMessageRow("No treatment records yet.");
+}
+
+function renderPatientNotes(){
+  document.getElementById("patientNotesList").innerHTML=
+    patient.visits.length?patient.visits.map(v=>`
+      <div class="simple-row">
+        <div>
+          <strong>${v.date}</strong>
+          <span>${v.visit}</span>
+        </div>
+        <div>
+          <strong>Visit Note</strong>
+          <span>${v.notes||"No note recorded."}</span>
+        </div>
+        <button class="edit-button" onclick="selectVisit('${v.id}');openNotesEdit()">✎ Edit</button>
+      </div>
+    `).join(""):emptyMessageRow("No notes recorded yet.");
+}
+
+
+/* =========================================================
+   PATIENT EDIT
+========================================================= */
+
+function openPatientEdit(){
+
+  document.getElementById("editPatientName").value=patient.name;
+  document.getElementById("editPatientId").value=patient.id;
+  document.getElementById("editPatientPhone").value=patient.phone||"";
+  document.getElementById("editPatientDob").value=patient.dob||"";
+  document.getElementById("editPatientGender").value=patient.gender||"Female";
+  document.getElementById("editPatientHeight").value=patient.height||"";
+  document.getElementById("editPatientStartWeight").value=patient.startingWeight||"";
+  document.getElementById("editPatientGoalWeight").value=patient.goalWeight||"";
+  document.getElementById("editPatientDoctor").value=patient.doctor||"Dr Aaron";
+  document.getElementById("editPatientStatus").value=patient.status||"Active";
+  document.getElementById("editArboleafUsername").value=patient.arboleafUsername||"";
+
+  openModal("patientEditModal");
+}
+
+function savePatientEdit(){
+
+  patient.name=document.getElementById("editPatientName").value.trim();
+  patient.phone=document.getElementById("editPatientPhone").value;
+  patient.dob=document.getElementById("editPatientDob").value;
+  patient.gender=document.getElementById("editPatientGender").value;
+  patient.height=document.getElementById("editPatientHeight").value;
+  patient.startingWeight=document.getElementById("editPatientStartWeight").value;
+  patient.goalWeight=document.getElementById("editPatientGoalWeight").value;
+  patient.doctor=document.getElementById("editPatientDoctor").value;
+  patient.status=document.getElementById("editPatientStatus").value;
+  patient.arboleafUsername=document.getElementById("editArboleafUsername").value;
+
+  refreshPatient();
+  closeModal("patientEditModal");
+  alert("Patient changes saved in the current UI.");
+}
+
+
+/* =========================================================
+   VISIT EDIT
+========================================================= */
+
+function openVisitEdit(){
+
+  if(!selectedVisit){
+    alert("Please select a visit first.");
+    return;
+  }
+
+  document.getElementById("editVisitSubtitle").textContent=
+    selectedVisit.date+" · "+selectedVisit.visit;
+
+  document.getElementById("editVisitDate").value=selectedVisit.dateKey;
+  document.getElementById("editVisitNumber").value=selectedVisit.visit;
+  document.getElementById("editVisitType").value=selectedVisit.type;
+  document.getElementById("editVisitStatus").value=selectedVisit.status||"Completed";
+
+  openModal("visitEditModal");
+}
+
+function saveVisitEdit(){
+
+  if(!selectedVisit)return;
+
+  const oldKey=selectedVisit.dateKey;
+  const newKey=document.getElementById("editVisitDate").value;
+
+  if(oldKey!==newKey && patient.measurements[oldKey]){
+    patient.measurements[newKey]=patient.measurements[oldKey];
+    delete patient.measurements[oldKey];
+  }
+
+  selectedVisit.dateKey=newKey;
+  selectedVisit.date=formatDateForDisplay(newKey);
+  selectedVisit.visit=document.getElementById("editVisitNumber").value;
+  selectedVisit.type=document.getElementById("editVisitType").value;
+  selectedVisit.status=document.getElementById("editVisitStatus").value;
+
+  renderAll();
+  closeModal("visitEditModal");
+  alert("Visit changes saved in the current UI.");
+}
+
+
+/* =========================================================
+   MEASUREMENT EDIT
+========================================================= */
+
+function openMeasurementEdit(dateKey){
+
+  const key=dateKey||(
+    selectedVisit?selectedVisit.dateKey:
+    Object.keys(patient.measurements)[Object.keys(patient.measurements).length-1]
+  );
+
+  const data=patient.measurements[key];
+
+  if(!data){
+    alert("No Arboleaf measurement is attached to this date.");
+    return;
+  }
+
+  document.getElementById("measurementEditSubtitle").textContent=
+    formatDateForDisplay(key);
+
+  const fields=[
+    ["weight","Weight"],["bodyFat","Body Fat"],["bmi","BMI"],
+    ["skeletalMuscle","Skeletal Muscle"],["muscleMass","Muscle Mass"],
+    ["protein","Protein"],["bmr","BMR"],["fatFreeWeight","Fat-Free Body Weight"],
+    ["subcutaneousFat","Subcutaneous Fat"],["visceralFat","Visceral Fat"],
+    ["bodyWater","Body Water"],["boneMass","Bone Mass"]
+  ];
+
+  const grid=document.getElementById("measurementEditGrid");
+  grid.dataset.date=key;
+
+  grid.innerHTML=fields.map(f=>`
+    <div class="form-group">
+      <label>${f[1]}</label>
+      <input type="number" step="0.01" id="editMeasurement_${f[0]}" value="${data[f[0]]??""}">
+    </div>
+  `).join("");
+
+  openModal("measurementEditModal");
+}
+
+function saveMeasurementEdit(){
+
+  const grid=document.getElementById("measurementEditGrid");
+  const date=grid.dataset.date;
+  const data=patient.measurements[date];
+
+  if(!data)return;
+
+  allMetrics.forEach(m=>{
+    const input=document.getElementById("editMeasurement_"+m[0]);
+    if(input && input.value!=="")data[m[0]]=Number(input.value);
+  });
+
+  renderAll();
+  closeModal("measurementEditModal");
+  alert("Body composition changes saved in the current UI.");
+}
+
+
+/* =========================================================
+   TREATMENT / NOTES EDIT
+========================================================= */
+
+function openTreatmentEdit(){
+
+  if(!selectedVisit){
+    alert("Please select a visit first.");
+    return;
+  }
+
+  document.getElementById("editInjection").value=selectedVisit.injection||"Tirzepatide";
+  document.getElementById("editDose").value=selectedVisit.dose||"";
+  document.getElementById("editMedication").value=selectedVisit.medication||"";
+  document.getElementById("editAdditionalTreatment").value=selectedVisit.additionalTreatment||"";
+
+  openModal("treatmentEditModal");
+}
+
+function saveTreatmentEdit(){
+
+  if(!selectedVisit)return;
+
+  selectedVisit.injection=document.getElementById("editInjection").value;
+  selectedVisit.dose=document.getElementById("editDose").value;
+  selectedVisit.medication=document.getElementById("editMedication").value;
+  selectedVisit.additionalTreatment=document.getElementById("editAdditionalTreatment").value;
+
+  renderAll();
+  closeModal("treatmentEditModal");
+  alert("Treatment changes saved in the current UI.");
+}
+
+function openNotesEdit(){
+
+  if(!selectedVisit){
+    alert("Please select a visit first.");
+    return;
+  }
+
+  document.getElementById("editVisitNotes").value=selectedVisit.notes||"";
+  openModal("notesEditModal");
+}
+
+function saveNotesEdit(){
+
+  if(!selectedVisit)return;
+
+  selectedVisit.notes=document.getElementById("editVisitNotes").value;
+
+  renderAll();
+  closeModal("notesEditModal");
+  alert("Notes changes saved in the current UI.");
+}
+
+
+/* =========================================================
+   APPOINTMENT
+========================================================= */
+
+function renderAppointment(){
+
+  const d=new Date(appointment.date+"T00:00:00");
+  const formatted=d.toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"});
+
+  document.getElementById("upcomingDateText").textContent=
+    formatted+" · "+formatTime(appointment.time);
+
+  document.getElementById("upcomingDetailsText").textContent=
+    appointment.type+" · "+appointment.week;
+
+  document.getElementById("appointmentRowDate").textContent=
+    d.toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
+
+  document.getElementById("appointmentRowTime").textContent=
+    formatTime(appointment.time);
+
+  document.getElementById("appointmentRowType").textContent=
+    appointment.type;
+
+  document.getElementById("appointmentRowWeek").textContent=
+    appointment.week;
+}
+
+function openAppointmentEdit(){
+
+  document.getElementById("editAppointmentDate").value=appointment.date;
+  document.getElementById("editAppointmentTime").value=appointment.time;
+  document.getElementById("editAppointmentType").value=appointment.type;
+  document.getElementById("editAppointmentWeek").value=appointment.week;
+
+  openModal("appointmentEditModal");
+}
+
+function saveAppointmentEdit(){
+
+  appointment.date=document.getElementById("editAppointmentDate").value;
+  appointment.time=document.getElementById("editAppointmentTime").value;
+  appointment.type=document.getElementById("editAppointmentType").value;
+  appointment.week=document.getElementById("editAppointmentWeek").value;
+
+  renderAppointment();
+  closeModal("appointmentEditModal");
+
+  alert("Appointment changes saved in the current UI.");
 }
 
 
@@ -7105,71 +2705,37 @@ alert(
    FILES
 ========================================================= */
 
-function openVisitFilesEdit() {
+function openVisitFilesEdit(){
 
-if(!selectedVisit) return;
+  if(!selectedVisit){
+    alert("Please select a visit first.");
+    return;
+  }
 
-document.getElementById(
-"replacePdf"
-).value = "";
+  document.getElementById("replacePdf").value="";
+  document.getElementById("replacePdfName").textContent="";
 
-document.getElementById(
-"replacePdfName"
-).textContent = "";
+  ["replaceFrontPreview","replaceSidePreview","replaceBackPreview"].forEach(id=>{
+    const el=document.getElementById(id);
+    el.style.display="none";
+    el.innerHTML="";
+  });
 
-[
-"replaceFrontPreview",
-"replaceSidePreview",
-"replaceBackPreview"
-].forEach(
-id => {
-
-const element =
-document.getElementById(id);
-
-element.style.display =
-"none";
-
-element.innerHTML = "";
-
-}
-);
-
-openModal(
-"filesEditModal"
-);
-
+  openModal("filesEditModal");
 }
 
+function saveFilesEdit(){
 
-function saveFilesEdit() {
+  if(!selectedVisit)return;
 
-if(!selectedVisit) return;
+  const pdf=document.getElementById("replacePdf").files[0];
 
-const pdf =
-document.getElementById(
-"replacePdf"
-).files[0];
+  if(pdf)selectedVisit.pdfName=pdf.name;
 
-if(pdf) {
+  renderAll();
+  closeModal("filesEditModal");
 
-selectedVisit.pdfName =
-pdf.name;
-
-}
-
-refreshSelectedVisit();
-
-renderFileVisits();
-
-closeModal(
-"filesEditModal"
-);
-
-alert(
-"File changes saved in the current UI."
-);
-
+  alert("File changes saved in the current UI.");
 }
 
 
@@ -7177,454 +2743,154 @@ alert(
    ADD VISIT
 ========================================================= */
 
-function openAddVisitModal() {
+function openAddVisitModal(){
 
-document.getElementById(
-"addVisitPatient"
-).textContent =
-patient.name +
-" · " +
-patient.id;
+  document.getElementById("addVisitPatient").textContent=
+    patient.name+" · "+patient.id;
 
-document.getElementById(
-"newVisitDate"
-).value = "";
+  document.getElementById("newVisitDate").value="";
+  document.getElementById("newVisitNumber").value=
+    "Visit #"+(patient.visits.length+1);
 
-document.getElementById(
-"newVisitNumber"
-).value =
-"Visit #" +
-(
-(patient.visits || []).length + 1
-);
-
-openModal(
-"addVisitModal"
-);
-
+  openModal("addVisitModal");
 }
 
+function saveNewVisit(){
 
-function saveNewVisit() {
+  const date=document.getElementById("newVisitDate").value;
 
-const date =
-document.getElementById(
-"newVisitDate"
-).value;
+  if(!date){
+    alert("Please select a visit date.");
+    return;
+  }
 
-if(!date) {
+  const newVisit={
+    id:patient.id+"-V"+Date.now(),
+    date:formatDateForDisplay(date),
+    dateKey:date,
+    visit:document.getElementById("newVisitNumber").value,
+    type:"Body Composition Review",
+    weight:"—",
+    change:"—",
+    injection:document.getElementById("newInjection").value,
+    dose:document.getElementById("newDose").value,
+    medication:document.getElementById("newMedication").value,
+    additionalTreatment:document.getElementById("newAdditionalTreatment").value,
+    notes:document.getElementById("newVisitNotes").value,
+    pdfName:document.getElementById("newVisitPdf").files[0]?.name||"Pending upload",
+    status:"Completed"
+  };
 
-alert(
-"Please select a visit date."
-);
+  patient.visits.unshift(newVisit);
+  selectedVisit=newVisit;
 
-return;
+  renderAll();
+  closeModal("addVisitModal");
 
-}
-
-
-const visit = {
-
-id:
-patient.id +
-"-V" +
-Date.now(),
-
-date:
-formatDateForDisplay(date),
-
-dateKey:
-date,
-
-visit:
-document.getElementById(
-"newVisitNumber"
-).value,
-
-type:
-"Body Composition Review",
-
-weight:"—",
-
-change:"—",
-
-injection:
-document.getElementById(
-"newInjection"
-).value,
-
-dose:
-document.getElementById(
-"newDose"
-).value,
-
-medication:
-document.getElementById(
-"newMedication"
-).value,
-
-additionalTreatment:
-document.getElementById(
-"newAdditionalTreatment"
-).value,
-
-notes:
-document.getElementById(
-"newVisitNotes"
-).value,
-
-pdfName:
-document.getElementById(
-"newVisitPdf"
-).files[0]
-?.name ||
-"Pending upload",
-
-status:"Completed"
-
-};
-
-
-patient.visits.unshift(
-visit
-);
-
-selectedVisit =
-visit;
-
-renderVisitLists();
-
-refreshSelectedVisit();
-
-renderPhotoVisits();
-
-renderFileVisits();
-
-renderTreatmentHistory();
-
-renderPatientNotes();
-
-closeModal(
-"addVisitModal"
-);
-
-alert(
-"New visit created in the current UI."
-);
-
+  alert("New visit created in the current UI.");
 }
 
 
 /* =========================================================
-   FILE PREVIEW
+   PHOTO / FILE PREVIEW
 ========================================================= */
 
-function showSelectedFile(
-input,
-targetId
-) {
-
-const target =
-document.getElementById(
-targetId
-);
-
-if(
-input.files &&
-input.files[0]
-) {
-
-target.textContent =
-"Selected: " +
-input.files[0].name;
-
+function showSelectedFile(input,targetId){
+  const target=document.getElementById(targetId);
+  target.textContent=input.files&&input.files[0]?"Selected: "+input.files[0].name:"";
 }
 
-else {
+function previewPhoto(input,previewId){
 
-target.textContent =
-"";
+  const preview=document.getElementById(previewId);
 
-}
+  if(!input.files||!input.files[0])return;
 
-}
+  const reader=new FileReader();
 
+  reader.onload=e=>{
+    preview.innerHTML='<img src="'+e.target.result+'" alt="Uploaded full body photo">';
+    preview.style.display="block";
+  };
 
-function previewPhoto(
-input,
-previewId
-) {
-
-const preview =
-document.getElementById(
-previewId
-);
-
-if(
-!input.files ||
-!input.files[0]
-) {
-
-return;
-
-}
-
-const reader =
-new FileReader();
-
-reader.onload =
-function(event) {
-
-preview.innerHTML = `
-
-<img
-src="${event.target.result}"
-alt="Uploaded body photo"
->
-
-`;
-
-preview.style.display =
-"flex";
-
-};
-
-reader.readAsDataURL(
-input.files[0]
-);
-
+  reader.readAsDataURL(input.files[0]);
 }
 
 
 /* =========================================================
-   MODAL
+   HELPERS
 ========================================================= */
 
-function openModal(id) {
+function formatDateForDisplay(date){
+  const d=new Date(date+"T00:00:00");
+  return d.toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
+}
 
-const modal =
-document.getElementById(id);
+function formatTime(time){
+  if(!time)return "";
+  const [h,m]=time.split(":");
+  let hour=Number(h);
+  const suffix=hour>=12?"PM":"AM";
+  hour=hour%12||12;
+  return `${hour}:${m} ${suffix}`;
+}
 
-if(!modal) return;
+function formatNumber(n){
+  if(n===null||n===undefined||n==="")return "—";
+  const x=Number(n);
+  if(Number.isInteger(x))return String(x);
+  return x.toFixed(2).replace(/0+$/,"").replace(/\.$/,"");
+}
 
-modal.classList.add("show");
+function emptyMessage(text){
+  return `<div style="padding:22px 0;color:var(--muted);font-size:10px">${text}</div>`;
+}
 
-document.body.style.overflow =
-"hidden";
+function emptyMessageRow(text){
+  return `<div style="padding:15px 0;color:var(--muted);font-size:10px">${text}</div>`;
+}
 
+function showComingSoon(section){
+  alert(section+" will be connected during the backend phase.");
+}
+
+function renderAll(){
+  refreshPatient();
+  renderVisits();
+  refreshSelectedVisit();
+  renderLatestMeasurement();
+  populateComparisonDates();
+  renderMeasurementHistory();
+  renderFileVisits();
+  renderTreatmentHistory();
+  renderPatientNotes();
+  renderAppointment();
 }
 
 
-function closeModal(id) {
+/* =========================================================
+   MOBILE SIDEBAR
+========================================================= */
 
-const modal =
-document.getElementById(id);
+const sidebar=document.getElementById("sidebar");
+const mobileOverlay=document.getElementById("mobileOverlay");
 
-if(!modal) return;
-
-modal.classList.remove("show");
-
-document.body.style.overflow =
-"";
-
-}
-
-
-document
-.querySelectorAll(".modal-overlay")
-.forEach(
-overlay => {
-
-overlay.addEventListener(
-"click",
-event => {
-
-if(event.target === overlay) {
-
-closeModal(
-overlay.id
-);
-
-}
-
+document.getElementById("mobileMenu").addEventListener("click",()=>{
+  sidebar.classList.toggle("open");
+  mobileOverlay.classList.toggle("show");
 });
 
-}
-);
+mobileOverlay.addEventListener("click",()=>{
+  sidebar.classList.remove("open");
+  mobileOverlay.classList.remove("show");
+});
 
-
-/* =========================================================
-   DATE / TIME
-========================================================= */
-
-function formatDateForDisplay(
-date
-) {
-
-const d =
-new Date(
-date + "T00:00:00"
-);
-
-return d.toLocaleDateString(
-"en-GB",
-{
-day:"2-digit",
-month:"short",
-year:"numeric"
-}
-);
-
-}
-
-
-function formatTime(
-time
-) {
-
-if(!time) return "";
-
-const parts =
-time.split(":");
-
-let hour =
-Number(parts[0]);
-
-const minutes =
-parts[1];
-
-const suffix =
-hour >= 12 ? "PM" : "AM";
-
-hour =
-hour % 12 || 12;
-
-return (
-hour +
-":" +
-minutes +
-" " +
-suffix
-);
-
-}
-
-
-/* =========================================================
-   NUMBER
-========================================================= */
-
-function formatNumber(
-number
-) {
-
-if(
-number === null ||
-number === undefined ||
-number === ""
-) {
-
-return "—";
-
-}
-
-const n =
-Number(number);
-
-if(
-Number.isInteger(n)
-) {
-
-return String(n);
-
-}
-
-return n
-.toFixed(2)
-.replace(/0+$/,"")
-.replace(/\.$/,"");
-
-}
-
-
-/* =========================================================
-   PLACEHOLDER
-========================================================= */
-
-function showComingSoon(
-section
-) {
-
-alert(
-section +
-" will be connected during the backend phase."
-);
-
-}
-
-
-/* =========================================================
-   MOBILE MENU
-========================================================= */
-
-const sidebar =
-document.getElementById(
-"sidebar"
-);
-
-const mobileOverlay =
-document.getElementById(
-"mobileOverlay"
-);
-
-document.getElementById(
-"mobileMenu"
-).addEventListener(
-"click",
-() => {
-
-sidebar.classList.toggle("open");
-
-mobileOverlay.classList.toggle("show");
-
-}
-);
-
-mobileOverlay.addEventListener(
-"click",
-() => {
-
-sidebar.classList.remove("open");
-
-mobileOverlay.classList.remove("show");
-
-}
-);
-
-
-/* =========================================================
-   ESCAPE
-========================================================= */
-
-document.addEventListener(
-"keydown",
-event => {
-
-if(event.key === "Escape") {
-
-document
-.querySelectorAll(".modal-overlay.show")
-.forEach(
-modal =>
-closeModal(modal.id)
-);
-
-sidebar.classList.remove("open");
-
-mobileOverlay.classList.remove("show");
-
-}
-
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){
+    document.querySelectorAll(".modal-overlay.show").forEach(el=>closeModal(el.id));
+    sidebar.classList.remove("open");
+    mobileOverlay.classList.remove("show");
+  }
 });
 
 
@@ -7632,8 +2898,8 @@ mobileOverlay.classList.remove("show");
    INITIALISE
 ========================================================= */
 
-refreshSelectedVisit();
-
+renderAll();
+activateTab("overview");
 </script>
 
 </body>
