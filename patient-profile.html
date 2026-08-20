@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Patient Profile | Getwell Weight Loss Admin</title>
 
-  <!-- Poppins -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -16,15 +18,9 @@
   >
 
   <style>
-
-    /* =====================================================
-       GETWELL DESIGN SYSTEM
-    ====================================================== */
-
     :root {
       --primary: #2563EB;
       --primary-dark: #1D4ED8;
-
       --primary-soft: #E1EEFF;
       --primary-pale: #EAF2FC;
 
@@ -54,15 +50,7 @@
 
       --shadow:
         0 4px 18px rgba(37, 99, 235, 0.07);
-
-      --shadow-hover:
-        0 8px 24px rgba(37, 99, 235, 0.10);
     }
-
-
-    /* =====================================================
-       RESET
-    ====================================================== */
 
     * {
       box-sizing: border-box;
@@ -101,23 +89,18 @@
       color: inherit;
     }
 
-
-    /* =====================================================
-       APP
-    ====================================================== */
-
     .app {
       display: flex;
       min-height: 100vh;
     }
 
-
-    /* =====================================================
+    /* =========================================
        SIDEBAR
-    ====================================================== */
+    ========================================== */
 
     .sidebar {
       width: 250px;
+
       background: var(--sidebar-bg);
 
       border-right: 1px solid var(--border);
@@ -166,13 +149,12 @@
       align-items: center;
       justify-content: center;
 
-      color: white;
+      color: var(--white);
 
       font-size: 17px;
       font-weight: 700;
 
       flex-shrink: 0;
-
       margin-right: 10px;
 
       box-shadow:
@@ -196,8 +178,6 @@
       font-weight: 700;
 
       line-height: 20px;
-
-      letter-spacing: -0.2px;
     }
 
     .brand-text span {
@@ -242,6 +222,7 @@
       gap: 12px;
 
       width: 100%;
+
       min-height: 44px;
 
       padding: 0 12px;
@@ -264,12 +245,15 @@
 
     .nav-item:hover {
       background: var(--primary-pale);
+
       color: var(--primary);
     }
 
     .nav-item.active {
       background: var(--primary-soft);
+
       color: var(--primary);
+
       font-weight: 600;
     }
 
@@ -278,6 +262,7 @@
       height: 20px;
 
       display: inline-flex;
+
       align-items: center;
       justify-content: center;
 
@@ -307,6 +292,7 @@
       padding: 10px;
 
       display: flex;
+
       align-items: center;
 
       gap: 10px;
@@ -323,10 +309,12 @@
       color: var(--primary);
 
       display: flex;
+
       justify-content: center;
       align-items: center;
 
       font-size: 11px;
+
       font-weight: 600;
 
       flex-shrink: 0;
@@ -338,7 +326,9 @@
       height: 34px;
 
       display: flex;
+
       flex-direction: column;
+
       justify-content: center;
     }
 
@@ -368,22 +358,17 @@
       line-height: 14px;
     }
 
-
-    /* =====================================================
-       MAIN
-    ====================================================== */
+    /* =========================================
+       MAIN + TOPBAR
+    ========================================== */
 
     .main {
       margin-left: 250px;
 
       flex: 1;
+
       min-width: 0;
     }
-
-
-    /* =====================================================
-       TOPBAR
-    ====================================================== */
 
     .topbar {
       height: 74px;
@@ -394,7 +379,9 @@
       border-bottom: 1px solid var(--border);
 
       display: flex;
+
       align-items: center;
+
       justify-content: space-between;
 
       padding: 0 28px;
@@ -409,7 +396,9 @@
 
     .topbar-left {
       display: flex;
+
       align-items: center;
+
       gap: 12px;
     }
 
@@ -446,15 +435,14 @@
       color: var(--navy);
 
       line-height: 20px;
-
-      letter-spacing: -0.3px;
     }
 
     .page-subtitle {
       font-size: 11px;
-      font-weight: 400;
 
       color: var(--muted);
+
+      font-weight: 400;
 
       line-height: 14px;
 
@@ -464,6 +452,7 @@
     .topbar-right {
       display: flex;
       align-items: center;
+
       gap: 9px;
     }
 
@@ -486,16 +475,13 @@
     }
 
     .search-icon {
-      width: 16px;
-      height: 16px;
-
       color: var(--muted-light);
 
       display: flex;
-      align-items: center;
-      justify-content: center;
 
-      flex-shrink: 0;
+      align-items: center;
+
+      justify-content: center;
     }
 
     .search-icon svg {
@@ -514,6 +500,7 @@
       color: var(--text);
 
       font-size: 11px;
+
       font-weight: 400;
     }
 
@@ -532,17 +519,18 @@
       background: var(--white);
 
       display: flex;
+
       align-items: center;
       justify-content: center;
 
       color: #475569;
-
-      transition: 0.15s ease;
     }
 
     .icon-button:hover {
       border-color: #BCD3F5;
+
       background: var(--primary-pale);
+
       color: var(--primary);
     }
 
@@ -559,20 +547,19 @@
 
       background: var(--navy);
 
-      color: white;
+      color: var(--white);
 
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
 
       font-size: 11px;
       font-weight: 600;
     }
 
-
-    /* =====================================================
+    /* =========================================
        CONTENT
-    ====================================================== */
+    ========================================== */
 
     .content {
       padding: 30px;
@@ -581,11 +568,6 @@
 
       margin: 0 auto;
     }
-
-
-    /* =====================================================
-       BACK
-    ====================================================== */
 
     .back-link {
       display: inline-flex;
@@ -601,8 +583,6 @@
       font-weight: 500;
 
       margin-bottom: 18px;
-
-      transition: color 0.15s ease;
     }
 
     .back-link:hover {
@@ -614,10 +594,9 @@
       height: 14px;
     }
 
-
-    /* =====================================================
+    /* =========================================
        PATIENT HERO
-    ====================================================== */
+    ========================================== */
 
     .patient-hero {
       background: var(--white);
@@ -669,7 +648,6 @@
       display: flex;
 
       align-items: center;
-
       justify-content: center;
 
       font-size: 20px;
@@ -693,8 +671,6 @@
       line-height: 28px;
 
       letter-spacing: -0.4px;
-
-      white-space: normal;
     }
 
     .patient-heading-meta {
@@ -804,10 +780,9 @@
       margin-top: 2px;
     }
 
-
-    /* =====================================================
-       KPI GRID
-    ====================================================== */
+    /* =========================================
+       KPI
+    ========================================== */
 
     .kpi-grid {
       display: grid;
@@ -830,10 +805,6 @@
       padding: 17px 18px;
 
       box-shadow: var(--shadow);
-
-      position: relative;
-
-      overflow: hidden;
     }
 
     .kpi-label {
@@ -916,7 +887,7 @@
     .kpi-goal-fill {
       height: 100%;
 
-      width: 69%;
+      border-radius: 999px;
 
       background:
         linear-gradient(
@@ -924,8 +895,6 @@
           #2563EB,
           #60A5FA
         );
-
-      border-radius: 999px;
     }
 
     .kpi-goal-meta {
@@ -942,10 +911,9 @@
       font-weight: 400;
     }
 
-
-    /* =====================================================
+    /* =========================================
        TABS
-    ====================================================== */
+    ========================================== */
 
     .tabs-card {
       background: var(--white);
@@ -969,8 +937,6 @@
       overflow-x: auto;
 
       padding: 0 10px;
-
-      scrollbar-width: thin;
     }
 
     .tab-button {
@@ -989,12 +955,6 @@
       font-weight: 500;
 
       white-space: nowrap;
-
-      transition: color 0.15s ease;
-    }
-
-    .tab-button:hover {
-      color: var(--primary);
     }
 
     .tab-button.active {
@@ -1019,11 +979,6 @@
       background: var(--primary);
     }
 
-
-    /* =====================================================
-       TAB CONTENT
-    ====================================================== */
-
     .tab-panel {
       display: none;
     }
@@ -1032,10 +987,9 @@
       display: block;
     }
 
-
-    /* =====================================================
-       TWO COLUMN GRID
-    ====================================================== */
+    /* =========================================
+       CARDS
+    ========================================== */
 
     .dashboard-columns {
       display: grid;
@@ -1046,11 +1000,6 @@
 
       gap: 20px;
     }
-
-
-    /* =====================================================
-       CONTENT CARD
-    ====================================================== */
 
     .content-card {
       background: var(--white);
@@ -1064,10 +1013,6 @@
       overflow: hidden;
 
       margin-bottom: 20px;
-    }
-
-    .content-card:last-child {
-      margin-bottom: 0;
     }
 
     .content-card-header {
@@ -1110,146 +1055,9 @@
       padding: 20px;
     }
 
-
-    /* =====================================================
-       PROGRESS CHART
-    ====================================================== */
-
-    .chart-summary {
-      display: flex;
-
-      align-items: center;
-
-      justify-content: space-between;
-
-      margin-bottom: 14px;
-    }
-
-    .chart-summary-main strong {
-      color: var(--navy);
-
-      font-size: 24px;
-
-      font-weight: 700;
-
-      line-height: 30px;
-    }
-
-    .chart-summary-main span {
-      color: var(--muted);
-
-      font-size: 10px;
-
-      font-weight: 400;
-    }
-
-    .chart-loss {
-      display: flex;
-
-      align-items: center;
-
-      gap: 5px;
-
-      color: var(--success);
-
-      font-size: 10px;
-
-      font-weight: 600;
-    }
-
-    .chart-container {
-      width: 100%;
-
-      height: 250px;
-
-      position: relative;
-    }
-
-    .chart-grid-line {
-      position: absolute;
-
-      left: 42px;
-      right: 5px;
-
-      border-top:
-        1px dashed #DCE6F2;
-    }
-
-    .chart-y-label {
-      position: absolute;
-
-      left: 0;
-
-      width: 34px;
-
-      color: var(--muted-light);
-
-      font-size: 9px;
-
-      text-align: right;
-
-      transform: translateY(-50%);
-    }
-
-    .chart-y1 {
-      top: 20px;
-    }
-
-    .chart-y2 {
-      top: 72px;
-    }
-
-    .chart-y3 {
-      top: 124px;
-    }
-
-    .chart-y4 {
-      top: 176px;
-    }
-
-    .chart-y5 {
-      top: 228px;
-    }
-
-    .chart-line {
-      position: absolute;
-
-      left: 55px;
-      right: 5px;
-
-      top: 0;
-      bottom: 0;
-    }
-
-    .chart-svg {
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-    }
-
-    .chart-axis-labels {
-      display: grid;
-
-      grid-template-columns:
-        repeat(5, 1fr);
-
-      margin-left: 55px;
-
-      color: var(--muted-light);
-
-      font-size: 9px;
-
-      font-weight: 400;
-    }
-
-    .chart-axis-labels span {
-      text-align: center;
-    }
-
-
-    /* =====================================================
-       LATEST MEASUREMENT
-    ====================================================== */
+    /* =========================================
+       MEASUREMENTS
+    ========================================== */
 
     .measurement-grid {
       display: grid;
@@ -1278,8 +1086,6 @@
       font-size: 9px;
 
       font-weight: 400;
-
-      line-height: 14px;
     }
 
     .measurement-value {
@@ -1290,8 +1096,6 @@
       font-size: 14px;
 
       font-weight: 600;
-
-      line-height: 20px;
 
       margin-top: 3px;
     }
@@ -1305,15 +1109,12 @@
 
       font-weight: 500;
 
-      line-height: 14px;
-
       margin-top: 2px;
     }
 
-
-    /* =====================================================
-       LATEST VISIT
-    ====================================================== */
+    /* =========================================
+       VISIT
+    ========================================== */
 
     .visit-card {
       background: #F8FBFF;
@@ -1331,8 +1132,6 @@
       align-items: flex-start;
 
       justify-content: space-between;
-
-      gap: 10px;
     }
 
     .visit-date strong {
@@ -1343,8 +1142,6 @@
       font-size: 12px;
 
       font-weight: 600;
-
-      line-height: 18px;
     }
 
     .visit-date span {
@@ -1353,10 +1150,6 @@
       color: var(--muted);
 
       font-size: 9px;
-
-      font-weight: 400;
-
-      line-height: 14px;
 
       margin-top: 2px;
     }
@@ -1373,8 +1166,6 @@
       font-size: 9px;
 
       font-weight: 600;
-
-      white-space: nowrap;
     }
 
     .visit-summary {
@@ -1404,8 +1195,6 @@
       color: var(--muted);
 
       font-size: 8px;
-
-      font-weight: 400;
     }
 
     .visit-metric strong {
@@ -1434,7 +1223,6 @@
       display: inline-flex;
 
       align-items: center;
-
       justify-content: center;
 
       gap: 6px;
@@ -1444,7 +1232,6 @@
       border-radius: 8px;
 
       font-size: 9px;
-
       font-weight: 500;
 
       background: var(--white);
@@ -1465,10 +1252,9 @@
       height: 13px;
     }
 
-
-    /* =====================================================
-       VISIT TIMELINE
-    ====================================================== */
+    /* =========================================
+       TIMELINE
+    ========================================== */
 
     .timeline {
       position: relative;
@@ -1558,8 +1344,6 @@
       color: var(--muted);
 
       font-size: 9px;
-
-      font-weight: 400;
     }
 
     .timeline-meta strong {
@@ -1568,10 +1352,114 @@
       font-weight: 600;
     }
 
+    /* =========================================
+       CHART
+    ========================================== */
 
-    /* =====================================================
-       BODY COMPOSITION TAB
-    ====================================================== */
+    .chart-summary {
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      margin-bottom: 14px;
+    }
+
+    .chart-summary-main strong {
+      color: var(--navy);
+
+      font-size: 24px;
+
+      font-weight: 700;
+
+      line-height: 30px;
+    }
+
+    .chart-summary-main span {
+      color: var(--muted);
+
+      font-size: 10px;
+    }
+
+    .chart-loss {
+      color: var(--success);
+
+      font-size: 10px;
+
+      font-weight: 600;
+    }
+
+    .chart-container {
+      width: 100%;
+
+      height: 250px;
+
+      position: relative;
+    }
+
+    .chart-grid-line {
+      position: absolute;
+
+      left: 42px;
+      right: 5px;
+
+      border-top: 1px dashed #DCE6F2;
+    }
+
+    .chart-y-label {
+      position: absolute;
+
+      left: 0;
+
+      width: 34px;
+
+      color: var(--muted-light);
+
+      font-size: 9px;
+
+      text-align: right;
+
+      transform: translateY(-50%);
+    }
+
+    .chart-line {
+      position: absolute;
+
+      left: 55px;
+      right: 5px;
+
+      top: 0;
+      bottom: 0;
+    }
+
+    .chart-svg {
+      width: 100%;
+      height: 100%;
+
+      overflow: visible;
+    }
+
+    .chart-axis-labels {
+      display: grid;
+
+      grid-template-columns:
+        repeat(5, 1fr);
+
+      margin-left: 55px;
+
+      color: var(--muted-light);
+
+      font-size: 9px;
+    }
+
+    .chart-axis-labels span {
+      text-align: center;
+    }
+
+    /* =========================================
+       COMPOSITION
+    ========================================== */
 
     .composition-grid {
       display: grid;
@@ -1596,8 +1484,6 @@
       color: var(--muted);
 
       font-size: 9px;
-
-      font-weight: 400;
     }
 
     .composition-card-value {
@@ -1620,13 +1506,15 @@
       margin-top: 2px;
     }
 
-    .composition-table {
+    .composition-table,
+    .treatment-table {
       width: 100%;
 
       border-collapse: collapse;
     }
 
-    .composition-table th {
+    .composition-table th,
+    .treatment-table th {
       padding: 11px 12px;
 
       background: #F8FBFF;
@@ -1644,7 +1532,8 @@
       text-transform: uppercase;
     }
 
-    .composition-table td {
+    .composition-table td,
+    .treatment-table td {
       padding: 12px;
 
       border-bottom: 1px solid var(--border-light);
@@ -1656,14 +1545,14 @@
       font-weight: 400;
     }
 
-    .composition-table tr:last-child td {
+    .composition-table tr:last-child td,
+    .treatment-table tr:last-child td {
       border-bottom: none;
     }
 
-
-    /* =====================================================
-       VISITS TAB
-    ====================================================== */
+    /* =========================================
+       VISITS
+    ========================================== */
 
     .visit-history {
       display: flex;
@@ -1740,10 +1629,9 @@
       margin-top: 2px;
     }
 
-
-    /* =====================================================
-       PHOTOS TAB
-    ====================================================== */
+    /* =========================================
+       PHOTOS
+    ========================================== */
 
     .photo-header {
       display: flex;
@@ -1829,7 +1717,6 @@
       display: flex;
 
       align-items: center;
-
       justify-content: center;
 
       color: #8BA8CC;
@@ -1852,10 +1739,9 @@
       font-size: 9px;
     }
 
-
-    /* =====================================================
-       FILES TAB
-    ====================================================== */
+    /* =========================================
+       FILES
+    ========================================== */
 
     .file-list {
       display: flex;
@@ -1890,7 +1776,6 @@
       display: flex;
 
       align-items: center;
-
       justify-content: center;
 
       background: var(--primary-soft);
@@ -1901,13 +1786,13 @@
     }
 
     .file-icon.pdf {
-      background: #FEF2F2;
+      background: var(--danger-soft);
 
       color: var(--danger);
     }
 
     .file-icon.image {
-      background: #ECFDF5;
+      background: var(--success-soft);
 
       color: var(--success);
     }
@@ -1967,14 +1852,9 @@
       font-weight: 500;
     }
 
-    .file-button:hover {
-      background: var(--primary-soft);
-    }
-
-
-    /* =====================================================
-       APPOINTMENTS TAB
-    ====================================================== */
+    /* =========================================
+       APPOINTMENTS
+    ========================================== */
 
     .appointment-list {
       display: flex;
@@ -2001,26 +1881,7 @@
       border-bottom: none;
     }
 
-    .appointment-date strong {
-      display: block;
-
-      color: var(--navy);
-
-      font-size: 11px;
-
-      font-weight: 600;
-    }
-
-    .appointment-date span {
-      display: block;
-
-      color: var(--muted);
-
-      font-size: 9px;
-
-      margin-top: 2px;
-    }
-
+    .appointment-date strong,
     .appointment-details strong {
       display: block;
 
@@ -2031,6 +1892,7 @@
       font-weight: 600;
     }
 
+    .appointment-date span,
     .appointment-details span {
       display: block;
 
@@ -2041,53 +1903,9 @@
       margin-top: 2px;
     }
 
-
-    /* =====================================================
-       TREATMENT TAB
-    ====================================================== */
-
-    .treatment-table {
-      width: 100%;
-
-      border-collapse: collapse;
-    }
-
-    .treatment-table th {
-      padding: 11px 12px;
-
-      background: #F8FBFF;
-
-      border-bottom: 1px solid var(--border);
-
-      text-align: left;
-
-      color: var(--muted);
-
-      font-size: 9px;
-
-      font-weight: 600;
-
-      text-transform: uppercase;
-    }
-
-    .treatment-table td {
-      padding: 12px;
-
-      border-bottom: 1px solid var(--border-light);
-
-      color: var(--text);
-
-      font-size: 10px;
-    }
-
-    .treatment-table tr:last-child td {
-      border-bottom: none;
-    }
-
-
-    /* =====================================================
-       NOTES TAB
-    ====================================================== */
+    /* =========================================
+       NOTES
+    ========================================== */
 
     .note-box {
       background: #F8FBFF;
@@ -2108,9 +1926,9 @@
     .note-top {
       display: flex;
 
-      align-items: center;
-
       justify-content: space-between;
+
+      align-items: center;
     }
 
     .note-top strong {
@@ -2137,10 +1955,9 @@
       margin-top: 8px;
     }
 
-
-    /* =====================================================
+    /* =========================================
        MOBILE OVERLAY
-    ====================================================== */
+    ========================================== */
 
     .mobile-overlay {
       display: none;
@@ -2159,13 +1976,11 @@
       display: block;
     }
 
-
-    /* =====================================================
+    /* =========================================
        RESPONSIVE
-    ====================================================== */
+    ========================================== */
 
     @media (max-width: 1200px) {
-
       .hero-details {
         gap: 16px;
       }
@@ -2183,12 +1998,9 @@
         grid-template-columns:
           repeat(2, minmax(0, 1fr));
       }
-
     }
 
-
     @media (max-width: 900px) {
-
       .sidebar {
         transform:
           translateX(-100%);
@@ -2212,9 +2024,9 @@
       }
 
       .patient-hero {
-        align-items: flex-start;
-
         flex-direction: column;
+
+        align-items: flex-start;
       }
 
       .hero-details {
@@ -2235,12 +2047,9 @@
         grid-template-columns:
           repeat(4, minmax(0, 1fr));
       }
-
     }
 
-
     @media (max-width: 680px) {
-
       .topbar {
         padding: 0 15px;
       }
@@ -2267,6 +2076,7 @@
 
       .patient-heading h1 {
         font-size: 17px;
+
         line-height: 24px;
       }
 
@@ -2315,12 +2125,9 @@
         left: 12px;
         right: 12px;
       }
-
     }
 
-
     @media (max-width: 420px) {
-
       .patient-large-avatar {
         width: 58px;
         height: 58px;
@@ -2336,28 +2143,23 @@
       .chart-container {
         height: 220px;
       }
-
     }
 
   </style>
 </head>
 
-
 <body>
 
 <div class="app">
 
-
-  <!-- =====================================================
+  <!-- =========================================
        SIDEBAR
-  ====================================================== -->
+  ========================================== -->
 
   <aside
     class="sidebar"
     id="sidebar"
   >
-
-    <!-- BRAND -->
 
     <div class="brand">
 
@@ -2380,17 +2182,12 @@
     </div>
 
 
-    <!-- NAVIGATION -->
-
     <div class="sidebar-content">
-
 
       <div class="nav-section-title">
         Main
       </div>
 
-
-      <!-- DASHBOARD -->
 
       <a
         class="nav-item"
@@ -2419,8 +2216,6 @@
       </a>
 
 
-      <!-- PATIENTS -->
-
       <a
         class="nav-item active"
         href="patients.html"
@@ -2436,23 +2231,10 @@
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <circle
-              cx="9"
-              cy="8"
-              r="3"
-            ></circle>
-
-            <path
-              d="M3.5 20a5.5 5.5 0 0111 0"
-            ></path>
-
-            <path
-              d="M15 5.5a3 3 0 010 5"
-            ></path>
-
-            <path
-              d="M17 13.5a5.5 5.5 0 013.5 5"
-            ></path>
+            <circle cx="9" cy="8" r="3"></circle>
+            <path d="M3.5 20a5.5 5.5 0 0111 0"></path>
+            <path d="M15 5.5a3 3 0 010 5"></path>
+            <path d="M17 13.5a5.5 5.5 0 013.5 5"></path>
           </svg>
 
         </span>
@@ -2461,8 +2243,6 @@
 
       </a>
 
-
-      <!-- APPOINTMENTS -->
 
       <button
         class="nav-item"
@@ -2489,7 +2269,6 @@
 
             <line x1="16" y1="2" x2="16" y2="6"></line>
             <line x1="8" y1="2" x2="8" y2="6"></line>
-
             <line x1="3" y1="10" x2="21" y2="10"></line>
           </svg>
 
@@ -2499,8 +2278,6 @@
 
       </button>
 
-
-      <!-- PROGRAM -->
 
       <div
         class="nav-section-title"
@@ -2601,8 +2378,6 @@
       </button>
 
 
-      <!-- MANAGEMENT -->
-
       <div
         class="nav-section-title"
         style="margin-top:14px;"
@@ -2661,11 +2436,7 @@
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <circle
-              cx="12"
-              cy="12"
-              r="3"
-            ></circle>
+            <circle cx="12" cy="12" r="3"></circle>
 
             <path
               d="M19.4 15a1.7 1.7 0 00.34 1.88l.06.06-1.8 1.8-.06-.06a1.7 1.7 0 00-1.88-.34 1.7 1.7 0 00-1.03 1.55V20H12v-.09a1.7 1.7 0 00-1.03-1.55 1.7 1.7 0 00-1.88.34l-.06.06-1.8-1.8.06-.06A1.7 1.7 0 007.63 15a1.7 1.7 0 00-1.55-1.03H6V11h.09a1.7 1.7 0 001.55-1.03 1.7 1.7 0 00-.34-1.88l-.06-.06 1.8-1.8.06.06a1.7 1.7 0 001.88.34A1.7 1.7 0 0012 4.09V4h3v.09a1.7 1.7 0 001.03 1.55 1.7 1.7 0 001.88-.34l.06-.06 1.8 1.8-.06.06A1.7 1.7 0 0019.4 9c.1.5.5.88 1.03.97H20v3h.09c-.53.09-.93.47-1.03 1.03z"
@@ -2680,8 +2451,6 @@
 
     </div>
 
-
-    <!-- ADMIN -->
 
     <div class="sidebar-bottom">
 
@@ -2710,22 +2479,17 @@
   </aside>
 
 
-  <!-- MOBILE OVERLAY -->
-
   <div
     class="mobile-overlay"
     id="mobileOverlay"
   ></div>
 
 
-  <!-- =====================================================
+  <!-- =========================================
        MAIN
-  ====================================================== -->
+  ========================================== -->
 
   <main class="main">
-
-
-    <!-- TOPBAR -->
 
     <header class="topbar">
 
@@ -2734,7 +2498,6 @@
         <button
           class="mobile-menu"
           id="mobileMenu"
-          aria-label="Open menu"
         >
 
           <svg
@@ -2780,15 +2543,8 @@
               stroke-width="2"
               stroke-linecap="round"
             >
-              <circle
-                cx="11"
-                cy="11"
-                r="7"
-              ></circle>
-
-              <path
-                d="M20 20l-4-4"
-              ></path>
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="M20 20l-4-4"></path>
             </svg>
 
           </span>
@@ -2837,12 +2593,7 @@
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <circle
-              cx="12"
-              cy="12"
-              r="9"
-            ></circle>
-
+            <circle cx="12" cy="12" r="9"></circle>
             <path d="M12 7v5l3 2"></path>
           </svg>
 
@@ -2858,14 +2609,12 @@
     </header>
 
 
-    <!-- =====================================================
+    <!-- =========================================
          CONTENT
-    ====================================================== -->
+    ========================================== -->
 
     <section class="content">
 
-
-      <!-- BACK -->
 
       <a
         href="patients.html"
@@ -2889,29 +2638,33 @@
       </a>
 
 
-      <!-- =================================================
-           PATIENT HERO
-      ================================================== -->
+      <!-- HERO -->
 
       <div class="patient-hero">
 
-
         <div class="patient-main">
 
-          <div class="patient-large-avatar">
+          <div
+            class="patient-large-avatar"
+            id="patientInitials"
+          >
             MA
           </div>
 
 
           <div class="patient-heading">
 
-            <h1>
+            <h1 id="patientName">
               MOHD AIZUDDIN BIN ABDUL MALEK
             </h1>
 
+
             <div class="patient-heading-meta">
 
-              <span class="patient-id">
+              <span
+                class="patient-id"
+                id="patientId"
+              >
                 GW0002
               </span>
 
@@ -2931,7 +2684,9 @@
 
                 <span class="status-dot"></span>
 
-                Active
+                <span id="patientStatus">
+                  Active
+                </span>
 
               </span>
 
@@ -2944,14 +2699,16 @@
 
         <div class="hero-details">
 
-
           <div class="hero-detail">
 
             <span class="hero-detail-label">
               Program Started
             </span>
 
-            <span class="hero-detail-value">
+            <span
+              class="hero-detail-value"
+              id="startDate"
+            >
               12 Jun 2026
             </span>
 
@@ -2964,7 +2721,10 @@
               Doctor
             </span>
 
-            <span class="hero-detail-value">
+            <span
+              class="hero-detail-value"
+              id="doctor"
+            >
               Dr Aaron
             </span>
 
@@ -2977,7 +2737,10 @@
               Last Visit
             </span>
 
-            <span class="hero-detail-value">
+            <span
+              class="hero-detail-value"
+              id="lastVisit"
+            >
               20 Aug 2026
             </span>
 
@@ -2988,14 +2751,10 @@
       </div>
 
 
-      <!-- =================================================
-           KPI
-      ================================================== -->
+      <!-- KPI -->
 
       <div class="kpi-grid">
 
-
-        <!-- STARTING WEIGHT -->
 
         <div class="kpi-card">
 
@@ -3005,7 +2764,10 @@
 
           <div class="kpi-value-row">
 
-            <span class="kpi-value">
+            <span
+              class="kpi-value"
+              id="startingWeight"
+            >
               89.0
             </span>
 
@@ -3022,8 +2784,6 @@
         </div>
 
 
-        <!-- CURRENT WEIGHT -->
-
         <div class="kpi-card">
 
           <span class="kpi-label">
@@ -3032,7 +2792,10 @@
 
           <div class="kpi-value-row">
 
-            <span class="kpi-value">
+            <span
+              class="kpi-value"
+              id="currentWeight"
+            >
               81.2
             </span>
 
@@ -3056,14 +2819,14 @@
               <path d="M6 11l6-6 6 6"></path>
             </svg>
 
-            7.8 kg lost
+            <span id="totalLoss">
+              7.8 kg lost
+            </span>
 
           </div>
 
         </div>
 
-
-        <!-- GOAL -->
 
         <div class="kpi-card">
 
@@ -3073,7 +2836,10 @@
 
           <div class="kpi-value-row">
 
-            <span class="kpi-value">
+            <span
+              class="kpi-value"
+              id="goalWeight"
+            >
               70.0
             </span>
 
@@ -3089,17 +2855,19 @@
 
               <div
                 class="kpi-goal-fill"
+                id="goalFill"
+                style="width:69%;"
               ></div>
 
             </div>
 
             <div class="kpi-goal-meta">
 
-              <span>
+              <span id="goalProgress">
                 69% achieved
               </span>
 
-              <span>
+              <span id="remainingWeight">
                 11.2 kg remaining
               </span>
 
@@ -3110,8 +2878,6 @@
         </div>
 
 
-        <!-- DURATION -->
-
         <div class="kpi-card">
 
           <span class="kpi-label">
@@ -3120,7 +2886,10 @@
 
           <div class="kpi-value-row">
 
-            <span class="kpi-value">
+            <span
+              class="kpi-value"
+              id="duration"
+            >
               10
             </span>
 
@@ -3139,13 +2908,14 @@
       </div>
 
 
-      <!-- =================================================
-           TABS
-      ================================================== -->
+      <!-- TABS -->
 
       <div class="tabs-card">
 
-        <div class="tabs" id="tabs">
+        <div
+          class="tabs"
+          id="tabs"
+        >
 
           <button
             class="tab-button active"
@@ -3208,9 +2978,9 @@
       </div>
 
 
-      <!-- =================================================
+      <!-- =========================================
            OVERVIEW
-      ================================================== -->
+      ========================================== -->
 
       <div
         class="tab-panel active"
@@ -3219,8 +2989,6 @@
 
         <div class="dashboard-columns">
 
-
-          <!-- LEFT -->
 
           <div>
 
@@ -3244,7 +3012,7 @@
                 </div>
 
                 <span>
-                  12 Jun — 20 Aug 2026
+                  Program history
                 </span>
 
               </div>
@@ -3256,7 +3024,7 @@
 
                   <div class="chart-summary-main">
 
-                    <strong>
+                    <strong id="chartCurrentWeight">
                       81.2 kg
                     </strong>
 
@@ -3267,9 +3035,7 @@
                   </div>
 
                   <div class="chart-loss">
-
-                    ↓ 7.8 kg overall
-
+                    ↓ <span id="chartTotalLoss">7.8</span> kg overall
                   </div>
 
                 </div>
@@ -3303,23 +3069,38 @@
                   ></div>
 
 
-                  <div class="chart-y-label chart-y1">
+                  <div
+                    class="chart-y-label"
+                    style="top:20px;"
+                  >
                     90
                   </div>
 
-                  <div class="chart-y-label chart-y2">
+                  <div
+                    class="chart-y-label"
+                    style="top:72px;"
+                  >
                     87
                   </div>
 
-                  <div class="chart-y-label chart-y3">
+                  <div
+                    class="chart-y-label"
+                    style="top:124px;"
+                  >
                     84
                   </div>
 
-                  <div class="chart-y-label chart-y4">
+                  <div
+                    class="chart-y-label"
+                    style="top:176px;"
+                  >
                     81
                   </div>
 
-                  <div class="chart-y-label chart-y5">
+                  <div
+                    class="chart-y-label"
+                    style="top:228px;"
+                  >
                     78
                   </div>
 
@@ -3361,13 +3142,13 @@
 
                       <path
                         d="
-                          M 20 35
-                          L 135 80
-                          L 250 130
-                          L 365 178
-                          L 480 215
-                          L 480 250
-                          L 20 250
+                          M20 35
+                          L135 80
+                          L250 130
+                          L365 178
+                          L480 215
+                          L480 250
+                          L20 250
                           Z
                         "
                         fill="url(#chartFill)"
@@ -3376,11 +3157,11 @@
 
                       <path
                         d="
-                          M 20 35
-                          L 135 80
-                          L 250 130
-                          L 365 178
-                          L 480 215
+                          M20 35
+                          L135 80
+                          L250 130
+                          L365 178
+                          L480 215
                         "
                         fill="none"
                         stroke="#2563EB"
@@ -3444,25 +3225,11 @@
 
                 <div class="chart-axis-labels">
 
-                  <span>
-                    Jun 12
-                  </span>
-
-                  <span>
-                    Jun 26
-                  </span>
-
-                  <span>
-                    Jul 10
-                  </span>
-
-                  <span>
-                    Jul 31
-                  </span>
-
-                  <span>
-                    Aug 20
-                  </span>
+                  <span>Jun</span>
+                  <span>Jul</span>
+                  <span>Jul</span>
+                  <span>Aug</span>
+                  <span>Aug</span>
 
                 </div>
 
@@ -3500,7 +3267,6 @@
 
                 <div class="visit-card">
 
-
                   <div class="visit-top">
 
                     <div class="visit-date">
@@ -3524,82 +3290,34 @@
 
                   <div class="visit-summary">
 
-
                     <div class="visit-metric">
-
-                      <span>
-                        Weight
-                      </span>
-
-                      <strong>
-                        81.2 kg
-                      </strong>
-
+                      <span>Weight</span>
+                      <strong>81.2 kg</strong>
                     </div>
 
-
                     <div class="visit-metric">
-
-                      <span>
-                        Body Fat
-                      </span>
-
-                      <strong>
-                        27.4%
-                      </strong>
-
+                      <span>Body Fat</span>
+                      <strong>27.4%</strong>
                     </div>
 
-
                     <div class="visit-metric">
-
-                      <span>
-                        BMI
-                      </span>
-
-                      <strong>
-                        28.4
-                      </strong>
-
+                      <span>BMI</span>
+                      <strong>28.4</strong>
                     </div>
 
-
                     <div class="visit-metric">
-
-                      <span>
-                        Skeletal Muscle
-                      </span>
-
-                      <strong>
-                        35.1 kg
-                      </strong>
-
+                      <span>Skeletal Muscle</span>
+                      <strong>35.1 kg</strong>
                     </div>
 
-
                     <div class="visit-metric">
-
-                      <span>
-                        Visceral Fat
-                      </span>
-
-                      <strong>
-                        11
-                      </strong>
-
+                      <span>Visceral Fat</span>
+                      <strong>11</strong>
                     </div>
 
-
                     <div class="visit-metric">
-
-                      <span>
-                        Body Water
-                      </span>
-
-                      <strong>
-                        52.8%
-                      </strong>
-
+                      <span>Body Water</span>
+                      <strong>52.8%</strong>
                     </div>
 
                   </div>
@@ -3612,67 +3330,14 @@
                       onclick="showComingSoon('Arboleaf PDF')"
                     >
 
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path
-                          d="M6 2h9l5 5v15H6z"
-                        ></path>
-
-                        <path
-                          d="M14 2v6h6"
-                        ></path>
-
-                        <path
-                          d="M9 13h6"
-                        ></path>
-
-                        <path
-                          d="M9 17h6"
-                        ></path>
-                      </svg>
-
                       View Arboleaf PDF
 
                     </button>
-
 
                     <button
                       class="small-button"
                       onclick="showComingSoon('Comparison Image')"
                     >
-
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <rect
-                          x="3"
-                          y="4"
-                          width="18"
-                          height="16"
-                          rx="2"
-                        ></rect>
-
-                        <circle
-                          cx="9"
-                          cy="10"
-                          r="1.5"
-                        ></circle>
-
-                        <path
-                          d="M3 17l5-5 4 4 3-3 6 6"
-                        ></path>
-                      </svg>
 
                       View Comparison
 
@@ -3693,8 +3358,6 @@
 
           <div>
 
-
-            <!-- LATEST MEASUREMENT -->
 
             <div class="content-card">
 
@@ -3723,106 +3386,40 @@
 
                 <div class="measurement-grid">
 
-
                   <div class="measurement-item">
-
-                    <span class="measurement-label">
-                      Weight
-                    </span>
-
-                    <span class="measurement-value">
-                      81.2 kg
-                    </span>
-
-                    <span class="measurement-change">
-                      ↓ 0.8 kg
-                    </span>
-
+                    <span class="measurement-label">Weight</span>
+                    <span class="measurement-value">81.2 kg</span>
+                    <span class="measurement-change">↓ 0.8 kg</span>
                   </div>
 
-
                   <div class="measurement-item">
-
-                    <span class="measurement-label">
-                      Body Fat
-                    </span>
-
-                    <span class="measurement-value">
-                      27.4%
-                    </span>
-
-                    <span class="measurement-change">
-                      ↓ 0.6%
-                    </span>
-
+                    <span class="measurement-label">Body Fat</span>
+                    <span class="measurement-value">27.4%</span>
+                    <span class="measurement-change">↓ 0.6%</span>
                   </div>
 
-
                   <div class="measurement-item">
-
-                    <span class="measurement-label">
-                      BMI
-                    </span>
-
-                    <span class="measurement-value">
-                      28.4
-                    </span>
-
-                    <span class="measurement-change">
-                      ↓ 0.3
-                    </span>
-
+                    <span class="measurement-label">BMI</span>
+                    <span class="measurement-value">28.4</span>
+                    <span class="measurement-change">↓ 0.3</span>
                   </div>
 
-
                   <div class="measurement-item">
-
-                    <span class="measurement-label">
-                      Skeletal Muscle
-                    </span>
-
-                    <span class="measurement-value">
-                      35.1 kg
-                    </span>
-
-                    <span class="measurement-change">
-                      ↑ 0.2 kg
-                    </span>
-
+                    <span class="measurement-label">Skeletal Muscle</span>
+                    <span class="measurement-value">35.1 kg</span>
+                    <span class="measurement-change">↑ 0.2 kg</span>
                   </div>
 
-
                   <div class="measurement-item">
-
-                    <span class="measurement-label">
-                      Visceral Fat
-                    </span>
-
-                    <span class="measurement-value">
-                      11
-                    </span>
-
-                    <span class="measurement-change">
-                      ↓ 1
-                    </span>
-
+                    <span class="measurement-label">Visceral Fat</span>
+                    <span class="measurement-value">11</span>
+                    <span class="measurement-change">↓ 1</span>
                   </div>
 
-
                   <div class="measurement-item">
-
-                    <span class="measurement-label">
-                      Body Water
-                    </span>
-
-                    <span class="measurement-value">
-                      52.8%
-                    </span>
-
-                    <span class="measurement-change">
-                      ↑ 0.4%
-                    </span>
-
+                    <span class="measurement-label">Body Water</span>
+                    <span class="measurement-value">52.8%</span>
+                    <span class="measurement-change">↑ 0.4%</span>
                   </div>
 
                 </div>
@@ -3831,8 +3428,6 @@
 
             </div>
 
-
-            <!-- PROGRAM SNAPSHOT -->
 
             <div class="content-card">
 
@@ -3857,56 +3452,24 @@
 
                 <div class="measurement-grid">
 
-
                   <div class="measurement-item">
-
-                    <span class="measurement-label">
-                      Height
-                    </span>
-
-                    <span class="measurement-value">
-                      169 cm
-                    </span>
-
+                    <span class="measurement-label">Height</span>
+                    <span class="measurement-value">169 cm</span>
                   </div>
 
-
                   <div class="measurement-item">
-
-                    <span class="measurement-label">
-                      Program Week
-                    </span>
-
-                    <span class="measurement-value">
-                      Week 10
-                    </span>
-
+                    <span class="measurement-label">Program Week</span>
+                    <span class="measurement-value">Week 10</span>
                   </div>
 
-
                   <div class="measurement-item">
-
-                    <span class="measurement-label">
-                      Goal Weight
-                    </span>
-
-                    <span class="measurement-value">
-                      70.0 kg
-                    </span>
-
+                    <span class="measurement-label">Goal Weight</span>
+                    <span class="measurement-value">70.0 kg</span>
                   </div>
 
-
                   <div class="measurement-item">
-
-                    <span class="measurement-label">
-                      Remaining
-                    </span>
-
-                    <span class="measurement-value">
-                      11.2 kg
-                    </span>
-
+                    <span class="measurement-label">Remaining</span>
+                    <span class="measurement-value">11.2 kg</span>
                   </div>
 
                 </div>
@@ -3915,8 +3478,6 @@
 
             </div>
 
-
-            <!-- VISIT TIMELINE -->
 
             <div class="content-card">
 
@@ -3962,16 +3523,12 @@
 
                       <span>
                         Weight:
-                        <strong>
-                          81.2 kg
-                        </strong>
+                        <strong>81.2 kg</strong>
                       </span>
 
                       <span>
                         Change:
-                        <strong>
-                          -0.8 kg
-                        </strong>
+                        <strong>-0.8 kg</strong>
                       </span>
 
                     </div>
@@ -3995,16 +3552,12 @@
 
                       <span>
                         Weight:
-                        <strong>
-                          82.0 kg
-                        </strong>
+                        <strong>82.0 kg</strong>
                       </span>
 
                       <span>
                         Change:
-                        <strong>
-                          -0.5 kg
-                        </strong>
+                        <strong>-0.5 kg</strong>
                       </span>
 
                     </div>
@@ -4028,49 +3581,12 @@
 
                       <span>
                         Weight:
-                        <strong>
-                          82.5 kg
-                        </strong>
+                        <strong>82.5 kg</strong>
                       </span>
 
                       <span>
                         Change:
-                        <strong>
-                          -0.7 kg
-                        </strong>
-                      </span>
-
-                    </div>
-
-                  </div>
-
-
-                  <div class="timeline-item">
-
-                    <div class="timeline-dot"></div>
-
-                    <div class="timeline-date">
-                      30 Jul 2026
-                    </div>
-
-                    <div class="timeline-title">
-                      Visit #7
-                    </div>
-
-                    <div class="timeline-meta">
-
-                      <span>
-                        Weight:
-                        <strong>
-                          83.2 kg
-                        </strong>
-                      </span>
-
-                      <span>
-                        Change:
-                        <strong>
-                          -0.6 kg
-                        </strong>
+                        <strong>-0.7 kg</strong>
                       </span>
 
                     </div>
@@ -4091,9 +3607,9 @@
       </div>
 
 
-      <!-- =================================================
+      <!-- =========================================
            BODY COMPOSITION
-      ================================================== -->
+      ========================================== -->
 
       <div
         class="tab-panel"
@@ -4116,10 +3632,6 @@
 
             </div>
 
-            <span>
-              20 Aug 2026
-            </span>
-
           </div>
 
 
@@ -4127,184 +3639,76 @@
 
             <div class="composition-grid">
 
-
               <div class="composition-card">
-                <span class="composition-card-label">
-                  Weight
-                </span>
-
-                <div class="composition-card-value">
-                  81.2 kg
-                </div>
-
-                <div class="composition-card-change">
-                  ↓ 7.8 kg overall
-                </div>
+                <span class="composition-card-label">Weight</span>
+                <div class="composition-card-value">81.2 kg</div>
+                <div class="composition-card-change">↓ 7.8 kg overall</div>
               </div>
 
-
               <div class="composition-card">
-                <span class="composition-card-label">
-                  Body Fat
-                </span>
-
-                <div class="composition-card-value">
-                  27.4%
-                </div>
-
-                <div class="composition-card-change">
-                  ↓ 4.1%
-                </div>
+                <span class="composition-card-label">Body Fat</span>
+                <div class="composition-card-value">27.4%</div>
+                <div class="composition-card-change">↓ 4.1%</div>
               </div>
 
-
               <div class="composition-card">
-                <span class="composition-card-label">
-                  BMI
-                </span>
-
-                <div class="composition-card-value">
-                  28.4
-                </div>
-
-                <div class="composition-card-change">
-                  ↓ 2.7
-                </div>
+                <span class="composition-card-label">BMI</span>
+                <div class="composition-card-value">28.4</div>
+                <div class="composition-card-change">↓ 2.7</div>
               </div>
 
-
               <div class="composition-card">
-                <span class="composition-card-label">
-                  Skeletal Muscle
-                </span>
-
-                <div class="composition-card-value">
-                  35.1 kg
-                </div>
-
-                <div class="composition-card-change">
-                  ↑ 0.8 kg
-                </div>
+                <span class="composition-card-label">Skeletal Muscle</span>
+                <div class="composition-card-value">35.1 kg</div>
+                <div class="composition-card-change">↑ 0.8 kg</div>
               </div>
 
-
               <div class="composition-card">
-                <span class="composition-card-label">
-                  Muscle Mass
-                </span>
-
-                <div class="composition-card-value">
-                  56.4 kg
-                </div>
-
-                <div class="composition-card-change">
-                  ↑ 0.4 kg
-                </div>
+                <span class="composition-card-label">Muscle Mass</span>
+                <div class="composition-card-value">56.4 kg</div>
+                <div class="composition-card-change">↑ 0.4 kg</div>
               </div>
 
-
               <div class="composition-card">
-                <span class="composition-card-label">
-                  Protein
-                </span>
-
-                <div class="composition-card-value">
-                  14.0 kg
-                </div>
-
-                <div class="composition-card-change">
-                  ↑ 0.2 kg
-                </div>
+                <span class="composition-card-label">Protein</span>
+                <div class="composition-card-value">14.0 kg</div>
+                <div class="composition-card-change">↑ 0.2 kg</div>
               </div>
 
-
               <div class="composition-card">
-                <span class="composition-card-label">
-                  BMR
-                </span>
-
-                <div class="composition-card-value">
-                  1642 kcal
-                </div>
-
-                <div class="composition-card-change">
-                  ↑ 18 kcal
-                </div>
+                <span class="composition-card-label">BMR</span>
+                <div class="composition-card-value">1642 kcal</div>
+                <div class="composition-card-change">↑ 18 kcal</div>
               </div>
 
-
               <div class="composition-card">
-                <span class="composition-card-label">
-                  Fat-Free Body Weight
-                </span>
-
-                <div class="composition-card-value">
-                  58.9 kg
-                </div>
-
-                <div class="composition-card-change">
-                  ↑ 0.6 kg
-                </div>
+                <span class="composition-card-label">Fat-Free Body Weight</span>
+                <div class="composition-card-value">58.9 kg</div>
+                <div class="composition-card-change">↑ 0.6 kg</div>
               </div>
 
-
               <div class="composition-card">
-                <span class="composition-card-label">
-                  Subcutaneous Fat
-                </span>
-
-                <div class="composition-card-value">
-                  24.1%
-                </div>
-
-                <div class="composition-card-change">
-                  ↓ 3.0%
-                </div>
+                <span class="composition-card-label">Subcutaneous Fat</span>
+                <div class="composition-card-value">24.1%</div>
+                <div class="composition-card-change">↓ 3.0%</div>
               </div>
 
-
               <div class="composition-card">
-                <span class="composition-card-label">
-                  Visceral Fat
-                </span>
-
-                <div class="composition-card-value">
-                  11
-                </div>
-
-                <div class="composition-card-change">
-                  ↓ 4
-                </div>
+                <span class="composition-card-label">Visceral Fat</span>
+                <div class="composition-card-value">11</div>
+                <div class="composition-card-change">↓ 4</div>
               </div>
 
-
               <div class="composition-card">
-                <span class="composition-card-label">
-                  Body Water
-                </span>
-
-                <div class="composition-card-value">
-                  52.8%
-                </div>
-
-                <div class="composition-card-change">
-                  ↑ 2.1%
-                </div>
+                <span class="composition-card-label">Body Water</span>
+                <div class="composition-card-value">52.8%</div>
+                <div class="composition-card-change">↑ 2.1%</div>
               </div>
 
-
               <div class="composition-card">
-                <span class="composition-card-label">
-                  Bone Mass
-                </span>
-
-                <div class="composition-card-value">
-                  3.05 kg
-                </div>
-
-                <div class="composition-card-change">
-                  ↑ 0.04 kg
-                </div>
+                <span class="composition-card-label">Bone Mass</span>
+                <div class="composition-card-value">3.05 kg</div>
+                <div class="composition-card-change">↑ 0.04 kg</div>
               </div>
 
             </div>
@@ -4342,122 +3746,43 @@
                 <thead>
 
                   <tr>
-
-                    <th>
-                      Date
-                    </th>
-
-                    <th>
-                      Weight
-                    </th>
-
-                    <th>
-                      Body Fat
-                    </th>
-
-                    <th>
-                      BMI
-                    </th>
-
-                    <th>
-                      Skeletal Muscle
-                    </th>
-
-                    <th>
-                      Visceral Fat
-                    </th>
-
+                    <th>Date</th>
+                    <th>Weight</th>
+                    <th>Body Fat</th>
+                    <th>BMI</th>
+                    <th>Skeletal Muscle</th>
+                    <th>Visceral Fat</th>
                   </tr>
 
                 </thead>
 
-
                 <tbody>
 
                   <tr>
-
-                    <td>
-                      20 Aug 2026
-                    </td>
-
-                    <td>
-                      81.2 kg
-                    </td>
-
-                    <td>
-                      27.4%
-                    </td>
-
-                    <td>
-                      28.4
-                    </td>
-
-                    <td>
-                      35.1 kg
-                    </td>
-
-                    <td>
-                      11
-                    </td>
-
+                    <td>20 Aug 2026</td>
+                    <td>81.2 kg</td>
+                    <td>27.4%</td>
+                    <td>28.4</td>
+                    <td>35.1 kg</td>
+                    <td>11</td>
                   </tr>
 
-
                   <tr>
-
-                    <td>
-                      13 Aug 2026
-                    </td>
-
-                    <td>
-                      82.0 kg
-                    </td>
-
-                    <td>
-                      28.0%
-                    </td>
-
-                    <td>
-                      28.7
-                    </td>
-
-                    <td>
-                      34.9 kg
-                    </td>
-
-                    <td>
-                      12
-                    </td>
-
+                    <td>13 Aug 2026</td>
+                    <td>82.0 kg</td>
+                    <td>28.0%</td>
+                    <td>28.7</td>
+                    <td>34.9 kg</td>
+                    <td>12</td>
                   </tr>
 
-
                   <tr>
-
-                    <td>
-                      06 Aug 2026
-                    </td>
-
-                    <td>
-                      82.5 kg
-                    </td>
-
-                    <td>
-                      28.5%
-                    </td>
-
-                    <td>
-                      28.9
-                    </td>
-
-                    <td>
-                      34.7 kg
-                    </td>
-
-                    <td>
-                      12
-                    </td>
-
+                    <td>06 Aug 2026</td>
+                    <td>82.5 kg</td>
+                    <td>28.5%</td>
+                    <td>28.9</td>
+                    <td>34.7 kg</td>
+                    <td>12</td>
                   </tr>
 
                 </tbody>
@@ -4473,9 +3798,9 @@
       </div>
 
 
-      <!-- =================================================
+      <!-- =========================================
            VISITS
-      ================================================== -->
+      ========================================== -->
 
       <div
         class="tab-panel"
@@ -4512,66 +3837,36 @@
 
             <div class="visit-history">
 
-
               <div class="history-card">
 
                 <div class="history-date">
-
-                  <strong>
-                    20 Aug 2026
-                  </strong>
-
-                  <span>
-                    Visit #10 · Week 10
-                  </span>
-
+                  <strong>20 Aug 2026</strong>
+                  <span>Visit #10 · Week 10</span>
                 </div>
-
 
                 <div class="history-stats">
 
                   <div class="history-stat">
-                    <span>
-                      Weight
-                    </span>
-
-                    <strong>
-                      81.2 kg
-                    </strong>
+                    <span>Weight</span>
+                    <strong>81.2 kg</strong>
                   </div>
 
                   <div class="history-stat">
-                    <span>
-                      Body Fat
-                    </span>
-
-                    <strong>
-                      27.4%
-                    </strong>
+                    <span>Body Fat</span>
+                    <strong>27.4%</strong>
                   </div>
 
                   <div class="history-stat">
-                    <span>
-                      BMI
-                    </span>
-
-                    <strong>
-                      28.4
-                    </strong>
+                    <span>BMI</span>
+                    <strong>28.4</strong>
                   </div>
 
                   <div class="history-stat">
-                    <span>
-                      Change
-                    </span>
-
-                    <strong>
-                      -0.8 kg
-                    </strong>
+                    <span>Change</span>
+                    <strong>-0.8 kg</strong>
                   </div>
 
                 </div>
-
 
                 <button
                   class="small-button"
@@ -4586,62 +3881,33 @@
               <div class="history-card">
 
                 <div class="history-date">
-
-                  <strong>
-                    13 Aug 2026
-                  </strong>
-
-                  <span>
-                    Visit #9 · Week 9
-                  </span>
-
+                  <strong>13 Aug 2026</strong>
+                  <span>Visit #9 · Week 9</span>
                 </div>
-
 
                 <div class="history-stats">
 
                   <div class="history-stat">
-                    <span>
-                      Weight
-                    </span>
-
-                    <strong>
-                      82.0 kg
-                    </strong>
+                    <span>Weight</span>
+                    <strong>82.0 kg</strong>
                   </div>
 
                   <div class="history-stat">
-                    <span>
-                      Body Fat
-                    </span>
-
-                    <strong>
-                      28.0%
-                    </strong>
+                    <span>Body Fat</span>
+                    <strong>28.0%</strong>
                   </div>
 
                   <div class="history-stat">
-                    <span>
-                      BMI
-                    </span>
-
-                    <strong>
-                      28.7
-                    </strong>
+                    <span>BMI</span>
+                    <strong>28.7</strong>
                   </div>
 
                   <div class="history-stat">
-                    <span>
-                      Change
-                    </span>
-
-                    <strong>
-                      -0.5 kg
-                    </strong>
+                    <span>Change</span>
+                    <strong>-0.5 kg</strong>
                   </div>
 
                 </div>
-
 
                 <button
                   class="small-button"
@@ -4656,62 +3922,33 @@
               <div class="history-card">
 
                 <div class="history-date">
-
-                  <strong>
-                    06 Aug 2026
-                  </strong>
-
-                  <span>
-                    Visit #8 · Week 8
-                  </span>
-
+                  <strong>06 Aug 2026</strong>
+                  <span>Visit #8 · Week 8</span>
                 </div>
-
 
                 <div class="history-stats">
 
                   <div class="history-stat">
-                    <span>
-                      Weight
-                    </span>
-
-                    <strong>
-                      82.5 kg
-                    </strong>
+                    <span>Weight</span>
+                    <strong>82.5 kg</strong>
                   </div>
 
                   <div class="history-stat">
-                    <span>
-                      Body Fat
-                    </span>
-
-                    <strong>
-                      28.5%
-                    </strong>
+                    <span>Body Fat</span>
+                    <strong>28.5%</strong>
                   </div>
 
                   <div class="history-stat">
-                    <span>
-                      BMI
-                    </span>
-
-                    <strong>
-                      28.9
-                    </strong>
+                    <span>BMI</span>
+                    <strong>28.9</strong>
                   </div>
 
                   <div class="history-stat">
-                    <span>
-                      Change
-                    </span>
-
-                    <strong>
-                      -0.7 kg
-                    </strong>
+                    <span>Change</span>
+                    <strong>-0.7 kg</strong>
                   </div>
 
                 </div>
-
 
                 <button
                   class="small-button"
@@ -4731,9 +3968,9 @@
       </div>
 
 
-      <!-- =================================================
-           PROGRESS PHOTOS
-      ================================================== -->
+      <!-- =========================================
+           PHOTOS
+      ========================================== -->
 
       <div
         class="tab-panel"
@@ -4747,7 +3984,6 @@
             <div class="photo-header">
 
               <div>
-
                 <h2>
                   Visual Progress
                 </h2>
@@ -4755,7 +3991,6 @@
                 <p>
                   Full-body photos recorded during visits.
                 </p>
-
               </div>
 
               <button
@@ -4770,8 +4005,6 @@
 
             <div class="photo-comparison">
 
-
-              <!-- FRONT -->
 
               <div class="photo-column">
 
@@ -4829,8 +4062,6 @@
               </div>
 
 
-              <!-- SIDE -->
-
               <div class="photo-column">
 
                 <div class="photo-column-header">
@@ -4886,8 +4117,6 @@
 
               </div>
 
-
-              <!-- BACK -->
 
               <div class="photo-column">
 
@@ -4953,9 +4182,9 @@
       </div>
 
 
-      <!-- =================================================
+      <!-- =========================================
            FILES
-      ================================================== -->
+      ========================================== -->
 
       <div
         class="tab-panel"
@@ -4993,8 +4222,6 @@
             <div class="file-list">
 
 
-              <!-- PDF -->
-
               <div class="file-item">
 
                 <div class="file-icon pdf">
@@ -5007,21 +4234,10 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   >
-                    <path
-                      d="M6 2h9l5 5v15H6z"
-                    ></path>
-
-                    <path
-                      d="M14 2v6h6"
-                    ></path>
-
-                    <path
-                      d="M9 13h6"
-                    ></path>
-
-                    <path
-                      d="M9 17h6"
-                    ></path>
+                    <path d="M6 2h9l5 5v15H6z"></path>
+                    <path d="M14 2v6h6"></path>
+                    <path d="M9 13h6"></path>
+                    <path d="M9 17h6"></path>
                   </svg>
 
                 </div>
@@ -5049,8 +4265,6 @@
 
               </div>
 
-
-              <!-- COMPARISON -->
 
               <div class="file-item">
 
@@ -5108,8 +4322,6 @@
 
               </div>
 
-
-              <!-- PHOTO -->
 
               <div class="file-item">
 
@@ -5176,9 +4388,9 @@
       </div>
 
 
-      <!-- =================================================
+      <!-- =========================================
            APPOINTMENTS
-      ================================================== -->
+      ========================================== -->
 
       <div
         class="tab-panel"
@@ -5201,13 +4413,6 @@
 
             </div>
 
-            <button
-              class="small-button"
-              onclick="showComingSoon('Book Appointment')"
-            >
-              + Book Appointment
-            </button>
-
           </div>
 
 
@@ -5215,39 +4420,21 @@
 
             <div class="appointment-list">
 
-
               <div class="appointment-item">
 
                 <div class="appointment-date">
-
-                  <strong>
-                    20 Aug 2026
-                  </strong>
-
-                  <span>
-                    10:30 AM
-                  </span>
-
+                  <strong>20 Aug 2026</strong>
+                  <span>10:30 AM</span>
                 </div>
 
                 <div class="appointment-details">
-
-                  <strong>
-                    Body Composition Review
-                  </strong>
-
-                  <span>
-                    Week 10 · Arboleaf measurement
-                  </span>
-
+                  <strong>Body Composition Review</strong>
+                  <span>Week 10 · Arboleaf measurement</span>
                 </div>
 
                 <span class="status-pill status-active">
-
                   <span class="status-dot"></span>
-
                   Completed
-
                 </span>
 
               </div>
@@ -5256,35 +4443,18 @@
               <div class="appointment-item">
 
                 <div class="appointment-date">
-
-                  <strong>
-                    27 Aug 2026
-                  </strong>
-
-                  <span>
-                    10:30 AM
-                  </span>
-
+                  <strong>27 Aug 2026</strong>
+                  <span>10:30 AM</span>
                 </div>
 
                 <div class="appointment-details">
-
-                  <strong>
-                    Weekly Follow-Up
-                  </strong>
-
-                  <span>
-                    Week 11 · Program review
-                  </span>
-
+                  <strong>Weekly Follow-Up</strong>
+                  <span>Week 11 · Program review</span>
                 </div>
 
                 <span class="status-pill status-active">
-
                   <span class="status-dot"></span>
-
                   Upcoming
-
                 </span>
 
               </div>
@@ -5293,35 +4463,18 @@
               <div class="appointment-item">
 
                 <div class="appointment-date">
-
-                  <strong>
-                    03 Sep 2026
-                  </strong>
-
-                  <span>
-                    10:30 AM
-                  </span>
-
+                  <strong>03 Sep 2026</strong>
+                  <span>10:30 AM</span>
                 </div>
 
                 <div class="appointment-details">
-
-                  <strong>
-                    Body Composition Review
-                  </strong>
-
-                  <span>
-                    Week 12 · Arboleaf measurement
-                  </span>
-
+                  <strong>Body Composition Review</strong>
+                  <span>Week 12 · Arboleaf measurement</span>
                 </div>
 
                 <span class="status-pill status-active">
-
                   <span class="status-dot"></span>
-
                   Upcoming
-
                 </span>
 
               </div>
@@ -5335,9 +4488,9 @@
       </div>
 
 
-      <!-- =================================================
+      <!-- =========================================
            TREATMENTS
-      ================================================== -->
+      ========================================== -->
 
       <div
         class="tab-panel"
@@ -5360,13 +4513,6 @@
 
             </div>
 
-            <button
-              class="small-button"
-              onclick="showComingSoon('Add Treatment')"
-            >
-              + Add Treatment
-            </button>
-
           </div>
 
 
@@ -5379,106 +4525,39 @@
                 <thead>
 
                   <tr>
-
-                    <th>
-                      Date
-                    </th>
-
-                    <th>
-                      Treatment
-                    </th>
-
-                    <th>
-                      Dose
-                    </th>
-
-                    <th>
-                      Staff
-                    </th>
-
-                    <th>
-                      Notes
-                    </th>
-
+                    <th>Date</th>
+                    <th>Treatment</th>
+                    <th>Dose</th>
+                    <th>Staff</th>
+                    <th>Notes</th>
                   </tr>
 
                 </thead>
 
-
                 <tbody>
 
                   <tr>
-
-                    <td>
-                      20 Aug 2026
-                    </td>
-
-                    <td>
-                      Tirzepatide
-                    </td>
-
-                    <td>
-                      2.5 mg
-                    </td>
-
-                    <td>
-                      Staff A
-                    </td>
-
-                    <td>
-                      No immediate concerns.
-                    </td>
-
+                    <td>20 Aug 2026</td>
+                    <td>Tirzepatide</td>
+                    <td>2.5 mg</td>
+                    <td>Staff A</td>
+                    <td>No immediate concerns.</td>
                   </tr>
 
-
                   <tr>
-
-                    <td>
-                      13 Aug 2026
-                    </td>
-
-                    <td>
-                      Tirzepatide
-                    </td>
-
-                    <td>
-                      2.5 mg
-                    </td>
-
-                    <td>
-                      Staff A
-                    </td>
-
-                    <td>
-                      Tolerated well.
-                    </td>
-
+                    <td>13 Aug 2026</td>
+                    <td>Tirzepatide</td>
+                    <td>2.5 mg</td>
+                    <td>Staff A</td>
+                    <td>Tolerated well.</td>
                   </tr>
 
-
                   <tr>
-
-                    <td>
-                      06 Aug 2026
-                    </td>
-
-                    <td>
-                      Tirzepatide
-                    </td>
-
-                    <td>
-                      2.5 mg
-                    </td>
-
-                    <td>
-                      Staff B
-                    </td>
-
-                    <td>
-                      No reported side effects.
-                    </td>
-
+                    <td>06 Aug 2026</td>
+                    <td>Tirzepatide</td>
+                    <td>2.5 mg</td>
+                    <td>Staff B</td>
+                    <td>No reported side effects.</td>
                   </tr>
 
                 </tbody>
@@ -5494,9 +4573,9 @@
       </div>
 
 
-      <!-- =================================================
+      <!-- =========================================
            NOTES
-      ================================================== -->
+      ========================================== -->
 
       <div
         class="tab-panel"
@@ -5519,31 +4598,16 @@
 
             </div>
 
-            <button
-              class="small-button"
-              onclick="showComingSoon('Add Note')"
-            >
-              + Add Note
-            </button>
-
           </div>
 
 
           <div class="content-card-body">
 
-
             <div class="note-box">
 
               <div class="note-top">
-
-                <strong>
-                  Doctor Review
-                </strong>
-
-                <span>
-                  20 Aug 2026
-                </span>
-
+                <strong>Doctor Review</strong>
+                <span>20 Aug 2026</span>
               </div>
 
               <p>
@@ -5557,15 +4621,8 @@
             <div class="note-box">
 
               <div class="note-top">
-
-                <strong>
-                  Staff Note
-                </strong>
-
-                <span>
-                  20 Aug 2026
-                </span>
-
+                <strong>Staff Note</strong>
+                <span>20 Aug 2026</span>
               </div>
 
               <p>
@@ -5579,15 +4636,8 @@
             <div class="note-box">
 
               <div class="note-top">
-
-                <strong>
-                  Patient Feedback
-                </strong>
-
-                <span>
-                  13 Aug 2026
-                </span>
-
+                <strong>Patient Feedback</strong>
+                <span>13 Aug 2026</span>
               </div>
 
               <p>
@@ -5612,9 +4662,278 @@
 
 <script>
 
-  /* =====================================================
+  /* =========================================
+     DEMO PATIENT DATA
+     UI ONLY FOR NOW
+  ========================================== */
+
+  const demoPatients = {
+
+    GW0001: {
+      id: "GW0001",
+      name: "AISYAH ABDULLAH",
+      initials: "AA",
+      status: "Active",
+      startDate: "15 Jun 2026",
+      doctor: "Dr Aaron",
+      lastVisit: "20 Aug 2026",
+
+      startingWeight: "78.0",
+      currentWeight: "72.4",
+      goalWeight: "65.0",
+
+      totalLoss: "5.6",
+      remaining: "7.4",
+      progress: "43",
+
+      duration: "10"
+    },
+
+
+    GW0002: {
+      id: "GW0002",
+      name: "MOHD AIZUDDIN BIN ABDUL MALEK",
+      initials: "MA",
+      status: "Active",
+      startDate: "12 Jun 2026",
+      doctor: "Dr Aaron",
+      lastVisit: "20 Aug 2026",
+
+      startingWeight: "89.0",
+      currentWeight: "81.2",
+      goalWeight: "70.0",
+
+      totalLoss: "7.8",
+      remaining: "11.2",
+      progress: "69",
+
+      duration: "10"
+    },
+
+
+    GW0003: {
+      id: "GW0003",
+      name: "BRANDON WILBERT",
+      initials: "BW",
+      status: "Active",
+      startDate: "18 Jun 2026",
+      doctor: "Dr Aaron",
+      lastVisit: "19 Aug 2026",
+
+      startingWeight: "81.7",
+      currentWeight: "76.8",
+      goalWeight: "68.0",
+
+      totalLoss: "4.9",
+      remaining: "8.8",
+      progress: "55",
+
+      duration: "9"
+    },
+
+
+    GW0004: {
+      id: "GW0004",
+      name: "SARAH ZAKARIA",
+      initials: "SZ",
+      status: "Active",
+      startDate: "24 Jun 2026",
+      doctor: "Dr Aaron",
+      lastVisit: "18 Aug 2026",
+
+      startingWeight: "72.6",
+      currentWeight: "69.5",
+      goalWeight: "62.0",
+
+      totalLoss: "3.1",
+      remaining: "7.5",
+      progress: "41",
+
+      duration: "8"
+    },
+
+
+    GW0005: {
+      id: "GW0005",
+      name: "DANIEL MALIK",
+      initials: "DM",
+      status: "Completed",
+      startDate: "08 May 2026",
+      doctor: "Dr Aaron",
+      lastVisit: "15 Aug 2026",
+
+      startingWeight: "79.4",
+      currentWeight: "68.0",
+      goalWeight: "68.0",
+
+      totalLoss: "11.4",
+      remaining: "0",
+      progress: "100",
+
+      duration: "14"
+    },
+
+
+    GW0006: {
+      id: "GW0006",
+      name: "AMINAH HASSAN",
+      initials: "AH",
+      status: "Inactive",
+      startDate: "10 Jul 2026",
+      doctor: "Dr Aaron",
+      lastVisit: "02 Aug 2026",
+
+      startingWeight: "84.4",
+      currentWeight: "83.2",
+      goalWeight: "70.0",
+
+      totalLoss: "1.2",
+      remaining: "13.2",
+      progress: "9",
+
+      duration: "4"
+    }
+
+  };
+
+
+  /* =========================================
+     GET PATIENT ID FROM URL
+  ========================================== */
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+
+  const patientId =
+    params.get("patient");
+
+
+  const patient =
+    demoPatients[patientId] ||
+    demoPatients.GW0002;
+
+
+  /* =========================================
+     LOAD PATIENT DATA
+  ========================================== */
+
+  document.title =
+    patient.name +
+    " | Getwell Weight Loss Admin";
+
+
+  document.getElementById(
+    "patientInitials"
+  ).textContent =
+    patient.initials;
+
+
+  document.getElementById(
+    "patientName"
+  ).textContent =
+    patient.name;
+
+
+  document.getElementById(
+    "patientId"
+  ).textContent =
+    patient.id;
+
+
+  document.getElementById(
+    "patientStatus"
+  ).textContent =
+    patient.status;
+
+
+  document.getElementById(
+    "startDate"
+  ).textContent =
+    patient.startDate;
+
+
+  document.getElementById(
+    "doctor"
+  ).textContent =
+    patient.doctor;
+
+
+  document.getElementById(
+    "lastVisit"
+  ).textContent =
+    patient.lastVisit;
+
+
+  document.getElementById(
+    "startingWeight"
+  ).textContent =
+    patient.startingWeight;
+
+
+  document.getElementById(
+    "currentWeight"
+  ).textContent =
+    patient.currentWeight;
+
+
+  document.getElementById(
+    "goalWeight"
+  ).textContent =
+    patient.goalWeight;
+
+
+  document.getElementById(
+    "totalLoss"
+  ).textContent =
+    patient.totalLoss +
+    " kg lost";
+
+
+  document.getElementById(
+    "goalFill"
+  ).style.width =
+    patient.progress + "%";
+
+
+  document.getElementById(
+    "goalProgress"
+  ).textContent =
+    patient.progress +
+    "% achieved";
+
+
+  document.getElementById(
+    "remainingWeight"
+  ).textContent =
+    patient.remaining +
+    " kg remaining";
+
+
+  document.getElementById(
+    "duration"
+  ).textContent =
+    patient.duration;
+
+
+  document.getElementById(
+    "chartCurrentWeight"
+  ).textContent =
+    patient.currentWeight +
+    " kg";
+
+
+  document.getElementById(
+    "chartTotalLoss"
+  ).textContent =
+    patient.totalLoss;
+
+
+  /* =========================================
      MOBILE SIDEBAR
-  ====================================================== */
+  ========================================== */
 
   const sidebar =
     document.getElementById("sidebar");
@@ -5650,15 +4969,20 @@
   );
 
 
-  /* =====================================================
+  /* =========================================
      TABS
-  ====================================================== */
+  ========================================== */
 
   const tabButtons =
-    document.querySelectorAll(".tab-button");
+    document.querySelectorAll(
+      ".tab-button"
+    );
+
 
   const tabPanels =
-    document.querySelectorAll(".tab-panel");
+    document.querySelectorAll(
+      ".tab-panel"
+    );
 
 
   tabButtons.forEach(button => {
@@ -5673,26 +4997,36 @@
 
         tabButtons.forEach(
           item =>
-            item.classList.remove("active")
+            item.classList.remove(
+              "active"
+            )
         );
 
 
         tabPanels.forEach(
           panel =>
-            panel.classList.remove("active")
+            panel.classList.remove(
+              "active"
+            )
         );
 
 
-        button.classList.add("active");
+        button.classList.add(
+          "active"
+        );
 
 
         const targetPanel =
-          document.getElementById(target);
+          document.getElementById(
+            target
+          );
 
 
         if (targetPanel) {
 
-          targetPanel.classList.add("active");
+          targetPanel.classList.add(
+            "active"
+          );
 
         }
 
@@ -5702,33 +5036,39 @@
   });
 
 
-  /* =====================================================
-     COMING SOON PLACEHOLDER
-  ====================================================== */
+  /* =========================================
+     PLACEHOLDER
+  ========================================== */
 
   function showComingSoon(section) {
 
     alert(
       section +
-      " will be connected when the remaining modules and backend are built."
+      " will be connected during the backend phase."
     );
 
   }
 
 
-  /* =====================================================
+  /* =========================================
      ESCAPE
-  ====================================================== */
+  ========================================== */
 
   document.addEventListener(
     "keydown",
     event => {
 
-      if (event.key === "Escape") {
+      if (
+        event.key === "Escape"
+      ) {
 
-        sidebar.classList.remove("open");
+        sidebar.classList.remove(
+          "open"
+        );
 
-        mobileOverlay.classList.remove("show");
+        mobileOverlay.classList.remove(
+          "show"
+        );
 
       }
 
