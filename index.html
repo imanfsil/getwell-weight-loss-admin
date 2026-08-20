@@ -2,40 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Getwell Weight Loss Admin</title>
 
-  <!-- Poppins -->
+  <!-- =========================================
+       POPPINS
+  ========================================== -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <link
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
     rel="stylesheet"
   >
 
   <style>
-    :root {
-      /* =========================
-         GETWELL COLOURS
-      ========================= */
 
+    /* =========================================
+       GETWELL DESIGN SYSTEM
+    ========================================== */
+
+    :root {
+
+      /* Primary */
       --primary: #2563EB;
       --primary-dark: #1D4ED8;
-      --primary-soft: #EFF6FF;
-      --primary-pale: #F5F9FF;
 
+      /* Soft blue surfaces */
+      --primary-soft: #E1EEFF;
+      --primary-pale: #EAF2FC;
+
+      /* Typography */
       --navy: #0F172A;
       --text: #172033;
       --muted: #64748B;
       --muted-light: #94A3B8;
 
-      --background: #F6F9FD;
+      /* Surfaces */
+      --background: #EEF4FB;
+      --sidebar-bg: #F8FBFF;
+      --topbar-bg: #F5F9FF;
       --white: #FFFFFF;
 
-      --border: #DCE6F2;
-      --border-light: #EDF2F7;
+      /* Borders */
+      --border: #D4E1F0;
+      --border-light: #E8EFF7;
 
+      /* Status */
       --success: #16A34A;
       --success-soft: #ECFDF3;
 
@@ -45,15 +62,21 @@
       --danger: #DC2626;
       --danger-soft: #FEF2F2;
 
+      /* Shape */
       --radius: 14px;
 
+      /* Shadow */
       --shadow:
-        0 4px 16px rgba(37, 99, 235, 0.06);
+        0 4px 18px rgba(37, 99, 235, 0.07);
+
+      --shadow-hover:
+        0 8px 24px rgba(37, 99, 235, 0.10);
     }
 
-    /* =========================
+
+    /* =========================================
        RESET
-    ========================= */
+    ========================================== */
 
     * {
       box-sizing: border-box;
@@ -67,9 +90,13 @@
 
     body {
       font-family: "Poppins", sans-serif;
+
       background: var(--background);
+
       color: var(--text);
+
       min-height: 100vh;
+
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
     }
@@ -91,27 +118,35 @@
       color: inherit;
     }
 
-    /* =========================
+
+    /* =========================================
        APP
-    ========================= */
+    ========================================== */
 
     .app {
       display: flex;
+
       min-height: 100vh;
     }
 
-    /* =========================
+
+    /* =========================================
        SIDEBAR
-    ========================= */
+    ========================================== */
 
     .sidebar {
+
       width: 250px;
-      background: var(--white);
-      border-right: 1px solid var(--border);
+
+      background: var(--sidebar-bg);
+
+      border-right:
+        1px solid var(--border);
 
       min-height: 100vh;
 
       position: fixed;
+
       left: 0;
       top: 0;
       bottom: 0;
@@ -119,36 +154,47 @@
       z-index: 1000;
 
       display: flex;
+
       flex-direction: column;
 
-      transition: transform 0.25s ease;
+      transition:
+        transform 0.25s ease;
     }
 
+
+    /* BRAND */
+
     .brand {
+
       height: 82px;
 
       display: flex;
+
       align-items: center;
 
       padding: 0 20px;
 
-      border-bottom: 1px solid var(--border);
+      border-bottom:
+        1px solid var(--border);
     }
 
     .brand-mark {
+
       width: 40px;
       height: 40px;
 
       border-radius: 12px;
 
-      background: linear-gradient(
-        135deg,
-        #2563EB 0%,
-        #3B82F6 60%,
-        #60A5FA 100%
-      );
+      background:
+        linear-gradient(
+          135deg,
+          #2563EB 0%,
+          #3B82F6 60%,
+          #60A5FA 100%
+        );
 
       display: flex;
+
       align-items: center;
       justify-content: center;
 
@@ -160,32 +206,41 @@
       margin-right: 11px;
 
       box-shadow:
-        0 5px 12px rgba(37, 99, 235, 0.20);
+        0 5px 12px
+        rgba(37, 99, 235, 0.20);
     }
 
     .brand-text strong {
+
       display: block;
 
       color: var(--navy);
 
       font-size: 15px;
+
       font-weight: 700;
 
       letter-spacing: -0.2px;
     }
 
     .brand-text span {
+
       display: block;
 
       color: var(--muted);
 
       font-size: 10px;
+
       font-weight: 400;
 
       margin-top: 2px;
     }
 
+
+    /* SIDEBAR CONTENT */
+
     .sidebar-content {
+
       padding: 18px 13px;
 
       flex: 1;
@@ -193,11 +248,17 @@
       overflow-y: auto;
     }
 
+
+    /* SECTION TITLE */
+
     .nav-section-title {
+
       font-size: 10px;
+
       font-weight: 600;
 
       text-transform: uppercase;
+
       letter-spacing: 0.08em;
 
       color: var(--muted-light);
@@ -207,13 +268,19 @@
       margin-bottom: 4px;
     }
 
+
+    /* NAV ITEM */
+
     .nav-item {
+
       display: flex;
+
       align-items: center;
 
       gap: 12px;
 
       width: 100%;
+
       min-height: 44px;
 
       padding: 0 12px;
@@ -225,6 +292,7 @@
       color: #475569;
 
       font-size: 12px;
+
       font-weight: 500;
 
       background: transparent;
@@ -235,17 +303,23 @@
     }
 
     .nav-item:hover {
+
       background: var(--primary-pale);
+
       color: var(--primary);
     }
 
     .nav-item.active {
+
       background: var(--primary-soft);
+
       color: var(--primary);
+
       font-weight: 600;
     }
 
     .nav-icon {
+
       width: 20px;
 
       text-align: center;
@@ -257,28 +331,37 @@
       flex-shrink: 0;
     }
 
+
+    /* SIDEBAR ADMIN */
+
     .sidebar-bottom {
+
       padding: 14px;
 
-      border-top: 1px solid var(--border);
+      border-top:
+        1px solid var(--border);
     }
 
     .admin-card {
-      background: var(--primary-pale);
 
-      border: 1px solid #DCEAFF;
+      background: #EFF6FF;
+
+      border:
+        1px solid #D7E7FB;
 
       border-radius: 12px;
 
       padding: 11px;
 
       display: flex;
+
       align-items: center;
 
       gap: 10px;
     }
 
     .admin-avatar {
+
       width: 35px;
       height: 35px;
 
@@ -289,46 +372,58 @@
       color: var(--primary);
 
       display: flex;
+
       justify-content: center;
+
       align-items: center;
 
       font-size: 11px;
+
       font-weight: 600;
     }
 
     .admin-info {
+
       min-width: 0;
     }
 
     .admin-info strong {
+
       display: block;
 
       color: var(--navy);
 
       font-size: 11px;
+
       font-weight: 600;
 
       white-space: nowrap;
+
       overflow: hidden;
+
       text-overflow: ellipsis;
     }
 
     .admin-info span {
+
       display: block;
 
       color: var(--muted);
 
       font-size: 10px;
+
       font-weight: 400;
 
       margin-top: 2px;
     }
 
-    /* =========================
+
+    /* =========================================
        MAIN
-    ========================= */
+    ========================================== */
 
     .main {
+
       margin-left: 250px;
 
       flex: 1;
@@ -336,24 +431,31 @@
       min-width: 0;
     }
 
-    /* =========================
+
+    /* =========================================
        TOPBAR
-    ========================= */
+    ========================================== */
 
     .topbar {
+
       height: 72px;
 
-      background: rgba(255, 255, 255, 0.96);
+      background:
+        rgba(245, 249, 255, 0.97);
 
-      border-bottom: 1px solid var(--border);
+      border-bottom:
+        1px solid var(--border);
 
       display: flex;
+
       align-items: center;
+
       justify-content: space-between;
 
       padding: 0 28px;
 
       position: sticky;
+
       top: 0;
 
       z-index: 900;
@@ -362,13 +464,16 @@
     }
 
     .topbar-left {
+
       display: flex;
+
       align-items: center;
 
       gap: 12px;
     }
 
     .mobile-menu {
+
       display: none;
 
       width: 38px;
@@ -378,9 +483,11 @@
 
       background: var(--white);
 
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
 
       align-items: center;
+
       justify-content: center;
 
       font-size: 17px;
@@ -388,8 +495,13 @@
       color: var(--navy);
     }
 
+
+    /* PAGE TITLE */
+
     .page-title {
+
       font-size: 16px;
+
       font-weight: 700;
 
       color: var(--navy);
@@ -398,6 +510,7 @@
     }
 
     .page-subtitle {
+
       font-size: 11px;
 
       color: var(--muted);
@@ -407,24 +520,35 @@
       margin-top: 2px;
     }
 
+
+    /* TOPBAR RIGHT */
+
     .topbar-right {
+
       display: flex;
+
       align-items: center;
 
       gap: 9px;
     }
 
+
+    /* SEARCH */
+
     .search-box {
+
       width: 270px;
       height: 40px;
 
       background: var(--white);
 
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
 
       border-radius: 9px;
 
       display: flex;
+
       align-items: center;
 
       padding: 0 12px;
@@ -433,15 +557,18 @@
     }
 
     .search-box span {
+
       color: var(--muted-light);
 
       font-size: 13px;
     }
 
     .search-box input {
+
       flex: 1;
 
       border: none;
+
       outline: none;
 
       background: transparent;
@@ -449,41 +576,59 @@
       color: var(--text);
 
       font-size: 11px;
+
       font-weight: 400;
     }
 
     .search-box input::placeholder {
+
       color: #94A3B8;
     }
 
+
+    /* ICON BUTTON */
+
     .icon-button {
+
       width: 40px;
       height: 40px;
 
       border-radius: 9px;
 
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
 
       background: var(--white);
 
       display: flex;
+
       align-items: center;
+
       justify-content: center;
 
       color: #475569;
 
-      transition: 0.15s ease;
+      transition:
+        0.15s ease;
     }
 
     .icon-button:hover {
-      border-color: #BCD3F5;
 
-      background: var(--primary-pale);
+      border-color:
+        #BCD3F5;
 
-      color: var(--primary);
+      background:
+        var(--primary-pale);
+
+      color:
+        var(--primary);
     }
 
+
+    /* USER AVATAR */
+
     .user-avatar {
+
       width: 38px;
       height: 38px;
 
@@ -494,18 +639,23 @@
       color: var(--white);
 
       display: flex;
+
       justify-content: center;
+
       align-items: center;
 
       font-size: 11px;
+
       font-weight: 600;
     }
 
-    /* =========================
+
+    /* =========================================
        CONTENT
-    ========================= */
+    ========================================== */
 
     .content {
+
       padding: 30px;
 
       max-width: 1600px;
@@ -513,11 +663,16 @@
       margin: 0 auto;
     }
 
+
+    /* WELCOME */
+
     .welcome {
+
       margin-bottom: 24px;
     }
 
     .welcome h1 {
+
       font-size: 24px;
 
       color: var(--navy);
@@ -530,6 +685,7 @@
     }
 
     .welcome p {
+
       font-size: 12px;
 
       color: var(--muted);
@@ -537,11 +693,13 @@
       font-weight: 400;
     }
 
-    /* =========================
+
+    /* =========================================
        STAT CARDS
-    ========================= */
+    ========================================== */
 
     .stats-grid {
+
       display: grid;
 
       grid-template-columns:
@@ -553,15 +711,20 @@
     }
 
     .stat-card {
-      background: var(--white);
 
-      border: 1px solid var(--border);
+      background:
+        var(--white);
 
-      border-radius: var(--radius);
+      border:
+        1px solid var(--border);
+
+      border-radius:
+        var(--radius);
 
       padding: 18px;
 
-      box-shadow: var(--shadow);
+      box-shadow:
+        var(--shadow);
 
       transition:
         transform 0.15s ease,
@@ -569,13 +732,16 @@
     }
 
     .stat-card:hover {
-      transform: translateY(-1px);
+
+      transform:
+        translateY(-1px);
 
       box-shadow:
-        0 7px 20px rgba(37, 99, 235, 0.09);
+        var(--shadow-hover);
     }
 
     .stat-top {
+
       display: flex;
 
       align-items: center;
@@ -586,26 +752,31 @@
     }
 
     .stat-label {
+
       color: var(--muted);
 
       font-size: 10px;
 
       font-weight: 600;
 
-      text-transform: uppercase;
+      text-transform:
+        uppercase;
 
       letter-spacing: 0.04em;
     }
 
     .stat-icon {
+
       width: 34px;
       height: 34px;
 
       border-radius: 9px;
 
-      background: var(--primary-soft);
+      background:
+        var(--primary-soft);
 
-      color: var(--primary);
+      color:
+        var(--primary);
 
       display: flex;
 
@@ -617,9 +788,11 @@
     }
 
     .stat-number {
+
       font-size: 27px;
 
-      color: var(--navy);
+      color:
+        var(--navy);
 
       font-weight: 700;
 
@@ -627,20 +800,24 @@
     }
 
     .stat-meta {
+
       font-size: 11px;
 
-      color: var(--muted);
+      color:
+        var(--muted);
 
       font-weight: 400;
 
       margin-top: 6px;
     }
 
-    /* =========================
+
+    /* =========================================
        DASHBOARD GRID
-    ========================= */
+    ========================================== */
 
     .dashboard-grid {
+
       display: grid;
 
       grid-template-columns:
@@ -650,22 +827,36 @@
       gap: 20px;
     }
 
+
+    /* CARD */
+
     .card {
-      background: var(--white);
 
-      border: 1px solid var(--border);
+      background:
+        var(--white);
 
-      border-radius: var(--radius);
+      border:
+        1px solid var(--border);
 
-      box-shadow: var(--shadow);
+      border-radius:
+        var(--radius);
 
-      overflow: hidden;
+      box-shadow:
+        var(--shadow);
+
+      overflow:
+        hidden;
     }
 
+
+    /* CARD HEADER */
+
     .card-header {
+
       padding: 18px 20px;
 
-      border-bottom: 1px solid var(--border);
+      border-bottom:
+        1px solid var(--border-light);
 
       display: flex;
 
@@ -675,15 +866,19 @@
     }
 
     .card-header h2 {
+
       font-size: 14px;
 
-      color: var(--navy);
+      color:
+        var(--navy);
 
       font-weight: 600;
     }
 
     .card-header span {
-      color: var(--muted);
+
+      color:
+        var(--muted);
 
       font-size: 11px;
 
@@ -691,14 +886,17 @@
     }
 
     .card-body {
+
       padding: 0;
     }
 
-    /* =========================
+
+    /* =========================================
        APPOINTMENTS
-    ========================= */
+    ========================================== */
 
     .appointment-row {
+
       padding: 15px 20px;
 
       display: flex;
@@ -709,14 +907,18 @@
 
       gap: 15px;
 
-      border-bottom: 1px solid var(--border-light);
+      border-bottom:
+        1px solid var(--border-light);
     }
 
     .appointment-row:last-child {
-      border-bottom: none;
+
+      border-bottom:
+        none;
     }
 
     .appointment-left {
+
       display: flex;
 
       align-items: center;
@@ -727,26 +929,31 @@
     }
 
     .appointment-time {
+
       width: 52px;
 
       font-size: 11px;
 
       font-weight: 600;
 
-      color: var(--navy);
+      color:
+        var(--navy);
 
       flex-shrink: 0;
     }
 
     .patient-avatar {
+
       width: 38px;
       height: 38px;
 
       border-radius: 10px;
 
-      background: var(--primary-soft);
+      background:
+        var(--primary-soft);
 
-      color: var(--primary);
+      color:
+        var(--primary);
 
       display: flex;
 
@@ -760,15 +967,18 @@
     }
 
     .appointment-info {
+
       min-width: 0;
     }
 
     .appointment-info strong {
+
       display: block;
 
       font-size: 12px;
 
-      color: var(--navy);
+      color:
+        var(--navy);
 
       font-weight: 600;
 
@@ -780,18 +990,24 @@
     }
 
     .appointment-info span {
+
       display: block;
 
       font-size: 10px;
 
-      color: var(--muted);
+      color:
+        var(--muted);
 
       font-weight: 400;
 
       margin-top: 3px;
     }
 
+
+    /* STATUS */
+
     .status {
+
       display: inline-flex;
 
       align-items: center;
@@ -808,31 +1024,43 @@
     }
 
     .status.upcoming {
-      background: var(--primary-soft);
 
-      color: var(--primary);
+      background:
+        var(--primary-soft);
+
+      color:
+        var(--primary);
     }
 
     .status.completed {
-      background: var(--success-soft);
 
-      color: var(--success);
+      background:
+        var(--success-soft);
+
+      color:
+        var(--success);
     }
 
     .status.alert {
-      background: var(--warning-soft);
 
-      color: var(--warning);
+      background:
+        var(--warning-soft);
+
+      color:
+        var(--warning);
     }
 
-    /* =========================
+
+    /* =========================================
        FOLLOW-UP
-    ========================= */
+    ========================================== */
 
     .follow-row {
+
       padding: 15px 20px;
 
-      border-bottom: 1px solid var(--border-light);
+      border-bottom:
+        1px solid var(--border-light);
 
       display: flex;
 
@@ -842,10 +1070,13 @@
     }
 
     .follow-row:last-child {
-      border-bottom: none;
+
+      border-bottom:
+        none;
     }
 
     .priority-dot {
+
       width: 8px;
       height: 8px;
 
@@ -857,33 +1088,42 @@
     }
 
     .priority-high {
-      background: var(--danger);
+
+      background:
+        var(--danger);
     }
 
     .priority-medium {
-      background: var(--warning);
+
+      background:
+        var(--warning);
     }
 
     .follow-content {
+
       flex: 1;
 
       min-width: 0;
     }
 
     .follow-content strong {
+
       display: block;
 
       font-size: 12px;
 
-      color: var(--navy);
+      color:
+        var(--navy);
 
       font-weight: 600;
     }
 
     .follow-content span {
+
       display: block;
 
-      color: var(--muted);
+      color:
+        var(--muted);
 
       font-size: 10px;
 
@@ -895,12 +1135,15 @@
     }
 
     .follow-action {
+
       width: 31px;
       height: 31px;
 
-      background: var(--white);
+      background:
+        var(--white);
 
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
 
       border-radius: 8px;
 
@@ -910,106 +1153,147 @@
 
       justify-content: center;
 
-      color: var(--primary);
+      color:
+        var(--primary);
 
       font-weight: 600;
 
-      transition: 0.15s ease;
+      transition:
+        0.15s ease;
     }
 
     .follow-action:hover {
-      background: var(--primary-soft);
 
-      border-color: #BFD4F8;
+      background:
+        var(--primary-soft);
+
+      border-color:
+        #BFD4F8;
     }
 
-    /* =========================
+
+    /* =========================================
        RESPONSIVE
-    ========================= */
+    ========================================== */
 
     @media (max-width: 1200px) {
+
       .stats-grid {
+
         grid-template-columns:
           repeat(3, minmax(0, 1fr));
       }
     }
 
+
     @media (max-width: 900px) {
+
       .sidebar {
-        transform: translateX(-100%);
+
+        transform:
+          translateX(-100%);
       }
 
       .sidebar.open {
-        transform: translateX(0);
+
+        transform:
+          translateX(0);
       }
 
       .main {
+
         margin-left: 0;
       }
 
       .mobile-menu {
+
         display: flex;
       }
 
       .search-box {
+
         width: 200px;
       }
 
       .dashboard-grid {
-        grid-template-columns: 1fr;
+
+        grid-template-columns:
+          1fr;
       }
     }
 
+
     @media (max-width: 680px) {
+
       .topbar {
-        padding: 0 15px;
+
+        padding:
+          0 15px;
       }
 
-      .topbar-right .icon-button {
+      .topbar-right
+      .icon-button {
+
         display: none;
       }
 
       .search-box {
+
         display: none;
       }
 
       .content {
-        padding: 20px 15px;
+
+        padding:
+          20px 15px;
       }
 
       .stats-grid {
+
         grid-template-columns:
           repeat(2, minmax(0, 1fr));
       }
 
       .stat-number {
+
         font-size: 23px;
       }
 
       .welcome h1 {
+
         font-size: 21px;
       }
     }
 
+
     @media (max-width: 420px) {
+
       .stats-grid {
-        grid-template-columns: 1fr;
+
+        grid-template-columns:
+          1fr;
       }
 
       .appointment-row {
-        align-items: flex-start;
+
+        align-items:
+          flex-start;
       }
 
       .status {
-        display: none;
+
+        display:
+          none;
       }
     }
 
-    /* =========================
+
+    /* =========================================
        MOBILE OVERLAY
-    ========================= */
+    ========================================== */
 
     .overlay {
+
       display: none;
 
       position: fixed;
@@ -1023,524 +1307,819 @@
     }
 
     .overlay.show {
-      display: block;
+
+      display:
+        block;
     }
+
   </style>
 </head>
 
+
 <body>
 
-<div class="app">
+  <div class="app">
 
-  <!-- =========================
-       SIDEBAR
-  ========================= -->
 
-  <aside class="sidebar" id="sidebar">
+    <!-- =====================================
+         SIDEBAR
+    ====================================== -->
 
-    <div class="brand">
+    <aside
+      class="sidebar"
+      id="sidebar"
+    >
 
-      <div class="brand-mark">
-        G
-      </div>
+      <!-- BRAND -->
 
-      <div class="brand-text">
+      <div class="brand">
 
-        <strong>
-          GETWELL
-        </strong>
-
-        <span>
-          Weight Loss Admin
-        </span>
-
-      </div>
-
-    </div>
-
-    <div class="sidebar-content">
-
-      <div class="nav-section-title">
-        Main
-      </div>
-
-      <button class="nav-item active">
-        <span class="nav-icon">⌂</span>
-        Dashboard
-      </button>
-
-      <button class="nav-item">
-        <span class="nav-icon">◉</span>
-        Patients
-      </button>
-
-      <button class="nav-item">
-        <span class="nav-icon">▣</span>
-        Appointments
-      </button>
-
-      <div
-        class="nav-section-title"
-        style="margin-top:14px;"
-      >
-        Program
-      </div>
-
-      <button class="nav-item">
-        <span class="nav-icon">◌</span>
-        Treatments
-      </button>
-
-      <button class="nav-item">
-        <span class="nav-icon">↗</span>
-        Progress
-      </button>
-
-      <button class="nav-item">
-        <span class="nav-icon">!</span>
-        Follow-Up
-      </button>
-
-      <div
-        class="nav-section-title"
-        style="margin-top:14px;"
-      >
-        Management
-      </div>
-
-      <button class="nav-item">
-        <span class="nav-icon">▤</span>
-        Reports
-      </button>
-
-      <button class="nav-item">
-        <span class="nav-icon">⚙</span>
-        Settings
-      </button>
-
-    </div>
-
-    <div class="sidebar-bottom">
-
-      <div class="admin-card">
-
-        <div class="admin-avatar">
-          A
+        <div class="brand-mark">
+          G
         </div>
 
-        <div class="admin-info">
+        <div class="brand-text">
 
           <strong>
-            Administrator
+            GETWELL
           </strong>
 
           <span>
-            Weight Loss Program
+            Weight Loss Admin
           </span>
 
         </div>
 
       </div>
 
-    </div>
 
-  </aside>
+      <!-- NAVIGATION -->
 
-  <div
-    class="overlay"
-    id="overlay">
-  </div>
+      <div class="sidebar-content">
 
-  <!-- =========================
-       MAIN
-  ========================= -->
 
-  <main class="main">
+        <!-- MAIN -->
 
-    <!-- TOPBAR -->
+        <div class="nav-section-title">
+          Main
+        </div>
 
-    <header class="topbar">
-
-      <div class="topbar-left">
 
         <button
-          class="mobile-menu"
-          id="mobileMenu"
-          aria-label="Open menu"
+          class="nav-item active"
         >
-          ☰
+
+          <span class="nav-icon">
+            ⌂
+          </span>
+
+          Dashboard
+
         </button>
 
-        <div>
 
-          <div class="page-title">
-            Dashboard
+        <button
+          class="nav-item"
+        >
+
+          <span class="nav-icon">
+            ◉
+          </span>
+
+          Patients
+
+        </button>
+
+
+        <button
+          class="nav-item"
+        >
+
+          <span class="nav-icon">
+            ▣
+          </span>
+
+          Appointments
+
+        </button>
+
+
+        <!-- PROGRAM -->
+
+        <div
+          class="nav-section-title"
+          style="margin-top:14px;"
+        >
+          Program
+        </div>
+
+
+        <button
+          class="nav-item"
+        >
+
+          <span class="nav-icon">
+            ◌
+          </span>
+
+          Treatments
+
+        </button>
+
+
+        <button
+          class="nav-item"
+        >
+
+          <span class="nav-icon">
+            ↗
+          </span>
+
+          Progress
+
+        </button>
+
+
+        <button
+          class="nav-item"
+        >
+
+          <span class="nav-icon">
+            !
+          </span>
+
+          Follow-Up
+
+        </button>
+
+
+        <!-- MANAGEMENT -->
+
+        <div
+          class="nav-section-title"
+          style="margin-top:14px;"
+        >
+          Management
+        </div>
+
+
+        <button
+          class="nav-item"
+        >
+
+          <span class="nav-icon">
+            ▤
+          </span>
+
+          Reports
+
+        </button>
+
+
+        <button
+          class="nav-item"
+        >
+
+          <span class="nav-icon">
+            ⚙
+          </span>
+
+          Settings
+
+        </button>
+
+      </div>
+
+
+      <!-- ADMIN -->
+
+      <div class="sidebar-bottom">
+
+        <div class="admin-card">
+
+          <div class="admin-avatar">
+            A
           </div>
 
-          <div class="page-subtitle">
-            Weight Loss Program Management
+          <div class="admin-info">
+
+            <strong>
+              Administrator
+            </strong>
+
+            <span>
+              Weight Loss Program
+            </span>
+
           </div>
 
         </div>
 
       </div>
 
-      <div class="topbar-right">
+    </aside>
 
-        <div class="search-box">
 
-          <span>
-            ⌕
-          </span>
+    <!-- MOBILE OVERLAY -->
 
-          <input
-            type="text"
-            placeholder="Search patient, ID or phone..."
-            aria-label="Search patients"
+    <div
+      class="overlay"
+      id="overlay"
+    ></div>
+
+
+    <!-- =====================================
+         MAIN CONTENT
+    ====================================== -->
+
+    <main class="main">
+
+
+      <!-- TOPBAR -->
+
+      <header class="topbar">
+
+
+        <div class="topbar-left">
+
+
+          <!-- MOBILE MENU -->
+
+          <button
+            class="mobile-menu"
+            id="mobileMenu"
+            aria-label="Open menu"
           >
+            ☰
+          </button>
 
-        </div>
 
-        <button
-          class="icon-button"
-          aria-label="Notifications"
-        >
-          ♧
-        </button>
+          <!-- PAGE TITLE -->
 
-        <button
-          class="icon-button"
-          aria-label="Activity"
-        >
-          ◔
-        </button>
+          <div>
 
-        <div class="user-avatar">
-          A
-        </div>
+            <div class="page-title">
+              Dashboard
+            </div>
 
-      </div>
-
-    </header>
-
-    <!-- CONTENT -->
-
-    <section class="content">
-
-      <!-- WELCOME -->
-
-      <div class="welcome">
-
-        <h1>
-          Good afternoon, Admin
-        </h1>
-
-        <p>
-          Here's what's happening with the weight loss program today.
-        </p>
-
-      </div>
-
-      <!-- STATISTICS -->
-
-      <div class="stats-grid">
-
-        <!-- TOTAL PATIENTS -->
-
-        <div class="stat-card">
-
-          <div class="stat-top">
-
-            <span class="stat-label">
-              Total Patients
-            </span>
-
-            <div class="stat-icon">
-              ◉
+            <div class="page-subtitle">
+              Weight Loss Program Management
             </div>
 
           </div>
 
-          <div class="stat-number">
-            128
+        </div>
+
+
+        <!-- RIGHT SIDE -->
+
+        <div class="topbar-right">
+
+
+          <!-- SEARCH -->
+
+          <div class="search-box">
+
+            <span>
+              ⌕
+            </span>
+
+            <input
+              type="text"
+              placeholder="Search patient, ID or phone..."
+              aria-label="Search patients"
+            >
+
           </div>
 
-          <div class="stat-meta">
-            All registered patients
+
+          <!-- NOTIFICATIONS -->
+
+          <button
+            class="icon-button"
+            aria-label="Notifications"
+          >
+            ♧
+          </button>
+
+
+          <!-- ACTIVITY -->
+
+          <button
+            class="icon-button"
+            aria-label="Activity"
+          >
+            ◔
+          </button>
+
+
+          <!-- USER -->
+
+          <div class="user-avatar">
+            A
           </div>
 
         </div>
 
-        <!-- ACTIVE PATIENTS -->
+      </header>
 
-        <div class="stat-card">
 
-          <div class="stat-top">
+      <!-- =====================================
+           PAGE CONTENT
+      ====================================== -->
 
-            <span class="stat-label">
-              Active Patients
-            </span>
+      <section class="content">
 
-            <div class="stat-icon">
-              ●
+
+        <!-- WELCOME -->
+
+        <div class="welcome">
+
+          <h1>
+            Good afternoon, Admin
+          </h1>
+
+          <p>
+            Here's what's happening with the weight loss program today.
+          </p>
+
+        </div>
+
+
+        <!-- =================================
+             STATISTICS
+        ================================== -->
+
+        <div class="stats-grid">
+
+
+          <!-- TOTAL PATIENTS -->
+
+          <div class="stat-card">
+
+            <div class="stat-top">
+
+              <span class="stat-label">
+                Total Patients
+              </span>
+
+              <div class="stat-icon">
+                ◉
+              </div>
+
+            </div>
+
+            <div class="stat-number">
+              128
+            </div>
+
+            <div class="stat-meta">
+              All registered patients
             </div>
 
           </div>
 
-          <div class="stat-number">
-            86
-          </div>
 
-          <div class="stat-meta">
-            Currently in program
-          </div>
+          <!-- ACTIVE PATIENTS -->
 
-        </div>
+          <div class="stat-card">
 
-        <!-- FOLLOW-UP -->
+            <div class="stat-top">
 
-        <div class="stat-card">
+              <span class="stat-label">
+                Active Patients
+              </span>
 
-          <div class="stat-top">
+              <div class="stat-icon">
+                ●
+              </div>
 
-            <span class="stat-label">
-              Due Follow-Up
-            </span>
+            </div>
 
-            <div class="stat-icon">
-              !
+            <div class="stat-number">
+              86
+            </div>
+
+            <div class="stat-meta">
+              Currently in program
             </div>
 
           </div>
 
-          <div class="stat-number">
-            14
-          </div>
 
-          <div class="stat-meta">
-            Require attention
-          </div>
+          <!-- FOLLOW-UP -->
 
-        </div>
+          <div class="stat-card">
 
-        <!-- MISSED -->
+            <div class="stat-top">
 
-        <div class="stat-card">
+              <span class="stat-label">
+                Due Follow-Up
+              </span>
 
-          <div class="stat-top">
+              <div class="stat-icon">
+                !
+              </div>
 
-            <span class="stat-label">
-              Missed
-            </span>
+            </div>
 
-            <div class="stat-icon">
-              ○
+            <div class="stat-number">
+              14
+            </div>
+
+            <div class="stat-meta">
+              Require attention
             </div>
 
           </div>
 
-          <div class="stat-number">
-            6
-          </div>
 
-          <div class="stat-meta">
-            Missed appointments
-          </div>
+          <!-- MISSED -->
 
-        </div>
+          <div class="stat-card">
 
-        <!-- GOALS -->
+            <div class="stat-top">
 
-        <div class="stat-card">
+              <span class="stat-label">
+                Missed
+              </span>
 
-          <div class="stat-top">
+              <div class="stat-icon">
+                ○
+              </div>
 
-            <span class="stat-label">
-              Goals Completed
-            </span>
+            </div>
 
-            <div class="stat-icon">
-              ✓
+            <div class="stat-number">
+              6
+            </div>
+
+            <div class="stat-meta">
+              Missed appointments
             </div>
 
           </div>
 
-          <div class="stat-number">
-            18
-          </div>
 
-          <div class="stat-meta">
-            Program completed
+          <!-- GOALS COMPLETED -->
+
+          <div class="stat-card">
+
+            <div class="stat-top">
+
+              <span class="stat-label">
+                Goals Completed
+              </span>
+
+              <div class="stat-icon">
+                ✓
+              </div>
+
+            </div>
+
+            <div class="stat-number">
+              18
+            </div>
+
+            <div class="stat-meta">
+              Program completed
+            </div>
+
           </div>
 
         </div>
 
-      </div>
 
-      <!-- DASHBOARD GRID -->
+        <!-- =================================
+             LOWER DASHBOARD
+        ================================== -->
 
-      <div class="dashboard-grid">
+        <div class="dashboard-grid">
 
-        <!-- =====================
-             APPOINTMENTS
-        ====================== -->
 
-        <div class="card">
+          <!-- =================================
+               TODAY'S APPOINTMENTS
+          ================================== -->
 
-          <div class="card-header">
+          <div class="card">
 
-            <div>
 
-              <h2>
-                Today's Appointments
-              </h2>
+            <div class="card-header">
+
+              <div>
+
+                <h2>
+                  Today's Appointments
+                </h2>
+
+                <span>
+                  Thursday, 20 August 2026
+                </span>
+
+              </div>
 
               <span>
-                Thursday, 20 August 2026
+                View all →
               </span>
 
             </div>
 
-            <span>
-              View all →
-            </span>
+
+            <div class="card-body">
+
+
+              <!-- APPOINTMENT 1 -->
+
+              <div class="appointment-row">
+
+                <div class="appointment-left">
+
+                  <div class="appointment-time">
+                    09:30
+                  </div>
+
+                  <div class="patient-avatar">
+                    AA
+                  </div>
+
+                  <div class="appointment-info">
+
+                    <strong>
+                      Aisyah Abdullah
+                    </strong>
+
+                    <span>
+                      Week 6 · Body Composition
+                    </span>
+
+                  </div>
+
+                </div>
+
+                <div class="status completed">
+                  Completed
+                </div>
+
+              </div>
+
+
+              <!-- APPOINTMENT 2 -->
+
+              <div class="appointment-row">
+
+                <div class="appointment-left">
+
+                  <div class="appointment-time">
+                    10:30
+                  </div>
+
+                  <div class="patient-avatar">
+                    BR
+                  </div>
+
+                  <div class="appointment-info">
+
+                    <strong>
+                      Brandon Wilbert
+                    </strong>
+
+                    <span>
+                      Week 3 · Review
+                    </span>
+
+                  </div>
+
+                </div>
+
+                <div class="status upcoming">
+                  Upcoming
+                </div>
+
+              </div>
+
+
+              <!-- APPOINTMENT 3 -->
+
+              <div class="appointment-row">
+
+                <div class="appointment-left">
+
+                  <div class="appointment-time">
+                    11:30
+                  </div>
+
+                  <div class="patient-avatar">
+                    SZ
+                  </div>
+
+                  <div class="appointment-info">
+
+                    <strong>
+                      Sarah Zakaria
+                    </strong>
+
+                    <span>
+                      Week 8 · Follow-Up
+                    </span>
+
+                  </div>
+
+                </div>
+
+                <div class="status alert">
+                  Attention
+                </div>
+
+              </div>
+
+
+              <!-- APPOINTMENT 4 -->
+
+              <div class="appointment-row">
+
+                <div class="appointment-left">
+
+                  <div class="appointment-time">
+                    14:00
+                  </div>
+
+                  <div class="patient-avatar">
+                    DM
+                  </div>
+
+                  <div class="appointment-info">
+
+                    <strong>
+                      Daniel Malik
+                    </strong>
+
+                    <span>
+                      Week 4 · Body Composition
+                    </span>
+
+                  </div>
+
+                </div>
+
+                <div class="status upcoming">
+                  Upcoming
+                </div>
+
+              </div>
+
+            </div>
 
           </div>
 
-          <div class="card-body">
 
-            <!-- APPOINTMENT 1 -->
+          <!-- =================================
+               PATIENTS NEEDING ATTENTION
+          ================================== -->
 
-            <div class="appointment-row">
+          <div class="card">
 
-              <div class="appointment-left">
 
-                <div class="appointment-time">
-                  09:30
-                </div>
+            <div class="card-header">
 
-                <div class="patient-avatar">
-                  AA
-                </div>
+              <div>
 
-                <div class="appointment-info">
+                <h2>
+                  Patients Needing Attention
+                </h2>
 
-                  <strong>
-                    Aisyah Abdullah
-                  </strong>
-
-                  <span>
-                    Week 6 · Body Composition
-                  </span>
-
-                </div>
+                <span>
+                  Follow-up required
+                </span>
 
               </div>
 
-              <div class="status completed">
-                Completed
-              </div>
+              <span>
+                14 total
+              </span>
 
             </div>
 
-            <!-- APPOINTMENT 2 -->
 
-            <div class="appointment-row">
+            <div class="card-body">
 
-              <div class="appointment-left">
 
-                <div class="appointment-time">
-                  10:30
-                </div>
+              <!-- PATIENT 1 -->
 
-                <div class="patient-avatar">
-                  BR
-                </div>
+              <div class="follow-row">
 
-                <div class="appointment-info">
+                <div
+                  class="priority-dot priority-high"
+                ></div>
 
-                  <strong>
-                    Brandon Wilbert
-                  </strong>
-
-                  <span>
-                    Week 3 · Review
-                  </span>
-
-                </div>
-
-              </div>
-
-              <div class="status upcoming">
-                Upcoming
-              </div>
-
-            </div>
-
-            <!-- APPOINTMENT 3 -->
-
-            <div class="appointment-row">
-
-              <div class="appointment-left">
-
-                <div class="appointment-time">
-                  11:30
-                </div>
-
-                <div class="patient-avatar">
-                  SZ
-                </div>
-
-                <div class="appointment-info">
+                <div class="follow-content">
 
                   <strong>
                     Sarah Zakaria
                   </strong>
 
                   <span>
-                    Week 8 · Follow-Up
+                    Appointment overdue by 2 days.
                   </span>
 
                 </div>
 
+                <button
+                  class="follow-action"
+                  aria-label="Open patient"
+                >
+                  →
+                </button>
+
               </div>
 
-              <div class="status alert">
-                Attention
+
+              <!-- PATIENT 2 -->
+
+              <div class="follow-row">
+
+                <div
+                  class="priority-dot priority-high"
+                ></div>
+
+                <div class="follow-content">
+
+                  <strong>
+                    Mohd Aizuddin
+                  </strong>
+
+                  <span>
+                    No body composition measurement this week.
+                  </span>
+
+                </div>
+
+                <button
+                  class="follow-action"
+                  aria-label="Open patient"
+                >
+                  →
+                </button>
+
               </div>
 
-            </div>
 
-            <!-- APPOINTMENT 4 -->
+              <!-- PATIENT 3 -->
 
-            <div class="appointment-row">
+              <div class="follow-row">
 
-              <div class="appointment-left">
+                <div
+                  class="priority-dot priority-medium"
+                ></div>
 
-                <div class="appointment-time">
-                  14:00
+                <div class="follow-content">
+
+                  <strong>
+                    Aisyah Abdullah
+                  </strong>
+
+                  <span>
+                    Weight unchanged for 3 weeks.
+                  </span>
+
                 </div>
 
-                <div class="patient-avatar">
-                  DM
-                </div>
+                <button
+                  class="follow-action"
+                  aria-label="Open patient"
+                >
+                  →
+                </button>
 
-                <div class="appointment-info">
+              </div>
+
+
+              <!-- PATIENT 4 -->
+
+              <div class="follow-row">
+
+                <div
+                  class="priority-dot priority-medium"
+                ></div>
+
+                <div class="follow-content">
 
                   <strong>
                     Daniel Malik
                   </strong>
 
                   <span>
-                    Week 4 · Body Composition
+                    Follow-up appointment required.
                   </span>
 
                 </div>
 
-              </div>
+                <button
+                  class="follow-action"
+                  aria-label="Open patient"
+                >
+                  →
+                </button>
 
-              <div class="status upcoming">
-                Upcoming
               </div>
 
             </div>
@@ -1549,177 +2128,57 @@
 
         </div>
 
-        <!-- =====================
-             FOLLOW-UP
-        ====================== -->
+      </section>
 
-        <div class="card">
+    </main>
 
-          <div class="card-header">
+  </div>
 
-            <div>
 
-              <h2>
-                Patients Needing Attention
-              </h2>
+  <!-- =========================================
+       JAVASCRIPT
+  ========================================== -->
 
-              <span>
-                Follow-up required
-              </span>
+  <script>
 
-            </div>
+    const sidebar =
+      document.getElementById("sidebar");
 
-            <span>
-              14 total
-            </span>
+    const overlay =
+      document.getElementById("overlay");
 
-          </div>
+    const mobileMenu =
+      document.getElementById("mobileMenu");
 
-          <div class="card-body">
 
-            <!-- FOLLOW-UP 1 -->
+    /* Open mobile sidebar */
 
-            <div class="follow-row">
+    mobileMenu.addEventListener(
+      "click",
+      () => {
 
-              <div
-                class="priority-dot priority-high">
-              </div>
+        sidebar.classList.toggle("open");
 
-              <div class="follow-content">
+        overlay.classList.toggle("show");
 
-                <strong>
-                  Sarah Zakaria
-                </strong>
+      }
+    );
 
-                <span>
-                  Appointment overdue by 2 days.
-                </span>
 
-              </div>
+    /* Close mobile sidebar */
 
-              <button
-                class="follow-action"
-                aria-label="Open patient"
-              >
-                →
-              </button>
+    overlay.addEventListener(
+      "click",
+      () => {
 
-            </div>
+        sidebar.classList.remove("open");
 
-            <!-- FOLLOW-UP 2 -->
+        overlay.classList.remove("show");
 
-            <div class="follow-row">
+      }
+    );
 
-              <div
-                class="priority-dot priority-high">
-              </div>
-
-              <div class="follow-content">
-
-                <strong>
-                  Mohd Aizuddin
-                </strong>
-
-                <span>
-                  No body composition measurement this week.
-                </span>
-
-              </div>
-
-              <button
-                class="follow-action"
-                aria-label="Open patient"
-              >
-                →
-              </button>
-
-            </div>
-
-            <!-- FOLLOW-UP 3 -->
-
-            <div class="follow-row">
-
-              <div
-                class="priority-dot priority-medium">
-              </div>
-
-              <div class="follow-content">
-
-                <strong>
-                  Aisyah Abdullah
-                </strong>
-
-                <span>
-                  Weight unchanged for 3 weeks.
-                </span>
-
-              </div>
-
-              <button
-                class="follow-action"
-                aria-label="Open patient"
-              >
-                →
-              </button>
-
-            </div>
-
-            <!-- FOLLOW-UP 4 -->
-
-            <div class="follow-row">
-
-              <div
-                class="priority-dot priority-medium">
-              </div>
-
-              <div class="follow-content">
-
-                <strong>
-                  Daniel Malik
-                </strong>
-
-                <span>
-                  Follow-up appointment required.
-                </span>
-
-              </div>
-
-              <button
-                class="follow-action"
-                aria-label="Open patient"
-              >
-                →
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  </main>
-
-</div>
-
-<script>
-  const sidebar = document.getElementById("sidebar");
-  const overlay = document.getElementById("overlay");
-  const mobileMenu = document.getElementById("mobileMenu");
-
-  mobileMenu.addEventListener("click", () => {
-    sidebar.classList.toggle("open");
-    overlay.classList.toggle("show");
-  });
-
-  overlay.addEventListener("click", () => {
-    sidebar.classList.remove("open");
-    overlay.classList.remove("show");
-  });
-</script>
+  </script>
 
 </body>
 </html>
