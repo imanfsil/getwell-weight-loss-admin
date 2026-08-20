@@ -6,24 +6,40 @@
 
   <title>Getwell Weight Loss Admin</title>
 
+  <!-- Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --navy: #0f172a;
-      --navy-2: #111827;
-      --sidebar: #ffffff;
-      --background: #f6f8fb;
-      --card: #ffffff;
-      --border: #e5e7eb;
-      --text: #111827;
-      --muted: #6b7280;
-      --success: #16a34a;
-      --warning: #d97706;
-      --danger: #dc2626;
-      --info: #2563eb;
+      --primary: #2563EB;
+      --primary-dark: #1D4ED8;
+      --primary-soft: #EFF6FF;
+      --primary-pale: #F5F9FF;
+
+      --navy: #0F172A;
+      --text: #172033;
+      --muted: #64748B;
+
+      --background: #F6F9FD;
+      --white: #FFFFFF;
+
+      --border: #DCE6F2;
+
+      --success: #16A34A;
+      --success-soft: #ECFDF3;
+
+      --warning: #D97706;
+      --warning-soft: #FFF7ED;
+
+      --danger: #DC2626;
+      --danger-soft: #FEF2F2;
+
       --radius: 14px;
-      --shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+
+      --shadow:
+        0 4px 16px rgba(37, 99, 235, 0.06);
     }
 
     * {
@@ -32,24 +48,21 @@
       padding: 0;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Helvetica,
-        Arial,
-        sans-serif;
+      font-family: "Poppins", sans-serif;
       background: var(--background);
       color: var(--text);
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
 
     button,
     input {
-      font: inherit;
+      font-family: "Poppins", sans-serif;
     }
 
     button {
@@ -62,144 +75,209 @@
       color: inherit;
     }
 
-    /* =========================
-       APP LAYOUT
-    ========================= */
+    /* =====================================
+       APP
+    ===================================== */
 
     .app {
       display: flex;
       min-height: 100vh;
     }
 
-    /* =========================
+    /* =====================================
        SIDEBAR
-    ========================= */
+    ===================================== */
 
     .sidebar {
       width: 250px;
-      background: var(--sidebar);
+      background: var(--white);
       border-right: 1px solid var(--border);
+
       min-height: 100vh;
+
       position: fixed;
       left: 0;
       top: 0;
       bottom: 0;
+
       z-index: 1000;
+
       display: flex;
       flex-direction: column;
+
       transition: transform 0.25s ease;
     }
 
     .brand {
       height: 82px;
+
       display: flex;
       align-items: center;
-      padding: 0 22px;
+
+      padding: 0 20px;
+
       border-bottom: 1px solid var(--border);
     }
 
     .brand-mark {
       width: 40px;
       height: 40px;
+
       border-radius: 12px;
-      background: linear-gradient(135deg, #2563eb, #60a5fa);
+
+      background:
+        linear-gradient(
+          135deg,
+          #2563EB 0%,
+          #3B82F6 60%,
+          #60A5FA 100%
+        );
+
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
-      font-weight: 800;
+
+      color: #fff;
+
       font-size: 18px;
+      font-weight: 800;
+
       margin-right: 11px;
+
+      box-shadow:
+        0 5px 12px rgba(37, 99, 235, 0.20);
     }
 
     .brand-text strong {
       display: block;
+
+      color: var(--navy);
+
       font-size: 15px;
       font-weight: 800;
+
       letter-spacing: -0.2px;
     }
 
     .brand-text span {
       display: block;
-      font-size: 11px;
+
       color: var(--muted);
+
+      font-size: 10px;
+      font-weight: 500;
+
       margin-top: 2px;
     }
 
     .sidebar-content {
-      padding: 18px 14px;
+      padding: 18px 13px;
+
       flex: 1;
+
       overflow-y: auto;
     }
 
     .nav-section-title {
       font-size: 10px;
       font-weight: 700;
+
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: #9ca3af;
-      padding: 8px 12px;
+
+      color: #94A3B8;
+
+      padding: 8px 11px;
+
       margin-bottom: 4px;
     }
 
     .nav-item {
       display: flex;
       align-items: center;
+
       gap: 12px;
+
       width: 100%;
       min-height: 44px;
+
       padding: 0 12px;
+
       margin-bottom: 4px;
+
       border-radius: 10px;
-      color: #4b5563;
-      font-size: 13px;
+
+      color: #475569;
+
+      font-size: 12px;
       font-weight: 600;
-      transition: all 0.15s ease;
+
       background: transparent;
+
+      transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        transform 0.15s ease;
     }
 
     .nav-item:hover {
-      background: #f3f6fb;
-      color: var(--text);
+      background: var(--primary-pale);
+      color: var(--primary);
     }
 
     .nav-item.active {
-      background: #eff6ff;
+      background: var(--primary-soft);
       color: var(--primary);
+      font-weight: 700;
     }
 
     .nav-icon {
       width: 20px;
+
       text-align: center;
-      font-size: 15px;
+
+      font-size: 14px;
+
+      color: inherit;
+
       flex-shrink: 0;
     }
 
     .sidebar-bottom {
       padding: 14px;
+
       border-top: 1px solid var(--border);
     }
 
     .admin-card {
-      background: #f8fafc;
-      border: 1px solid var(--border);
+      background: var(--primary-pale);
+
+      border: 1px solid #DCEAFF;
+
       border-radius: 12px;
-      padding: 12px;
+
+      padding: 11px;
+
       display: flex;
       align-items: center;
+
       gap: 10px;
     }
 
     .admin-avatar {
       width: 35px;
       height: 35px;
+
       border-radius: 50%;
-      background: #dbeafe;
+
+      background: #DCEAFF;
       color: var(--primary);
+
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 12px;
+
+      font-size: 11px;
       font-weight: 800;
     }
 
@@ -209,7 +287,12 @@
 
     .admin-info strong {
       display: block;
-      font-size: 12px;
+
+      color: var(--navy);
+
+      font-size: 11px;
+      font-weight: 700;
+
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -217,129 +300,202 @@
 
     .admin-info span {
       display: block;
-      font-size: 10px;
+
       color: var(--muted);
+
+      font-size: 9px;
+      font-weight: 500;
+
       margin-top: 2px;
     }
 
-    /* =========================
-       MAIN CONTENT
-    ========================= */
+    /* =====================================
+       MAIN
+    ===================================== */
 
     .main {
       margin-left: 250px;
+
       flex: 1;
+
       min-width: 0;
     }
 
+    /* =====================================
+       TOPBAR
+    ===================================== */
+
     .topbar {
       height: 72px;
-      background: rgba(255, 255, 255, 0.94);
-      backdrop-filter: blur(10px);
+
+      background:
+        rgba(255, 255, 255, 0.96);
+
       border-bottom: 1px solid var(--border);
+
       display: flex;
       align-items: center;
       justify-content: space-between;
+
       padding: 0 28px;
+
       position: sticky;
       top: 0;
+
       z-index: 900;
+
+      backdrop-filter: blur(10px);
     }
 
     .topbar-left {
       display: flex;
       align-items: center;
+
       gap: 12px;
     }
 
     .mobile-menu {
       display: none;
+
       width: 38px;
       height: 38px;
+
       border-radius: 9px;
-      background: white;
+
+      background: var(--white);
+
       border: 1px solid var(--border);
+
       align-items: center;
       justify-content: center;
+
       font-size: 17px;
+
+      color: var(--navy);
     }
 
     .page-title {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 800;
+
+      color: var(--navy);
+
       letter-spacing: -0.3px;
     }
 
     .page-subtitle {
-      font-size: 12px;
+      font-size: 10px;
+
       color: var(--muted);
+
+      font-weight: 500;
+
       margin-top: 2px;
     }
 
     .topbar-right {
       display: flex;
       align-items: center;
-      gap: 10px;
+
+      gap: 9px;
     }
 
     .search-box {
       width: 270px;
       height: 40px;
-      background: #f8fafc;
+
+      background: var(--white);
+
       border: 1px solid var(--border);
+
       border-radius: 9px;
+
       display: flex;
       align-items: center;
+
       padding: 0 12px;
+
       gap: 8px;
     }
 
     .search-box span {
-      color: #9ca3af;
-      font-size: 14px;
+      color: #94A3B8;
+
+      font-size: 13px;
     }
 
     .search-box input {
       flex: 1;
+
       border: none;
       outline: none;
+
       background: transparent;
-      font-size: 12px;
+
       color: var(--text);
+
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .search-box input::placeholder {
+      color: #94A3B8;
     }
 
     .icon-button {
       width: 40px;
       height: 40px;
+
       border-radius: 9px;
+
       border: 1px solid var(--border);
-      background: white;
+
+      background: var(--white);
+
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #4b5563;
+
+      color: #475569;
+
+      transition: 0.15s ease;
+    }
+
+    .icon-button:hover {
+      border-color: #BCD3F5;
+
+      background: var(--primary-pale);
+
+      color: var(--primary);
     }
 
     .user-avatar {
       width: 38px;
       height: 38px;
+
       border-radius: 50%;
+
       background: var(--navy);
-      color: white;
+
+      color: var(--white);
+
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 12px;
-      font-weight: 800;
+
+      font-size: 11px;
+      font-weight: 700;
     }
 
-    /* =========================
+    /* =====================================
        CONTENT
-    ========================= */
+    ===================================== */
 
     .content {
       padding: 30px;
+
       max-width: 1600px;
+
       margin: 0 auto;
     }
 
@@ -348,124 +504,198 @@
     }
 
     .welcome h1 {
-      font-size: 25px;
+      font-size: 24px;
+
+      color: var(--navy);
+
+      font-weight: 800;
+
       letter-spacing: -0.7px;
-      margin-bottom: 5px;
+
+      margin-bottom: 4px;
     }
 
     .welcome p {
-      font-size: 13px;
+      font-size: 11px;
+
       color: var(--muted);
+
+      font-weight: 500;
     }
 
-    /* =========================
-       KPI CARDS
-    ========================= */
+    /* =====================================
+       STAT CARDS
+    ===================================== */
 
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+
+      grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
       gap: 16px;
+
       margin-bottom: 22px;
     }
 
     .stat-card {
-      background: var(--card);
+      background: var(--white);
+
       border: 1px solid var(--border);
+
       border-radius: var(--radius);
+
       padding: 18px;
+
       box-shadow: var(--shadow);
+
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-1px);
+
+      box-shadow:
+        0 7px 20px rgba(37, 99, 235, 0.09);
     }
 
     .stat-top {
       display: flex;
+
       align-items: center;
+
       justify-content: space-between;
+
       margin-bottom: 18px;
     }
 
     .stat-label {
-      color: var(--muted);
-      font-size: 11px;
+      color: #64748B;
+
+      font-size: 10px;
+
       font-weight: 700;
+
       text-transform: uppercase;
+
       letter-spacing: 0.04em;
     }
 
     .stat-icon {
       width: 34px;
       height: 34px;
+
       border-radius: 9px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #eff6ff;
+
+      background: var(--primary-soft);
+
       color: var(--primary);
-      font-size: 14px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-size: 13px;
     }
 
     .stat-number {
       font-size: 27px;
+
+      color: var(--navy);
+
       font-weight: 800;
+
       letter-spacing: -1px;
     }
 
     .stat-meta {
-      font-size: 11px;
+      font-size: 10px;
+
       color: var(--muted);
-      margin-top: 6px;
+
+      font-weight: 500;
+
+      margin-top: 5px;
     }
 
-    /* =========================
+    /* =====================================
        DASHBOARD GRID
-    ========================= */
+    ===================================== */
 
     .dashboard-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.65fr) minmax(320px, 1fr);
+
+      grid-template-columns:
+        minmax(0, 1.65fr)
+        minmax(320px, 1fr);
+
       gap: 20px;
     }
 
     .card {
-      background: white;
+      background: var(--white);
+
       border: 1px solid var(--border);
+
       border-radius: var(--radius);
+
       box-shadow: var(--shadow);
+
+      overflow: hidden;
     }
 
     .card-header {
       padding: 18px 20px;
+
       border-bottom: 1px solid var(--border);
+
       display: flex;
+
       justify-content: space-between;
+
       align-items: center;
     }
 
     .card-header h2 {
-      font-size: 14px;
+      font-size: 13px;
+
+      color: var(--navy);
+
       font-weight: 800;
     }
 
     .card-header span {
       color: var(--muted);
-      font-size: 11px;
+
+      font-size: 10px;
+
+      font-weight: 500;
     }
 
     .card-body {
       padding: 0;
     }
 
-    /* =========================
-       APPOINTMENT LIST
-    ========================= */
+    /* =====================================
+       APPOINTMENTS
+    ===================================== */
 
     .appointment-row {
       padding: 15px 20px;
+
       display: flex;
+
       align-items: center;
+
       justify-content: space-between;
+
       gap: 15px;
-      border-bottom: 1px solid #f0f2f5;
+
+      border-bottom: 1px solid #EDF2F7;
     }
 
     .appointment-row:last-child {
@@ -474,29 +704,44 @@
 
     .appointment-left {
       display: flex;
+
       align-items: center;
+
       gap: 13px;
+
       min-width: 0;
     }
 
     .appointment-time {
       width: 52px;
-      font-size: 12px;
+
+      font-size: 11px;
+
       font-weight: 800;
-      color: var(--text);
+
+      color: var(--navy);
+
       flex-shrink: 0;
     }
 
     .patient-avatar {
       width: 38px;
       height: 38px;
+
       border-radius: 10px;
-      background: #eff6ff;
+
+      background: var(--primary-soft);
+
       color: var(--primary);
+
       display: flex;
+
       justify-content: center;
+
       align-items: center;
-      font-size: 11px;
+
+      font-size: 10px;
+
       font-weight: 800;
     }
 
@@ -506,53 +751,79 @@
 
     .appointment-info strong {
       display: block;
-      font-size: 12px;
+
+      font-size: 11px;
+
+      color: var(--navy);
+
+      font-weight: 700;
+
       white-space: nowrap;
+
       overflow: hidden;
+
       text-overflow: ellipsis;
     }
 
     .appointment-info span {
       display: block;
-      font-size: 10px;
+
+      font-size: 9px;
+
       color: var(--muted);
+
+      font-weight: 500;
+
       margin-top: 3px;
     }
 
     .status {
       display: inline-flex;
+
       align-items: center;
+
       border-radius: 999px;
+
       padding: 5px 9px;
-      font-size: 10px;
+
+      font-size: 9px;
+
       font-weight: 700;
+
       white-space: nowrap;
     }
 
     .status.upcoming {
-      background: #eff6ff;
-      color: #2563eb;
+      background: var(--primary-soft);
+
+      color: var(--primary);
     }
 
     .status.completed {
-      background: #ecfdf5;
-      color: #15803d;
+      background: var(--success-soft);
+
+      color: var(--success);
     }
 
     .status.alert {
-      background: #fff7ed;
-      color: #c2410c;
+      background: var(--warning-soft);
+
+      color: var(--warning);
     }
 
-    /* =========================
+    /* =====================================
        FOLLOW-UP
-    ========================= */
+    ===================================== */
 
     .follow-row {
       padding: 15px 20px;
-      border-bottom: 1px solid #f0f2f5;
+
+      border-bottom: 1px solid #EDF2F7;
+
       display: flex;
+
       gap: 12px;
+
       align-items: flex-start;
     }
 
@@ -561,10 +832,13 @@
     }
 
     .priority-dot {
-      width: 9px;
-      height: 9px;
+      width: 8px;
+      height: 8px;
+
       border-radius: 50%;
+
       margin-top: 5px;
+
       flex-shrink: 0;
     }
 
@@ -578,45 +852,78 @@
 
     .follow-content {
       flex: 1;
+
       min-width: 0;
     }
 
     .follow-content strong {
       display: block;
-      font-size: 12px;
+
+      font-size: 11px;
+
+      color: var(--navy);
+
+      font-weight: 700;
     }
 
     .follow-content span {
       display: block;
+
       color: var(--muted);
-      font-size: 10px;
+
+      font-size: 9px;
+
+      font-weight: 500;
+
       margin-top: 4px;
+
       line-height: 1.5;
     }
 
     .follow-action {
       width: 31px;
       height: 31px;
-      background: #f8fafc;
+
+      background: var(--white);
+
       border: 1px solid var(--border);
+
       border-radius: 8px;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
-      color: #6b7280;
+
+      color: var(--primary);
+
+      font-weight: 700;
+
+      transition: 0.15s ease;
     }
 
-    /* =========================
+    .follow-action:hover {
+      background: var(--primary-soft);
+
+      border-color: #BFD4F8;
+    }
+
+    /* =====================================
        RESPONSIVE
-    ========================= */
+    ===================================== */
 
     @media (max-width: 1200px) {
+
       .stats-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns:
+          repeat(3, minmax(0, 1fr));
       }
+
     }
 
     @media (max-width: 900px) {
+
       .sidebar {
         transform: translateX(-100%);
       }
@@ -640,9 +947,11 @@
       .dashboard-grid {
         grid-template-columns: 1fr;
       }
+
     }
 
     @media (max-width: 680px) {
+
       .topbar {
         padding: 0 15px;
       }
@@ -660,7 +969,8 @@
       }
 
       .stats-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
       }
 
       .stat-number {
@@ -668,11 +978,13 @@
       }
 
       .welcome h1 {
-        font-size: 22px;
+        font-size: 21px;
       }
+
     }
 
     @media (max-width: 420px) {
+
       .stats-grid {
         grid-template-columns: 1fr;
       }
@@ -684,17 +996,23 @@
       .status {
         display: none;
       }
+
     }
 
-    /* =========================
-       MOBILE OVERLAY
-    ========================= */
+    /* =====================================
+       OVERLAY
+    ===================================== */
 
     .overlay {
       display: none;
+
       position: fixed;
+
       inset: 0;
-      background: rgba(15, 23, 42, 0.35);
+
+      background:
+        rgba(15, 23, 42, 0.35);
+
       z-index: 950;
     }
 
@@ -712,12 +1030,23 @@
   <aside class="sidebar" id="sidebar">
 
     <div class="brand">
-      <div class="brand-mark">G</div>
+
+      <div class="brand-mark">
+        G
+      </div>
 
       <div class="brand-text">
-        <strong>GETWELL</strong>
-        <span>Weight Loss Admin</span>
+
+        <strong>
+          GETWELL
+        </strong>
+
+        <span>
+          Weight Loss Admin
+        </span>
+
       </div>
+
     </div>
 
     <div class="sidebar-content">
@@ -741,7 +1070,10 @@
         Appointments
       </button>
 
-      <div class="nav-section-title" style="margin-top:14px;">
+      <div
+        class="nav-section-title"
+        style="margin-top:14px;"
+      >
         Program
       </div>
 
@@ -760,7 +1092,10 @@
         Follow-Up
       </button>
 
-      <div class="nav-section-title" style="margin-top:14px;">
+      <div
+        class="nav-section-title"
+        style="margin-top:14px;"
+      >
         Management
       </div>
 
@@ -777,21 +1112,35 @@
     </div>
 
     <div class="sidebar-bottom">
+
       <div class="admin-card">
+
         <div class="admin-avatar">
           A
         </div>
 
         <div class="admin-info">
-          <strong>Administrator</strong>
-          <span>Weight Loss Program</span>
+
+          <strong>
+            Administrator
+          </strong>
+
+          <span>
+            Weight Loss Program
+          </span>
+
         </div>
+
       </div>
+
     </div>
 
   </aside>
 
-  <div class="overlay" id="overlay"></div>
+  <div
+    class="overlay"
+    id="overlay">
+  </div>
 
   <!-- MAIN -->
   <main class="main">
@@ -801,11 +1150,14 @@
 
       <div class="topbar-left">
 
-        <button class="mobile-menu" id="mobileMenu">
+        <button
+          class="mobile-menu"
+          id="mobileMenu">
           ☰
         </button>
 
         <div>
+
           <div class="page-title">
             Dashboard
           </div>
@@ -813,6 +1165,7 @@
           <div class="page-subtitle">
             Weight Loss Program Management
           </div>
+
         </div>
 
       </div>
@@ -820,11 +1173,16 @@
       <div class="topbar-right">
 
         <div class="search-box">
-          <span>⌕</span>
+
+          <span>
+            ⌕
+          </span>
+
           <input
             type="text"
             placeholder="Search patient, ID or phone..."
           >
+
         </div>
 
         <button class="icon-button">
@@ -847,17 +1205,24 @@
     <section class="content">
 
       <div class="welcome">
-        <h1>Good afternoon, Admin</h1>
+
+        <h1>
+          Good afternoon, Admin
+        </h1>
+
         <p>
           Here's what's happening with the weight loss program today.
         </p>
+
       </div>
 
-      <!-- STATISTICS -->
+      <!-- STATS -->
       <div class="stats-grid">
 
         <div class="stat-card">
+
           <div class="stat-top">
+
             <span class="stat-label">
               Total Patients
             </span>
@@ -865,6 +1230,7 @@
             <div class="stat-icon">
               ◉
             </div>
+
           </div>
 
           <div class="stat-number">
@@ -874,10 +1240,13 @@
           <div class="stat-meta">
             All registered patients
           </div>
+
         </div>
 
         <div class="stat-card">
+
           <div class="stat-top">
+
             <span class="stat-label">
               Active Patients
             </span>
@@ -885,6 +1254,7 @@
             <div class="stat-icon">
               ●
             </div>
+
           </div>
 
           <div class="stat-number">
@@ -894,10 +1264,13 @@
           <div class="stat-meta">
             Currently in program
           </div>
+
         </div>
 
         <div class="stat-card">
+
           <div class="stat-top">
+
             <span class="stat-label">
               Due Follow-Up
             </span>
@@ -905,6 +1278,7 @@
             <div class="stat-icon">
               !
             </div>
+
           </div>
 
           <div class="stat-number">
@@ -914,10 +1288,13 @@
           <div class="stat-meta">
             Require attention
           </div>
+
         </div>
 
         <div class="stat-card">
+
           <div class="stat-top">
+
             <span class="stat-label">
               Missed
             </span>
@@ -925,6 +1302,7 @@
             <div class="stat-icon">
               ○
             </div>
+
           </div>
 
           <div class="stat-number">
@@ -934,10 +1312,13 @@
           <div class="stat-meta">
             Missed appointments
           </div>
+
         </div>
 
         <div class="stat-card">
+
           <div class="stat-top">
+
             <span class="stat-label">
               Goals Completed
             </span>
@@ -945,6 +1326,7 @@
             <div class="stat-icon">
               ✓
             </div>
+
           </div>
 
           <div class="stat-number">
@@ -954,6 +1336,7 @@
           <div class="stat-meta">
             Program completed
           </div>
+
         </div>
 
       </div>
@@ -965,12 +1348,23 @@
         <div class="card">
 
           <div class="card-header">
+
             <div>
-              <h2>Today's Appointments</h2>
-              <span>Thursday, 20 August 2026</span>
+
+              <h2>
+                Today's Appointments
+              </h2>
+
+              <span>
+                Thursday, 20 August 2026
+              </span>
+
             </div>
 
-            <span>View all →</span>
+            <span>
+              View all →
+            </span>
+
           </div>
 
           <div class="card-body">
@@ -988,10 +1382,15 @@
                 </div>
 
                 <div class="appointment-info">
-                  <strong>Aisyah Abdullah</strong>
+
+                  <strong>
+                    Aisyah Abdullah
+                  </strong>
+
                   <span>
                     Week 6 · Body Composition
                   </span>
+
                 </div>
 
               </div>
@@ -1015,10 +1414,15 @@
                 </div>
 
                 <div class="appointment-info">
-                  <strong>Brandon Wilbert</strong>
+
+                  <strong>
+                    Brandon Wilbert
+                  </strong>
+
                   <span>
                     Week 3 · Review
                   </span>
+
                 </div>
 
               </div>
@@ -1042,10 +1446,15 @@
                 </div>
 
                 <div class="appointment-info">
-                  <strong>Sarah Zakaria</strong>
+
+                  <strong>
+                    Sarah Zakaria
+                  </strong>
+
                   <span>
                     Week 8 · Follow-Up
                   </span>
+
                 </div>
 
               </div>
@@ -1069,10 +1478,15 @@
                 </div>
 
                 <div class="appointment-info">
-                  <strong>Daniel Malik</strong>
+
+                  <strong>
+                    Daniel Malik
+                  </strong>
+
                   <span>
                     Week 4 · Body Composition
                   </span>
+
                 </div>
 
               </div>
@@ -1084,32 +1498,50 @@
             </div>
 
           </div>
+
         </div>
 
-        <!-- FOLLOW UP -->
+        <!-- FOLLOW-UP -->
         <div class="card">
 
           <div class="card-header">
+
             <div>
-              <h2>Patients Needing Attention</h2>
-              <span>Follow-up required</span>
+
+              <h2>
+                Patients Needing Attention
+              </h2>
+
+              <span>
+                Follow-up required
+              </span>
+
             </div>
 
-            <span>14 total</span>
+            <span>
+              14 total
+            </span>
+
           </div>
 
           <div class="card-body">
 
             <div class="follow-row">
 
-              <div class="priority-dot priority-high"></div>
+              <div
+                class="priority-dot priority-high">
+              </div>
 
               <div class="follow-content">
-                <strong>Sarah Zakaria</strong>
+
+                <strong>
+                  Sarah Zakaria
+                </strong>
 
                 <span>
                   Appointment overdue by 2 days.
                 </span>
+
               </div>
 
               <button class="follow-action">
@@ -1120,14 +1552,20 @@
 
             <div class="follow-row">
 
-              <div class="priority-dot priority-high"></div>
+              <div
+                class="priority-dot priority-high">
+              </div>
 
               <div class="follow-content">
-                <strong>Mohd Aizuddin</strong>
+
+                <strong>
+                  Mohd Aizuddin
+                </strong>
 
                 <span>
                   No body composition measurement this week.
                 </span>
+
               </div>
 
               <button class="follow-action">
@@ -1138,14 +1576,20 @@
 
             <div class="follow-row">
 
-              <div class="priority-dot priority-medium"></div>
+              <div
+                class="priority-dot priority-medium">
+              </div>
 
               <div class="follow-content">
-                <strong>Aisyah Abdullah</strong>
+
+                <strong>
+                  Aisyah Abdullah
+                </strong>
 
                 <span>
                   Weight unchanged for 3 weeks.
                 </span>
+
               </div>
 
               <button class="follow-action">
@@ -1156,14 +1600,20 @@
 
             <div class="follow-row">
 
-              <div class="priority-dot priority-medium"></div>
+              <div
+                class="priority-dot priority-medium">
+              </div>
 
               <div class="follow-content">
-                <strong>Daniel Malik</strong>
+
+                <strong>
+                  Daniel Malik
+                </strong>
 
                 <span>
                   Follow-up appointment required.
                 </span>
+
               </div>
 
               <button class="follow-action">
@@ -1185,19 +1635,38 @@
 </div>
 
 <script>
-  const sidebar = document.getElementById("sidebar");
-  const overlay = document.getElementById("overlay");
-  const mobileMenu = document.getElementById("mobileMenu");
 
-  mobileMenu.addEventListener("click", () => {
-    sidebar.classList.toggle("open");
-    overlay.classList.toggle("show");
-  });
+  const sidebar =
+    document.getElementById("sidebar");
 
-  overlay.addEventListener("click", () => {
-    sidebar.classList.remove("open");
-    overlay.classList.remove("show");
-  });
+  const overlay =
+    document.getElementById("overlay");
+
+  const mobileMenu =
+    document.getElementById("mobileMenu");
+
+  mobileMenu.addEventListener(
+    "click",
+    () => {
+
+      sidebar.classList.toggle("open");
+
+      overlay.classList.toggle("show");
+
+    }
+  );
+
+  overlay.addEventListener(
+    "click",
+    () => {
+
+      sidebar.classList.remove("open");
+
+      overlay.classList.remove("show");
+
+    }
+  );
+
 </script>
 
 </body>
