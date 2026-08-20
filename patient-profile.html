@@ -2,10 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Patient Profile | Getwell Weight Loss Admin</title>
 
@@ -18,9 +15,15 @@
   >
 
   <style>
+
+    /* =====================================================
+       GETWELL DESIGN SYSTEM
+    ====================================================== */
+
     :root {
       --primary: #2563EB;
       --primary-dark: #1D4ED8;
+
       --primary-soft: #E1EEFF;
       --primary-pale: #EAF2FC;
 
@@ -32,6 +35,7 @@
       --background: #EEF4FB;
       --sidebar-bg: #F8FBFF;
       --topbar-bg: #F5F9FF;
+
       --white: #FFFFFF;
 
       --border: #D4E1F0;
@@ -50,7 +54,15 @@
 
       --shadow:
         0 4px 18px rgba(37, 99, 235, 0.07);
+
+      --shadow-hover:
+        0 8px 24px rgba(37, 99, 235, 0.10);
     }
+
+
+    /* =====================================================
+       RESET
+    ====================================================== */
 
     * {
       box-sizing: border-box;
@@ -89,14 +101,20 @@
       color: inherit;
     }
 
+
+    /* =====================================================
+       APP
+    ====================================================== */
+
     .app {
       display: flex;
       min-height: 100vh;
     }
 
-    /* =========================================
+
+    /* =====================================================
        SIDEBAR
-    ========================================== */
+    ====================================================== */
 
     .sidebar {
       width: 250px;
@@ -149,12 +167,13 @@
       align-items: center;
       justify-content: center;
 
-      color: var(--white);
+      color: white;
 
       font-size: 17px;
       font-weight: 700;
 
       flex-shrink: 0;
+
       margin-right: 10px;
 
       box-shadow:
@@ -222,7 +241,6 @@
       gap: 12px;
 
       width: 100%;
-
       min-height: 44px;
 
       padding: 0 12px;
@@ -245,15 +263,12 @@
 
     .nav-item:hover {
       background: var(--primary-pale);
-
       color: var(--primary);
     }
 
     .nav-item.active {
       background: var(--primary-soft);
-
       color: var(--primary);
-
       font-weight: 600;
     }
 
@@ -262,7 +277,6 @@
       height: 20px;
 
       display: inline-flex;
-
       align-items: center;
       justify-content: center;
 
@@ -292,7 +306,6 @@
       padding: 10px;
 
       display: flex;
-
       align-items: center;
 
       gap: 10px;
@@ -309,12 +322,10 @@
       color: var(--primary);
 
       display: flex;
-
-      justify-content: center;
       align-items: center;
+      justify-content: center;
 
       font-size: 11px;
-
       font-weight: 600;
 
       flex-shrink: 0;
@@ -326,9 +337,7 @@
       height: 34px;
 
       display: flex;
-
       flex-direction: column;
-
       justify-content: center;
     }
 
@@ -358,9 +367,10 @@
       line-height: 14px;
     }
 
-    /* =========================================
-       MAIN + TOPBAR
-    ========================================== */
+
+    /* =====================================================
+       MAIN
+    ====================================================== */
 
     .main {
       margin-left: 250px;
@@ -369,6 +379,11 @@
 
       min-width: 0;
     }
+
+
+    /* =====================================================
+       TOPBAR
+    ====================================================== */
 
     .topbar {
       height: 74px;
@@ -379,14 +394,13 @@
       border-bottom: 1px solid var(--border);
 
       display: flex;
-
       align-items: center;
-
       justify-content: space-between;
 
       padding: 0 28px;
 
       position: sticky;
+
       top: 0;
 
       z-index: 900;
@@ -396,7 +410,6 @@
 
     .topbar-left {
       display: flex;
-
       align-items: center;
 
       gap: 12px;
@@ -439,10 +452,9 @@
 
     .page-subtitle {
       font-size: 11px;
+      font-weight: 400;
 
       color: var(--muted);
-
-      font-weight: 400;
 
       line-height: 14px;
 
@@ -451,6 +463,7 @@
 
     .topbar-right {
       display: flex;
+
       align-items: center;
 
       gap: 9px;
@@ -480,7 +493,6 @@
       display: flex;
 
       align-items: center;
-
       justify-content: center;
     }
 
@@ -500,7 +512,6 @@
       color: var(--text);
 
       font-size: 11px;
-
       font-weight: 400;
     }
 
@@ -524,6 +535,8 @@
       justify-content: center;
 
       color: #475569;
+
+      transition: 0.15s ease;
     }
 
     .icon-button:hover {
@@ -557,9 +570,10 @@
       font-weight: 600;
     }
 
-    /* =========================================
+
+    /* =====================================================
        CONTENT
-    ========================================== */
+    ====================================================== */
 
     .content {
       padding: 30px;
@@ -594,9 +608,10 @@
       height: 14px;
     }
 
-    /* =========================================
+
+    /* =====================================================
        PATIENT HERO
-    ========================================== */
+    ====================================================== */
 
     .patient-hero {
       background: var(--white);
@@ -646,7 +661,6 @@
       color: var(--primary);
 
       display: flex;
-
       align-items: center;
       justify-content: center;
 
@@ -731,6 +745,18 @@
       background: var(--success-soft);
     }
 
+    .status-completed {
+      color: var(--primary);
+
+      background: var(--primary-soft);
+    }
+
+    .status-inactive {
+      color: var(--muted);
+
+      background: #F1F5F9;
+    }
+
     .status-dot {
       width: 5px;
       height: 5px;
@@ -780,9 +806,10 @@
       margin-top: 2px;
     }
 
-    /* =========================================
+
+    /* =====================================================
        KPI
-    ========================================== */
+    ====================================================== */
 
     .kpi-grid {
       display: grid;
@@ -911,95 +938,125 @@
       font-weight: 400;
     }
 
-    /* =========================================
-       TABS
-    ========================================== */
 
-    .tabs-card {
-      background: var(--white);
+    /* =====================================================
+       UPCOMING APPOINTMENT
+    ====================================================== */
 
-      border: 1px solid var(--border);
+    .upcoming-card {
+      background:
+        linear-gradient(
+          135deg,
+          #F8FBFF 0%,
+          #EEF6FF 100%
+        );
+
+      border: 1px solid #CBDDF4;
 
       border-radius: var(--radius);
 
       box-shadow: var(--shadow);
 
+      padding: 18px 20px;
+
       margin-bottom: 20px;
 
-      overflow: hidden;
-    }
-
-    .tabs {
       display: flex;
 
       align-items: center;
 
-      overflow-x: auto;
+      justify-content: space-between;
 
-      padding: 0 10px;
+      gap: 18px;
     }
 
-    .tab-button {
-      position: relative;
+    .upcoming-left {
+      display: flex;
 
-      min-height: 54px;
+      align-items: center;
 
-      padding: 0 15px;
+      gap: 14px;
 
+      min-width: 0;
+    }
+
+    .upcoming-icon {
+      width: 44px;
+      height: 44px;
+
+      border-radius: 12px;
+
+      background: var(--primary-soft);
+
+      color: var(--primary);
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      flex-shrink: 0;
+    }
+
+    .upcoming-icon svg {
+      width: 21px;
+      height: 21px;
+    }
+
+    .upcoming-label {
+      color: var(--primary);
+
+      font-size: 9px;
+
+      font-weight: 600;
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.05em;
+    }
+
+    .upcoming-date {
+      color: var(--navy);
+
+      font-size: 13px;
+
+      font-weight: 600;
+
+      line-height: 19px;
+
+      margin-top: 2px;
+    }
+
+    .upcoming-details {
       color: var(--muted);
-
-      background: transparent;
 
       font-size: 10px;
 
-      font-weight: 500;
+      line-height: 15px;
 
-      white-space: nowrap;
+      margin-top: 2px;
     }
 
-    .tab-button.active {
-      color: var(--primary);
 
-      font-weight: 600;
-    }
+    /* =====================================================
+       MAIN OVERVIEW GRID
+    ====================================================== */
 
-    .tab-button.active::after {
-      content: "";
-
-      position: absolute;
-
-      left: 15px;
-      right: 15px;
-      bottom: 0;
-
-      height: 2px;
-
-      border-radius: 3px;
-
-      background: var(--primary);
-    }
-
-    .tab-panel {
-      display: none;
-    }
-
-    .tab-panel.active {
-      display: block;
-    }
-
-    /* =========================================
-       CARDS
-    ========================================== */
-
-    .dashboard-columns {
+    .overview-grid {
       display: grid;
 
       grid-template-columns:
-        minmax(0, 1.6fr)
+        minmax(0, 1.55fr)
         minmax(320px, 1fr);
 
       gap: 20px;
     }
+
+
+    /* =====================================================
+       CARD
+    ====================================================== */
 
     .content-card {
       background: var(--white);
@@ -1055,83 +1112,42 @@
       padding: 20px;
     }
 
-    /* =========================================
-       MEASUREMENTS
-    ========================================== */
 
-    .measurement-grid {
+    /* =====================================================
+       QUICK VISIT LIST
+    ====================================================== */
+
+    .visit-list {
+      display: flex;
+
+      flex-direction: column;
+    }
+
+    .visit-row {
       display: grid;
 
       grid-template-columns:
-        repeat(2, minmax(0, 1fr));
+        115px 1fr auto;
 
-      gap: 10px;
+      align-items: center;
+
+      gap: 14px;
+
+      min-height: 64px;
+
+      border-bottom: 1px solid var(--border-light);
+
+      cursor: pointer;
+
+      transition: background 0.15s ease;
     }
 
-    .measurement-item {
+    .visit-row:last-child {
+      border-bottom: none;
+    }
+
+    .visit-row:hover {
       background: #F8FBFF;
-
-      border: 1px solid var(--border-light);
-
-      border-radius: 10px;
-
-      padding: 12px;
-    }
-
-    .measurement-label {
-      display: block;
-
-      color: var(--muted);
-
-      font-size: 9px;
-
-      font-weight: 400;
-    }
-
-    .measurement-value {
-      display: block;
-
-      color: var(--navy);
-
-      font-size: 14px;
-
-      font-weight: 600;
-
-      margin-top: 3px;
-    }
-
-    .measurement-change {
-      display: block;
-
-      color: var(--success);
-
-      font-size: 9px;
-
-      font-weight: 500;
-
-      margin-top: 2px;
-    }
-
-    /* =========================================
-       VISIT
-    ========================================== */
-
-    .visit-card {
-      background: #F8FBFF;
-
-      border: 1px solid var(--border-light);
-
-      border-radius: 11px;
-
-      padding: 15px;
-    }
-
-    .visit-top {
-      display: flex;
-
-      align-items: flex-start;
-
-      justify-content: space-between;
     }
 
     .visit-date strong {
@@ -1139,7 +1155,7 @@
 
       color: var(--navy);
 
-      font-size: 12px;
+      font-size: 11px;
 
       font-weight: 600;
     }
@@ -1154,50 +1170,7 @@
       margin-top: 2px;
     }
 
-    .visit-number {
-      color: var(--primary);
-
-      background: var(--primary-soft);
-
-      border-radius: 999px;
-
-      padding: 5px 8px;
-
-      font-size: 9px;
-
-      font-weight: 600;
-    }
-
-    .visit-summary {
-      display: grid;
-
-      grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-
-      gap: 8px;
-
-      margin-top: 14px;
-    }
-
-    .visit-metric {
-      background: var(--white);
-
-      border: 1px solid var(--border-light);
-
-      border-radius: 8px;
-
-      padding: 9px;
-    }
-
-    .visit-metric span {
-      display: block;
-
-      color: var(--muted);
-
-      font-size: 8px;
-    }
-
-    .visit-metric strong {
+    .visit-main strong {
       display: block;
 
       color: var(--navy);
@@ -1205,156 +1178,45 @@
       font-size: 11px;
 
       font-weight: 600;
+    }
+
+    .visit-main span {
+      display: block;
+
+      color: var(--muted);
+
+      font-size: 9px;
 
       margin-top: 2px;
     }
 
-    .visit-actions {
-      display: flex;
-
-      gap: 7px;
-
-      margin-top: 14px;
-    }
-
-    .small-button {
-      height: 34px;
-
-      display: inline-flex;
-
-      align-items: center;
-      justify-content: center;
-
-      gap: 6px;
-
-      padding: 0 10px;
-
-      border-radius: 8px;
-
-      font-size: 9px;
-      font-weight: 500;
-
-      background: var(--white);
+    .visit-arrow {
+      width: 30px;
+      height: 30px;
 
       border: 1px solid var(--border);
 
+      background: var(--white);
+
       color: var(--primary);
-    }
 
-    .small-button:hover {
-      background: var(--primary-soft);
+      border-radius: 8px;
 
-      border-color: #BCD3F5;
-    }
-
-    .small-button svg {
-      width: 13px;
-      height: 13px;
-    }
-
-    /* =========================================
-       TIMELINE
-    ========================================== */
-
-    .timeline {
-      position: relative;
-
-      padding-left: 26px;
-    }
-
-    .timeline::before {
-      content: "";
-
-      position: absolute;
-
-      top: 5px;
-      bottom: 5px;
-      left: 8px;
-
-      width: 1px;
-
-      background: var(--border);
-    }
-
-    .timeline-item {
-      position: relative;
-
-      padding-bottom: 22px;
-    }
-
-    .timeline-item:last-child {
-      padding-bottom: 0;
-    }
-
-    .timeline-dot {
-      position: absolute;
-
-      left: -22px;
-      top: 3px;
-
-      width: 14px;
-      height: 14px;
-
-      border-radius: 50%;
-
-      background: var(--primary-soft);
-
-      border: 3px solid var(--white);
-
-      box-shadow:
-        0 0 0 1px #BFD4F8;
-    }
-
-    .timeline-item.latest .timeline-dot {
-      background: var(--primary);
-
-      box-shadow:
-        0 0 0 1px var(--primary);
-    }
-
-    .timeline-date {
-      color: var(--muted);
-
-      font-size: 9px;
-
-      font-weight: 500;
-    }
-
-    .timeline-title {
-      color: var(--navy);
-
-      font-size: 12px;
-
-      font-weight: 600;
-
-      margin-top: 2px;
-    }
-
-    .timeline-meta {
       display: flex;
 
-      gap: 12px;
-
-      flex-wrap: wrap;
-
-      margin-top: 5px;
+      align-items: center;
+      justify-content: center;
     }
 
-    .timeline-meta span {
-      color: var(--muted);
-
-      font-size: 9px;
+    .visit-arrow svg {
+      width: 14px;
+      height: 14px;
     }
 
-    .timeline-meta strong {
-      color: var(--text);
 
-      font-weight: 600;
-    }
-
-    /* =========================================
-       CHART
-    ========================================== */
+    /* =====================================================
+       WEIGHT CHART
+    ====================================================== */
 
     .chart-summary {
       display: flex;
@@ -1457,9 +1319,567 @@
       text-align: center;
     }
 
-    /* =========================================
+
+    /* =====================================================
+       LATEST BODY COMPOSITION
+    ====================================================== */
+
+    .measurement-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 10px;
+    }
+
+    .measurement-item {
+      background: #F8FBFF;
+
+      border: 1px solid var(--border-light);
+
+      border-radius: 10px;
+
+      padding: 12px;
+    }
+
+    .measurement-label {
+      display: block;
+
+      color: var(--muted);
+
+      font-size: 9px;
+
+      font-weight: 400;
+    }
+
+    .measurement-value {
+      display: block;
+
+      color: var(--navy);
+
+      font-size: 14px;
+
+      font-weight: 600;
+
+      margin-top: 3px;
+    }
+
+    .measurement-change {
+      display: block;
+
+      color: var(--success);
+
+      font-size: 9px;
+
+      font-weight: 500;
+
+      margin-top: 2px;
+    }
+
+
+    /* =====================================================
+       TABS
+    ====================================================== */
+
+    .tabs-card {
+      background: var(--white);
+
+      border: 1px solid var(--border);
+
+      border-radius: var(--radius);
+
+      box-shadow: var(--shadow);
+
+      margin-bottom: 20px;
+
+      overflow: hidden;
+    }
+
+    .tabs {
+      display: flex;
+
+      align-items: center;
+
+      overflow-x: auto;
+
+      padding: 0 10px;
+    }
+
+    .tab-button {
+      position: relative;
+
+      min-height: 54px;
+
+      padding: 0 15px;
+
+      color: var(--muted);
+
+      background: transparent;
+
+      font-size: 10px;
+
+      font-weight: 500;
+
+      white-space: nowrap;
+    }
+
+    .tab-button:hover {
+      color: var(--primary);
+    }
+
+    .tab-button.active {
+      color: var(--primary);
+
+      font-weight: 600;
+    }
+
+    .tab-button.active::after {
+      content: "";
+
+      position: absolute;
+
+      left: 15px;
+      right: 15px;
+      bottom: 0;
+
+      height: 2px;
+
+      background: var(--primary);
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+
+    /* =====================================================
+       VISIT DETAIL
+    ====================================================== */
+
+    .visit-detail-grid {
+      display: grid;
+
+      grid-template-columns:
+        minmax(0, 1.4fr)
+        minmax(300px, 1fr);
+
+      gap: 20px;
+    }
+
+    .detail-section-title {
+      color: var(--navy);
+
+      font-size: 13px;
+
+      font-weight: 600;
+
+      margin-bottom: 12px;
+    }
+
+    .detail-section-subtitle {
+      color: var(--muted);
+
+      font-size: 9px;
+
+      margin-bottom: 15px;
+    }
+
+    .detail-block {
+      background: #F8FBFF;
+
+      border: 1px solid var(--border-light);
+
+      border-radius: 11px;
+
+      padding: 15px;
+
+      margin-bottom: 14px;
+    }
+
+    .detail-block:last-child {
+      margin-bottom: 0;
+    }
+
+
+    /* =====================================================
+       TREATMENT
+    ====================================================== */
+
+    .treatment-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 10px;
+    }
+
+    .treatment-item {
+      background: var(--white);
+
+      border: 1px solid var(--border-light);
+
+      border-radius: 9px;
+
+      padding: 11px;
+    }
+
+    .treatment-item span {
+      display: block;
+
+      color: var(--muted);
+
+      font-size: 9px;
+    }
+
+    .treatment-item strong {
+      display: block;
+
+      color: var(--navy);
+
+      font-size: 11px;
+
+      font-weight: 600;
+
+      margin-top: 3px;
+    }
+
+
+    /* =====================================================
+       FILE / UPLOAD CARDS
+    ====================================================== */
+
+    .upload-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 12px;
+    }
+
+    .upload-card {
+      border: 1px dashed #BFD3EB;
+
+      border-radius: 11px;
+
+      background: #F9FCFF;
+
+      padding: 16px;
+
+      min-height: 145px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      justify-content: center;
+
+      text-align: center;
+
+      transition:
+        border-color 0.15s ease,
+        background 0.15s ease;
+    }
+
+    .upload-card:hover {
+      border-color: var(--primary);
+
+      background: #F4F9FF;
+    }
+
+    .upload-icon {
+      width: 40px;
+      height: 40px;
+
+      border-radius: 11px;
+
+      background: var(--primary-soft);
+
+      color: var(--primary);
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      margin-bottom: 9px;
+    }
+
+    .upload-icon svg {
+      width: 19px;
+      height: 19px;
+    }
+
+    .upload-card strong {
+      color: var(--navy);
+
+      font-size: 10px;
+
+      font-weight: 600;
+    }
+
+    .upload-card span {
+      color: var(--muted);
+
+      font-size: 8px;
+
+      line-height: 14px;
+
+      margin-top: 3px;
+    }
+
+    .upload-button {
+      height: 32px;
+
+      padding: 0 10px;
+
+      margin-top: 10px;
+
+      border-radius: 8px;
+
+      border: 1px solid var(--border);
+
+      background: var(--white);
+
+      color: var(--primary);
+
+      font-size: 9px;
+
+      font-weight: 500;
+    }
+
+    .upload-button:hover {
+      background: var(--primary-soft);
+    }
+
+    .hidden-file {
+      display: none;
+    }
+
+    .selected-file {
+      margin-top: 8px;
+
+      max-width: 100%;
+
+      color: var(--success);
+
+      font-size: 8px;
+
+      line-height: 12px;
+
+      overflow: hidden;
+
+      text-overflow: ellipsis;
+
+      white-space: nowrap;
+    }
+
+
+    /* =====================================================
+       PHOTO GRID
+    ====================================================== */
+
+    .photo-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+      gap: 12px;
+    }
+
+    .photo-upload-card {
+      border: 1px dashed #BFD3EB;
+
+      border-radius: 11px;
+
+      overflow: hidden;
+
+      background: #F9FCFF;
+    }
+
+    .photo-preview {
+      width: 100%;
+
+      aspect-ratio: 3 / 4;
+
+      background:
+        linear-gradient(
+          145deg,
+          #DCEAFE,
+          #EDF5FF
+        );
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      color: #8BA8CC;
+
+      overflow: hidden;
+    }
+
+    .photo-preview svg {
+      width: 30px;
+      height: 30px;
+    }
+
+    .photo-preview img {
+      width: 100%;
+      height: 100%;
+
+      object-fit: cover;
+
+      display: block;
+    }
+
+    .photo-upload-footer {
+      padding: 10px;
+    }
+
+    .photo-upload-footer strong {
+      display: block;
+
+      color: var(--navy);
+
+      font-size: 9px;
+
+      font-weight: 600;
+    }
+
+    .photo-upload-footer span {
+      display: block;
+
+      color: var(--muted);
+
+      font-size: 8px;
+
+      margin-top: 2px;
+    }
+
+
+    /* =====================================================
+       NOTES
+    ====================================================== */
+
+    .notes-area {
+      width: 100%;
+
+      min-height: 120px;
+
+      resize: vertical;
+
+      border: 1px solid var(--border);
+
+      border-radius: 9px;
+
+      background: var(--white);
+
+      padding: 11px;
+
+      color: var(--text);
+
+      font-size: 10px;
+
+      line-height: 18px;
+
+      outline: none;
+    }
+
+    .notes-area:focus {
+      border-color: #9CC0F2;
+
+      box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.08);
+    }
+
+
+    /* =====================================================
+       BUTTONS
+    ====================================================== */
+
+    .primary-button {
+      display: inline-flex;
+
+      align-items: center;
+      justify-content: center;
+
+      gap: 7px;
+
+      height: 40px;
+
+      padding: 0 14px;
+
+      border-radius: 8px;
+
+      background: var(--primary);
+
+      color: var(--white);
+
+      font-size: 10px;
+
+      font-weight: 600;
+    }
+
+    .primary-button:hover {
+      background: var(--primary-dark);
+    }
+
+    .primary-button svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .secondary-button {
+      height: 40px;
+
+      padding: 0 14px;
+
+      border-radius: 8px;
+
+      background: var(--white);
+
+      border: 1px solid var(--border);
+
+      color: var(--muted);
+
+      font-size: 10px;
+
+      font-weight: 500;
+    }
+
+    .secondary-button:hover {
+      color: var(--text);
+
+      background: #F8FBFF;
+    }
+
+    .button-row {
+      display: flex;
+
+      align-items: center;
+
+      justify-content: flex-end;
+
+      gap: 8px;
+
+      margin-top: 15px;
+    }
+
+
+    /* =====================================================
        COMPOSITION
-    ========================================== */
+    ====================================================== */
 
     .composition-grid {
       display: grid;
@@ -1506,15 +1926,13 @@
       margin-top: 2px;
     }
 
-    .composition-table,
-    .treatment-table {
+    .history-table {
       width: 100%;
 
       border-collapse: collapse;
     }
 
-    .composition-table th,
-    .treatment-table th {
+    .history-table th {
       padding: 11px 12px;
 
       background: #F8FBFF;
@@ -1532,8 +1950,7 @@
       text-transform: uppercase;
     }
 
-    .composition-table td,
-    .treatment-table td {
+    .history-table td {
       padding: 12px;
 
       border-bottom: 1px solid var(--border-light);
@@ -1541,334 +1958,26 @@
       color: var(--text);
 
       font-size: 10px;
-
-      font-weight: 400;
     }
 
-    .composition-table tr:last-child td,
-    .treatment-table tr:last-child td {
-      border-bottom: none;
-    }
 
-    /* =========================================
-       VISITS
-    ========================================== */
+    /* =====================================================
+       GENERAL TAB LISTS
+    ====================================================== */
 
-    .visit-history {
-      display: flex;
-
-      flex-direction: column;
-
-      gap: 12px;
-    }
-
-    .history-card {
-      background: #F8FBFF;
-
-      border: 1px solid var(--border-light);
-
-      border-radius: 11px;
-
-      padding: 16px;
-
-      display: grid;
-
-      grid-template-columns: 150px 1fr auto;
-
-      gap: 18px;
-
-      align-items: center;
-    }
-
-    .history-date strong {
-      display: block;
-
-      color: var(--navy);
-
-      font-size: 12px;
-
-      font-weight: 600;
-    }
-
-    .history-date span {
-      display: block;
-
-      color: var(--muted);
-
-      font-size: 9px;
-
-      margin-top: 2px;
-    }
-
-    .history-stats {
-      display: grid;
-
-      grid-template-columns:
-        repeat(4, minmax(0, 1fr));
-
-      gap: 12px;
-    }
-
-    .history-stat span {
-      display: block;
-
-      color: var(--muted);
-
-      font-size: 8px;
-    }
-
-    .history-stat strong {
-      display: block;
-
-      color: var(--navy);
-
-      font-size: 11px;
-
-      font-weight: 600;
-
-      margin-top: 2px;
-    }
-
-    /* =========================================
-       PHOTOS
-    ========================================== */
-
-    .photo-header {
-      display: flex;
-
-      align-items: center;
-
-      justify-content: space-between;
-
-      margin-bottom: 16px;
-    }
-
-    .photo-header h2 {
-      color: var(--navy);
-
-      font-size: 14px;
-
-      font-weight: 600;
-    }
-
-    .photo-header p {
-      color: var(--muted);
-
-      font-size: 10px;
-
-      margin-top: 2px;
-    }
-
-    .photo-comparison {
-      display: grid;
-
-      grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-
-      gap: 14px;
-    }
-
-    .photo-column {
-      border: 1px solid var(--border);
-
-      border-radius: 12px;
-
-      overflow: hidden;
-
-      background: #F8FBFF;
-    }
-
-    .photo-column-header {
-      padding: 11px 12px;
-
-      border-bottom: 1px solid var(--border-light);
-
-      display: flex;
-
-      justify-content: space-between;
-
-      align-items: center;
-    }
-
-    .photo-column-header strong {
-      color: var(--navy);
-
-      font-size: 10px;
-
-      font-weight: 600;
-    }
-
-    .photo-column-header span {
-      color: var(--muted);
-
-      font-size: 8px;
-    }
-
-    .photo-placeholder {
-      aspect-ratio: 3 / 4;
-
-      background:
-        linear-gradient(
-          145deg,
-          #DCEAFE,
-          #EDF5FF
-        );
-
-      display: flex;
-
-      align-items: center;
-      justify-content: center;
-
-      color: #8BA8CC;
-    }
-
-    .photo-placeholder svg {
-      width: 34px;
-      height: 34px;
-    }
-
-    .photo-footer {
-      padding: 10px 12px;
-
-      background: var(--white);
-    }
-
-    .photo-footer span {
-      color: var(--muted);
-
-      font-size: 9px;
-    }
-
-    /* =========================================
-       FILES
-    ========================================== */
-
-    .file-list {
-      display: flex;
-
-      flex-direction: column;
-
-      gap: 10px;
-    }
-
-    .file-item {
-      display: flex;
-
-      align-items: center;
-
-      gap: 12px;
-
-      padding: 13px;
-
-      border: 1px solid var(--border-light);
-
-      border-radius: 10px;
-
-      background: #F8FBFF;
-    }
-
-    .file-icon {
-      width: 38px;
-      height: 38px;
-
-      border-radius: 10px;
-
-      display: flex;
-
-      align-items: center;
-      justify-content: center;
-
-      background: var(--primary-soft);
-
-      color: var(--primary);
-
-      flex-shrink: 0;
-    }
-
-    .file-icon.pdf {
-      background: var(--danger-soft);
-
-      color: var(--danger);
-    }
-
-    .file-icon.image {
-      background: var(--success-soft);
-
-      color: var(--success);
-    }
-
-    .file-icon svg {
-      width: 17px;
-      height: 17px;
-    }
-
-    .file-info {
-      flex: 1;
-
-      min-width: 0;
-    }
-
-    .file-info strong {
-      display: block;
-
-      color: var(--navy);
-
-      font-size: 11px;
-
-      font-weight: 600;
-
-      white-space: nowrap;
-
-      overflow: hidden;
-
-      text-overflow: ellipsis;
-    }
-
-    .file-info span {
-      display: block;
-
-      color: var(--muted);
-
-      font-size: 9px;
-
-      margin-top: 2px;
-    }
-
-    .file-button {
-      height: 32px;
-
-      padding: 0 10px;
-
-      border-radius: 8px;
-
-      border: 1px solid var(--border);
-
-      background: var(--white);
-
-      color: var(--primary);
-
-      font-size: 9px;
-
-      font-weight: 500;
-    }
-
-    /* =========================================
-       APPOINTMENTS
-    ========================================== */
-
-    .appointment-list {
+    .simple-list {
       display: flex;
 
       flex-direction: column;
     }
 
-    .appointment-item {
+    .simple-list-row {
       display: grid;
 
       grid-template-columns:
-        110px 1fr auto;
+        120px 1fr auto;
 
-      gap: 16px;
+      gap: 15px;
 
       align-items: center;
 
@@ -1877,12 +1986,11 @@
       border-bottom: 1px solid var(--border-light);
     }
 
-    .appointment-item:last-child {
+    .simple-list-row:last-child {
       border-bottom: none;
     }
 
-    .appointment-date strong,
-    .appointment-details strong {
+    .simple-list-row strong {
       display: block;
 
       color: var(--navy);
@@ -1892,8 +2000,7 @@
       font-weight: 600;
     }
 
-    .appointment-date span,
-    .appointment-details span {
+    .simple-list-row span {
       display: block;
 
       color: var(--muted);
@@ -1903,61 +2010,192 @@
       margin-top: 2px;
     }
 
-    /* =========================================
-       NOTES
-    ========================================== */
 
-    .note-box {
-      background: #F8FBFF;
+    /* =====================================================
+       MODAL
+    ====================================================== */
 
-      border: 1px solid var(--border-light);
+    .modal-overlay {
+      position: fixed;
 
-      border-radius: 10px;
+      inset: 0;
 
-      padding: 15px;
+      background:
+        rgba(15, 23, 42, 0.42);
 
-      margin-bottom: 12px;
-    }
-
-    .note-box:last-child {
-      margin-bottom: 0;
-    }
-
-    .note-top {
-      display: flex;
-
-      justify-content: space-between;
+      display: none;
 
       align-items: center;
+
+      justify-content: center;
+
+      padding: 20px;
+
+      z-index: 3000;
     }
 
-    .note-top strong {
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+
+      max-width: 780px;
+
+      max-height: 92vh;
+
+      overflow-y: auto;
+
+      background: var(--white);
+
+      border-radius: 16px;
+
+      border: 1px solid var(--border);
+
+      box-shadow:
+        0 20px 50px rgba(15, 23, 42, 0.18);
+    }
+
+    .modal-header {
+      padding: 18px 20px;
+
+      border-bottom: 1px solid var(--border-light);
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+    }
+
+    .modal-header h2 {
       color: var(--navy);
 
-      font-size: 11px;
+      font-size: 15px;
 
       font-weight: 600;
     }
 
-    .note-top span {
+    .modal-header span {
+      display: block;
+
       color: var(--muted);
 
       font-size: 9px;
+
+      margin-top: 2px;
     }
 
-    .note-box p {
+    .modal-close {
+      width: 32px;
+      height: 32px;
+
+      border-radius: 8px;
+
+      border: 1px solid var(--border);
+
+      background: #F8FAFC;
+
+      color: var(--muted);
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .modal-footer {
+      padding: 15px 20px;
+
+      border-top: 1px solid var(--border-light);
+
+      display: flex;
+
+      justify-content: flex-end;
+
+      gap: 8px;
+    }
+
+    .form-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 6px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-group label {
       color: var(--text);
 
       font-size: 10px;
 
-      line-height: 18px;
-
-      margin-top: 8px;
+      font-weight: 500;
     }
 
-    /* =========================================
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+
+      border: 1px solid var(--border);
+
+      border-radius: 8px;
+
+      background: var(--white);
+
+      color: var(--text);
+
+      outline: none;
+
+      font-size: 10px;
+    }
+
+    .form-group input,
+    .form-group select {
+      height: 40px;
+
+      padding: 0 10px;
+    }
+
+    .form-group textarea {
+      min-height: 90px;
+
+      padding: 10px;
+
+      resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #9CC0F2;
+
+      box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.08);
+    }
+
+
+    /* =====================================================
        MOBILE OVERLAY
-    ========================================== */
+    ====================================================== */
 
     .mobile-overlay {
       display: none;
@@ -1976,21 +2214,23 @@
       display: block;
     }
 
-    /* =========================================
+
+    /* =====================================================
        RESPONSIVE
-    ========================================== */
+    ====================================================== */
 
     @media (max-width: 1200px) {
-      .hero-details {
-        gap: 16px;
-      }
 
       .kpi-grid {
         grid-template-columns:
           repeat(2, minmax(0, 1fr));
       }
 
-      .dashboard-columns {
+      .overview-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .visit-detail-grid {
         grid-template-columns: 1fr;
       }
 
@@ -1998,9 +2238,12 @@
         grid-template-columns:
           repeat(2, minmax(0, 1fr));
       }
+
     }
 
+
     @media (max-width: 900px) {
+
       .sidebar {
         transform:
           translateX(-100%);
@@ -2039,17 +2282,11 @@
         align-items: flex-start;
       }
 
-      .history-card {
-        grid-template-columns: 1fr;
-      }
-
-      .history-stats {
-        grid-template-columns:
-          repeat(4, minmax(0, 1fr));
-      }
     }
 
+
     @media (max-width: 680px) {
+
       .topbar {
         padding: 0 15px;
       }
@@ -2070,10 +2307,6 @@
         padding: 18px;
       }
 
-      .patient-main {
-        align-items: flex-start;
-      }
-
       .patient-heading h1 {
         font-size: 17px;
 
@@ -2092,6 +2325,23 @@
         grid-template-columns: 1fr;
       }
 
+      .overview-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .visit-row {
+        grid-template-columns:
+          95px 1fr auto;
+      }
+
+      .upload-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .photo-grid {
+        grid-template-columns: 1fr;
+      }
+
       .composition-grid {
         grid-template-columns: 1fr;
       }
@@ -2100,34 +2350,29 @@
         grid-template-columns: 1fr;
       }
 
-      .photo-comparison {
+      .upcoming-card {
+        align-items: flex-start;
+
+        flex-direction: column;
+      }
+
+      .form-grid {
         grid-template-columns: 1fr;
       }
 
-      .visit-summary {
-        grid-template-columns:
-          repeat(2, minmax(0, 1fr));
+      .form-group.full {
+        grid-column: auto;
       }
 
-      .appointment-item {
-        grid-template-columns: 1fr;
+      .modal {
+        max-height: 95vh;
       }
 
-      .tabs {
-        padding: 0 4px;
-      }
-
-      .tab-button {
-        padding: 0 12px;
-      }
-
-      .tab-button.active::after {
-        left: 12px;
-        right: 12px;
-      }
     }
 
+
     @media (max-width: 420px) {
+
       .patient-large-avatar {
         width: 58px;
         height: 58px;
@@ -2135,26 +2380,28 @@
         font-size: 17px;
       }
 
-      .history-stats {
-        grid-template-columns:
-          repeat(2, minmax(0, 1fr));
+      .visit-row {
+        grid-template-columns: 1fr auto;
       }
 
-      .chart-container {
-        height: 220px;
+      .visit-date {
+        grid-row: span 2;
       }
+
     }
 
   </style>
 </head>
 
+
 <body>
 
 <div class="app">
 
-  <!-- =========================================
+
+  <!-- =====================================================
        SIDEBAR
-  ========================================== -->
+  ====================================================== -->
 
   <aside
     class="sidebar"
@@ -2183,6 +2430,7 @@
 
 
     <div class="sidebar-content">
+
 
       <div class="nav-section-title">
         Main
@@ -2231,10 +2479,23 @@
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <circle cx="9" cy="8" r="3"></circle>
-            <path d="M3.5 20a5.5 5.5 0 0111 0"></path>
-            <path d="M15 5.5a3 3 0 010 5"></path>
-            <path d="M17 13.5a5.5 5.5 0 013.5 5"></path>
+            <circle
+              cx="9"
+              cy="8"
+              r="3"
+            ></circle>
+
+            <path
+              d="M3.5 20a5.5 5.5 0 0111 0"
+            ></path>
+
+            <path
+              d="M15 5.5a3 3 0 010 5"
+            ></path>
+
+            <path
+              d="M17 13.5a5.5 5.5 0 013.5 5"
+            ></path>
           </svg>
 
         </span>
@@ -2244,9 +2505,9 @@
       </a>
 
 
-      <button
+      <a
         class="nav-item"
-        onclick="showComingSoon('Appointments')"
+        href="appointments.html"
       >
 
         <span class="nav-icon">
@@ -2267,16 +2528,33 @@
               rx="2"
             ></rect>
 
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
+            <line
+              x1="16"
+              y1="2"
+              x2="16"
+              y2="6"
+            ></line>
+
+            <line
+              x1="8"
+              y1="2"
+              x2="8"
+              y2="6"
+            ></line>
+
+            <line
+              x1="3"
+              y1="10"
+              x2="21"
+              y2="10"
+            ></line>
           </svg>
 
         </span>
 
         Appointments
 
-      </button>
+      </a>
 
 
       <div
@@ -2436,7 +2714,11 @@
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <circle cx="12" cy="12" r="3"></circle>
+            <circle
+              cx="12"
+              cy="12"
+              r="3"
+            ></circle>
 
             <path
               d="M19.4 15a1.7 1.7 0 00.34 1.88l.06.06-1.8 1.8-.06-.06a1.7 1.7 0 00-1.88-.34 1.7 1.7 0 00-1.03 1.55V20H12v-.09a1.7 1.7 0 00-1.03-1.55 1.7 1.7 0 00-1.88.34l-.06.06-1.8-1.8.06-.06A1.7 1.7 0 007.63 15a1.7 1.7 0 00-1.55-1.03H6V11h.09a1.7 1.7 0 001.55-1.03 1.7 1.7 0 00-.34-1.88l-.06-.06 1.8-1.8.06.06a1.7 1.7 0 001.88.34A1.7 1.7 0 0012 4.09V4h3v.09a1.7 1.7 0 001.03 1.55 1.7 1.7 0 001.88-.34l.06-.06 1.8 1.8-.06.06A1.7 1.7 0 0019.4 9c.1.5.5.88 1.03.97H20v3h.09c-.53.09-.93.47-1.03 1.03z"
@@ -2485,11 +2767,14 @@
   ></div>
 
 
-  <!-- =========================================
+  <!-- =====================================================
        MAIN
-  ========================================== -->
+  ====================================================== -->
 
   <main class="main">
+
+
+    <!-- TOPBAR -->
 
     <header class="topbar">
 
@@ -2543,8 +2828,15 @@
               stroke-width="2"
               stroke-linecap="round"
             >
-              <circle cx="11" cy="11" r="7"></circle>
-              <path d="M20 20l-4-4"></path>
+              <circle
+                cx="11"
+                cy="11"
+                r="7"
+              ></circle>
+
+              <path
+                d="M20 20l-4-4"
+              ></path>
             </svg>
 
           </span>
@@ -2574,7 +2866,9 @@
               d="M18 8a6 6 0 00-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"
             ></path>
 
-            <path d="M10 21h4"></path>
+            <path
+              d="M10 21h4"
+            ></path>
           </svg>
 
         </button>
@@ -2593,8 +2887,15 @@
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <circle cx="12" cy="12" r="9"></circle>
-            <path d="M12 7v5l3 2"></path>
+            <circle
+              cx="12"
+              cy="12"
+              r="9"
+            ></circle>
+
+            <path
+              d="M12 7v5l3 2"
+            ></path>
           </svg>
 
         </button>
@@ -2609,16 +2910,16 @@
     </header>
 
 
-    <!-- =========================================
-         CONTENT
-    ========================================== -->
+    <!-- =====================================================
+         PAGE
+    ====================================================== -->
 
     <section class="content">
 
 
       <a
-        href="patients.html"
         class="back-link"
+        href="patients.html"
       >
 
         <svg
@@ -2638,7 +2939,9 @@
       </a>
 
 
-      <!-- HERO -->
+      <!-- =================================================
+           PATIENT HERO
+      ================================================== -->
 
       <div class="patient-hero">
 
@@ -2680,7 +2983,10 @@
                 •
               </span>
 
-              <span class="status-pill status-active">
+              <span
+                class="status-pill status-active"
+                id="statusPill"
+              >
 
                 <span class="status-dot"></span>
 
@@ -2698,6 +3004,7 @@
 
 
         <div class="hero-details">
+
 
           <div class="hero-detail">
 
@@ -2751,7 +3058,9 @@
       </div>
 
 
-      <!-- KPI -->
+      <!-- =================================================
+           KPI
+      ================================================== -->
 
       <div class="kpi-grid">
 
@@ -2807,18 +3116,7 @@
 
           <div class="kpi-change">
 
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M12 19V5"></path>
-              <path d="M6 11l6-6 6 6"></path>
-            </svg>
-
+            ↓
             <span id="totalLoss">
               7.8 kg lost
             </span>
@@ -2849,6 +3147,7 @@
 
           </div>
 
+
           <div class="kpi-goal">
 
             <div class="kpi-goal-bar">
@@ -2860,6 +3159,7 @@
               ></div>
 
             </div>
+
 
             <div class="kpi-goal-meta">
 
@@ -2908,7 +3208,102 @@
       </div>
 
 
-      <!-- TABS -->
+      <!-- =================================================
+           UPCOMING APPOINTMENT
+      ================================================== -->
+
+      <div class="upcoming-card">
+
+
+        <div class="upcoming-left">
+
+
+          <div class="upcoming-icon">
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect
+                x="3"
+                y="4"
+                width="18"
+                height="17"
+                rx="2"
+              ></rect>
+
+              <line
+                x1="8"
+                y1="2"
+                x2="8"
+                y2="6"
+              ></line>
+
+              <line
+                x1="16"
+                y1="2"
+                x2="16"
+                y2="6"
+              ></line>
+
+              <line
+                x1="3"
+                y1="9"
+                x2="21"
+                y2="9"
+              ></line>
+
+              <circle
+                cx="16"
+                cy="15"
+                r="3"
+              ></circle>
+
+              <path
+                d="M16 13.5v1.5l1 0.8"
+              ></path>
+            </svg>
+
+          </div>
+
+
+          <div>
+
+            <div class="upcoming-label">
+              Upcoming Appointment
+            </div>
+
+            <div class="upcoming-date">
+              27 August 2026 · 10:30 AM
+            </div>
+
+            <div class="upcoming-details">
+              Body Composition Review · Week 11
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <a
+          href="#tab-appointments"
+          class="secondary-button"
+          onclick="openAppointmentsTab(event)"
+        >
+          View Appointment →
+        </a>
+
+      </div>
+
+
+      <!-- =================================================
+           TABS
+      ================================================== -->
 
       <div class="tabs-card">
 
@@ -2926,16 +3321,16 @@
 
           <button
             class="tab-button"
-            data-tab="composition"
+            data-tab="visits"
           >
-            Body Composition
+            Visits
           </button>
 
           <button
             class="tab-button"
-            data-tab="visits"
+            data-tab="composition"
           >
-            Visits
+            Body Composition
           </button>
 
           <button
@@ -2955,6 +3350,7 @@
           <button
             class="tab-button"
             data-tab="appointments"
+            id="appointmentsTab"
           >
             Appointments
           </button>
@@ -2978,19 +3374,79 @@
       </div>
 
 
-      <!-- =========================================
+      <!-- =================================================
            OVERVIEW
-      ========================================== -->
+      ================================================== -->
 
       <div
         class="tab-panel active"
         id="overview"
       >
 
-        <div class="dashboard-columns">
 
+        <div class="overview-grid">
+
+
+          <!-- LEFT -->
 
           <div>
+
+
+            <!-- VISIT HISTORY -->
+
+            <div class="content-card">
+
+              <div class="content-card-header">
+
+                <div>
+
+                  <h2>
+                    Visit History
+                  </h2>
+
+                  <p>
+                    Select a visit to view its complete record.
+                  </p>
+
+                </div>
+
+                <button
+                  class="primary-button"
+                  onclick="openAddVisitModal()"
+                >
+
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  >
+                    <path d="M12 5v14"></path>
+                    <path d="M5 12h14"></path>
+                  </svg>
+
+                  Add Visit
+
+                </button>
+
+              </div>
+
+
+              <div class="content-card-body">
+
+                <div
+                  class="visit-list"
+                  id="overviewVisitList"
+                >
+
+                  <!-- Filled by JavaScript -->
+
+                </div>
+
+              </div>
+
+            </div>
 
 
             <!-- WEIGHT PROGRESS -->
@@ -3006,7 +3462,7 @@
                   </h2>
 
                   <p>
-                    Weight trend throughout the program.
+                    Overall weight trend.
                   </p>
 
                 </div>
@@ -3035,7 +3491,13 @@
                   </div>
 
                   <div class="chart-loss">
-                    ↓ <span id="chartTotalLoss">7.8</span> kg overall
+
+                    ↓
+                    <span id="chartTotalLoss">
+                      7.8
+                    </span>
+                    kg overall
+
                   </div>
 
                 </div>
@@ -3225,125 +3687,25 @@
 
                 <div class="chart-axis-labels">
 
-                  <span>Jun</span>
-                  <span>Jul</span>
-                  <span>Jul</span>
-                  <span>Aug</span>
-                  <span>Aug</span>
+                  <span>
+                    Jun
+                  </span>
 
-                </div>
+                  <span>
+                    Jul
+                  </span>
 
-              </div>
+                  <span>
+                    Jul
+                  </span>
 
-            </div>
+                  <span>
+                    Aug
+                  </span>
 
-
-            <!-- LATEST VISIT -->
-
-            <div class="content-card">
-
-              <div class="content-card-header">
-
-                <div>
-
-                  <h2>
-                    Latest Visit
-                  </h2>
-
-                  <p>
-                    Most recent patient measurement.
-                  </p>
-
-                </div>
-
-                <span>
-                  Visit #10
-                </span>
-
-              </div>
-
-
-              <div class="content-card-body">
-
-                <div class="visit-card">
-
-                  <div class="visit-top">
-
-                    <div class="visit-date">
-
-                      <strong>
-                        20 August 2026
-                      </strong>
-
-                      <span>
-                        Body composition measurement
-                      </span>
-
-                    </div>
-
-                    <div class="visit-number">
-                      Week 10
-                    </div>
-
-                  </div>
-
-
-                  <div class="visit-summary">
-
-                    <div class="visit-metric">
-                      <span>Weight</span>
-                      <strong>81.2 kg</strong>
-                    </div>
-
-                    <div class="visit-metric">
-                      <span>Body Fat</span>
-                      <strong>27.4%</strong>
-                    </div>
-
-                    <div class="visit-metric">
-                      <span>BMI</span>
-                      <strong>28.4</strong>
-                    </div>
-
-                    <div class="visit-metric">
-                      <span>Skeletal Muscle</span>
-                      <strong>35.1 kg</strong>
-                    </div>
-
-                    <div class="visit-metric">
-                      <span>Visceral Fat</span>
-                      <strong>11</strong>
-                    </div>
-
-                    <div class="visit-metric">
-                      <span>Body Water</span>
-                      <strong>52.8%</strong>
-                    </div>
-
-                  </div>
-
-
-                  <div class="visit-actions">
-
-                    <button
-                      class="small-button"
-                      onclick="showComingSoon('Arboleaf PDF')"
-                    >
-
-                      View Arboleaf PDF
-
-                    </button>
-
-                    <button
-                      class="small-button"
-                      onclick="showComingSoon('Comparison Image')"
-                    >
-
-                      View Comparison
-
-                    </button>
-
-                  </div>
+                  <span>
+                    Aug
+                  </span>
 
                 </div>
 
@@ -3359,6 +3721,8 @@
           <div>
 
 
+            <!-- LATEST MEASUREMENT -->
+
             <div class="content-card">
 
               <div class="content-card-header">
@@ -3366,11 +3730,11 @@
                 <div>
 
                   <h2>
-                    Latest Measurement
+                    Latest Body Composition
                   </h2>
 
                   <p>
-                    Arboleaf body composition.
+                    Most recent Arboleaf measurement.
                   </p>
 
                 </div>
@@ -3387,39 +3751,104 @@
                 <div class="measurement-grid">
 
                   <div class="measurement-item">
-                    <span class="measurement-label">Weight</span>
-                    <span class="measurement-value">81.2 kg</span>
-                    <span class="measurement-change">↓ 0.8 kg</span>
+
+                    <span class="measurement-label">
+                      Weight
+                    </span>
+
+                    <span class="measurement-value">
+                      81.2 kg
+                    </span>
+
+                    <span class="measurement-change">
+                      ↓ 0.8 kg
+                    </span>
+
                   </div>
 
-                  <div class="measurement-item">
-                    <span class="measurement-label">Body Fat</span>
-                    <span class="measurement-value">27.4%</span>
-                    <span class="measurement-change">↓ 0.6%</span>
-                  </div>
 
                   <div class="measurement-item">
-                    <span class="measurement-label">BMI</span>
-                    <span class="measurement-value">28.4</span>
-                    <span class="measurement-change">↓ 0.3</span>
+
+                    <span class="measurement-label">
+                      Body Fat
+                    </span>
+
+                    <span class="measurement-value">
+                      27.4%
+                    </span>
+
+                    <span class="measurement-change">
+                      ↓ 0.6%
+                    </span>
+
                   </div>
 
-                  <div class="measurement-item">
-                    <span class="measurement-label">Skeletal Muscle</span>
-                    <span class="measurement-value">35.1 kg</span>
-                    <span class="measurement-change">↑ 0.2 kg</span>
-                  </div>
 
                   <div class="measurement-item">
-                    <span class="measurement-label">Visceral Fat</span>
-                    <span class="measurement-value">11</span>
-                    <span class="measurement-change">↓ 1</span>
+
+                    <span class="measurement-label">
+                      BMI
+                    </span>
+
+                    <span class="measurement-value">
+                      28.4
+                    </span>
+
+                    <span class="measurement-change">
+                      ↓ 0.3
+                    </span>
+
                   </div>
 
+
                   <div class="measurement-item">
-                    <span class="measurement-label">Body Water</span>
-                    <span class="measurement-value">52.8%</span>
-                    <span class="measurement-change">↑ 0.4%</span>
+
+                    <span class="measurement-label">
+                      Skeletal Muscle
+                    </span>
+
+                    <span class="measurement-value">
+                      35.1 kg
+                    </span>
+
+                    <span class="measurement-change">
+                      ↑ 0.2 kg
+                    </span>
+
+                  </div>
+
+
+                  <div class="measurement-item">
+
+                    <span class="measurement-label">
+                      Visceral Fat
+                    </span>
+
+                    <span class="measurement-value">
+                      11
+                    </span>
+
+                    <span class="measurement-change">
+                      ↓ 1
+                    </span>
+
+                  </div>
+
+
+                  <div class="measurement-item">
+
+                    <span class="measurement-label">
+                      Body Water
+                    </span>
+
+                    <span class="measurement-value">
+                      52.8%
+                    </span>
+
+                    <span class="measurement-change">
+                      ↑ 0.4%
+                    </span>
+
                   </div>
 
                 </div>
@@ -3428,6 +3857,8 @@
 
             </div>
 
+
+            <!-- PROGRAM SNAPSHOT -->
 
             <div class="content-card">
 
@@ -3453,146 +3884,52 @@
                 <div class="measurement-grid">
 
                   <div class="measurement-item">
-                    <span class="measurement-label">Height</span>
-                    <span class="measurement-value">169 cm</span>
+
+                    <span class="measurement-label">
+                      Height
+                    </span>
+
+                    <span class="measurement-value">
+                      169 cm
+                    </span>
+
                   </div>
 
                   <div class="measurement-item">
-                    <span class="measurement-label">Program Week</span>
-                    <span class="measurement-value">Week 10</span>
+
+                    <span class="measurement-label">
+                      Program Week
+                    </span>
+
+                    <span class="measurement-value">
+                      Week 10
+                    </span>
+
                   </div>
 
                   <div class="measurement-item">
-                    <span class="measurement-label">Goal Weight</span>
-                    <span class="measurement-value">70.0 kg</span>
+
+                    <span class="measurement-label">
+                      Goal Weight
+                    </span>
+
+                    <span class="measurement-value">
+                      70.0 kg
+                    </span>
+
                   </div>
 
                   <div class="measurement-item">
-                    <span class="measurement-label">Remaining</span>
-                    <span class="measurement-value">11.2 kg</span>
-                  </div>
 
-                </div>
+                    <span class="measurement-label">
+                      Remaining
+                    </span>
 
-              </div>
-
-            </div>
-
-
-            <div class="content-card">
-
-              <div class="content-card-header">
-
-                <div>
-
-                  <h2>
-                    Recent Visits
-                  </h2>
-
-                  <p>
-                    Latest patient activity.
-                  </p>
-
-                </div>
-
-                <span>
-                  View all
-                </span>
-
-              </div>
-
-
-              <div class="content-card-body">
-
-                <div class="timeline">
-
-
-                  <div class="timeline-item latest">
-
-                    <div class="timeline-dot"></div>
-
-                    <div class="timeline-date">
-                      20 Aug 2026
-                    </div>
-
-                    <div class="timeline-title">
-                      Visit #10
-                    </div>
-
-                    <div class="timeline-meta">
-
-                      <span>
-                        Weight:
-                        <strong>81.2 kg</strong>
-                      </span>
-
-                      <span>
-                        Change:
-                        <strong>-0.8 kg</strong>
-                      </span>
-
-                    </div>
+                    <span class="measurement-value">
+                      11.2 kg
+                    </span>
 
                   </div>
-
-
-                  <div class="timeline-item">
-
-                    <div class="timeline-dot"></div>
-
-                    <div class="timeline-date">
-                      13 Aug 2026
-                    </div>
-
-                    <div class="timeline-title">
-                      Visit #9
-                    </div>
-
-                    <div class="timeline-meta">
-
-                      <span>
-                        Weight:
-                        <strong>82.0 kg</strong>
-                      </span>
-
-                      <span>
-                        Change:
-                        <strong>-0.5 kg</strong>
-                      </span>
-
-                    </div>
-
-                  </div>
-
-
-                  <div class="timeline-item">
-
-                    <div class="timeline-dot"></div>
-
-                    <div class="timeline-date">
-                      06 Aug 2026
-                    </div>
-
-                    <div class="timeline-title">
-                      Visit #8
-                    </div>
-
-                    <div class="timeline-meta">
-
-                      <span>
-                        Weight:
-                        <strong>82.5 kg</strong>
-                      </span>
-
-                      <span>
-                        Change:
-                        <strong>-0.7 kg</strong>
-                      </span>
-
-                    </div>
-
-                  </div>
-
 
                 </div>
 
@@ -3607,9 +3944,429 @@
       </div>
 
 
-      <!-- =========================================
+      <!-- =================================================
+           VISITS
+      ================================================== -->
+
+      <div
+        class="tab-panel"
+        id="visits"
+      >
+
+        <div class="content-card">
+
+          <div class="content-card-header">
+
+            <div>
+
+              <h2>
+                Visit Records
+              </h2>
+
+              <p>
+                Each visit contains its own measurements, files,
+                treatment, photos and notes.
+              </p>
+
+            </div>
+
+            <button
+              class="primary-button"
+              onclick="openAddVisitModal()"
+            >
+
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <path d="M12 5v14"></path>
+                <path d="M5 12h14"></path>
+              </svg>
+
+              Add Visit
+
+            </button>
+
+          </div>
+
+
+          <div class="content-card-body">
+
+            <div class="visit-detail-grid">
+
+
+              <!-- VISIT LIST -->
+
+              <div>
+
+                <div class="detail-section-title">
+                  Visits
+                </div>
+
+                <div class="detail-section-subtitle">
+                  Select a date to open the complete visit record.
+                </div>
+
+
+                <div
+                  class="visit-list"
+                  id="fullVisitList"
+                >
+                  <!-- Filled by JavaScript -->
+                </div>
+
+              </div>
+
+
+              <!-- SELECTED VISIT -->
+
+              <div>
+
+                <div class="detail-section-title">
+                  Selected Visit
+                </div>
+
+                <div
+                  class="detail-section-subtitle"
+                  id="selectedVisitLabel"
+                >
+                  20 August 2026 · Visit #10
+                </div>
+
+
+                <div class="detail-block">
+
+                  <div class="detail-section-title">
+                    Body Composition
+                  </div>
+
+
+                  <div class="measurement-grid">
+
+                    <div class="measurement-item">
+                      <span class="measurement-label">
+                        Weight
+                      </span>
+
+                      <span class="measurement-value">
+                        81.2 kg
+                      </span>
+                    </div>
+
+                    <div class="measurement-item">
+                      <span class="measurement-label">
+                        Body Fat
+                      </span>
+
+                      <span class="measurement-value">
+                        27.4%
+                      </span>
+                    </div>
+
+                    <div class="measurement-item">
+                      <span class="measurement-label">
+                        BMI
+                      </span>
+
+                      <span class="measurement-value">
+                        28.4
+                      </span>
+                    </div>
+
+                    <div class="measurement-item">
+                      <span class="measurement-label">
+                        Skeletal Muscle
+                      </span>
+
+                      <span class="measurement-value">
+                        35.1 kg
+                      </span>
+                    </div>
+
+                    <div class="measurement-item">
+                      <span class="measurement-label">
+                        Visceral Fat
+                      </span>
+
+                      <span class="measurement-value">
+                        11
+                      </span>
+                    </div>
+
+                    <div class="measurement-item">
+                      <span class="measurement-label">
+                        Body Water
+                      </span>
+
+                      <span class="measurement-value">
+                        52.8%
+                      </span>
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                <div class="detail-block">
+
+                  <div class="detail-section-title">
+                    Treatment & Medication
+                  </div>
+
+
+                  <div class="treatment-grid">
+
+                    <div class="treatment-item">
+
+                      <span>
+                        Injection
+                      </span>
+
+                      <strong>
+                        Tirzepatide
+                      </strong>
+
+                    </div>
+
+
+                    <div class="treatment-item">
+
+                      <span>
+                        Dose
+                      </span>
+
+                      <strong>
+                        2.5 mg
+                      </strong>
+
+                    </div>
+
+
+                    <div class="treatment-item">
+
+                      <span>
+                        Medication
+                      </span>
+
+                      <strong>
+                        None recorded
+                      </strong>
+
+                    </div>
+
+
+                    <div class="treatment-item">
+
+                      <span>
+                        Additional Treatment
+                      </span>
+
+                      <strong>
+                        None recorded
+                      </strong>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                <div class="detail-block">
+
+                  <div class="detail-section-title">
+                    Visit Notes
+                  </div>
+
+                  <p
+                    style="
+                      color:var(--text);
+                      font-size:10px;
+                      line-height:18px;
+                    "
+                  >
+                    Patient completed body composition measurement.
+                    Progress reviewed and patient tolerated the current
+                    treatment well.
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- CURRENT VISIT FILES -->
+
+        <div class="content-card">
+
+          <div class="content-card-header">
+
+            <div>
+
+              <h2>
+                Visit Files
+              </h2>
+
+              <p>
+                Files attached to the selected visit.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="content-card-body">
+
+            <div class="upload-grid">
+
+
+              <!-- ARBOLEAF PDF -->
+
+              <div class="upload-card">
+
+                <div class="upload-icon">
+
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M6 2h9l5 5v15H6z"></path>
+                    <path d="M14 2v6h6"></path>
+                    <path d="M9 13h6"></path>
+                    <path d="M9 17h6"></path>
+                  </svg>
+
+                </div>
+
+                <strong>
+                  Arboleaf PDF
+                </strong>
+
+                <span>
+                  Original body composition report
+                </span>
+
+                <label
+                  for="arboleafPdfMain"
+                  class="upload-button"
+                >
+                  Upload PDF
+                </label>
+
+                <input
+                  class="hidden-file"
+                  type="file"
+                  id="arboleafPdfMain"
+                  accept="application/pdf"
+                  onchange="handleSingleFile(
+                    this,
+                    'arboleafPdfName'
+                  )"
+                >
+
+                <div
+                  class="selected-file"
+                  id="arboleafPdfName"
+                ></div>
+
+              </div>
+
+
+              <!-- COMPARISON IMAGE -->
+
+              <div class="upload-card">
+
+                <div class="upload-icon">
+
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect
+                      x="3"
+                      y="4"
+                      width="18"
+                      height="16"
+                      rx="2"
+                    ></rect>
+
+                    <circle
+                      cx="9"
+                      cy="10"
+                      r="1.5"
+                    ></circle>
+
+                    <path
+                      d="M3 17l5-5 4 4 3-3 6 6"
+                    ></path>
+                  </svg>
+
+                </div>
+
+                <strong>
+                  Arboleaf Comparison
+                </strong>
+
+                <span>
+                  Generated comparison image
+                </span>
+
+                <label
+                  for="arboleafComparisonMain"
+                  class="upload-button"
+                >
+                  Upload Image
+                </label>
+
+                <input
+                  class="hidden-file"
+                  type="file"
+                  id="arboleafComparisonMain"
+                  accept="image/*"
+                  onchange="handleSingleFile(
+                    this,
+                    'arboleafComparisonName'
+                  )"
+                >
+
+                <div
+                  class="selected-file"
+                  id="arboleafComparisonName"
+                ></div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
            BODY COMPOSITION
-      ========================================== -->
+      ================================================== -->
 
       <div
         class="tab-panel"
@@ -3623,11 +4380,11 @@
             <div>
 
               <h2>
-                Body Composition Overview
+                Body Composition History
               </h2>
 
               <p>
-                Latest Arboleaf measurements.
+                Historical measurements from each visit.
               </p>
 
             </div>
@@ -3640,75 +4397,182 @@
             <div class="composition-grid">
 
               <div class="composition-card">
-                <span class="composition-card-label">Weight</span>
-                <div class="composition-card-value">81.2 kg</div>
-                <div class="composition-card-change">↓ 7.8 kg overall</div>
+                <span class="composition-card-label">
+                  Weight
+                </span>
+
+                <div class="composition-card-value">
+                  81.2 kg
+                </div>
+
+                <div class="composition-card-change">
+                  ↓ 7.8 kg overall
+                </div>
               </div>
 
-              <div class="composition-card">
-                <span class="composition-card-label">Body Fat</span>
-                <div class="composition-card-value">27.4%</div>
-                <div class="composition-card-change">↓ 4.1%</div>
-              </div>
 
               <div class="composition-card">
-                <span class="composition-card-label">BMI</span>
-                <div class="composition-card-value">28.4</div>
-                <div class="composition-card-change">↓ 2.7</div>
+                <span class="composition-card-label">
+                  Body Fat
+                </span>
+
+                <div class="composition-card-value">
+                  27.4%
+                </div>
+
+                <div class="composition-card-change">
+                  ↓ 4.1%
+                </div>
               </div>
 
-              <div class="composition-card">
-                <span class="composition-card-label">Skeletal Muscle</span>
-                <div class="composition-card-value">35.1 kg</div>
-                <div class="composition-card-change">↑ 0.8 kg</div>
-              </div>
 
               <div class="composition-card">
-                <span class="composition-card-label">Muscle Mass</span>
-                <div class="composition-card-value">56.4 kg</div>
-                <div class="composition-card-change">↑ 0.4 kg</div>
+                <span class="composition-card-label">
+                  BMI
+                </span>
+
+                <div class="composition-card-value">
+                  28.4
+                </div>
+
+                <div class="composition-card-change">
+                  ↓ 2.7
+                </div>
               </div>
 
-              <div class="composition-card">
-                <span class="composition-card-label">Protein</span>
-                <div class="composition-card-value">14.0 kg</div>
-                <div class="composition-card-change">↑ 0.2 kg</div>
-              </div>
 
               <div class="composition-card">
-                <span class="composition-card-label">BMR</span>
-                <div class="composition-card-value">1642 kcal</div>
-                <div class="composition-card-change">↑ 18 kcal</div>
+                <span class="composition-card-label">
+                  Skeletal Muscle
+                </span>
+
+                <div class="composition-card-value">
+                  35.1 kg
+                </div>
+
+                <div class="composition-card-change">
+                  ↑ 0.8 kg
+                </div>
               </div>
 
-              <div class="composition-card">
-                <span class="composition-card-label">Fat-Free Body Weight</span>
-                <div class="composition-card-value">58.9 kg</div>
-                <div class="composition-card-change">↑ 0.6 kg</div>
-              </div>
 
               <div class="composition-card">
-                <span class="composition-card-label">Subcutaneous Fat</span>
-                <div class="composition-card-value">24.1%</div>
-                <div class="composition-card-change">↓ 3.0%</div>
+                <span class="composition-card-label">
+                  Muscle Mass
+                </span>
+
+                <div class="composition-card-value">
+                  56.4 kg
+                </div>
+
+                <div class="composition-card-change">
+                  ↑ 0.4 kg
+                </div>
               </div>
 
-              <div class="composition-card">
-                <span class="composition-card-label">Visceral Fat</span>
-                <div class="composition-card-value">11</div>
-                <div class="composition-card-change">↓ 4</div>
-              </div>
 
               <div class="composition-card">
-                <span class="composition-card-label">Body Water</span>
-                <div class="composition-card-value">52.8%</div>
-                <div class="composition-card-change">↑ 2.1%</div>
+                <span class="composition-card-label">
+                  Protein
+                </span>
+
+                <div class="composition-card-value">
+                  14.0 kg
+                </div>
+
+                <div class="composition-card-change">
+                  ↑ 0.2 kg
+                </div>
               </div>
 
+
               <div class="composition-card">
-                <span class="composition-card-label">Bone Mass</span>
-                <div class="composition-card-value">3.05 kg</div>
-                <div class="composition-card-change">↑ 0.04 kg</div>
+                <span class="composition-card-label">
+                  BMR
+                </span>
+
+                <div class="composition-card-value">
+                  1642 kcal
+                </div>
+
+                <div class="composition-card-change">
+                  ↑ 18 kcal
+                </div>
+              </div>
+
+
+              <div class="composition-card">
+                <span class="composition-card-label">
+                  Fat-Free Body Weight
+                </span>
+
+                <div class="composition-card-value">
+                  58.9 kg
+                </div>
+
+                <div class="composition-card-change">
+                  ↑ 0.6 kg
+                </div>
+              </div>
+
+
+              <div class="composition-card">
+                <span class="composition-card-label">
+                  Subcutaneous Fat
+                </span>
+
+                <div class="composition-card-value">
+                  24.1%
+                </div>
+
+                <div class="composition-card-change">
+                  ↓ 3.0%
+                </div>
+              </div>
+
+
+              <div class="composition-card">
+                <span class="composition-card-label">
+                  Visceral Fat
+                </span>
+
+                <div class="composition-card-value">
+                  11
+                </div>
+
+                <div class="composition-card-change">
+                  ↓ 4
+                </div>
+              </div>
+
+
+              <div class="composition-card">
+                <span class="composition-card-label">
+                  Body Water
+                </span>
+
+                <div class="composition-card-value">
+                  52.8%
+                </div>
+
+                <div class="composition-card-change">
+                  ↑ 2.1%
+                </div>
+              </div>
+
+
+              <div class="composition-card">
+                <span class="composition-card-label">
+                  Bone Mass
+                </span>
+
+                <div class="composition-card-value">
+                  3.05 kg
+                </div>
+
+                <div class="composition-card-change">
+                  ↑ 0.04 kg
+                </div>
               </div>
 
             </div>
@@ -3729,7 +4593,7 @@
               </h2>
 
               <p>
-                Historical Arboleaf measurements.
+                One row per patient visit.
               </p>
 
             </div>
@@ -3741,48 +4605,68 @@
 
             <div style="overflow-x:auto;">
 
-              <table class="composition-table">
+              <table class="history-table">
 
                 <thead>
 
                   <tr>
-                    <th>Date</th>
-                    <th>Weight</th>
-                    <th>Body Fat</th>
-                    <th>BMI</th>
-                    <th>Skeletal Muscle</th>
-                    <th>Visceral Fat</th>
+
+                    <th>
+                      Date
+                    </th>
+
+                    <th>
+                      Visit
+                    </th>
+
+                    <th>
+                      Weight
+                    </th>
+
+                    <th>
+                      Body Fat
+                    </th>
+
+                    <th>
+                      BMI
+                    </th>
+
+                    <th>
+                      Skeletal Muscle
+                    </th>
+
                   </tr>
 
                 </thead>
+
 
                 <tbody>
 
                   <tr>
                     <td>20 Aug 2026</td>
+                    <td>Visit #10</td>
                     <td>81.2 kg</td>
                     <td>27.4%</td>
                     <td>28.4</td>
                     <td>35.1 kg</td>
-                    <td>11</td>
                   </tr>
 
                   <tr>
                     <td>13 Aug 2026</td>
+                    <td>Visit #9</td>
                     <td>82.0 kg</td>
                     <td>28.0%</td>
                     <td>28.7</td>
                     <td>34.9 kg</td>
-                    <td>12</td>
                   </tr>
 
                   <tr>
                     <td>06 Aug 2026</td>
+                    <td>Visit #8</td>
                     <td>82.5 kg</td>
                     <td>28.5%</td>
                     <td>28.9</td>
                     <td>34.7 kg</td>
-                    <td>12</td>
                   </tr>
 
                 </tbody>
@@ -3798,13 +4682,13 @@
       </div>
 
 
-      <!-- =========================================
-           VISITS
-      ========================================== -->
+      <!-- =================================================
+           PHOTOS
+      ================================================== -->
 
       <div
         class="tab-panel"
-        id="visits"
+        id="photos"
       >
 
         <div class="content-card">
@@ -3814,20 +4698,20 @@
             <div>
 
               <h2>
-                Visit History
+                Progress Photos
               </h2>
 
               <p>
-                Every recorded patient visit.
+                Full-body photos organized by visit.
               </p>
 
             </div>
 
             <button
-              class="small-button"
-              onclick="showComingSoon('Add Visit')"
+              class="primary-button"
+              onclick="openAddVisitModal()"
             >
-              + Add Visit
+              + Add Visit Photos
             </button>
 
           </div>
@@ -3835,193 +4719,89 @@
 
           <div class="content-card-body">
 
-            <div class="visit-history">
+            <div class="photo-grid">
 
-              <div class="history-card">
 
-                <div class="history-date">
-                  <strong>20 Aug 2026</strong>
-                  <span>Visit #10 · Week 10</span>
-                </div>
+              <!-- FRONT -->
 
-                <div class="history-stats">
+              <div class="photo-upload-card">
 
-                  <div class="history-stat">
-                    <span>Weight</span>
-                    <strong>81.2 kg</strong>
-                  </div>
-
-                  <div class="history-stat">
-                    <span>Body Fat</span>
-                    <strong>27.4%</strong>
-                  </div>
-
-                  <div class="history-stat">
-                    <span>BMI</span>
-                    <strong>28.4</strong>
-                  </div>
-
-                  <div class="history-stat">
-                    <span>Change</span>
-                    <strong>-0.8 kg</strong>
-                  </div>
-
-                </div>
-
-                <button
-                  class="small-button"
-                  onclick="showComingSoon('Visit Details')"
+                <div
+                  class="photo-preview"
+                  id="frontPhotoPreview"
                 >
-                  View Visit
-                </button>
 
-              </div>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect
+                      x="3"
+                      y="4"
+                      width="18"
+                      height="16"
+                      rx="2"
+                    ></rect>
 
+                    <circle
+                      cx="9"
+                      cy="10"
+                      r="1.5"
+                    ></circle>
 
-              <div class="history-card">
-
-                <div class="history-date">
-                  <strong>13 Aug 2026</strong>
-                  <span>Visit #9 · Week 9</span>
-                </div>
-
-                <div class="history-stats">
-
-                  <div class="history-stat">
-                    <span>Weight</span>
-                    <strong>82.0 kg</strong>
-                  </div>
-
-                  <div class="history-stat">
-                    <span>Body Fat</span>
-                    <strong>28.0%</strong>
-                  </div>
-
-                  <div class="history-stat">
-                    <span>BMI</span>
-                    <strong>28.7</strong>
-                  </div>
-
-                  <div class="history-stat">
-                    <span>Change</span>
-                    <strong>-0.5 kg</strong>
-                  </div>
+                    <path
+                      d="M3 17l5-5 4 4 3-3 6 6"
+                    ></path>
+                  </svg>
 
                 </div>
 
-                <button
-                  class="small-button"
-                  onclick="showComingSoon('Visit Details')"
-                >
-                  View Visit
-                </button>
 
-              </div>
-
-
-              <div class="history-card">
-
-                <div class="history-date">
-                  <strong>06 Aug 2026</strong>
-                  <span>Visit #8 · Week 8</span>
-                </div>
-
-                <div class="history-stats">
-
-                  <div class="history-stat">
-                    <span>Weight</span>
-                    <strong>82.5 kg</strong>
-                  </div>
-
-                  <div class="history-stat">
-                    <span>Body Fat</span>
-                    <strong>28.5%</strong>
-                  </div>
-
-                  <div class="history-stat">
-                    <span>BMI</span>
-                    <strong>28.9</strong>
-                  </div>
-
-                  <div class="history-stat">
-                    <span>Change</span>
-                    <strong>-0.7 kg</strong>
-                  </div>
-
-                </div>
-
-                <button
-                  class="small-button"
-                  onclick="showComingSoon('Visit Details')"
-                >
-                  View Visit
-                </button>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- =========================================
-           PHOTOS
-      ========================================== -->
-
-      <div
-        class="tab-panel"
-        id="photos"
-      >
-
-        <div class="content-card">
-
-          <div class="content-card-body">
-
-            <div class="photo-header">
-
-              <div>
-                <h2>
-                  Visual Progress
-                </h2>
-
-                <p>
-                  Full-body photos recorded during visits.
-                </p>
-              </div>
-
-              <button
-                class="small-button"
-                onclick="showComingSoon('Upload Photos')"
-              >
-                + Upload Photos
-              </button>
-
-            </div>
-
-
-            <div class="photo-comparison">
-
-
-              <div class="photo-column">
-
-                <div class="photo-column-header">
+                <div class="photo-upload-footer">
 
                   <strong>
                     Front
                   </strong>
 
                   <span>
-                    20 Aug 2026
+                    20 Aug 2026 · Visit #10
                   </span>
+
+                  <label
+                    for="frontPhotoMain"
+                    class="upload-button"
+                  >
+                    Upload Photo
+                  </label>
+
+                  <input
+                    class="hidden-file"
+                    type="file"
+                    id="frontPhotoMain"
+                    accept="image/*"
+                    onchange="previewPhoto(
+                      this,
+                      'frontPhotoPreview'
+                    )"
+                  >
 
                 </div>
 
+              </div>
 
-                <div class="photo-placeholder">
+
+              <!-- SIDE -->
+
+              <div class="photo-upload-card">
+
+                <div
+                  class="photo-preview"
+                  id="sidePhotoPreview"
+                >
 
                   <svg
                     viewBox="0 0 24 24"
@@ -4053,31 +4833,47 @@
                 </div>
 
 
-                <div class="photo-footer">
-                  <span>
-                    Latest visit
-                  </span>
-                </div>
-
-              </div>
-
-
-              <div class="photo-column">
-
-                <div class="photo-column-header">
+                <div class="photo-upload-footer">
 
                   <strong>
                     Side
                   </strong>
 
                   <span>
-                    20 Aug 2026
+                    20 Aug 2026 · Visit #10
                   </span>
+
+                  <label
+                    for="sidePhotoMain"
+                    class="upload-button"
+                  >
+                    Upload Photo
+                  </label>
+
+                  <input
+                    class="hidden-file"
+                    type="file"
+                    id="sidePhotoMain"
+                    accept="image/*"
+                    onchange="previewPhoto(
+                      this,
+                      'sidePhotoPreview'
+                    )"
+                  >
 
                 </div>
 
+              </div>
 
-                <div class="photo-placeholder">
+
+              <!-- BACK -->
+
+              <div class="photo-upload-card">
+
+                <div
+                  class="photo-preview"
+                  id="backPhotoPreview"
+                >
 
                   <svg
                     viewBox="0 0 24 24"
@@ -4109,66 +4905,34 @@
                 </div>
 
 
-                <div class="photo-footer">
-                  <span>
-                    Latest visit
-                  </span>
-                </div>
-
-              </div>
-
-
-              <div class="photo-column">
-
-                <div class="photo-column-header">
+                <div class="photo-upload-footer">
 
                   <strong>
                     Back
                   </strong>
 
                   <span>
-                    20 Aug 2026
+                    20 Aug 2026 · Visit #10
                   </span>
 
-                </div>
-
-
-                <div class="photo-placeholder">
-
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                  <label
+                    for="backPhotoMain"
+                    class="upload-button"
                   >
-                    <rect
-                      x="3"
-                      y="4"
-                      width="18"
-                      height="16"
-                      rx="2"
-                    ></rect>
+                    Upload Photo
+                  </label>
 
-                    <circle
-                      cx="9"
-                      cy="10"
-                      r="1.5"
-                    ></circle>
+                  <input
+                    class="hidden-file"
+                    type="file"
+                    id="backPhotoMain"
+                    accept="image/*"
+                    onchange="previewPhoto(
+                      this,
+                      'backPhotoPreview'
+                    )"
+                  >
 
-                    <path
-                      d="M3 17l5-5 4 4 3-3 6 6"
-                    ></path>
-                  </svg>
-
-                </div>
-
-
-                <div class="photo-footer">
-                  <span>
-                    Latest visit
-                  </span>
                 </div>
 
               </div>
@@ -4182,9 +4946,9 @@
       </div>
 
 
-      <!-- =========================================
+      <!-- =================================================
            FILES
-      ========================================== -->
+      ================================================== -->
 
       <div
         class="tab-panel"
@@ -4202,29 +4966,22 @@
               </h2>
 
               <p>
-                Original Arboleaf reports and comparison files.
+                Files stored across the patient's visits.
               </p>
 
             </div>
-
-            <button
-              class="small-button"
-              onclick="showComingSoon('Upload File')"
-            >
-              + Upload File
-            </button>
 
           </div>
 
 
           <div class="content-card-body">
 
-            <div class="file-list">
+            <div class="upload-grid">
 
 
-              <div class="file-item">
+              <div class="upload-card">
 
-                <div class="file-icon pdf">
+                <div class="upload-icon">
 
                   <svg
                     viewBox="0 0 24 24"
@@ -4242,33 +4999,43 @@
 
                 </div>
 
+                <strong>
+                  Arboleaf PDF
+                </strong>
 
-                <div class="file-info">
+                <span>
+                  Upload a report directly to this patient.
+                </span>
 
-                  <strong>
-                    Arboleaf_Body_Composition_20Aug2026.pdf
-                  </strong>
-
-                  <span>
-                    PDF · 3 pages · Visit #10
-                  </span>
-
-                </div>
-
-
-                <button
-                  class="file-button"
-                  onclick="showComingSoon('PDF Viewer')"
+                <label
+                  for="generalPdf"
+                  class="upload-button"
                 >
-                  View
-                </button>
+                  Upload PDF
+                </label>
+
+                <input
+                  type="file"
+                  class="hidden-file"
+                  id="generalPdf"
+                  accept="application/pdf"
+                  onchange="handleSingleFile(
+                    this,
+                    'generalPdfName'
+                  )"
+                >
+
+                <div
+                  class="selected-file"
+                  id="generalPdfName"
+                ></div>
 
               </div>
 
 
-              <div class="file-item">
+              <div class="upload-card">
 
-                <div class="file-icon image">
+                <div class="upload-icon">
 
                   <svg
                     viewBox="0 0 24 24"
@@ -4299,83 +5066,36 @@
 
                 </div>
 
+                <strong>
+                  Comparison Image
+                </strong>
 
-                <div class="file-info">
+                <span>
+                  Upload an Arboleaf comparison result.
+                </span>
 
-                  <strong>
-                    Arboleaf_Comparison_20Aug2026.png
-                  </strong>
-
-                  <span>
-                    Image · Comparison result · Visit #10
-                  </span>
-
-                </div>
-
-
-                <button
-                  class="file-button"
-                  onclick="showComingSoon('Comparison Viewer')"
+                <label
+                  for="generalComparison"
+                  class="upload-button"
                 >
-                  View
-                </button>
+                  Upload Image
+                </label>
 
-              </div>
-
-
-              <div class="file-item">
-
-                <div class="file-icon image">
-
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <rect
-                      x="3"
-                      y="4"
-                      width="18"
-                      height="16"
-                      rx="2"
-                    ></rect>
-
-                    <circle
-                      cx="9"
-                      cy="10"
-                      r="1.5"
-                    ></circle>
-
-                    <path
-                      d="M3 17l5-5 4 4 3-3 6 6"
-                    ></path>
-                  </svg>
-
-                </div>
-
-
-                <div class="file-info">
-
-                  <strong>
-                    FullBody_Front_20Aug2026.jpg
-                  </strong>
-
-                  <span>
-                    Image · Front photo · Visit #10
-                  </span>
-
-                </div>
-
-
-                <button
-                  class="file-button"
-                  onclick="showComingSoon('Image Viewer')"
+                <input
+                  type="file"
+                  class="hidden-file"
+                  id="generalComparison"
+                  accept="image/*"
+                  onchange="handleSingleFile(
+                    this,
+                    'generalComparisonName'
+                  )"
                 >
-                  View
-                </button>
+
+                <div
+                  class="selected-file"
+                  id="generalComparisonName"
+                ></div>
 
               </div>
 
@@ -4388,9 +5108,9 @@
       </div>
 
 
-      <!-- =========================================
+      <!-- =================================================
            APPOINTMENTS
-      ========================================== -->
+      ================================================== -->
 
       <div
         class="tab-panel"
@@ -4408,7 +5128,7 @@
               </h2>
 
               <p>
-                Previous and upcoming appointments.
+                This patient's appointment history.
               </p>
 
             </div>
@@ -4418,21 +5138,78 @@
 
           <div class="content-card-body">
 
-            <div class="appointment-list">
+            <div class="simple-list">
 
-              <div class="appointment-item">
 
-                <div class="appointment-date">
-                  <strong>20 Aug 2026</strong>
-                  <span>10:30 AM</span>
+              <div class="simple-list-row">
+
+                <div>
+
+                  <strong>
+                    27 Aug 2026
+                  </strong>
+
+                  <span>
+                    10:30 AM
+                  </span>
+
                 </div>
 
-                <div class="appointment-details">
-                  <strong>Body Composition Review</strong>
-                  <span>Week 10 · Arboleaf measurement</span>
+
+                <div>
+
+                  <strong>
+                    Body Composition Review
+                  </strong>
+
+                  <span>
+                    Week 11 · Upcoming
+                  </span>
+
                 </div>
 
-                <span class="status-pill status-active">
+
+                <span
+                  class="status-pill status-active"
+                >
+                  <span class="status-dot"></span>
+                  Upcoming
+                </span>
+
+              </div>
+
+
+              <div class="simple-list-row">
+
+                <div>
+
+                  <strong>
+                    20 Aug 2026
+                  </strong>
+
+                  <span>
+                    10:30 AM
+                  </span>
+
+                </div>
+
+
+                <div>
+
+                  <strong>
+                    Body Composition Review
+                  </strong>
+
+                  <span>
+                    Week 10 · Arboleaf
+                  </span>
+
+                </div>
+
+
+                <span
+                  class="status-pill status-completed"
+                >
                   <span class="status-dot"></span>
                   Completed
                 </span>
@@ -4440,41 +5217,39 @@
               </div>
 
 
-              <div class="appointment-item">
+              <div class="simple-list-row">
 
-                <div class="appointment-date">
-                  <strong>27 Aug 2026</strong>
-                  <span>10:30 AM</span>
+                <div>
+
+                  <strong>
+                    13 Aug 2026
+                  </strong>
+
+                  <span>
+                    10:30 AM
+                  </span>
+
                 </div>
 
-                <div class="appointment-details">
-                  <strong>Weekly Follow-Up</strong>
-                  <span>Week 11 · Program review</span>
+
+                <div>
+
+                  <strong>
+                    Weekly Follow-Up
+                  </strong>
+
+                  <span>
+                    Week 9
+                  </span>
+
                 </div>
 
-                <span class="status-pill status-active">
+
+                <span
+                  class="status-pill status-completed"
+                >
                   <span class="status-dot"></span>
-                  Upcoming
-                </span>
-
-              </div>
-
-
-              <div class="appointment-item">
-
-                <div class="appointment-date">
-                  <strong>03 Sep 2026</strong>
-                  <span>10:30 AM</span>
-                </div>
-
-                <div class="appointment-details">
-                  <strong>Body Composition Review</strong>
-                  <span>Week 12 · Arboleaf measurement</span>
-                </div>
-
-                <span class="status-pill status-active">
-                  <span class="status-dot"></span>
-                  Upcoming
+                  Completed
                 </span>
 
               </div>
@@ -4488,9 +5263,9 @@
       </div>
 
 
-      <!-- =========================================
+      <!-- =================================================
            TREATMENTS
-      ========================================== -->
+      ================================================== -->
 
       <div
         class="tab-panel"
@@ -4508,7 +5283,7 @@
               </h2>
 
               <p>
-                Treatments recorded throughout the program.
+                Treatment and medication records across visits.
               </p>
 
             </div>
@@ -4518,51 +5293,106 @@
 
           <div class="content-card-body">
 
-            <div style="overflow-x:auto;">
+            <div class="simple-list">
 
-              <table class="treatment-table">
 
-                <thead>
+              <div class="simple-list-row">
 
-                  <tr>
-                    <th>Date</th>
-                    <th>Treatment</th>
-                    <th>Dose</th>
-                    <th>Staff</th>
-                    <th>Notes</th>
-                  </tr>
+                <div>
 
-                </thead>
+                  <strong>
+                    20 Aug 2026
+                  </strong>
 
-                <tbody>
+                  <span>
+                    Visit #10
+                  </span>
 
-                  <tr>
-                    <td>20 Aug 2026</td>
-                    <td>Tirzepatide</td>
-                    <td>2.5 mg</td>
-                    <td>Staff A</td>
-                    <td>No immediate concerns.</td>
-                  </tr>
+                </div>
 
-                  <tr>
-                    <td>13 Aug 2026</td>
-                    <td>Tirzepatide</td>
-                    <td>2.5 mg</td>
-                    <td>Staff A</td>
-                    <td>Tolerated well.</td>
-                  </tr>
+                <div>
 
-                  <tr>
-                    <td>06 Aug 2026</td>
-                    <td>Tirzepatide</td>
-                    <td>2.5 mg</td>
-                    <td>Staff B</td>
-                    <td>No reported side effects.</td>
-                  </tr>
+                  <strong>
+                    Tirzepatide
+                  </strong>
 
-                </tbody>
+                  <span>
+                    2.5 mg · Injection
+                  </span>
 
-              </table>
+                </div>
+
+                <span>
+                  Completed
+                </span>
+
+              </div>
+
+
+              <div class="simple-list-row">
+
+                <div>
+
+                  <strong>
+                    13 Aug 2026
+                  </strong>
+
+                  <span>
+                    Visit #9
+                  </span>
+
+                </div>
+
+                <div>
+
+                  <strong>
+                    Tirzepatide
+                  </strong>
+
+                  <span>
+                    2.5 mg · Injection
+                  </span>
+
+                </div>
+
+                <span>
+                  Completed
+                </span>
+
+              </div>
+
+
+              <div class="simple-list-row">
+
+                <div>
+
+                  <strong>
+                    06 Aug 2026
+                  </strong>
+
+                  <span>
+                    Visit #8
+                  </span>
+
+                </div>
+
+                <div>
+
+                  <strong>
+                    Tirzepatide
+                  </strong>
+
+                  <span>
+                    2.5 mg · Injection
+                  </span>
+
+                </div>
+
+                <span>
+                  Completed
+                </span>
+
+              </div>
 
             </div>
 
@@ -4573,9 +5403,9 @@
       </div>
 
 
-      <!-- =========================================
+      <!-- =================================================
            NOTES
-      ========================================== -->
+      ================================================== -->
 
       <div
         class="tab-panel"
@@ -4593,7 +5423,7 @@
               </h2>
 
               <p>
-                Staff and doctor notes recorded during visits.
+                General notes associated with the patient.
               </p>
 
             </div>
@@ -4603,46 +5433,53 @@
 
           <div class="content-card-body">
 
-            <div class="note-box">
+            <div class="detail-block">
 
-              <div class="note-top">
-                <strong>Doctor Review</strong>
-                <span>20 Aug 2026</span>
-              </div>
+              <strong
+                style="
+                  color:var(--navy);
+                  font-size:11px;
+                "
+              >
+                Doctor Review
+              </strong>
 
-              <p>
+              <p
+                style="
+                  color:var(--text);
+                  font-size:10px;
+                  line-height:18px;
+                  margin-top:7px;
+                "
+              >
                 Patient continues to show steady weight reduction.
-                Body composition reviewed during today's visit.
+                Body composition reviewed during the latest visit.
               </p>
 
             </div>
 
 
-            <div class="note-box">
+            <div class="detail-block">
 
-              <div class="note-top">
-                <strong>Staff Note</strong>
-                <span>20 Aug 2026</span>
-              </div>
+              <strong
+                style="
+                  color:var(--navy);
+                  font-size:11px;
+                "
+              >
+                Staff Note
+              </strong>
 
-              <p>
-                Patient completed Arboleaf measurement and provided
-                front, side and back progress photos.
-              </p>
-
-            </div>
-
-
-            <div class="note-box">
-
-              <div class="note-top">
-                <strong>Patient Feedback</strong>
-                <span>13 Aug 2026</span>
-              </div>
-
-              <p>
-                Patient reports feeling more comfortable with current
-                appetite and energy levels.
+              <p
+                style="
+                  color:var(--text);
+                  font-size:10px;
+                  line-height:18px;
+                  margin-top:7px;
+                "
+              >
+                Arboleaf measurement completed and full-body
+                progress photographs were taken.
               </p>
 
             </div>
@@ -4660,12 +5497,472 @@
 </div>
 
 
+<!-- =====================================================
+     ADD VISIT MODAL
+====================================================== -->
+
+<div
+  class="modal-overlay"
+  id="addVisitModal"
+>
+
+  <div class="modal">
+
+
+    <div class="modal-header">
+
+      <div>
+
+        <h2>
+          Add Visit Record
+        </h2>
+
+        <span id="addVisitPatientName">
+          Patient visit record
+        </span>
+
+      </div>
+
+
+      <button
+        class="modal-close"
+        onclick="closeAddVisitModal()"
+        aria-label="Close"
+      >
+
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+        >
+          <path d="M6 6l12 12"></path>
+          <path d="M18 6L6 18"></path>
+        </svg>
+
+      </button>
+
+    </div>
+
+
+    <div class="modal-body">
+
+
+      <!-- VISIT -->
+
+      <div class="form-grid">
+
+
+        <div class="form-group">
+
+          <label>
+            Visit Date
+          </label>
+
+          <input
+            type="date"
+            id="visitDateInput"
+            value="2026-08-20"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Visit Number
+          </label>
+
+          <input
+            type="text"
+            id="visitNumberInput"
+            value="Visit #11"
+          >
+
+        </div>
+
+
+        <!-- ARBOLEAF PDF -->
+
+        <div class="form-group">
+
+          <label>
+            Arboleaf PDF
+          </label>
+
+          <input
+            type="file"
+            id="visitPdfInput"
+            accept="application/pdf"
+            onchange="
+              handleSingleFile(
+                this,
+                'visitPdfName'
+              )
+            "
+          >
+
+          <div
+            class="selected-file"
+            id="visitPdfName"
+          ></div>
+
+        </div>
+
+
+        <!-- COMPARISON -->
+
+        <div class="form-group">
+
+          <label>
+            Arboleaf Comparison Image
+          </label>
+
+          <input
+            type="file"
+            id="visitComparisonInput"
+            accept="image/*"
+            onchange="
+              handleSingleFile(
+                this,
+                'visitComparisonName'
+              )
+            "
+          >
+
+          <div
+            class="selected-file"
+            id="visitComparisonName"
+          ></div>
+
+        </div>
+
+
+        <!-- INJECTION -->
+
+        <div class="form-group">
+
+          <label>
+            Injection / Treatment
+          </label>
+
+          <select id="injectionInput">
+
+            <option value="">
+              Select treatment
+            </option>
+
+            <option>
+              Tirzepatide
+            </option>
+
+            <option>
+              Semaglutide
+            </option>
+
+            <option>
+              Other
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- DOSE -->
+
+        <div class="form-group">
+
+          <label>
+            Dose
+          </label>
+
+          <input
+            type="text"
+            id="doseInput"
+            placeholder="e.g. 2.5 mg"
+          >
+
+        </div>
+
+
+        <!-- MEDICATION -->
+
+        <div class="form-group">
+
+          <label>
+            Medication
+          </label>
+
+          <input
+            type="text"
+            id="medicationInput"
+            placeholder="Medication / supplement"
+          >
+
+        </div>
+
+
+        <!-- ADDITIONAL -->
+
+        <div class="form-group">
+
+          <label>
+            Additional Treatment
+          </label>
+
+          <input
+            type="text"
+            id="additionalInput"
+            placeholder="Optional"
+          >
+
+        </div>
+
+
+        <!-- FRONT -->
+
+        <div class="form-group">
+
+          <label>
+            Full Body — Front
+          </label>
+
+          <input
+            type="file"
+            id="frontVisitInput"
+            accept="image/*"
+            onchange="
+              previewPhoto(
+                this,
+                'frontVisitPreview'
+              )
+            "
+          >
+
+          <div
+            class="photo-preview"
+            id="frontVisitPreview"
+            style="
+              margin-top:7px;
+              border-radius:9px;
+              aspect-ratio:3/4;
+            "
+          >
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <rect
+                x="3"
+                y="4"
+                width="18"
+                height="16"
+                rx="2"
+              ></rect>
+
+              <circle
+                cx="9"
+                cy="10"
+                r="1.5"
+              ></circle>
+
+              <path
+                d="M3 17l5-5 4 4 3-3 6 6"
+              ></path>
+            </svg>
+
+          </div>
+
+        </div>
+
+
+        <!-- SIDE -->
+
+        <div class="form-group">
+
+          <label>
+            Full Body — Side
+          </label>
+
+          <input
+            type="file"
+            id="sideVisitInput"
+            accept="image/*"
+            onchange="
+              previewPhoto(
+                this,
+                'sideVisitPreview'
+              )
+            "
+          >
+
+          <div
+            class="photo-preview"
+            id="sideVisitPreview"
+            style="
+              margin-top:7px;
+              border-radius:9px;
+              aspect-ratio:3/4;
+            "
+          >
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <rect
+                x="3"
+                y="4"
+                width="18"
+                height="16"
+                rx="2"
+              ></rect>
+
+              <circle
+                cx="9"
+                cy="10"
+                r="1.5"
+              ></circle>
+
+              <path
+                d="M3 17l5-5 4 4 3-3 6 6"
+              ></path>
+            </svg>
+
+          </div>
+
+        </div>
+
+
+        <!-- BACK -->
+
+        <div class="form-group">
+
+          <label>
+            Full Body — Back
+          </label>
+
+          <input
+            type="file"
+            id="backVisitInput"
+            accept="image/*"
+            onchange="
+              previewPhoto(
+                this,
+                'backVisitPreview'
+              )
+            "
+          >
+
+          <div
+            class="photo-preview"
+            id="backVisitPreview"
+            style="
+              margin-top:7px;
+              border-radius:9px;
+              aspect-ratio:3/4;
+            "
+          >
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <rect
+                x="3"
+                y="4"
+                width="18"
+                height="16"
+                rx="2"
+              ></rect>
+
+              <circle
+                cx="9"
+                cy="10"
+                r="1.5"
+              ></circle>
+
+              <path
+                d="M3 17l5-5 4 4 3-3 6 6"
+              ></path>
+            </svg>
+
+          </div>
+
+        </div>
+
+
+        <!-- NOTES -->
+
+        <div class="form-group full">
+
+          <label>
+            Visit Notes
+          </label>
+
+          <textarea
+            id="visitNotesInput"
+            placeholder="Enter staff / doctor notes for this visit..."
+          ></textarea>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="modal-footer">
+
+      <button
+        class="secondary-button"
+        onclick="closeAddVisitModal()"
+      >
+        Cancel
+      </button>
+
+
+      <button
+        class="primary-button"
+        onclick="demoSaveVisit()"
+      >
+
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        >
+          <path d="M5 12l4 4L19 6"></path>
+        </svg>
+
+        Save Visit
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
 <script>
 
-  /* =========================================
-     DEMO PATIENT DATA
-     UI ONLY FOR NOW
-  ========================================== */
+  /* =====================================================
+     DEMO PATIENT DATABASE
+  ====================================================== */
 
   const demoPatients = {
 
@@ -4685,8 +5982,34 @@
       totalLoss: "5.6",
       remaining: "7.4",
       progress: "43",
+      duration: "10",
 
-      duration: "10"
+      visits: [
+        {
+          id: "GW0001-V10",
+          date: "20 Aug 2026",
+          visit: "Visit #10",
+          type: "Body Composition Review",
+          weight: "72.4 kg",
+          change: "-0.6 kg"
+        },
+        {
+          id: "GW0001-V9",
+          date: "13 Aug 2026",
+          visit: "Visit #9",
+          type: "Weekly Follow-Up",
+          weight: "73.0 kg",
+          change: "-0.5 kg"
+        },
+        {
+          id: "GW0001-V8",
+          date: "06 Aug 2026",
+          visit: "Visit #8",
+          type: "Body Composition Review",
+          weight: "73.5 kg",
+          change: "-0.7 kg"
+        }
+      ]
     },
 
 
@@ -4706,8 +6029,42 @@
       totalLoss: "7.8",
       remaining: "11.2",
       progress: "69",
+      duration: "10",
 
-      duration: "10"
+      visits: [
+        {
+          id: "GW0002-V10",
+          date: "20 Aug 2026",
+          visit: "Visit #10",
+          type: "Body Composition Review",
+          weight: "81.2 kg",
+          change: "-0.8 kg"
+        },
+        {
+          id: "GW0002-V9",
+          date: "13 Aug 2026",
+          visit: "Visit #9",
+          type: "Weekly Follow-Up",
+          weight: "82.0 kg",
+          change: "-0.5 kg"
+        },
+        {
+          id: "GW0002-V8",
+          date: "06 Aug 2026",
+          visit: "Visit #8",
+          type: "Body Composition Review",
+          weight: "82.5 kg",
+          change: "-0.7 kg"
+        },
+        {
+          id: "GW0002-V7",
+          date: "30 Jul 2026",
+          visit: "Visit #7",
+          type: "Body Composition Review",
+          weight: "83.2 kg",
+          change: "-0.6 kg"
+        }
+      ]
     },
 
 
@@ -4727,8 +6084,26 @@
       totalLoss: "4.9",
       remaining: "8.8",
       progress: "55",
+      duration: "9",
 
-      duration: "9"
+      visits: [
+        {
+          id: "GW0003-V9",
+          date: "19 Aug 2026",
+          visit: "Visit #9",
+          type: "Review",
+          weight: "76.8 kg",
+          change: "-0.5 kg"
+        },
+        {
+          id: "GW0003-V8",
+          date: "12 Aug 2026",
+          visit: "Visit #8",
+          type: "Body Composition Review",
+          weight: "77.3 kg",
+          change: "-0.6 kg"
+        }
+      ]
     },
 
 
@@ -4748,8 +6123,18 @@
       totalLoss: "3.1",
       remaining: "7.5",
       progress: "41",
+      duration: "8",
 
-      duration: "8"
+      visits: [
+        {
+          id: "GW0004-V8",
+          date: "18 Aug 2026",
+          visit: "Visit #8",
+          type: "Follow-Up",
+          weight: "69.5 kg",
+          change: "-0.3 kg"
+        }
+      ]
     },
 
 
@@ -4769,8 +6154,18 @@
       totalLoss: "11.4",
       remaining: "0",
       progress: "100",
+      duration: "14",
 
-      duration: "14"
+      visits: [
+        {
+          id: "GW0005-V14",
+          date: "15 Aug 2026",
+          visit: "Visit #14",
+          type: "Goal Review",
+          weight: "68.0 kg",
+          change: "0.0 kg"
+        }
+      ]
     },
 
 
@@ -4790,35 +6185,43 @@
       totalLoss: "1.2",
       remaining: "13.2",
       progress: "9",
+      duration: "4",
 
-      duration: "4"
+      visits: [
+        {
+          id: "GW0006-V4",
+          date: "02 Aug 2026",
+          visit: "Visit #4",
+          type: "Review",
+          weight: "83.2 kg",
+          change: "-0.1 kg"
+        }
+      ]
     }
 
   };
 
 
-  /* =========================================
-     GET PATIENT ID FROM URL
-  ========================================== */
+  /* =====================================================
+     READ PATIENT FROM URL
+  ====================================================== */
 
   const params =
     new URLSearchParams(
       window.location.search
     );
 
-
   const patientId =
     params.get("patient");
-
 
   const patient =
     demoPatients[patientId] ||
     demoPatients.GW0002;
 
 
-  /* =========================================
-     LOAD PATIENT DATA
-  ========================================== */
+  /* =====================================================
+     LOAD PATIENT IDENTITY
+  ====================================================== */
 
   document.title =
     patient.name +
@@ -4931,27 +6334,589 @@
     patient.totalLoss;
 
 
-  /* =========================================
+  /* =====================================================
+     STATUS STYLE
+  ====================================================== */
+
+  const statusPill =
+    document.getElementById(
+      "statusPill"
+    );
+
+  statusPill.classList.remove(
+    "status-active",
+    "status-completed",
+    "status-inactive"
+  );
+
+
+  if (
+    patient.status === "Completed"
+  ) {
+
+    statusPill.classList.add(
+      "status-completed"
+    );
+
+  } else if (
+    patient.status === "Inactive"
+  ) {
+
+    statusPill.classList.add(
+      "status-inactive"
+    );
+
+  } else {
+
+    statusPill.classList.add(
+      "status-active"
+    );
+
+  }
+
+
+  /* =====================================================
+     VISIT LIST
+  ====================================================== */
+
+  const overviewVisitList =
+    document.getElementById(
+      "overviewVisitList"
+    );
+
+  const fullVisitList =
+    document.getElementById(
+      "fullVisitList"
+    );
+
+
+  function renderVisits() {
+
+    const visits =
+      patient.visits || [];
+
+
+    const html =
+      visits.map(
+        visit => `
+
+          <div
+            class="visit-row"
+            onclick="openVisit('${visit.id}')"
+          >
+
+            <div class="visit-date">
+
+              <strong>
+                ${visit.date}
+              </strong>
+
+              <span>
+                ${visit.visit}
+              </span>
+
+            </div>
+
+
+            <div class="visit-main">
+
+              <strong>
+                ${visit.type}
+              </strong>
+
+              <span>
+                Weight ${visit.weight}
+                ·
+                ${visit.change}
+              </span>
+
+            </div>
+
+
+            <div class="visit-arrow">
+
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M5 12h13"></path>
+                <path d="M13 6l6 6-6 6"></path>
+              </svg>
+
+            </div>
+
+          </div>
+
+        `
+      ).join("");
+
+
+    overviewVisitList.innerHTML =
+      html;
+
+    fullVisitList.innerHTML =
+      html;
+
+  }
+
+
+  renderVisits();
+
+
+  /* =====================================================
+     VISIT DETAILS
+  ====================================================== */
+
+  let selectedVisit =
+    patient.visits &&
+    patient.visits[0];
+
+
+  function openVisit(
+    visitId
+  ) {
+
+    selectedVisit =
+      patient.visits.find(
+        visit =>
+          visit.id === visitId
+      );
+
+
+    if (!selectedVisit) {
+      return;
+    }
+
+
+    document.getElementById(
+      "selectedVisitLabel"
+    ).textContent =
+      selectedVisit.date +
+      " · " +
+      selectedVisit.visit;
+
+
+    document.getElementById(
+      "visitDateInput"
+    ).value =
+      convertDateToInput(
+        selectedVisit.date
+      );
+
+
+    activateTab("visits");
+
+  }
+
+
+  /* =====================================================
+     TAB SYSTEM
+  ====================================================== */
+
+  const tabButtons =
+    document.querySelectorAll(
+      ".tab-button"
+    );
+
+  const tabPanels =
+    document.querySelectorAll(
+      ".tab-panel"
+    );
+
+
+  function activateTab(
+    target
+  ) {
+
+    tabButtons.forEach(
+      button => {
+
+        button.classList.toggle(
+          "active",
+          button.dataset.tab ===
+          target
+        );
+
+      }
+    );
+
+
+    tabPanels.forEach(
+      panel => {
+
+        panel.classList.toggle(
+          "active",
+          panel.id === target
+        );
+
+      }
+    );
+
+  }
+
+
+  tabButtons.forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          activateTab(
+            button.dataset.tab
+          );
+
+        }
+      );
+
+    }
+  );
+
+
+  /* =====================================================
+     UPCOMING APPOINTMENT
+  ====================================================== */
+
+  function openAppointmentsTab(
+    event
+  ) {
+
+    event.preventDefault();
+
+    activateTab(
+      "appointments"
+    );
+
+    document.getElementById(
+      "appointments"
+    ).scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+  }
+
+
+  /* =====================================================
+     FILE UPLOAD
+  ====================================================== */
+
+  function handleSingleFile(
+    input,
+    targetId
+  ) {
+
+    const target =
+      document.getElementById(
+        targetId
+      );
+
+
+    if (!target) {
+      return;
+    }
+
+
+    if (
+      input.files &&
+      input.files.length > 0
+    ) {
+
+      target.textContent =
+        "Selected: " +
+        input.files[0].name;
+
+    } else {
+
+      target.textContent =
+        "";
+
+    }
+
+  }
+
+
+  /* =====================================================
+     PHOTO PREVIEW
+  ====================================================== */
+
+  function previewPhoto(
+    input,
+    previewId
+  ) {
+
+    const preview =
+      document.getElementById(
+        previewId
+      );
+
+
+    if (
+      !preview ||
+      !input.files ||
+      !input.files[0]
+    ) {
+
+      return;
+
+    }
+
+
+    const file =
+      input.files[0];
+
+
+    if (
+      !file.type.startsWith(
+        "image/"
+      )
+    ) {
+
+      return;
+
+    }
+
+
+    const reader =
+      new FileReader();
+
+
+    reader.onload =
+      function(event) {
+
+        preview.innerHTML = `
+
+          <img
+            src="${event.target.result}"
+            alt="Uploaded progress photo"
+          >
+
+        `;
+
+      };
+
+
+    reader.readAsDataURL(file);
+
+  }
+
+
+  /* =====================================================
+     ADD VISIT MODAL
+  ====================================================== */
+
+  const addVisitModal =
+    document.getElementById(
+      "addVisitModal"
+    );
+
+
+  function openAddVisitModal() {
+
+    document.getElementById(
+      "addVisitPatientName"
+    ).textContent =
+      patient.name +
+      " · " +
+      patient.id;
+
+
+    addVisitModal.classList.add(
+      "show"
+    );
+
+
+    document.body.style.overflow =
+      "hidden";
+
+  }
+
+
+  function closeAddVisitModal() {
+
+    addVisitModal.classList.remove(
+      "show"
+    );
+
+
+    document.body.style.overflow =
+      "";
+
+  }
+
+
+  addVisitModal.addEventListener(
+    "click",
+    event => {
+
+      if (
+        event.target ===
+        addVisitModal
+      ) {
+
+        closeAddVisitModal();
+
+      }
+
+    }
+  );
+
+
+  /* =====================================================
+     DEMO SAVE VISIT
+  ====================================================== */
+
+  function demoSaveVisit() {
+
+    const visitDate =
+      document.getElementById(
+        "visitDateInput"
+      ).value;
+
+
+    const visitNumber =
+      document.getElementById(
+        "visitNumberInput"
+      ).value;
+
+
+    if (!visitDate) {
+
+      alert(
+        "Please select the visit date."
+      );
+
+      return;
+
+    }
+
+
+    /*
+      UI DEMO ONLY.
+
+      This confirms the form is working.
+      Permanent storage will later go into
+      Google Sheets + Google Drive.
+    */
+
+
+    alert(
+      "Visit record prepared.\n\n" +
+      "Date: " +
+      visitDate +
+      "\n" +
+      "Visit: " +
+      visitNumber +
+      "\n\n" +
+      "Files selected in this form are ready " +
+      "to be connected to permanent storage."
+    );
+
+
+    closeAddVisitModal();
+
+  }
+
+
+  /* =====================================================
+     DATE HELPER
+  ====================================================== */
+
+  function convertDateToInput(
+    dateString
+  ) {
+
+    const parts =
+      dateString.split(" ");
+
+
+    if (
+      parts.length !== 3
+    ) {
+
+      return "";
+
+    }
+
+
+    const day =
+      parts[0];
+
+    const monthMap = {
+      Jan: "01",
+      Feb: "02",
+      Mar: "03",
+      Apr: "04",
+      May: "05",
+      Jun: "06",
+      Jul: "07",
+      Aug: "08",
+      Sep: "09",
+      Oct: "10",
+      Nov: "11",
+      Dec: "12"
+    };
+
+
+    const month =
+      monthMap[parts[1]];
+
+
+    const year =
+      parts[2];
+
+
+    if (!month) {
+      return "";
+    }
+
+
+    return (
+      year +
+      "-" +
+      month +
+      "-" +
+      String(day).padStart(2, "0")
+    );
+
+  }
+
+
+  /* =====================================================
      MOBILE SIDEBAR
-  ========================================== */
+  ====================================================== */
 
   const sidebar =
-    document.getElementById("sidebar");
+    document.getElementById(
+      "sidebar"
+    );
 
   const mobileOverlay =
-    document.getElementById("mobileOverlay");
+    document.getElementById(
+      "mobileOverlay"
+    );
 
   const mobileMenu =
-    document.getElementById("mobileMenu");
+    document.getElementById(
+      "mobileMenu"
+    );
 
 
   mobileMenu.addEventListener(
     "click",
     () => {
 
-      sidebar.classList.toggle("open");
+      sidebar.classList.toggle(
+        "open"
+      );
 
-      mobileOverlay.classList.toggle("show");
+      mobileOverlay.classList.toggle(
+        "show"
+      );
 
     }
   );
@@ -4961,86 +6926,25 @@
     "click",
     () => {
 
-      sidebar.classList.remove("open");
+      sidebar.classList.remove(
+        "open"
+      );
 
-      mobileOverlay.classList.remove("show");
+      mobileOverlay.classList.remove(
+        "show"
+      );
 
     }
   );
 
 
-  /* =========================================
-     TABS
-  ========================================== */
-
-  const tabButtons =
-    document.querySelectorAll(
-      ".tab-button"
-    );
-
-
-  const tabPanels =
-    document.querySelectorAll(
-      ".tab-panel"
-    );
-
-
-  tabButtons.forEach(button => {
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        const target =
-          button.dataset.tab;
-
-
-        tabButtons.forEach(
-          item =>
-            item.classList.remove(
-              "active"
-            )
-        );
-
-
-        tabPanels.forEach(
-          panel =>
-            panel.classList.remove(
-              "active"
-            )
-        );
-
-
-        button.classList.add(
-          "active"
-        );
-
-
-        const targetPanel =
-          document.getElementById(
-            target
-          );
-
-
-        if (targetPanel) {
-
-          targetPanel.classList.add(
-            "active"
-          );
-
-        }
-
-      }
-    );
-
-  });
-
-
-  /* =========================================
+  /* =====================================================
      PLACEHOLDER
-  ========================================== */
+  ====================================================== */
 
-  function showComingSoon(section) {
+  function showComingSoon(
+    section
+  ) {
 
     alert(
       section +
@@ -5050,9 +6954,9 @@
   }
 
 
-  /* =========================================
+  /* =====================================================
      ESCAPE
-  ========================================== */
+  ====================================================== */
 
   document.addEventListener(
     "keydown",
@@ -5061,6 +6965,8 @@
       if (
         event.key === "Escape"
       ) {
+
+        closeAddVisitModal();
 
         sidebar.classList.remove(
           "open"
