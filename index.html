@@ -9,10 +9,17 @@
   <!-- Poppins -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
 
   <style>
     :root {
+      /* =========================
+         GETWELL COLOURS
+      ========================= */
+
       --primary: #2563EB;
       --primary-dark: #1D4ED8;
       --primary-soft: #EFF6FF;
@@ -21,11 +28,13 @@
       --navy: #0F172A;
       --text: #172033;
       --muted: #64748B;
+      --muted-light: #94A3B8;
 
       --background: #F6F9FD;
       --white: #FFFFFF;
 
       --border: #DCE6F2;
+      --border-light: #EDF2F7;
 
       --success: #16A34A;
       --success-soft: #ECFDF3;
@@ -41,6 +50,10 @@
       --shadow:
         0 4px 16px rgba(37, 99, 235, 0.06);
     }
+
+    /* =========================
+       RESET
+    ========================= */
 
     * {
       box-sizing: border-box;
@@ -58,10 +71,13 @@
       color: var(--text);
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
     button,
-    input {
+    input,
+    select,
+    textarea {
       font-family: "Poppins", sans-serif;
     }
 
@@ -75,18 +91,18 @@
       color: inherit;
     }
 
-    /* =====================================
+    /* =========================
        APP
-    ===================================== */
+    ========================= */
 
     .app {
       display: flex;
       min-height: 100vh;
     }
 
-    /* =====================================
+    /* =========================
        SIDEBAR
-    ===================================== */
+    ========================= */
 
     .sidebar {
       width: 250px;
@@ -125,22 +141,21 @@
 
       border-radius: 12px;
 
-      background:
-        linear-gradient(
-          135deg,
-          #2563EB 0%,
-          #3B82F6 60%,
-          #60A5FA 100%
-        );
+      background: linear-gradient(
+        135deg,
+        #2563EB 0%,
+        #3B82F6 60%,
+        #60A5FA 100%
+      );
 
       display: flex;
       align-items: center;
       justify-content: center;
 
-      color: #fff;
+      color: var(--white);
 
       font-size: 18px;
-      font-weight: 800;
+      font-weight: 700;
 
       margin-right: 11px;
 
@@ -154,7 +169,7 @@
       color: var(--navy);
 
       font-size: 15px;
-      font-weight: 800;
+      font-weight: 700;
 
       letter-spacing: -0.2px;
     }
@@ -165,7 +180,7 @@
       color: var(--muted);
 
       font-size: 10px;
-      font-weight: 500;
+      font-weight: 400;
 
       margin-top: 2px;
     }
@@ -180,12 +195,12 @@
 
     .nav-section-title {
       font-size: 10px;
-      font-weight: 700;
+      font-weight: 600;
 
       text-transform: uppercase;
       letter-spacing: 0.08em;
 
-      color: #94A3B8;
+      color: var(--muted-light);
 
       padding: 8px 11px;
 
@@ -210,14 +225,13 @@
       color: #475569;
 
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 500;
 
       background: transparent;
 
       transition:
         background 0.15s ease,
-        color 0.15s ease,
-        transform 0.15s ease;
+        color 0.15s ease;
     }
 
     .nav-item:hover {
@@ -228,7 +242,7 @@
     .nav-item.active {
       background: var(--primary-soft);
       color: var(--primary);
-      font-weight: 700;
+      font-weight: 600;
     }
 
     .nav-icon {
@@ -271,6 +285,7 @@
       border-radius: 50%;
 
       background: #DCEAFF;
+
       color: var(--primary);
 
       display: flex;
@@ -278,7 +293,7 @@
       align-items: center;
 
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 600;
     }
 
     .admin-info {
@@ -291,7 +306,7 @@
       color: var(--navy);
 
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 600;
 
       white-space: nowrap;
       overflow: hidden;
@@ -303,15 +318,15 @@
 
       color: var(--muted);
 
-      font-size: 9px;
-      font-weight: 500;
+      font-size: 10px;
+      font-weight: 400;
 
       margin-top: 2px;
     }
 
-    /* =====================================
+    /* =========================
        MAIN
-    ===================================== */
+    ========================= */
 
     .main {
       margin-left: 250px;
@@ -321,15 +336,14 @@
       min-width: 0;
     }
 
-    /* =====================================
+    /* =========================
        TOPBAR
-    ===================================== */
+    ========================= */
 
     .topbar {
       height: 72px;
 
-      background:
-        rgba(255, 255, 255, 0.96);
+      background: rgba(255, 255, 255, 0.96);
 
       border-bottom: 1px solid var(--border);
 
@@ -376,7 +390,7 @@
 
     .page-title {
       font-size: 16px;
-      font-weight: 800;
+      font-weight: 700;
 
       color: var(--navy);
 
@@ -384,11 +398,11 @@
     }
 
     .page-subtitle {
-      font-size: 10px;
+      font-size: 11px;
 
       color: var(--muted);
 
-      font-weight: 500;
+      font-weight: 400;
 
       margin-top: 2px;
     }
@@ -419,7 +433,7 @@
     }
 
     .search-box span {
-      color: #94A3B8;
+      color: var(--muted-light);
 
       font-size: 13px;
     }
@@ -435,7 +449,7 @@
       color: var(--text);
 
       font-size: 11px;
-      font-weight: 500;
+      font-weight: 400;
     }
 
     .search-box input::placeholder {
@@ -484,12 +498,12 @@
       align-items: center;
 
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 600;
     }
 
-    /* =====================================
+    /* =========================
        CONTENT
-    ===================================== */
+    ========================= */
 
     .content {
       padding: 30px;
@@ -508,24 +522,24 @@
 
       color: var(--navy);
 
-      font-weight: 800;
+      font-weight: 700;
 
       letter-spacing: -0.7px;
 
-      margin-bottom: 4px;
+      margin-bottom: 5px;
     }
 
     .welcome p {
-      font-size: 11px;
+      font-size: 12px;
 
       color: var(--muted);
 
-      font-weight: 500;
+      font-weight: 400;
     }
 
-    /* =====================================
+    /* =========================
        STAT CARDS
-    ===================================== */
+    ========================= */
 
     .stats-grid {
       display: grid;
@@ -572,11 +586,11 @@
     }
 
     .stat-label {
-      color: #64748B;
+      color: var(--muted);
 
       font-size: 10px;
 
-      font-weight: 700;
+      font-weight: 600;
 
       text-transform: uppercase;
 
@@ -607,24 +621,24 @@
 
       color: var(--navy);
 
-      font-weight: 800;
+      font-weight: 700;
 
       letter-spacing: -1px;
     }
 
     .stat-meta {
-      font-size: 10px;
+      font-size: 11px;
 
       color: var(--muted);
 
-      font-weight: 500;
+      font-weight: 400;
 
-      margin-top: 5px;
+      margin-top: 6px;
     }
 
-    /* =====================================
+    /* =========================
        DASHBOARD GRID
-    ===================================== */
+    ========================= */
 
     .dashboard-grid {
       display: grid;
@@ -661,28 +675,28 @@
     }
 
     .card-header h2 {
-      font-size: 13px;
+      font-size: 14px;
 
       color: var(--navy);
 
-      font-weight: 800;
+      font-weight: 600;
     }
 
     .card-header span {
       color: var(--muted);
 
-      font-size: 10px;
+      font-size: 11px;
 
-      font-weight: 500;
+      font-weight: 400;
     }
 
     .card-body {
       padding: 0;
     }
 
-    /* =====================================
+    /* =========================
        APPOINTMENTS
-    ===================================== */
+    ========================= */
 
     .appointment-row {
       padding: 15px 20px;
@@ -695,7 +709,7 @@
 
       gap: 15px;
 
-      border-bottom: 1px solid #EDF2F7;
+      border-bottom: 1px solid var(--border-light);
     }
 
     .appointment-row:last-child {
@@ -717,7 +731,7 @@
 
       font-size: 11px;
 
-      font-weight: 800;
+      font-weight: 600;
 
       color: var(--navy);
 
@@ -742,7 +756,7 @@
 
       font-size: 10px;
 
-      font-weight: 800;
+      font-weight: 600;
     }
 
     .appointment-info {
@@ -752,11 +766,11 @@
     .appointment-info strong {
       display: block;
 
-      font-size: 11px;
+      font-size: 12px;
 
       color: var(--navy);
 
-      font-weight: 700;
+      font-weight: 600;
 
       white-space: nowrap;
 
@@ -768,11 +782,11 @@
     .appointment-info span {
       display: block;
 
-      font-size: 9px;
+      font-size: 10px;
 
       color: var(--muted);
 
-      font-weight: 500;
+      font-weight: 400;
 
       margin-top: 3px;
     }
@@ -788,7 +802,7 @@
 
       font-size: 9px;
 
-      font-weight: 700;
+      font-weight: 600;
 
       white-space: nowrap;
     }
@@ -811,14 +825,14 @@
       color: var(--warning);
     }
 
-    /* =====================================
+    /* =========================
        FOLLOW-UP
-    ===================================== */
+    ========================= */
 
     .follow-row {
       padding: 15px 20px;
 
-      border-bottom: 1px solid #EDF2F7;
+      border-bottom: 1px solid var(--border-light);
 
       display: flex;
 
@@ -837,7 +851,7 @@
 
       border-radius: 50%;
 
-      margin-top: 5px;
+      margin-top: 6px;
 
       flex-shrink: 0;
     }
@@ -859,11 +873,11 @@
     .follow-content strong {
       display: block;
 
-      font-size: 11px;
+      font-size: 12px;
 
       color: var(--navy);
 
-      font-weight: 700;
+      font-weight: 600;
     }
 
     .follow-content span {
@@ -871,13 +885,13 @@
 
       color: var(--muted);
 
-      font-size: 9px;
+      font-size: 10px;
 
-      font-weight: 500;
+      font-weight: 400;
 
       margin-top: 4px;
 
-      line-height: 1.5;
+      line-height: 1.55;
     }
 
     .follow-action {
@@ -898,7 +912,7 @@
 
       color: var(--primary);
 
-      font-weight: 700;
+      font-weight: 600;
 
       transition: 0.15s ease;
     }
@@ -909,21 +923,18 @@
       border-color: #BFD4F8;
     }
 
-    /* =====================================
+    /* =========================
        RESPONSIVE
-    ===================================== */
+    ========================= */
 
     @media (max-width: 1200px) {
-
       .stats-grid {
         grid-template-columns:
           repeat(3, minmax(0, 1fr));
       }
-
     }
 
     @media (max-width: 900px) {
-
       .sidebar {
         transform: translateX(-100%);
       }
@@ -947,11 +958,9 @@
       .dashboard-grid {
         grid-template-columns: 1fr;
       }
-
     }
 
     @media (max-width: 680px) {
-
       .topbar {
         padding: 0 15px;
       }
@@ -980,11 +989,9 @@
       .welcome h1 {
         font-size: 21px;
       }
-
     }
 
     @media (max-width: 420px) {
-
       .stats-grid {
         grid-template-columns: 1fr;
       }
@@ -996,12 +1003,11 @@
       .status {
         display: none;
       }
-
     }
 
-    /* =====================================
-       OVERLAY
-    ===================================== */
+    /* =========================
+       MOBILE OVERLAY
+    ========================= */
 
     .overlay {
       display: none;
@@ -1026,7 +1032,10 @@
 
 <div class="app">
 
-  <!-- SIDEBAR -->
+  <!-- =========================
+       SIDEBAR
+  ========================= -->
+
   <aside class="sidebar" id="sidebar">
 
     <div class="brand">
@@ -1142,17 +1151,23 @@
     id="overlay">
   </div>
 
-  <!-- MAIN -->
+  <!-- =========================
+       MAIN
+  ========================= -->
+
   <main class="main">
 
     <!-- TOPBAR -->
+
     <header class="topbar">
 
       <div class="topbar-left">
 
         <button
           class="mobile-menu"
-          id="mobileMenu">
+          id="mobileMenu"
+          aria-label="Open menu"
+        >
           ☰
         </button>
 
@@ -1181,15 +1196,22 @@
           <input
             type="text"
             placeholder="Search patient, ID or phone..."
+            aria-label="Search patients"
           >
 
         </div>
 
-        <button class="icon-button">
+        <button
+          class="icon-button"
+          aria-label="Notifications"
+        >
           ♧
         </button>
 
-        <button class="icon-button">
+        <button
+          class="icon-button"
+          aria-label="Activity"
+        >
           ◔
         </button>
 
@@ -1202,7 +1224,10 @@
     </header>
 
     <!-- CONTENT -->
+
     <section class="content">
+
+      <!-- WELCOME -->
 
       <div class="welcome">
 
@@ -1216,8 +1241,11 @@
 
       </div>
 
-      <!-- STATS -->
+      <!-- STATISTICS -->
+
       <div class="stats-grid">
+
+        <!-- TOTAL PATIENTS -->
 
         <div class="stat-card">
 
@@ -1243,6 +1271,8 @@
 
         </div>
 
+        <!-- ACTIVE PATIENTS -->
+
         <div class="stat-card">
 
           <div class="stat-top">
@@ -1266,6 +1296,8 @@
           </div>
 
         </div>
+
+        <!-- FOLLOW-UP -->
 
         <div class="stat-card">
 
@@ -1291,6 +1323,8 @@
 
         </div>
 
+        <!-- MISSED -->
+
         <div class="stat-card">
 
           <div class="stat-top">
@@ -1314,6 +1348,8 @@
           </div>
 
         </div>
+
+        <!-- GOALS -->
 
         <div class="stat-card">
 
@@ -1341,10 +1377,14 @@
 
       </div>
 
-      <!-- DASHBOARD -->
+      <!-- DASHBOARD GRID -->
+
       <div class="dashboard-grid">
 
-        <!-- APPOINTMENTS -->
+        <!-- =====================
+             APPOINTMENTS
+        ====================== -->
+
         <div class="card">
 
           <div class="card-header">
@@ -1368,6 +1408,8 @@
           </div>
 
           <div class="card-body">
+
+            <!-- APPOINTMENT 1 -->
 
             <div class="appointment-row">
 
@@ -1401,6 +1443,8 @@
 
             </div>
 
+            <!-- APPOINTMENT 2 -->
+
             <div class="appointment-row">
 
               <div class="appointment-left">
@@ -1433,6 +1477,8 @@
 
             </div>
 
+            <!-- APPOINTMENT 3 -->
+
             <div class="appointment-row">
 
               <div class="appointment-left">
@@ -1464,6 +1510,8 @@
               </div>
 
             </div>
+
+            <!-- APPOINTMENT 4 -->
 
             <div class="appointment-row">
 
@@ -1501,7 +1549,10 @@
 
         </div>
 
-        <!-- FOLLOW-UP -->
+        <!-- =====================
+             FOLLOW-UP
+        ====================== -->
+
         <div class="card">
 
           <div class="card-header">
@@ -1526,6 +1577,8 @@
 
           <div class="card-body">
 
+            <!-- FOLLOW-UP 1 -->
+
             <div class="follow-row">
 
               <div
@@ -1544,11 +1597,16 @@
 
               </div>
 
-              <button class="follow-action">
+              <button
+                class="follow-action"
+                aria-label="Open patient"
+              >
                 →
               </button>
 
             </div>
+
+            <!-- FOLLOW-UP 2 -->
 
             <div class="follow-row">
 
@@ -1568,11 +1626,16 @@
 
               </div>
 
-              <button class="follow-action">
+              <button
+                class="follow-action"
+                aria-label="Open patient"
+              >
                 →
               </button>
 
             </div>
+
+            <!-- FOLLOW-UP 3 -->
 
             <div class="follow-row">
 
@@ -1592,11 +1655,16 @@
 
               </div>
 
-              <button class="follow-action">
+              <button
+                class="follow-action"
+                aria-label="Open patient"
+              >
                 →
               </button>
 
             </div>
+
+            <!-- FOLLOW-UP 4 -->
 
             <div class="follow-row">
 
@@ -1616,7 +1684,10 @@
 
               </div>
 
-              <button class="follow-action">
+              <button
+                class="follow-action"
+                aria-label="Open patient"
+              >
                 →
               </button>
 
@@ -1635,38 +1706,19 @@
 </div>
 
 <script>
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
+  const mobileMenu = document.getElementById("mobileMenu");
 
-  const sidebar =
-    document.getElementById("sidebar");
+  mobileMenu.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+    overlay.classList.toggle("show");
+  });
 
-  const overlay =
-    document.getElementById("overlay");
-
-  const mobileMenu =
-    document.getElementById("mobileMenu");
-
-  mobileMenu.addEventListener(
-    "click",
-    () => {
-
-      sidebar.classList.toggle("open");
-
-      overlay.classList.toggle("show");
-
-    }
-  );
-
-  overlay.addEventListener(
-    "click",
-    () => {
-
-      sidebar.classList.remove("open");
-
-      overlay.classList.remove("show");
-
-    }
-  );
-
+  overlay.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    overlay.classList.remove("show");
+  });
 </script>
 
 </body>
