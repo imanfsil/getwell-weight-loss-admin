@@ -2,16 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Getwell Weight Loss Admin</title>
 
-  <!-- =========================================
-       POPPINS
-  ========================================== -->
+  <!-- Poppins -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -22,9 +17,9 @@
 
   <style>
 
-    /* =========================================
+    /* =====================================================
        GETWELL DESIGN SYSTEM
-    ========================================== */
+    ====================================================== */
 
     :root {
       --primary: #2563EB;
@@ -65,9 +60,9 @@
     }
 
 
-    /* =========================================
+    /* =====================================================
        RESET
-    ========================================== */
+    ====================================================== */
 
     * {
       box-sizing: border-box;
@@ -107,9 +102,9 @@
     }
 
 
-    /* =========================================
+    /* =====================================================
        APP
-    ========================================== */
+    ====================================================== */
 
     .app {
       display: flex;
@@ -117,9 +112,9 @@
     }
 
 
-    /* =========================================
+    /* =====================================================
        SIDEBAR
-    ========================================== */
+    ====================================================== */
 
     .sidebar {
       width: 250px;
@@ -142,9 +137,6 @@
 
       transition: transform 0.25s ease;
     }
-
-
-    /* BRAND */
 
     .brand {
       height: 74px;
@@ -222,9 +214,6 @@
       margin-top: 1px;
     }
 
-
-    /* SIDEBAR CONTENT */
-
     .sidebar-content {
       padding: 18px 13px;
 
@@ -232,9 +221,6 @@
 
       overflow-y: auto;
     }
-
-
-    /* SECTION TITLE */
 
     .nav-section-title {
       font-size: 10px;
@@ -249,9 +235,6 @@
 
       margin-bottom: 4px;
     }
-
-
-    /* NAV ITEM */
 
     .nav-item {
       display: flex;
@@ -288,7 +271,6 @@
     .nav-item.active {
       background: var(--primary-soft);
       color: var(--primary);
-
       font-weight: 600;
     }
 
@@ -309,9 +291,6 @@
       width: 15px;
       height: 15px;
     }
-
-
-    /* SIDEBAR ADMIN */
 
     .sidebar-bottom {
       padding: 14px;
@@ -391,9 +370,9 @@
     }
 
 
-    /* =========================================
+    /* =====================================================
        MAIN
-    ========================================== */
+    ====================================================== */
 
     .main {
       margin-left: 250px;
@@ -404,9 +383,9 @@
     }
 
 
-    /* =========================================
+    /* =====================================================
        TOPBAR
-    ========================================== */
+    ====================================================== */
 
     .topbar {
       height: 74px;
@@ -417,15 +396,12 @@
       border-bottom: 1px solid var(--border);
 
       display: flex;
-
       align-items: center;
-
       justify-content: space-between;
 
       padding: 0 28px;
 
       position: sticky;
-
       top: 0;
 
       z-index: 900;
@@ -435,14 +411,28 @@
 
     .topbar-left {
       display: flex;
-
       align-items: center;
 
       gap: 12px;
     }
 
+    .mobile-menu {
+      display: none;
 
-    /* TITLE GROUP */
+      width: 38px;
+      height: 38px;
+
+      border-radius: 9px;
+
+      background: var(--white);
+
+      border: 1px solid var(--border);
+
+      align-items: center;
+      justify-content: center;
+
+      color: var(--navy);
+    }
 
     .page-title-group {
       height: 40px;
@@ -474,41 +464,12 @@
       margin-top: 1px;
     }
 
-
-    /* MOBILE MENU */
-
-    .mobile-menu {
-      display: none;
-
-      width: 38px;
-      height: 38px;
-
-      border-radius: 9px;
-
-      background: var(--white);
-
-      border: 1px solid var(--border);
-
-      align-items: center;
-      justify-content: center;
-
-      font-size: 17px;
-
-      color: var(--navy);
-    }
-
-
-    /* TOPBAR RIGHT */
-
     .topbar-right {
       display: flex;
       align-items: center;
 
       gap: 9px;
     }
-
-
-    /* SEARCH */
 
     .search-box {
       width: 270px;
@@ -521,7 +482,6 @@
       border-radius: 9px;
 
       display: flex;
-
       align-items: center;
 
       padding: 0 12px;
@@ -562,11 +522,8 @@
     }
 
     .search-box input::placeholder {
-      color: #94A3B8;
+      color: var(--muted-light);
     }
-
-
-    /* ICON BUTTON */
 
     .icon-button {
       width: 40px;
@@ -579,7 +536,6 @@
       background: var(--white);
 
       display: flex;
-
       align-items: center;
       justify-content: center;
 
@@ -601,9 +557,6 @@
       height: 16px;
     }
 
-
-    /* USER AVATAR */
-
     .user-avatar {
       width: 38px;
       height: 38px;
@@ -615,7 +568,6 @@
       color: var(--white);
 
       display: flex;
-
       justify-content: center;
       align-items: center;
 
@@ -624,9 +576,9 @@
     }
 
 
-    /* =========================================
+    /* =====================================================
        CONTENT
-    ========================================== */
+    ====================================================== */
 
     .content {
       padding: 30px;
@@ -635,9 +587,6 @@
 
       margin: 0 auto;
     }
-
-
-    /* WELCOME */
 
     .welcome {
       margin-bottom: 24px;
@@ -668,9 +617,9 @@
     }
 
 
-    /* =========================================
+    /* =====================================================
        STATISTICS
-    ========================================== */
+    ====================================================== */
 
     .stats-grid {
       display: grid;
@@ -729,8 +678,6 @@
       line-height: 14px;
     }
 
-    /* UNIQUE STAT ICON */
-
     .stat-icon {
       width: 34px;
       height: 34px;
@@ -782,9 +729,9 @@
     }
 
 
-    /* =========================================
+    /* =====================================================
        DASHBOARD GRID
-    ========================================== */
+    ====================================================== */
 
     .dashboard-grid {
       display: grid;
@@ -795,9 +742,6 @@
 
       gap: 20px;
     }
-
-
-    /* CARD */
 
     .card {
       background: var(--white);
@@ -810,9 +754,6 @@
 
       overflow: hidden;
     }
-
-
-    /* CARD HEADER */
 
     .card-header {
       padding: 18px 20px;
@@ -851,9 +792,9 @@
     }
 
 
-    /* =========================================
+    /* =====================================================
        APPOINTMENTS
-    ========================================== */
+    ====================================================== */
 
     .appointment-row {
       padding: 15px 20px;
@@ -955,9 +896,6 @@
       margin-top: 2px;
     }
 
-
-    /* STATUS */
-
     .status {
       display: inline-flex;
 
@@ -995,9 +933,9 @@
     }
 
 
-    /* =========================================
+    /* =====================================================
        FOLLOW-UP
-    ========================================== */
+    ====================================================== */
 
     .follow-row {
       padding: 15px 20px;
@@ -1103,9 +1041,9 @@
     }
 
 
-    /* =========================================
+    /* =====================================================
        MOBILE OVERLAY
-    ========================================== */
+    ====================================================== */
 
     .overlay {
       display: none;
@@ -1114,7 +1052,8 @@
 
       inset: 0;
 
-      background: rgba(15, 23, 42, 0.35);
+      background:
+        rgba(15, 23, 42, 0.35);
 
       z-index: 950;
     }
@@ -1124,27 +1063,26 @@
     }
 
 
-    /* =========================================
+    /* =====================================================
        RESPONSIVE
-    ========================================== */
+    ====================================================== */
 
     @media (max-width: 1200px) {
-
       .stats-grid {
         grid-template-columns:
           repeat(3, minmax(0, 1fr));
       }
     }
 
-
     @media (max-width: 900px) {
-
       .sidebar {
-        transform: translateX(-100%);
+        transform:
+          translateX(-100%);
       }
 
       .sidebar.open {
-        transform: translateX(0);
+        transform:
+          translateX(0);
       }
 
       .main {
@@ -1156,7 +1094,7 @@
       }
 
       .search-box {
-        width: 200px;
+        width: 210px;
       }
 
       .dashboard-grid {
@@ -1164,9 +1102,7 @@
       }
     }
 
-
     @media (max-width: 680px) {
-
       .topbar {
         padding: 0 15px;
       }
@@ -1197,9 +1133,7 @@
       }
     }
 
-
     @media (max-width: 420px) {
-
       .stats-grid {
         grid-template-columns: 1fr;
       }
@@ -1219,396 +1153,464 @@
 
 <body>
 
-  <div class="app">
+<div class="app">
 
 
-    <!-- =========================================
-         SIDEBAR
-    ========================================== -->
+  <!-- =====================================================
+       SIDEBAR
+  ====================================================== -->
 
-    <aside
-      class="sidebar"
-      id="sidebar"
-    >
+  <aside
+    class="sidebar"
+    id="sidebar"
+  >
 
-      <!-- BRAND -->
+    <!-- BRAND -->
 
-      <div class="brand">
+    <div class="brand">
 
-        <div class="brand-mark">
-          G
+      <div class="brand-mark">
+        G
+      </div>
+
+      <div class="brand-text">
+
+        <strong>
+          GETWELL
+        </strong>
+
+        <span>
+          Weight Loss Admin
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <!-- NAVIGATION -->
+
+    <div class="sidebar-content">
+
+
+      <!-- MAIN -->
+
+      <div class="nav-section-title">
+        Main
+      </div>
+
+
+      <!-- DASHBOARD -->
+
+      <a
+        class="nav-item active"
+        href="index.html"
+      >
+
+        <span class="nav-icon">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 12l9-9 9 9"></path>
+            <path d="M5 10v10h14V10"></path>
+            <path d="M9 20v-6h6v6"></path>
+          </svg>
+
+        </span>
+
+        Dashboard
+
+      </a>
+
+
+      <!-- PATIENTS -->
+
+      <a
+        class="nav-item"
+        href="patients.html"
+      >
+
+        <span class="nav-icon">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle
+              cx="9"
+              cy="8"
+              r="3"
+            ></circle>
+
+            <path
+              d="M3.5 20a5.5 5.5 0 0111 0"
+            ></path>
+
+            <path
+              d="M15 5.5a3 3 0 010 5"
+            ></path>
+
+            <path
+              d="M17 13.5a5.5 5.5 0 013.5 5"
+            ></path>
+          </svg>
+
+        </span>
+
+        Patients
+
+      </a>
+
+
+      <!-- APPOINTMENTS -->
+
+      <button
+        class="nav-item"
+        onclick="showComingSoon('Appointments')"
+      >
+
+        <span class="nav-icon">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect
+              x="3"
+              y="4"
+              width="18"
+              height="17"
+              rx="2"
+            ></rect>
+
+            <line
+              x1="16"
+              y1="2"
+              x2="16"
+              y2="6"
+            ></line>
+
+            <line
+              x1="8"
+              y1="2"
+              x2="8"
+              y2="6"
+            ></line>
+
+            <line
+              x1="3"
+              y1="10"
+              x2="21"
+              y2="10"
+            ></line>
+          </svg>
+
+        </span>
+
+        Appointments
+
+      </button>
+
+
+      <!-- PROGRAM -->
+
+      <div
+        class="nav-section-title"
+        style="margin-top:14px;"
+      >
+        Program
+      </div>
+
+
+      <!-- TREATMENTS -->
+
+      <button
+        class="nav-item"
+        onclick="showComingSoon('Treatments')"
+      >
+
+        <span class="nav-icon">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M14 4l6 6"></path>
+            <path d="M13 5l6 6"></path>
+            <path d="M5 19l5-5"></path>
+            <path d="M3 21l2-2"></path>
+            <path d="M9 15l-4-4"></path>
+            <path d="M11 13l-4-4"></path>
+            <path d="M7 17l-4-4"></path>
+          </svg>
+
+        </span>
+
+        Treatments
+
+      </button>
+
+
+      <!-- PROGRESS -->
+
+      <button
+        class="nav-item"
+        onclick="showComingSoon('Progress')"
+      >
+
+        <span class="nav-icon">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M4 19V5"></path>
+            <path d="M4 19h16"></path>
+            <path d="M7 15l4-4 3 2 5-6"></path>
+            <path d="M16 7h3v3"></path>
+          </svg>
+
+        </span>
+
+        Progress
+
+      </button>
+
+
+      <!-- FOLLOW-UP -->
+
+      <button
+        class="nav-item"
+        onclick="showComingSoon('Follow-Up')"
+      >
+
+        <span class="nav-icon">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="9"
+            ></circle>
+
+            <path d="M12 8v5"></path>
+            <path d="M12 16h.01"></path>
+          </svg>
+
+        </span>
+
+        Follow-Up
+
+      </button>
+
+
+      <!-- MANAGEMENT -->
+
+      <div
+        class="nav-section-title"
+        style="margin-top:14px;"
+      >
+        Management
+      </div>
+
+
+      <!-- REPORTS -->
+
+      <button
+        class="nav-item"
+        onclick="showComingSoon('Reports')"
+      >
+
+        <span class="nav-icon">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect
+              x="4"
+              y="4"
+              width="16"
+              height="17"
+              rx="2"
+            ></rect>
+
+            <path d="M8 16v-3"></path>
+            <path d="M12 16V9"></path>
+            <path d="M16 16v-5"></path>
+          </svg>
+
+        </span>
+
+        Reports
+
+      </button>
+
+
+      <!-- SETTINGS -->
+
+      <button
+        class="nav-item"
+        onclick="showComingSoon('Settings')"
+      >
+
+        <span class="nav-icon">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="3"
+            ></circle>
+
+            <path
+              d="M19.4 15a1.7 1.7 0 00.34 1.88l.06.06-1.8 1.8-.06-.06a1.7 1.7 0 00-1.88-.34 1.7 1.7 0 00-1.03 1.55V20H12v-.09a1.7 1.7 0 00-1.03-1.55 1.7 1.7 0 00-1.88.34l-.06.06-1.8-1.8.06-.06A1.7 1.7 0 007.63 15a1.7 1.7 0 00-1.55-1.03H6V11h.09a1.7 1.7 0 001.55-1.03 1.7 1.7 0 00-.34-1.88l-.06-.06 1.8-1.8.06.06a1.7 1.7 0 001.88.34A1.7 1.7 0 0012 4.09V4h3v.09a1.7 1.7 0 001.03 1.55 1.7 1.7 0 001.88-.34l.06-.06 1.8 1.8-.06.06A1.7 1.7 0 0019.4 9c.1.5.5.88 1.03.97H20v3h.09c-.53.09-.93.47-1.03 1.03z"
+            ></path>
+          </svg>
+
+        </span>
+
+        Settings
+
+      </button>
+
+    </div>
+
+
+    <!-- ADMIN -->
+
+    <div class="sidebar-bottom">
+
+      <div class="admin-card">
+
+        <div class="admin-avatar">
+          A
         </div>
 
-        <div class="brand-text">
+        <div class="admin-info">
 
           <strong>
-            GETWELL
+            Administrator
           </strong>
 
           <span>
-            Weight Loss Admin
+            Weight Loss Program
           </span>
 
         </div>
 
       </div>
 
+    </div>
 
-      <!-- NAVIGATION -->
-
-      <div class="sidebar-content">
-
-
-        <!-- MAIN -->
-
-        <div class="nav-section-title">
-          Main
-        </div>
+  </aside>
 
 
-        <button
-          class="nav-item active"
-        >
+  <!-- MOBILE OVERLAY -->
 
-          <span class="nav-icon">
+  <div
+    class="overlay"
+    id="overlay"
+  ></div>
 
-            <!-- Dashboard -->
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M3 12l9-9 9 9"></path>
-              <path d="M5 10v10h14V10"></path>
-              <path d="M9 20v-6h6v6"></path>
-            </svg>
 
-          </span>
+  <!-- =====================================================
+       MAIN CONTENT
+  ====================================================== -->
 
-          Dashboard
+  <main class="main">
 
-        </button>
 
+    <!-- TOPBAR -->
+
+    <header class="topbar">
+
+      <div class="topbar-left">
 
         <button
-          class="nav-item"
+          class="mobile-menu"
+          id="mobileMenu"
+          aria-label="Open menu"
         >
 
-          <span class="nav-icon">
-
-            <!-- Patients -->
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="9" cy="8" r="3"></circle>
-              <path d="M3.5 20a5.5 5.5 0 0111 0"></path>
-              <path d="M15 5.5a3 3 0 010 5"></path>
-              <path d="M17 13.5a5.5 5.5 0 013.5 5"></path>
-            </svg>
-
-          </span>
-
-          Patients
-
-        </button>
-
-
-        <button
-          class="nav-item"
-        >
-
-          <span class="nav-icon">
-
-            <!-- Calendar -->
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <rect
-                x="3"
-                y="4"
-                width="18"
-                height="17"
-                rx="2"
-              ></rect>
-
-              <line
-                x1="16"
-                y1="2"
-                x2="16"
-                y2="6"
-              ></line>
-
-              <line
-                x1="8"
-                y1="2"
-                x2="8"
-                y2="6"
-              ></line>
-
-              <line
-                x1="3"
-                y1="10"
-                x2="21"
-                y2="10"
-              ></line>
-            </svg>
-
-          </span>
-
-          Appointments
-
-        </button>
-
-
-        <!-- PROGRAM -->
-
-        <div
-          class="nav-section-title"
-          style="margin-top:14px;"
-        >
-          Program
-        </div>
-
-
-        <button
-          class="nav-item"
-        >
-
-          <span class="nav-icon">
-
-            <!-- Treatment / Syringe -->
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M14 4l6 6"></path>
-              <path d="M13 5l6 6"></path>
-              <path d="M5 19l5-5"></path>
-              <path d="M3 21l2-2"></path>
-              <path d="M9 15l-4-4"></path>
-              <path d="M11 13l-4-4"></path>
-              <path d="M7 17l-4-4"></path>
-            </svg>
-
-          </span>
-
-          Treatments
-
-        </button>
-
-
-        <button
-          class="nav-item"
-        >
-
-          <span class="nav-icon">
-
-            <!-- Progress -->
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M4 19V5"></path>
-              <path d="M4 19h16"></path>
-              <path d="M7 15l4-4 3 2 5-6"></path>
-              <path d="M16 7h3v3"></path>
-            </svg>
-
-          </span>
-
-          Progress
-
-        </button>
-
-
-        <button
-          class="nav-item"
-        >
-
-          <span class="nav-icon">
-
-            <!-- Follow Up -->
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle
-                cx="12"
-                cy="12"
-                r="9"
-              ></circle>
-
-              <path d="M12 8v5"></path>
-              <path d="M12 16h.01"></path>
-            </svg>
-
-          </span>
-
-          Follow-Up
-
-        </button>
-
-
-        <!-- MANAGEMENT -->
-
-        <div
-          class="nav-section-title"
-          style="margin-top:14px;"
-        >
-          Management
-        </div>
-
-
-        <button
-          class="nav-item"
-        >
-
-          <span class="nav-icon">
-
-            <!-- Reports -->
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <rect
-                x="4"
-                y="4"
-                width="16"
-                height="17"
-                rx="2"
-              ></rect>
-
-              <path d="M8 16v-3"></path>
-              <path d="M12 16V9"></path>
-              <path d="M16 16v-5"></path>
-            </svg>
-
-          </span>
-
-          Reports
-
-        </button>
-
-
-        <button
-          class="nav-item"
-        >
-
-          <span class="nav-icon">
-
-            <!-- Settings -->
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle
-                cx="12"
-                cy="12"
-                r="3"
-              ></circle>
-
-              <path d="M19.4 15a1.7 1.7 0 00.34 1.88l.06.06-1.8 1.8-.06-.06a1.7 1.7 0 00-1.88-.34 1.7 1.7 0 00-1.03 1.55V20H12v-.09a1.7 1.7 0 00-1.03-1.55 1.7 1.7 0 00-1.88.34l-.06.06-1.8-1.8.06-.06A1.7 1.7 0 007.63 15a1.7 1.7 0 00-1.55-1.03H6V11h.09a1.7 1.7 0 001.55-1.03 1.7 1.7 0 00-.34-1.88l-.06-.06 1.8-1.8.06.06a1.7 1.7 0 001.88.34A1.7 1.7 0 0012 4.09V4h3v.09a1.7 1.7 0 001.03 1.55 1.7 1.7 0 001.88-.34l.06-.06 1.8 1.8-.06.06A1.7 1.7 0 0019.4 9c.1.5.5.88 1.03.97H20v3h.09c-.53.09-.93.47-1.03 1.03z"></path>
-            </svg>
-
-          </span>
-
-          Settings
-
-        </button>
-
-      </div>
-
-
-      <!-- ADMIN -->
-
-      <div class="sidebar-bottom">
-
-        <div class="admin-card">
-
-          <div class="admin-avatar">
-            A
-          </div>
-
-          <div class="admin-info">
-
-            <strong>
-              Administrator
-            </strong>
-
-            <span>
-              Weight Loss Program
-            </span>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </aside>
-
-
-    <!-- MOBILE OVERLAY -->
-
-    <div
-      class="overlay"
-      id="overlay"
-    ></div>
-
-
-    <!-- =========================================
-         MAIN
-    ========================================== -->
-
-    <main class="main">
-
-
-      <!-- TOPBAR -->
-
-      <header class="topbar">
-
-        <div class="topbar-left">
-
-
-          <!-- MOBILE MENU -->
-
-          <button
-            class="mobile-menu"
-            id="mobileMenu"
-            aria-label="Open menu"
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
           >
+            <path d="M4 7h16"></path>
+            <path d="M4 12h16"></path>
+            <path d="M4 17h16"></path>
+          </svg>
+
+        </button>
+
+
+        <div class="page-title-group">
+
+          <div class="page-title">
+            Dashboard
+          </div>
+
+          <div class="page-subtitle">
+            Weight Loss Program Management
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="topbar-right">
+
+
+        <!-- SEARCH -->
+
+        <div class="search-box">
+
+          <span class="search-icon">
 
             <svg
               viewBox="0 0 24 24"
@@ -1617,912 +1619,877 @@
               stroke-width="2"
               stroke-linecap="round"
             >
-              <path d="M4 7h16"></path>
-              <path d="M4 12h16"></path>
-              <path d="M4 17h16"></path>
+              <circle
+                cx="11"
+                cy="11"
+                r="7"
+              ></circle>
+
+              <path
+                d="M20 20l-4-4"
+              ></path>
             </svg>
 
-          </button>
+          </span>
 
-
-          <!-- PAGE TITLE -->
-
-          <div class="page-title-group">
-
-            <div class="page-title">
-              Dashboard
-            </div>
-
-            <div class="page-subtitle">
-              Weight Loss Program Management
-            </div>
-
-          </div>
+          <input
+            type="text"
+            placeholder="Search patient, ID or phone..."
+            aria-label="Search patients"
+          >
 
         </div>
 
 
-        <!-- TOPBAR RIGHT -->
+        <!-- NOTIFICATIONS -->
 
-        <div class="topbar-right">
+        <button
+          class="icon-button"
+          aria-label="Notifications"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M18 8a6 6 0 00-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"
+            ></path>
+
+            <path d="M10 21h4"></path>
+          </svg>
+
+        </button>
 
 
-          <!-- SEARCH -->
+        <!-- ACTIVITY -->
 
-          <div class="search-box">
+        <button
+          class="icon-button"
+          aria-label="Activity"
+        >
 
-            <span class="search-icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="9"
+            ></circle>
+
+            <path d="M12 7v5l3 2"></path>
+          </svg>
+
+        </button>
+
+
+        <!-- USER -->
+
+        <div class="user-avatar">
+          A
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         DASHBOARD CONTENT
+    ====================================================== -->
+
+    <section class="content">
+
+
+      <!-- WELCOME -->
+
+      <div class="welcome">
+
+        <h1>
+          Good afternoon, Admin
+        </h1>
+
+        <p>
+          Here's what's happening with the weight loss program today.
+        </p>
+
+      </div>
+
+
+      <!-- =================================================
+           STAT CARDS
+      ================================================== -->
+
+      <div class="stats-grid">
+
+
+        <!-- TOTAL PATIENTS -->
+
+        <div class="stat-card">
+
+          <div class="stat-top">
+
+            <span class="stat-label">
+              Total Patients
+            </span>
+
+            <div class="stat-icon">
 
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
                 stroke-linecap="round"
+                stroke-linejoin="round"
               >
                 <circle
-                  cx="11"
-                  cy="11"
-                  r="7"
+                  cx="9"
+                  cy="8"
+                  r="3"
                 ></circle>
 
                 <path
-                  d="M20 20l-4-4"
+                  d="M3.5 20a5.5 5.5 0 0111 0"
+                ></path>
+
+                <path
+                  d="M15 5.5a3 3 0 010 5"
+                ></path>
+
+                <path
+                  d="M17 13.5a5.5 5.5 0 013.5 5"
                 ></path>
               </svg>
 
+            </div>
+
+          </div>
+
+          <div class="stat-number">
+            128
+          </div>
+
+          <div class="stat-meta">
+            All registered patients
+          </div>
+
+        </div>
+
+
+        <!-- ACTIVE PATIENTS -->
+
+        <div class="stat-card">
+
+          <div class="stat-top">
+
+            <span class="stat-label">
+              Active Patients
             </span>
 
-            <input
-              type="text"
-              placeholder="Search patient, ID or phone..."
-              aria-label="Search patients"
-            >
+            <div class="stat-icon">
 
-          </div>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle
+                  cx="9"
+                  cy="8"
+                  r="3"
+                ></circle>
 
+                <path
+                  d="M3.5 20a5.5 5.5 0 0111 0"
+                ></path>
 
-          <!-- NOTIFICATION -->
+                <path
+                  d="M16 15l2 2 4-4"
+                ></path>
+              </svg>
 
-          <button
-            class="icon-button"
-            aria-label="Notifications"
-          >
-
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M18 8a6 6 0 00-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"
-              ></path>
-
-              <path
-                d="M10 21h4"
-              ></path>
-            </svg>
-
-          </button>
-
-
-          <!-- ACTIVITY -->
-
-          <button
-            class="icon-button"
-            aria-label="Activity"
-          >
-
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle
-                cx="12"
-                cy="12"
-                r="9"
-              ></circle>
-
-              <path
-                d="M12 7v5l3 2"
-              ></path>
-            </svg>
-
-          </button>
-
-
-          <!-- USER -->
-
-          <div class="user-avatar">
-            A
-          </div>
-
-        </div>
-
-      </header>
-
-
-      <!-- =========================================
-           CONTENT
-      ========================================== -->
-
-      <section class="content">
-
-
-        <!-- WELCOME -->
-
-        <div class="welcome">
-
-          <h1>
-            Good afternoon, Admin
-          </h1>
-
-          <p>
-            Here's what's happening with the weight loss program today.
-          </p>
-
-        </div>
-
-
-        <!-- =====================================
-             STAT CARDS
-        ====================================== -->
-
-        <div class="stats-grid">
-
-
-          <!-- TOTAL PATIENTS -->
-
-          <div class="stat-card">
-
-            <div class="stat-top">
-
-              <span class="stat-label">
-                Total Patients
-              </span>
-
-              <div class="stat-icon">
-
-                <!-- USERS ICON -->
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <circle
-                    cx="9"
-                    cy="8"
-                    r="3"
-                  ></circle>
-
-                  <path
-                    d="M3.5 20a5.5 5.5 0 0111 0"
-                  ></path>
-
-                  <path
-                    d="M15 5.5a3 3 0 010 5"
-                  ></path>
-
-                  <path
-                    d="M17 13.5a5.5 5.5 0 013.5 5"
-                  ></path>
-                </svg>
-
-              </div>
-
-            </div>
-
-            <div class="stat-number">
-              128
-            </div>
-
-            <div class="stat-meta">
-              All registered patients
             </div>
 
           </div>
 
-
-          <!-- ACTIVE PATIENTS -->
-
-          <div class="stat-card">
-
-            <div class="stat-top">
-
-              <span class="stat-label">
-                Active Patients
-              </span>
-
-              <div class="stat-icon">
-
-                <!-- USER CHECK ICON -->
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <circle
-                    cx="9"
-                    cy="8"
-                    r="3"
-                  ></circle>
-
-                  <path
-                    d="M3.5 20a5.5 5.5 0 0111 0"
-                  ></path>
-
-                  <path
-                    d="M16 15l2 2 4-4"
-                  ></path>
-                </svg>
-
-              </div>
-
-            </div>
-
-            <div class="stat-number">
-              86
-            </div>
-
-            <div class="stat-meta">
-              Currently in program
-            </div>
-
+          <div class="stat-number">
+            86
           </div>
 
-
-          <!-- DUE FOLLOW-UP -->
-
-          <div class="stat-card">
-
-            <div class="stat-top">
-
-              <span class="stat-label">
-                Due Follow-Up
-              </span>
-
-              <div class="stat-icon">
-
-                <!-- CALENDAR CLOCK ICON -->
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <rect
-                    x="3"
-                    y="4"
-                    width="18"
-                    height="17"
-                    rx="2"
-                  ></rect>
-
-                  <line
-                    x1="8"
-                    y1="2"
-                    x2="8"
-                    y2="6"
-                  ></line>
-
-                  <line
-                    x1="16"
-                    y1="2"
-                    x2="16"
-                    y2="6"
-                  ></line>
-
-                  <line
-                    x1="3"
-                    y1="9"
-                    x2="21"
-                    y2="9"
-                  ></line>
-
-                  <circle
-                    cx="16"
-                    cy="15"
-                    r="3"
-                  ></circle>
-
-                  <path
-                    d="M16 13.5v1.7l1.1.8"
-                  ></path>
-                </svg>
-
-              </div>
-
-            </div>
-
-            <div class="stat-number">
-              14
-            </div>
-
-            <div class="stat-meta">
-              Require attention
-            </div>
-
-          </div>
-
-
-          <!-- MISSED -->
-
-          <div class="stat-card">
-
-            <div class="stat-top">
-
-              <span class="stat-label">
-                Missed
-              </span>
-
-              <div class="stat-icon">
-
-                <!-- CALENDAR X ICON -->
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <rect
-                    x="3"
-                    y="4"
-                    width="18"
-                    height="17"
-                    rx="2"
-                  ></rect>
-
-                  <line
-                    x1="8"
-                    y1="2"
-                    x2="8"
-                    y2="6"
-                  ></line>
-
-                  <line
-                    x1="16"
-                    y1="2"
-                    x2="16"
-                    y2="6"
-                  ></line>
-
-                  <line
-                    x1="3"
-                    y1="9"
-                    x2="21"
-                    y2="9"
-                  ></line>
-
-                  <path
-                    d="M9 13l6 6"
-                  ></path>
-
-                  <path
-                    d="M15 13l-6 6"
-                  ></path>
-                </svg>
-
-              </div>
-
-            </div>
-
-            <div class="stat-number">
-              6
-            </div>
-
-            <div class="stat-meta">
-              Missed appointments
-            </div>
-
-          </div>
-
-
-          <!-- GOALS COMPLETED -->
-
-          <div class="stat-card">
-
-            <div class="stat-top">
-
-              <span class="stat-label">
-                Goals Completed
-              </span>
-
-              <div class="stat-icon">
-
-                <!-- TARGET ICON -->
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="9"
-                  ></circle>
-
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="5"
-                  ></circle>
-
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="1.5"
-                  ></circle>
-                </svg>
-
-              </div>
-
-            </div>
-
-            <div class="stat-number">
-              18
-            </div>
-
-            <div class="stat-meta">
-              Program completed
-            </div>
-
+          <div class="stat-meta">
+            Currently in program
           </div>
 
         </div>
 
 
-        <!-- =====================================
-             LOWER DASHBOARD
-        ====================================== -->
+        <!-- DUE FOLLOW-UP -->
 
-        <div class="dashboard-grid">
+        <div class="stat-card">
+
+          <div class="stat-top">
+
+            <span class="stat-label">
+              Due Follow-Up
+            </span>
+
+            <div class="stat-icon">
+
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect
+                  x="3"
+                  y="4"
+                  width="18"
+                  height="17"
+                  rx="2"
+                ></rect>
+
+                <line
+                  x1="8"
+                  y1="2"
+                  x2="8"
+                  y2="6"
+                ></line>
+
+                <line
+                  x1="16"
+                  y1="2"
+                  x2="16"
+                  y2="6"
+                ></line>
+
+                <line
+                  x1="3"
+                  y1="9"
+                  x2="21"
+                  y2="9"
+                ></line>
+
+                <circle
+                  cx="16"
+                  cy="15"
+                  r="3"
+                ></circle>
+
+                <path
+                  d="M16 13.5v1.7l1.1.8"
+                ></path>
+              </svg>
+
+            </div>
+
+          </div>
+
+          <div class="stat-number">
+            14
+          </div>
+
+          <div class="stat-meta">
+            Require attention
+          </div>
+
+        </div>
 
 
-          <!-- =====================================
-               TODAY'S APPOINTMENTS
-          ====================================== -->
+        <!-- MISSED -->
 
-          <div class="card">
+        <div class="stat-card">
+
+          <div class="stat-top">
+
+            <span class="stat-label">
+              Missed
+            </span>
+
+            <div class="stat-icon">
+
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect
+                  x="3"
+                  y="4"
+                  width="18"
+                  height="17"
+                  rx="2"
+                ></rect>
+
+                <line
+                  x1="8"
+                  y1="2"
+                  x2="8"
+                  y2="6"
+                ></line>
+
+                <line
+                  x1="16"
+                  y1="2"
+                  x2="16"
+                  y2="6"
+                ></line>
+
+                <line
+                  x1="3"
+                  y1="9"
+                  x2="21"
+                  y2="9"
+                ></line>
+
+                <path
+                  d="M9 13l6 6"
+                ></path>
+
+                <path
+                  d="M15 13l-6 6"
+                ></path>
+              </svg>
+
+            </div>
+
+          </div>
+
+          <div class="stat-number">
+            6
+          </div>
+
+          <div class="stat-meta">
+            Missed appointments
+          </div>
+
+        </div>
 
 
-            <div class="card-header">
+        <!-- GOALS -->
 
-              <div>
+        <div class="stat-card">
 
-                <h2>
-                  Today's Appointments
-                </h2>
+          <div class="stat-top">
 
-                <span>
-                  Thursday, 20 August 2026
-                </span>
+            <span class="stat-label">
+              Goals Completed
+            </span>
 
-              </div>
+            <div class="stat-icon">
+
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="9"
+                ></circle>
+
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="5"
+                ></circle>
+
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="1.5"
+                ></circle>
+              </svg>
+
+            </div>
+
+          </div>
+
+          <div class="stat-number">
+            18
+          </div>
+
+          <div class="stat-meta">
+            Program completed
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           LOWER DASHBOARD
+      ================================================== -->
+
+      <div class="dashboard-grid">
+
+
+        <!-- TODAY'S APPOINTMENTS -->
+
+        <div class="card">
+
+          <div class="card-header">
+
+            <div>
+
+              <h2>
+                Today's Appointments
+              </h2>
 
               <span>
-                View all →
+                Thursday, 20 August 2026
               </span>
 
             </div>
 
-
-            <div class="card-body">
-
-
-              <!-- APPOINTMENT 1 -->
-
-              <div class="appointment-row">
-
-                <div class="appointment-left">
-
-                  <div class="appointment-time">
-                    09:30
-                  </div>
-
-                  <div class="patient-avatar">
-                    AA
-                  </div>
-
-                  <div class="appointment-info">
-
-                    <strong>
-                      Aisyah Abdullah
-                    </strong>
-
-                    <span>
-                      Week 6 · Body Composition
-                    </span>
-
-                  </div>
-
-                </div>
-
-                <div class="status completed">
-                  Completed
-                </div>
-
-              </div>
-
-
-              <!-- APPOINTMENT 2 -->
-
-              <div class="appointment-row">
-
-                <div class="appointment-left">
-
-                  <div class="appointment-time">
-                    10:30
-                  </div>
-
-                  <div class="patient-avatar">
-                    BR
-                  </div>
-
-                  <div class="appointment-info">
-
-                    <strong>
-                      Brandon Wilbert
-                    </strong>
-
-                    <span>
-                      Week 3 · Review
-                    </span>
-
-                  </div>
-
-                </div>
-
-                <div class="status upcoming">
-                  Upcoming
-                </div>
-
-              </div>
-
-
-              <!-- APPOINTMENT 3 -->
-
-              <div class="appointment-row">
-
-                <div class="appointment-left">
-
-                  <div class="appointment-time">
-                    11:30
-                  </div>
-
-                  <div class="patient-avatar">
-                    SZ
-                  </div>
-
-                  <div class="appointment-info">
-
-                    <strong>
-                      Sarah Zakaria
-                    </strong>
-
-                    <span>
-                      Week 8 · Follow-Up
-                    </span>
-
-                  </div>
-
-                </div>
-
-                <div class="status alert">
-                  Attention
-                </div>
-
-              </div>
-
-
-              <!-- APPOINTMENT 4 -->
-
-              <div class="appointment-row">
-
-                <div class="appointment-left">
-
-                  <div class="appointment-time">
-                    14:00
-                  </div>
-
-                  <div class="patient-avatar">
-                    DM
-                  </div>
-
-                  <div class="appointment-info">
-
-                    <strong>
-                      Daniel Malik
-                    </strong>
-
-                    <span>
-                      Week 4 · Body Composition
-                    </span>
-
-                  </div>
-
-                </div>
-
-                <div class="status upcoming">
-                  Upcoming
-                </div>
-
-              </div>
-
-            </div>
+            <span>
+              View all →
+            </span>
 
           </div>
 
 
-          <!-- =====================================
-               PATIENTS NEEDING ATTENTION
-          ====================================== -->
-
-          <div class="card">
+          <div class="card-body">
 
 
-            <div class="card-header">
+            <!-- 09:30 -->
 
-              <div>
+            <div class="appointment-row">
 
-                <h2>
-                  Patients Needing Attention
-                </h2>
+              <div class="appointment-left">
 
-                <span>
-                  Follow-up required
-                </span>
-
-              </div>
-
-              <span>
-                14 total
-              </span>
-
-            </div>
-
-
-            <div class="card-body">
-
-
-              <!-- PATIENT 1 -->
-
-              <div class="follow-row">
-
-                <div
-                  class="priority-dot priority-high"
-                ></div>
-
-                <div class="follow-content">
-
-                  <strong>
-                    Sarah Zakaria
-                  </strong>
-
-                  <span>
-                    Appointment overdue by 2 days.
-                  </span>
-
+                <div class="appointment-time">
+                  09:30
                 </div>
 
-                <button
-                  class="follow-action"
-                  aria-label="Open patient"
-                >
-
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M5 12h13"></path>
-                    <path d="M13 6l6 6-6 6"></path>
-                  </svg>
-
-                </button>
-
-              </div>
-
-
-              <!-- PATIENT 2 -->
-
-              <div class="follow-row">
-
-                <div
-                  class="priority-dot priority-high"
-                ></div>
-
-                <div class="follow-content">
-
-                  <strong>
-                    Mohd Aizuddin
-                  </strong>
-
-                  <span>
-                    No body composition measurement this week.
-                  </span>
-
+                <div class="patient-avatar">
+                  AA
                 </div>
 
-                <button
-                  class="follow-action"
-                  aria-label="Open patient"
-                >
-
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M5 12h13"></path>
-                    <path d="M13 6l6 6-6 6"></path>
-                  </svg>
-
-                </button>
-
-              </div>
-
-
-              <!-- PATIENT 3 -->
-
-              <div class="follow-row">
-
-                <div
-                  class="priority-dot priority-medium"
-                ></div>
-
-                <div class="follow-content">
+                <div class="appointment-info">
 
                   <strong>
                     Aisyah Abdullah
                   </strong>
 
                   <span>
-                    Weight unchanged for 3 weeks.
+                    Week 6 · Body Composition
                   </span>
 
                 </div>
 
-                <button
-                  class="follow-action"
-                  aria-label="Open patient"
-                >
+              </div>
 
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M5 12h13"></path>
-                    <path d="M13 6l6 6-6 6"></path>
-                  </svg>
+              <div class="status completed">
+                Completed
+              </div>
 
-                </button>
+            </div>
+
+
+            <!-- 10:30 -->
+
+            <div class="appointment-row">
+
+              <div class="appointment-left">
+
+                <div class="appointment-time">
+                  10:30
+                </div>
+
+                <div class="patient-avatar">
+                  BR
+                </div>
+
+                <div class="appointment-info">
+
+                  <strong>
+                    Brandon Wilbert
+                  </strong>
+
+                  <span>
+                    Week 3 · Review
+                  </span>
+
+                </div>
 
               </div>
 
+              <div class="status upcoming">
+                Upcoming
+              </div>
 
-              <!-- PATIENT 4 -->
+            </div>
 
-              <div class="follow-row">
 
-                <div
-                  class="priority-dot priority-medium"
-                ></div>
+            <!-- 11:30 -->
 
-                <div class="follow-content">
+            <div class="appointment-row">
+
+              <div class="appointment-left">
+
+                <div class="appointment-time">
+                  11:30
+                </div>
+
+                <div class="patient-avatar">
+                  SZ
+                </div>
+
+                <div class="appointment-info">
+
+                  <strong>
+                    Sarah Zakaria
+                  </strong>
+
+                  <span>
+                    Week 8 · Follow-Up
+                  </span>
+
+                </div>
+
+              </div>
+
+              <div class="status alert">
+                Attention
+              </div>
+
+            </div>
+
+
+            <!-- 14:00 -->
+
+            <div class="appointment-row">
+
+              <div class="appointment-left">
+
+                <div class="appointment-time">
+                  14:00
+                </div>
+
+                <div class="patient-avatar">
+                  DM
+                </div>
+
+                <div class="appointment-info">
 
                   <strong>
                     Daniel Malik
                   </strong>
 
                   <span>
-                    Follow-up appointment required.
+                    Week 4 · Body Composition
                   </span>
 
                 </div>
 
-                <button
-                  class="follow-action"
-                  aria-label="Open patient"
-                >
+              </div>
 
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M5 12h13"></path>
-                    <path d="M13 6l6 6-6 6"></path>
-                  </svg>
-
-                </button>
-
+              <div class="status upcoming">
+                Upcoming
               </div>
 
             </div>
+
 
           </div>
 
         </div>
 
-      </section>
 
-    </main>
+        <!-- PATIENTS NEEDING ATTENTION -->
 
-  </div>
+        <div class="card">
+
+          <div class="card-header">
+
+            <div>
+
+              <h2>
+                Patients Needing Attention
+              </h2>
+
+              <span>
+                Follow-up required
+              </span>
+
+            </div>
+
+            <span>
+              14 total
+            </span>
+
+          </div>
 
 
-  <!-- =========================================
-       JAVASCRIPT
-  ========================================== -->
-
-  <script>
-
-    const sidebar =
-      document.getElementById("sidebar");
-
-    const overlay =
-      document.getElementById("overlay");
-
-    const mobileMenu =
-      document.getElementById("mobileMenu");
+          <div class="card-body">
 
 
-    /* Open mobile sidebar */
+            <!-- SARAH -->
 
-    mobileMenu.addEventListener(
-      "click",
-      () => {
+            <div class="follow-row">
 
-        sidebar.classList.toggle("open");
+              <div class="priority-dot priority-high"></div>
 
-        overlay.classList.toggle("show");
+              <div class="follow-content">
 
-      }
+                <strong>
+                  Sarah Zakaria
+                </strong>
+
+                <span>
+                  Appointment overdue by 2 days.
+                </span>
+
+              </div>
+
+              <button
+                class="follow-action"
+                onclick="openPatient('Sarah Zakaria')"
+              >
+
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 12h13"></path>
+                  <path d="M13 6l6 6-6 6"></path>
+                </svg>
+
+              </button>
+
+            </div>
+
+
+            <!-- AIZUDDIN -->
+
+            <div class="follow-row">
+
+              <div class="priority-dot priority-high"></div>
+
+              <div class="follow-content">
+
+                <strong>
+                  Mohd Aizuddin
+                </strong>
+
+                <span>
+                  No body composition measurement this week.
+                </span>
+
+              </div>
+
+              <button
+                class="follow-action"
+                onclick="openPatient('Mohd Aizuddin')"
+              >
+
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 12h13"></path>
+                  <path d="M13 6l6 6-6 6"></path>
+                </svg>
+
+              </button>
+
+            </div>
+
+
+            <!-- AISYAH -->
+
+            <div class="follow-row">
+
+              <div class="priority-dot priority-medium"></div>
+
+              <div class="follow-content">
+
+                <strong>
+                  Aisyah Abdullah
+                </strong>
+
+                <span>
+                  Weight unchanged for 3 weeks.
+                </span>
+
+              </div>
+
+              <button
+                class="follow-action"
+                onclick="openPatient('Aisyah Abdullah')"
+              >
+
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 12h13"></path>
+                  <path d="M13 6l6 6-6 6"></path>
+                </svg>
+
+              </button>
+
+            </div>
+
+
+            <!-- DANIEL -->
+
+            <div class="follow-row">
+
+              <div class="priority-dot priority-medium"></div>
+
+              <div class="follow-content">
+
+                <strong>
+                  Daniel Malik
+                </strong>
+
+                <span>
+                  Follow-up appointment required.
+                </span>
+
+              </div>
+
+              <button
+                class="follow-action"
+                onclick="openPatient('Daniel Malik')"
+              >
+
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 12h13"></path>
+                  <path d="M13 6l6 6-6 6"></path>
+                </svg>
+
+              </button>
+
+            </div>
+
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+
+<script>
+
+  /* =====================================================
+     MOBILE SIDEBAR
+  ====================================================== */
+
+  const sidebar =
+    document.getElementById("sidebar");
+
+  const overlay =
+    document.getElementById("overlay");
+
+  const mobileMenu =
+    document.getElementById("mobileMenu");
+
+
+  mobileMenu.addEventListener(
+    "click",
+    () => {
+
+      sidebar.classList.toggle("open");
+
+      overlay.classList.toggle("show");
+
+    }
+  );
+
+
+  overlay.addEventListener(
+    "click",
+    () => {
+
+      sidebar.classList.remove("open");
+
+      overlay.classList.remove("show");
+
+    }
+  );
+
+
+  /* =====================================================
+     TEMPORARY PATIENT OPEN FUNCTION
+  ====================================================== */
+
+  function openPatient(name) {
+
+    /*
+      UI-ONLY FOR NOW.
+
+      Later this will use the real Patient ID
+      and open the correct patient profile.
+    */
+
+    window.location.href =
+      "patient-profile.html";
+
+  }
+
+
+  /* =====================================================
+     TEMPORARY COMING SOON
+  ====================================================== */
+
+  function showComingSoon(section) {
+
+    alert(
+      section +
+      " page will be connected during the UI build."
     );
 
+  }
 
-    /* Close mobile sidebar */
-
-    overlay.addEventListener(
-      "click",
-      () => {
-
-        sidebar.classList.remove("open");
-
-        overlay.classList.remove("show");
-
-      }
-    );
-
-  </script>
+</script>
 
 </body>
 </html>
