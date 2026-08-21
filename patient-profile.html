@@ -556,6 +556,120 @@ a{text-decoration:none;color:inherit}
 .billing-table-wrap,.billing-editor-table-wrap{
   overflow-x:auto
 }
+
+.visit-charge-table-wrap{
+  overflow-x:auto
+}
+.visit-charge-table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:780px
+}
+.visit-charge-table th{
+  padding:10px 9px;
+  background:#F8FBFF;
+  border-bottom:1px solid var(--border);
+  color:var(--muted);
+  font-size:9px;
+  font-weight:600;
+  text-align:left
+}
+.visit-charge-table td{
+  padding:10px 9px;
+  border-bottom:1px solid var(--border-light);
+  vertical-align:top;
+  font-size:10px;
+  color:var(--text)
+}
+.charge-detail-pair{
+  display:grid;
+  grid-template-columns:1fr 110px;
+  gap:7px;
+  margin-bottom:7px
+}
+.charge-detail-pair input,
+.charge-detail-pair input + input,
+.visit-charge-table input,
+.visit-charge-table textarea{
+  width:100%;
+  box-sizing:border-box;
+  border:1px solid var(--border);
+  border-radius:7px;
+  background:#fff;
+  color:var(--text);
+  font-size:9px;
+  outline:0;
+  padding:0 8px
+}
+.visit-charge-table input{
+  height:33px
+}
+.visit-charge-table textarea{
+  min-height:38px;
+  padding:7px 8px;
+  resize:vertical
+}
+.charge-price{
+  min-width:105px
+}
+.payment-summary-card{
+  margin-top:15px;
+  border:1px solid var(--border-light);
+  border-radius:10px;
+  background:#F8FBFF;
+  padding:13px
+}
+.payment-summary-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px
+}
+.payment-summary-header div{
+  display:flex;
+  flex-direction:column;
+  gap:2px
+}
+.payment-summary-header strong{
+  font-size:11px;
+  color:var(--navy)
+}
+.payment-summary-header span{
+  font-size:9px;
+  color:var(--primary)
+}
+.payment-summary-hint{
+  color:var(--muted)!important
+}
+.payment-summary-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px
+}
+.payment-summary-item{
+  padding:10px;
+  background:#fff;
+  border:1px solid var(--border-light);
+  border-radius:9px
+}
+.payment-summary-item span{
+  display:block;
+  font-size:9px;
+  color:var(--muted);
+  margin-bottom:5px
+}
+.payment-summary-item input{
+  width:100%;
+  box-sizing:border-box;
+  height:34px;
+  border:1px solid var(--border);
+  border-radius:7px;
+  padding:0 8px;
+  font-size:10px;
+  outline:0
+}
+
 .billing-table{
   width:100%;
   border-collapse:collapse
@@ -1888,13 +2002,7 @@ a{text-decoration:none;color:inherit}
 
     <div class="modal-body">
 
-      <div class="detail-block">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div class="detail-title">Treatment & Medication</div>
-          <button class="edit-button" onclick="openTreatmentEditFromDetail()">✎ Edit</button>
-        </div>
-        <div class="treatment-grid" id="visitDetailTreatmentGrid"></div>
-      </div>
+      
 
       <div class="detail-block">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
@@ -1907,8 +2015,8 @@ a{text-decoration:none;color:inherit}
       <div class="detail-block">
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div class="detail-title">Billing & Claims</div>
-          <button class="edit-button" onclick="openVisitBillingEditFromDetail()">✎ Edit</button>
+          <div class="detail-title">Visit Charges & Payment</div>
+          <button class="edit-button" onclick="openVisitChargesEditFromDetail()">✎ Edit</button>
         </div>
 
         <div class="billing-table-wrap">
@@ -1995,34 +2103,34 @@ a{text-decoration:none;color:inherit}
 
 
 <!-- ==============================
-     VISIT BILLING EDIT
+     VISIT CHARGES & PAYMENT EDIT
 ================================ -->
 
-<div class="modal-overlay" id="visitBillingEditModal">
+<div class="modal-overlay" id="visitChargesEditModal">
 
   <div class="modal">
 
     <div class="modal-header">
 
       <div>
-        <h2>Edit Billing & Claims</h2>
-        <span id="billingEditSubtitle">Selected visit</span>
+        <h2>Edit Visit Charges & Payment</h2>
+        <span id="chargesEditSubtitle">Selected visit</span>
       </div>
 
-      <button class="modal-close" onclick="closeModal('visitBillingEditModal')">✕</button>
+      <button class="modal-close" type="button" onclick="closeModal('visitChargesEditModal')">✕</button>
 
     </div>
 
     <div class="modal-body">
 
-      <div class="billing-editor-table-wrap">
+      <div class="visit-charge-table-wrap">
 
-        <table class="billing-table">
+        <table class="visit-charge-table">
 
           <thead>
             <tr>
               <th>Item</th>
-              <th>Notes</th>
+              <th>Details / Notes</th>
               <th>Price</th>
             </tr>
           </thead>
@@ -2031,26 +2139,49 @@ a{text-decoration:none;color:inherit}
 
             <tr>
               <td><strong>Injection</strong></td>
-              <td><input id="billingInjectionNotes" placeholder="e.g. Tirzepatide 2.5 mg"></td>
-              <td><input id="billingInjectionPrice" type="number" min="0" step="0.01" placeholder="0.00"></td>
+              <td>
+                <div class="charge-detail-pair">
+                  <input id="chargeInjectionType" placeholder="Injection type">
+                  <input id="chargeInjectionDose" placeholder="Dose e.g. 2.5 mg">
+                </div>
+                <textarea id="chargeInjectionNotes" class="charge-notes" placeholder="Notes (optional)"></textarea>
+              </td>
+              <td>
+                <input id="chargeInjectionPrice" class="charge-price" type="number" min="0" step="0.01" placeholder="0.00">
+              </td>
             </tr>
 
             <tr>
               <td><strong>Medication</strong></td>
-              <td><input id="billingMedicationNotes" placeholder="Medication / supplement"></td>
-              <td><input id="billingMedicationPrice" type="number" min="0" step="0.01" placeholder="0.00"></td>
+              <td>
+                <input id="chargeMedicationName" placeholder="Medication / supplement">
+                <textarea id="chargeMedicationNotes" class="charge-notes" placeholder="Notes (optional)"></textarea>
+              </td>
+              <td>
+                <input id="chargeMedicationPrice" class="charge-price" type="number" min="0" step="0.01" placeholder="0.00">
+              </td>
             </tr>
 
             <tr>
               <td><strong>Treatment</strong></td>
-              <td><input id="billingTreatmentNotes" placeholder="Any other treatment"></td>
-              <td><input id="billingTreatmentPrice" type="number" min="0" step="0.01" placeholder="0.00"></td>
+              <td>
+                <input id="chargeTreatmentName" placeholder="Treatment received">
+                <textarea id="chargeTreatmentNotes" class="charge-notes" placeholder="Notes (optional)"></textarea>
+              </td>
+              <td>
+                <input id="chargeTreatmentPrice" class="charge-price" type="number" min="0" step="0.01" placeholder="0.00">
+              </td>
             </tr>
 
             <tr>
-              <td><strong>Other</strong></td>
-              <td><input id="billingOtherNotes" placeholder="Optional"></td>
-              <td><input id="billingOtherPrice" type="number" min="0" step="0.01" placeholder="0.00"></td>
+              <td><strong>Additional</strong></td>
+              <td>
+                <input id="chargeAdditionalName" placeholder="Other service / item">
+                <textarea id="chargeAdditionalNotes" class="charge-notes" placeholder="Notes (optional)"></textarea>
+              </td>
+              <td>
+                <input id="chargeAdditionalPrice" class="charge-price" type="number" min="0" step="0.01" placeholder="0.00">
+              </td>
             </tr>
 
           </tbody>
@@ -2061,50 +2192,69 @@ a{text-decoration:none;color:inherit}
 
       <div class="billing-total-editor">
         <span>Visit Total</span>
-        <strong id="billingEditorTotal">RM 0.00</strong>
+        <strong id="chargesEditorTotal">RM 0.00</strong>
       </div>
 
-      <div class="form-grid" style="margin-top:14px">
+      <div class="payment-summary-card">
 
-        <div class="form-group">
-          <label>Payment / Claim Type</label>
-          <select id="billingCoverageType" onchange="handleCoverageTypeChange()">
-            <option value="self">Self-Pay</option>
-            <option value="panel">Panel</option>
-          </select>
+        <div class="payment-summary-header">
+          <div>
+            <strong>Payment Allocation</strong>
+            <span id="chargePaymentTypeLabel">Self-Pay</span>
+          </div>
+          <span class="payment-summary-hint">Patient-level payment type</span>
         </div>
 
-        
+        <div class="payment-summary-grid">
 
-      </div>
+          <div class="payment-summary-item" id="panelEligibleGroup">
 
-      <div class="form-grid" style="margin-top:14px">
+            <span>Panel / Insurance</span>
 
-        <div class="form-group">
-          <label>Panel / Insurance Amount</label>
-          <input id="billingPanelAmount" type="number" min="0" step="0.01" oninput="updateBillingEditorTotal()">
+            <input
+              id="chargePanelAmount"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+              oninput="updateChargesEditorTotal()"
+            >
+
+          </div>
+
+          <div class="payment-summary-item">
+
+            <span>Self-Pay / Co-Payment</span>
+
+            <input
+              id="chargeSelfPayAmount"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+              oninput="updateChargesEditorTotal()"
+            >
+
+          </div>
+
         </div>
 
-        <div class="form-group">
-          <label>Self-Pay Amount</label>
-          <input id="billingSelfPayAmount" type="number" min="0" step="0.01" oninput="updateBillingEditorTotal()">
+        <div class="claim-validation" id="chargesEditorValidation"></div>
+
+        <div class="billing-helper">
+          For panel patients, Panel / Insurance + Self-Pay / Co-Payment must equal the Visit Total.
+          The actual claim submission amount is entered later in the Panel Claims tab.
         </div>
 
-      </div>
-
-      <div class="claim-validation" id="billingEditorValidation"></div>
-
-      <div class="billing-helper">
-        Panel + Self-Pay must equal the Visit Total before the record can be saved.
       </div>
 
     </div>
 
     <div class="modal-footer">
 
-      <button class="secondary-button" onclick="closeModal('visitBillingEditModal')">Cancel</button>
+      <button type="button" class="secondary-button" onclick="closeModal('visitChargesEditModal')">Cancel</button>
 
-      <button class="primary-button" onclick="saveVisitBilling()">Save Billing</button>
+      <button type="button" class="primary-button" onclick="saveVisitCharges()">Save Changes</button>
 
     </div>
 
@@ -2185,7 +2335,7 @@ a{text-decoration:none;color:inherit}
       <div class="form-group">
         <label>Panel / Insurance</label>
         <select id="editPatientPanel" onchange="toggleOtherPanelField()">
-          <option value="SELF_PAY">Self-Pay</option>
+          <option value="No Panel">No Panel</option>
           <option value="PMCare">PMCare</option>
           <option value="MiCare">MiCare</option>
           <option value="HealthMetrics">HealthMetrics</option>
@@ -2218,7 +2368,7 @@ a{text-decoration:none;color:inherit}
 
   <div class="modal-footer">
     <button class="secondary-button" onclick="closeModal('patientEditModal')">Cancel</button>
-    <button type="button" class="primary-button" id="savePatientChangesBtn">Save Changes</button>
+    <button type="button" class="primary-button" onclick="savePatientEdit()">Save Changes</button>
   </div>
 
 </div>
@@ -2311,63 +2461,6 @@ a{text-decoration:none;color:inherit}
   <div class="modal-footer">
     <button class="secondary-button" onclick="closeModal('measurementEditModal')">Cancel</button>
     <button class="primary-button" onclick="saveMeasurementEdit()">Save Changes</button>
-  </div>
-
-</div>
-</div>
-
-
-<!-- ==============================
-     TREATMENT EDIT
-================================ -->
-
-<div class="modal-overlay" id="treatmentEditModal">
-
-<div class="modal modal-small">
-
-  <div class="modal-header">
-    <div>
-      <h2>Edit Treatment & Medication</h2>
-      <span>Selected visit</span>
-    </div>
-    <button class="modal-close" onclick="closeModal('treatmentEditModal')">✕</button>
-  </div>
-
-  <div class="modal-body">
-
-    <div class="form-grid">
-
-      <div class="form-group">
-        <label>Injection / Treatment</label>
-        <select id="editInjection">
-          <option>Tirzepatide</option>
-          <option>Semaglutide</option>
-          <option>Other</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Dose</label>
-        <input id="editDose" placeholder="e.g. 2.5 mg">
-      </div>
-
-      <div class="form-group">
-        <label>Medication</label>
-        <input id="editMedication">
-      </div>
-
-      <div class="form-group">
-        <label>Additional Treatment</label>
-        <input id="editAdditionalTreatment">
-      </div>
-
-    </div>
-
-  </div>
-
-  <div class="modal-footer">
-    <button class="secondary-button" onclick="closeModal('treatmentEditModal')">Cancel</button>
-    <button class="primary-button" onclick="saveTreatmentEdit()">Save Changes</button>
   </div>
 
 </div>
@@ -2810,7 +2903,7 @@ const patients={
     phone:"",
     dob:"",
     gender:"Female",
-    panelProvider:"SELF_PAY",
+    panelProvider:"No Panel",
     arboleafUsername:"",
     measurements:{
       "2026-08-06":{
@@ -3143,7 +3236,7 @@ function renderPanelClaims(){
 
   if(!tbody)return;
 
-  const hasPanel=!!patient.panelProvider && patient.panelProvider!=="No Panel" && patient.panelProvider!=="SELF_PAY";
+  const hasPanel=!!patient.panelProvider && patient.panelProvider!=="No Panel";
 
   if(notice){
     notice.hidden=hasPanel;
@@ -3366,7 +3459,7 @@ function renderFinancialSummary(){
   });
 
   const balance=Math.max(0,claimable-claimed);
-  const hasPanel=!!patient.panelProvider && patient.panelProvider!=="No Panel" && patient.panelProvider!=="SELF_PAY";
+  const hasPanel=!!patient.panelProvider && patient.panelProvider!=="No Panel";
 
   const kpiGrid=document.getElementById("financeKpiGrid");
   const breakdown=document.getElementById("financeBreakdown");
@@ -3452,11 +3545,16 @@ function renderVisitBilling(){
 
   const b=ensureBilling(selectedVisit);
 
+  const injectionDetail=[
+    selectedVisit.injection,
+    selectedVisit.dose
+  ].filter(Boolean).join(" · ");
+
   const rows=[
-    ["Injection",b.injection],
-    ["Medication",b.medication],
-    ["Treatment",b.treatment],
-    ["Other",b.other]
+    ["Injection", injectionDetail || b.injection.notes || "—", b.injection.price],
+    ["Medication", selectedVisit.medication || b.medication.notes || "—", b.medication.price],
+    ["Treatment", selectedVisit.additionalTreatment || b.treatment.notes || "—", b.treatment.price],
+    ["Additional", b.other.notes || "—", b.other.price]
   ];
 
   const tbody=document.getElementById("visitBillingRows");
@@ -3465,8 +3563,8 @@ function renderVisitBilling(){
     tbody.innerHTML=rows.map(row=>`
       <tr>
         <td><strong>${row[0]}</strong></td>
-        <td>${row[1].notes||"—"}</td>
-        <td>${showMoney(row[1].price)}</td>
+        <td>${row[1]}</td>
+        <td>${showMoney(row[2])}</td>
       </tr>
     `).join("");
   }
@@ -3477,26 +3575,44 @@ function renderVisitBilling(){
   document.getElementById("visitPanelAmount").textContent=showMoney(b.panel);
   document.getElementById("visitSelfPayAmount").textContent=showMoney(b.selfPay);
 
-  const difference=Math.abs(total-(Number(b.panel||0)+Number(b.selfPay||0)));
   const validation=document.getElementById("visitClaimValidation");
 
   if(!validation)return;
 
-  if(difference<0.001){
+  const mode=(typeof getVisitPanelMode==="function")
+    ? getVisitPanelMode()
+    : "self";
+
+  const difference=Math.abs(
+    total-(Number(b.panel||0)+Number(b.selfPay||0))
+  );
+
+  if(mode==="self"){
     validation.className="claim-validation valid";
-    validation.textContent="Panel + Self-Pay matches the Visit Total.";
+    validation.textContent="Self-Pay patient: full Visit Total is assigned to Self-Pay.";
+  }else if(difference<0.001){
+    validation.className="claim-validation valid";
+    validation.textContent="Panel + Self-Pay / Co-Payment matches the Visit Total.";
   }else{
     validation.className="claim-validation invalid";
-    validation.textContent="Panel + Self-Pay does not match the Visit Total.";
+    validation.textContent="Panel + Self-Pay / Co-Payment does not match the Visit Total.";
   }
 }
 
-function openVisitBillingEditFromDetail(){
+function openVisitChargesEditFromDetail(){
   closeModal("visitDetailModal");
-  openVisitBillingEdit();
+  openVisitChargesEdit();
 }
 
-function openVisitBillingEdit(){
+
+
+
+function getVisitPanelMode(){
+  const value=patient.panelProvider||"SELF_PAY";
+  return (value==="SELF_PAY" || value==="No Panel") ? "self" : "panel";
+}
+
+function openVisitChargesEdit(){
 
   if(!selectedVisit){
     alert("Please select a visit first.");
@@ -3505,120 +3621,194 @@ function openVisitBillingEdit(){
 
   const b=ensureBilling(selectedVisit);
 
-  document.getElementById("billingEditSubtitle").textContent=
+  document.getElementById("chargesEditSubtitle").textContent=
     selectedVisit.date+" · "+selectedVisit.visit;
 
-  document.getElementById("billingInjectionNotes").value=b.injection.notes||"";
-  document.getElementById("billingInjectionPrice").value=b.injection.price||"";
-  document.getElementById("billingMedicationNotes").value=b.medication.notes||"";
-  document.getElementById("billingMedicationPrice").value=b.medication.price||"";
-  document.getElementById("billingTreatmentNotes").value=b.treatment.notes||"";
-  document.getElementById("billingTreatmentPrice").value=b.treatment.price||"";
-  document.getElementById("billingOtherNotes").value=b.other.notes||"";
-  document.getElementById("billingOtherPrice").value=b.other.price||"";
-  document.getElementById("billingCoverageType").value=b.coverageType||"self";
-  document.getElementById("billingPanelAmount").value=b.panel||0;
-  document.getElementById("billingSelfPayAmount").value=b.selfPay||0;
+  document.getElementById("chargeInjectionType").value=
+    selectedVisit.injection||"";
 
-  updateBillingEditorTotal();
-  openModal("visitBillingEditModal");
+  document.getElementById("chargeInjectionDose").value=
+    selectedVisit.dose||"";
+
+  document.getElementById("chargeInjectionNotes").value=
+    b.injection.notes||"";
+
+  document.getElementById("chargeInjectionPrice").value=
+    b.injection.price||"";
+
+  document.getElementById("chargeMedicationName").value=
+    selectedVisit.medication||"";
+
+  document.getElementById("chargeMedicationNotes").value=
+    b.medication.notes||"";
+
+  document.getElementById("chargeMedicationPrice").value=
+    b.medication.price||"";
+
+  document.getElementById("chargeTreatmentName").value=
+    selectedVisit.additionalTreatment||b.treatment.notes||"";
+
+  document.getElementById("chargeTreatmentNotes").value=
+    b.treatment.notes||"";
+
+  document.getElementById("chargeTreatmentPrice").value=
+    b.treatment.price||"";
+
+  document.getElementById("chargeAdditionalName").value=
+    b.other.notes||"";
+
+  document.getElementById("chargeAdditionalNotes").value=
+    b.other.notes||"";
+
+  document.getElementById("chargeAdditionalPrice").value=
+    b.other.price||"";
+
+  const mode=getVisitPanelMode();
+  const panelInput=document.getElementById("chargePanelAmount");
+  const selfPayInput=document.getElementById("chargeSelfPayAmount");
+  const panelGroup=document.getElementById("panelEligibleGroup");
+  const typeLabel=document.getElementById("chargePaymentTypeLabel");
+
+  if(mode==="panel"){
+
+    panelGroup.style.display="";
+    panelInput.value=b.panel||0;
+    selfPayInput.value=b.selfPay||0;
+    typeLabel.textContent=getPatientPanelName();
+
+  }else{
+
+    panelGroup.style.display="none";
+    panelInput.value=0;
+    selfPayInput.value=b.selfPay || billingTotal(b);
+    typeLabel.textContent="Self-Pay";
+
+  }
+
+  updateChargesEditorTotal();
+  openModal("visitChargesEditModal");
 }
 
-function updateBillingEditorTotal(){
+function updateChargesEditorTotal(){
 
   const total=
-    Number(document.getElementById("billingInjectionPrice").value||0)+
-    Number(document.getElementById("billingMedicationPrice").value||0)+
-    Number(document.getElementById("billingTreatmentPrice").value||0)+
-    Number(document.getElementById("billingOtherPrice").value||0);
+    Number(document.getElementById("chargeInjectionPrice").value||0)+
+    Number(document.getElementById("chargeMedicationPrice").value||0)+
+    Number(document.getElementById("chargeTreatmentPrice").value||0)+
+    Number(document.getElementById("chargeAdditionalPrice").value||0);
 
-  document.getElementById("billingEditorTotal").textContent=showMoney(total);
+  document.getElementById("chargesEditorTotal").textContent=showMoney(total);
 
-  const panel=Number(document.getElementById("billingPanelAmount").value||0);
-  const selfPay=Number(document.getElementById("billingSelfPayAmount").value||0);
+  const mode=getVisitPanelMode();
+  const panel=Number(document.getElementById("chargePanelAmount").value||0);
+  const selfPayInput=document.getElementById("chargeSelfPayAmount");
+  const selfPay=Number(selfPayInput.value||0);
+  const validation=document.getElementById("chargesEditorValidation");
+
+  if(mode==="self"){
+
+    selfPayInput.value=total;
+
+    validation.className="claim-validation valid";
+    validation.textContent="Self-Pay patient: the full Visit Total is assigned to Self-Pay.";
+
+    return true;
+  }
+
   const diff=Math.abs(total-(panel+selfPay));
-  const validation=document.getElementById("billingEditorValidation");
 
   if(diff<0.001){
+
     validation.className="claim-validation valid";
-    validation.textContent="Panel + Self-Pay matches the Visit Total.";
+    validation.textContent=
+      getPatientPanelName()+" + Self-Pay / Co-Payment matches the Visit Total.";
+
     return true;
   }
 
   validation.className="claim-validation invalid";
-  validation.textContent=`Panel + Self-Pay must equal ${showMoney(total)}. Current allocation is ${showMoney(panel+selfPay)}.`;
+  validation.textContent=
+    getPatientPanelName()+" + Self-Pay / Co-Payment must equal "+
+    showMoney(total)+". Current allocation is "+showMoney(panel+selfPay)+".";
+
   return false;
 }
 
-function handleCoverageTypeChange(){
-
-  const type=document.getElementById("billingCoverageType").value;
-
-  if(type==="self"){
-    const total=
-      Number(document.getElementById("billingInjectionPrice").value||0)+
-      Number(document.getElementById("billingMedicationPrice").value||0)+
-      Number(document.getElementById("billingTreatmentPrice").value||0)+
-      Number(document.getElementById("billingOtherPrice").value||0);
-
-    document.getElementById("billingPanelAmount").value=0;
-    document.getElementById("billingSelfPayAmount").value=total;
-  }
-
-  updateBillingEditorTotal();
-}
-
-function saveVisitBilling(){
+function saveVisitCharges(){
 
   if(!selectedVisit)return;
 
-  if(!updateBillingEditorTotal())return;
+  if(!updateChargesEditorTotal())return;
 
   const total=
-    Number(document.getElementById("billingInjectionPrice").value||0)+
-    Number(document.getElementById("billingMedicationPrice").value||0)+
-    Number(document.getElementById("billingTreatmentPrice").value||0)+
-    Number(document.getElementById("billingOtherPrice").value||0);
+    Number(document.getElementById("chargeInjectionPrice").value||0)+
+    Number(document.getElementById("chargeMedicationPrice").value||0)+
+    Number(document.getElementById("chargeTreatmentPrice").value||0)+
+    Number(document.getElementById("chargeAdditionalPrice").value||0);
 
   const b=ensureBilling(selectedVisit);
 
+  /* Treatment details */
+  selectedVisit.injection=
+    document.getElementById("chargeInjectionType").value.trim();
+
+  selectedVisit.dose=
+    document.getElementById("chargeInjectionDose").value.trim();
+
+  selectedVisit.medication=
+    document.getElementById("chargeMedicationName").value.trim();
+
+  selectedVisit.additionalTreatment=
+    document.getElementById("chargeTreatmentName").value.trim();
+
+  /* Charges + notes */
   b.injection={
-    notes:document.getElementById("billingInjectionNotes").value,
-    price:Number(document.getElementById("billingInjectionPrice").value||0)
+    notes:document.getElementById("chargeInjectionNotes").value.trim(),
+    price:Number(document.getElementById("chargeInjectionPrice").value||0)
   };
 
   b.medication={
-    notes:document.getElementById("billingMedicationNotes").value,
-    price:Number(document.getElementById("billingMedicationPrice").value||0)
+    notes:document.getElementById("chargeMedicationNotes").value.trim(),
+    price:Number(document.getElementById("chargeMedicationPrice").value||0)
   };
 
   b.treatment={
-    notes:document.getElementById("billingTreatmentNotes").value,
-    price:Number(document.getElementById("billingTreatmentPrice").value||0)
+    notes:document.getElementById("chargeTreatmentNotes").value.trim(),
+    price:Number(document.getElementById("chargeTreatmentPrice").value||0)
   };
 
   b.other={
-    notes:document.getElementById("billingOtherNotes").value,
-    price:Number(document.getElementById("billingOtherPrice").value||0)
+    notes:document.getElementById("chargeAdditionalName").value.trim()+
+      (document.getElementById("chargeAdditionalNotes").value.trim()
+        ? " · "+document.getElementById("chargeAdditionalNotes").value.trim()
+        : ""),
+    price:Number(document.getElementById("chargeAdditionalPrice").value||0)
   };
 
-  b.panel=Number(document.getElementById("billingPanelAmount").value||0);
-  b.selfPay=Number(document.getElementById("billingSelfPayAmount").value||0);
+  const mode=getVisitPanelMode();
 
-  const newPanelEligible=Number(b.panel||0);
+  if(mode==="panel"){
 
-  if(Number(b.panelClaimAmount||0)>newPanelEligible){
-    b.panelClaimAmount=newPanelEligible;
+    b.panel=Number(document.getElementById("chargePanelAmount").value||0);
+    b.selfPay=Number(document.getElementById("chargeSelfPayAmount").value||0);
+
+  }else{
+
+    b.panel=0;
+    b.selfPay=total;
+
   }
-  b.coverageType=document.getElementById("billingCoverageType").value;
 
-  closeModal("visitBillingEditModal");
+  if(Number(b.panelClaimAmount||0)>Number(b.panel||0)){
+    b.panelClaimAmount=Number(b.panel||0);
+  }
+
+  /* Keep the patient-level payment type as the source of truth. */
+  b.coverageType=mode;
+
+  closeModal("visitChargesEditModal");
 
   renderAll();
-  renderVisitBilling();
-  renderVisitDetailModal();
-
-  alert("Billing changes saved in the current UI.");
 }
 
 /* =========================================================
@@ -3637,16 +3827,9 @@ function toggleOtherPanelField(){
 }
 
 function getPatientPanelName(){
-  const value=patient.panelProvider||"SELF_PAY";
-
-  if(value==="SELF_PAY" || value==="No Panel"){
-    return "Self-Pay";
-  }
-
-  if(value==="Other"){
-    return patient.otherPanelName||"Other Panel";
-  }
-
+  const value=patient.panelProvider||"No Panel";
+  if(value==="No Panel")return "Self-Pay";
+  if(value==="Other")return patient.otherPanelName||"Other Panel";
   return value;
 }
 
@@ -4045,13 +4228,11 @@ function openPatientEdit(){
   document.getElementById("editPatientDoctor").value=patient.doctor||"Dr Aaron";
   document.getElementById("editPatientStatus").value=patient.status||"Active";
 
-  const rawPanel=patient.panelProvider||"SELF_PAY";
-  const panelValue=(rawPanel==="No Panel" ? "SELF_PAY" : rawPanel);
-
+  const panelValue=patient.panelProvider||"No Panel";
   const panelSelect=document.getElementById("editPatientPanel");
   const otherInput=document.getElementById("editOtherPanel");
 
-  if(["SELF_PAY","PMCare","MiCare","HealthMetrics","Other"].includes(panelValue)){
+  if(["No Panel","PMCare","MiCare","HealthMetrics","Other"].includes(panelValue)){
     panelSelect.value=panelValue;
     otherInput.value=patient.otherPanelName||"";
   }else{
@@ -4067,6 +4248,7 @@ function openPatientEdit(){
   openModal("patientEditModal");
 }
 
+
 function restoreCurrentPatientLocal(){
 
   try{
@@ -4079,11 +4261,8 @@ function restoreCurrentPatientLocal(){
 
     if(!saved || typeof saved!=="object")return;
 
-    if(saved.panelProvider!==undefined){
-      patient.panelProvider =
-        saved.panelProvider==="No Panel"
-          ? "SELF_PAY"
-          : saved.panelProvider;
+    if(saved.panelProvider){
+      patient.panelProvider=saved.panelProvider;
     }
 
     if(saved.otherPanelName!==undefined){
@@ -4099,85 +4278,61 @@ function restoreCurrentPatientLocal(){
 
 function savePatientEdit(){
 
-  const panelSelectEl=document.getElementById("editPatientPanel");
-
-  if(!panelSelectEl){
-    alert("Panel / Insurance field could not be found.");
-    return;
-  }
-
-  const selectedPanel=panelSelectEl.value;
-
-  /* Normalize the explicit Self-Pay choice. */
-  patient.panelProvider =
-    selectedPanel==="SELF_PAY"
-      ? "SELF_PAY"
-      : selectedPanel;
-
-  if(patient.panelProvider==="Other"){
-    const otherInput=document.getElementById("editOtherPanel");
-    patient.otherPanelName =
-      otherInput ? (otherInput.value.trim() || "Other Panel") : "Other Panel";
-  }else{
-    patient.otherPanelName="";
-  }
-
-  /* Persist the payment type FIRST. */
   try{
 
-    localStorage.setItem(
-      "getwell_patient_"+patient.id,
-      JSON.stringify({
-        panelProvider:patient.panelProvider,
-        otherPanelName:patient.otherPanelName
-      })
-    );
+    const panelSelectEl=document.getElementById("editPatientPanel");
+    const panelValue=panelSelectEl ? panelSelectEl.value : "No Panel";
 
-    /* Verify what was written. */
-    const verify=JSON.parse(
-      localStorage.getItem("getwell_patient_"+patient.id)
-    );
+    patient.name=document.getElementById("editPatientName").value.trim();
+    patient.phone=document.getElementById("editPatientPhone").value;
+    patient.dob=document.getElementById("editPatientDob").value;
+    patient.gender=document.getElementById("editPatientGender").value;
+    patient.height=document.getElementById("editPatientHeight").value;
+    patient.startingWeight=document.getElementById("editPatientStartWeight").value;
+    patient.goalWeight=document.getElementById("editPatientGoalWeight").value;
+    patient.doctor=document.getElementById("editPatientDoctor").value;
+    patient.status=document.getElementById("editPatientStatus").value;
 
-    if(!verify || verify.panelProvider!==patient.panelProvider){
-      throw new Error("Panel selection could not be verified after saving.");
+    patient.panelProvider=panelValue;
+
+    if(panelValue==="Other"){
+      patient.otherPanelName=
+        document.getElementById("editOtherPanel").value.trim() || "Other Panel";
+    }else{
+      patient.otherPanelName="";
     }
+
+    patient.arboleafUsername=
+      document.getElementById("editArboleafUsername").value;
+
+    /* Persist the patient-level panel choice locally until Google Sheets is connected. */
+    try{
+      localStorage.setItem(
+        "getwell_patient_"+patient.id,
+        JSON.stringify({
+          panelProvider:patient.panelProvider,
+          otherPanelName:patient.otherPanelName
+        })
+      );
+    }catch(storageError){
+      console.warn("Local save unavailable:",storageError);
+    }
+
+    /* Update only the parts that must change immediately. */
+    refreshPatient();
+
+    if(typeof renderFinancialSummary==="function"){
+      renderFinancialSummary();
+    }
+
+    closeModal("patientEditModal");
 
   }catch(error){
 
-    console.error("Panel selection save failed:",error);
-    alert("The Panel / Self-Pay selection could not be saved in this browser.");
-    return;
+    console.error("Unable to save patient changes:",error);
+    alert("Unable to save the patient changes. Please check the browser console for the error.");
 
   }
-
-  /* Save other patient details. */
-  const getValue=id=>{
-    const el=document.getElementById(id);
-    return el ? el.value : "";
-  };
-
-  patient.name=getValue("editPatientName").trim();
-  patient.phone=getValue("editPatientPhone");
-  patient.dob=getValue("editPatientDob");
-  patient.gender=getValue("editPatientGender");
-  patient.height=getValue("editPatientHeight");
-  patient.startingWeight=getValue("editPatientStartWeight");
-  patient.goalWeight=getValue("editPatientGoalWeight");
-  patient.doctor=getValue("editPatientDoctor");
-  patient.status=getValue("editPatientStatus");
-  patient.arboleafUsername=getValue("editArboleafUsername");
-
-  refreshPatient();
-
-  if(typeof renderFinancialSummary==="function"){
-    renderFinancialSummary();
-  }
-
-  if(typeof renderPanelClaims==="function"){
-    renderPanelClaims();
-  }
-
-  closeModal("patientEditModal");
 }
 
 /* =========================================================
@@ -4301,13 +4456,6 @@ function renderVisitDetailModal(){
     selectedVisit.pdfName||"No Arboleaf PDF uploaded";
   document.getElementById("visitDetailNotes").textContent=
     selectedVisit.notes||"No visit notes recorded.";
-
-  document.getElementById("visitDetailTreatmentGrid").innerHTML=`
-    <div class="treatment-item"><span>Injection / Treatment</span><strong>${selectedVisit.injection||"None recorded"}</strong></div>
-    <div class="treatment-item"><span>Dose</span><strong>${selectedVisit.dose||"—"}</strong></div>
-    <div class="treatment-item"><span>Medication</span><strong>${selectedVisit.medication||"None recorded"}</strong></div>
-    <div class="treatment-item"><span>Additional Treatment</span><strong>${selectedVisit.additionalTreatment||"None recorded"}</strong></div>
-  `;
 }
 
 function openVisitDetail(){
@@ -4319,10 +4467,6 @@ function openVisitDetail(){
   openModal("visitDetailModal");
 }
 
-function openTreatmentEditFromDetail(){
-  closeModal("visitDetailModal");
-  openTreatmentEdit();
-}
 
 function openNotesEditFromDetail(){
   closeModal("visitDetailModal");
@@ -4339,34 +4483,6 @@ function openVisitEditFromDetail(){
   openVisitEdit();
 }
 
-function openTreatmentEdit(){
-
-  if(!selectedVisit){
-    alert("Please select a visit first.");
-    return;
-  }
-
-  document.getElementById("editInjection").value=selectedVisit.injection||"Tirzepatide";
-  document.getElementById("editDose").value=selectedVisit.dose||"";
-  document.getElementById("editMedication").value=selectedVisit.medication||"";
-  document.getElementById("editAdditionalTreatment").value=selectedVisit.additionalTreatment||"";
-
-  openModal("treatmentEditModal");
-}
-
-function saveTreatmentEdit(){
-
-  if(!selectedVisit)return;
-
-  selectedVisit.injection=document.getElementById("editInjection").value;
-  selectedVisit.dose=document.getElementById("editDose").value;
-  selectedVisit.medication=document.getElementById("editMedication").value;
-  selectedVisit.additionalTreatment=document.getElementById("editAdditionalTreatment").value;
-
-  renderAll();
-  closeModal("treatmentEditModal");
-  alert("Treatment changes saved in the current UI.");
-}
 
 function openNotesEdit(){
 
@@ -4703,124 +4819,6 @@ document.addEventListener("keydown",e=>{
 restoreCurrentPatientLocal();
 renderAll();
 activateTab("overview");
-
-/* =========================================================
-   DEFINITIVE PATIENT PAYMENT SAVE HANDLER
-   Panel / Self-Pay is saved independently.
-========================================================= */
-
-window.savePatientPanelChoice = function(){
-
-  const select=document.getElementById("editPatientPanel");
-
-  if(!select){
-    alert("Panel / Insurance field not found.");
-    return false;
-  }
-
-  let value=select.value;
-
-  /* Explicit self-pay value. */
-  if(value==="No Panel" || value===""){
-    value="SELF_PAY";
-  }
-
-  if(!["SELF_PAY","PMCare","MiCare","HealthMetrics","Other"].includes(value)){
-    alert("Please select a valid Panel / Self-Pay option.");
-    return false;
-  }
-
-  let otherName="";
-  if(value==="Other"){
-    const other=document.getElementById("editOtherPanel");
-    otherName=other ? other.value.trim() : "";
-    if(!otherName){
-      alert("Please enter the panel name.");
-      return false;
-    }
-  }
-
-  /* Update in-memory patient immediately. */
-  patient.panelProvider=value;
-  patient.otherPanelName=otherName;
-
-  /* Persist immediately and independently. */
-  try{
-    localStorage.setItem(
-      "getwell_patient_"+patient.id,
-      JSON.stringify({
-        panelProvider:value,
-        otherPanelName:otherName
-      })
-    );
-
-    const saved=JSON.parse(
-      localStorage.getItem("getwell_patient_"+patient.id)
-    );
-
-    if(!saved || saved.panelProvider!==value){
-      throw new Error("Verification failed.");
-    }
-
-  }catch(error){
-    console.error("Panel save failed:",error);
-    alert("Save failed. Your browser did not allow this change to be stored.");
-    return false;
-  }
-
-  /* Update the visible header immediately. */
-  try{
-    if(typeof refreshPatient==="function"){
-      refreshPatient();
-    }
-  }catch(error){
-    console.error("Header refresh failed:",error);
-  }
-
-  /* Update the financial summary immediately. */
-  try{
-    if(typeof renderFinancialSummary==="function"){
-      renderFinancialSummary();
-    }
-  }catch(error){
-    console.error("Financial summary refresh failed:",error);
-  }
-
-  /* Update Panel Claims immediately. */
-  try{
-    if(typeof renderPanelClaims==="function"){
-      renderPanelClaims();
-    }
-  }catch(error){
-    console.error("Panel claims refresh failed:",error);
-  }
-
-  closeModal("patientEditModal");
-
-  return true;
-};
-
-window.bindPatientPanelSaveButton = function(){
-
-  const btn=document.getElementById("savePatientChangesBtn");
-
-  if(!btn)return;
-
-  btn.onclick=function(event){
-    event.preventDefault();
-    event.stopPropagation();
-    window.savePatientPanelChoice();
-    return false;
-  };
-};
-
-/* Bind now and again after DOM is ready. */
-window.bindPatientPanelSaveButton();
-
-if(document.readyState==="loading"){
-  document.addEventListener("DOMContentLoaded",window.bindPatientPanelSaveButton);
-}
-
 </script>
 
 </body>
