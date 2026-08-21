@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 :root{
@@ -227,4 +228,266 @@ body{
 
 .search-box input{
   font-size:10px;
+}
+
+
+/* =========================================================
+   GLOBAL DAY / NIGHT MODE
+========================================================= */
+
+:root{
+  --mode-bg:#EEF5FF;
+  --mode-card:#FFFFFF;
+  --mode-soft:#F8FBFF;
+  --mode-text:#08142A;
+  --mode-muted:#64748B;
+  --mode-border:#D9E4F2;
+  --mode-input:#FFFFFF;
+}
+
+html[data-theme="dark"]{
+  --page:#0B1220;
+  --card:#111827;
+  --border:#263449;
+  --navy:#F1F5F9;
+  --muted:#94A3B8;
+  --blue-soft:#102A4A;
+  --mode-bg:#0B1220;
+  --mode-card:#111827;
+  --mode-soft:#162033;
+  --mode-text:#F1F5F9;
+  --mode-muted:#A8B3C2;
+  --mode-border:#263449;
+  --mode-input:#0F172A;
+
+  color-scheme:dark;
+}
+
+html[data-theme="dark"] body{
+  background:#0B1220;
+  color:#F1F5F9;
+}
+
+html[data-theme="dark"] .sidebar{
+  background:#0A1020;
+  border-color:#263449;
+}
+
+html[data-theme="dark"] .brand{
+  border-color:#263449;
+}
+
+html[data-theme="dark"] .nav a{
+  color:#CBD5E1;
+}
+
+html[data-theme="dark"] .nav a:hover,
+html[data-theme="dark"] .nav a.active{
+  background:#102A4A;
+  color:#60A5FA;
+}
+
+html[data-theme="dark"] .topbar{
+  background:#0F172A;
+  border-color:#263449;
+}
+
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .kpi,
+html[data-theme="dark"] .patient-hero,
+html[data-theme="dark"] .finance-card,
+html[data-theme="dark"] .visit-item,
+html[data-theme="dark"] .break,
+html[data-theme="dark"] .user-card{
+  background:#111827;
+  border-color:#263449;
+  box-shadow:0 8px 28px rgba(0,0,0,.18);
+}
+
+html[data-theme="dark"] .card-head,
+html[data-theme="dark"] .modal-head,
+html[data-theme="dark"] .modal-foot,
+html[data-theme="dark"] .row,
+html[data-theme="dark"] .table th,
+html[data-theme="dark"] .patient-tabs{
+  border-color:#263449;
+}
+
+html[data-theme="dark"] .table th{
+  background:#162033;
+  color:#A8B3C2;
+}
+
+html[data-theme="dark"] .table td{
+  color:#E2E8F0;
+}
+
+html[data-theme="dark"] .table tr:hover td{
+  background:#162033;
+}
+
+html[data-theme="dark"] .search-box,
+html[data-theme="dark"] .icon-button,
+html[data-theme="dark"] .secondary,
+html[data-theme="dark"] .modal,
+html[data-theme="dark"] .form-group input,
+html[data-theme="dark"] .form-group select,
+html[data-theme="dark"] .form-group textarea,
+html[data-theme="dark"] .claim-input{
+  background:#0F172A;
+  border-color:#334155;
+  color:#F1F5F9;
+}
+
+html[data-theme="dark"] .search-box input{
+  background:transparent;
+  color:#F1F5F9;
+}
+
+html[data-theme="dark"] .search-box input::placeholder,
+html[data-theme="dark"] .form-group input::placeholder,
+html[data-theme="dark"] .form-group textarea::placeholder,
+html[data-theme="dark"] .claim-input::placeholder{
+  color:#64748B;
+}
+
+html[data-theme="dark"] .finance-card{
+  background:#162033;
+}
+
+html[data-theme="dark"] .balance{
+  background:#2A1D10;
+  border-color:#8B5A1A;
+}
+
+html[data-theme="dark"] .balance .value{
+  color:#FDBA74;
+}
+
+html[data-theme="dark"] .panel-chip{
+  background:#102A4A;
+  border-color:#1E4D7A;
+  color:#60A5FA;
+}
+
+html[data-theme="dark"] .badge.green{
+  background:#102A1A;
+  color:#86EFAC;
+}
+
+html[data-theme="dark"] .badge.gray{
+  background:#1E293B;
+  color:#CBD5E1;
+}
+
+html[data-theme="dark"] .badge.blue{
+  background:#102A4A;
+  color:#93C5FD;
+}
+
+html[data-theme="dark"] .notif-head{
+  background:#162033;
+  border-color:#263449;
+}
+
+html[data-theme="dark"] .global-notification-panel{
+  background:#111827;
+  border-color:#334155;
+  box-shadow:0 25px 60px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .notif-item:hover{
+  background:#162033;
+}
+
+html[data-theme="dark"] .notif-name{
+  color:#F1F5F9;
+}
+
+html[data-theme="dark"] .modal-wrap{
+  background:rgba(2,6,23,.72);
+}
+
+html[data-theme="dark"] .modal-close{
+  background:#0F172A;
+  border-color:#334155;
+  color:#CBD5E1;
+}
+
+html[data-theme="dark"] .modal-close:hover,
+html[data-theme="dark"] .icon-button:hover,
+html[data-theme="dark"] .secondary:hover{
+  background:#162033;
+}
+
+html[data-theme="dark"] .visit-section-title{
+  color:#F1F5F9;
+}
+
+html[data-theme="dark"] .hero-label,
+html[data-theme="dark"] .kpi-label,
+html[data-theme="dark"] .finance-card .label,
+html[data-theme="dark"] .break span,
+html[data-theme="dark"] .form-group label,
+html[data-theme="dark"] .table th{
+  color:#A8B3C2;
+}
+
+html[data-theme="dark"] .page-subtitle,
+html[data-theme="dark"] .card-head p,
+html[data-theme="dark"] .row-sub,
+html[data-theme="dark"] .kpi-sub{
+  color:#94A3B8;
+}
+
+html[data-theme="dark"] .patient-tabs{
+  background:#111827;
+}
+
+html[data-theme="dark"] .patient-tabs button{
+  color:#A8B3C2;
+}
+
+html[data-theme="dark"] .patient-tabs button.active{
+  color:#60A5FA;
+}
+
+html[data-theme="dark"] .user-dot{
+  background:#102A4A;
+  color:#60A5FA;
+}
+
+html[data-theme="dark"] .notification-count{
+  border-color:#0F172A;
+}
+
+/* Theme toggle */
+.theme-toggle{
+  width:36px;
+  height:36px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  background:#fff;
+  color:#334155;
+  display:grid;
+  place-items:center;
+  font-size:15px;
+  transition:.18s ease;
+}
+
+.theme-toggle:hover{
+  transform:translateY(-1px);
+}
+
+html[data-theme="dark"] .theme-toggle{
+  background:#0F172A;
+  border-color:#334155;
+  color:#FBBF24;
+}
+
+@media(max-width:700px){
+  .theme-toggle{
+    width:34px;
+    height:34px;
+  }
 }
