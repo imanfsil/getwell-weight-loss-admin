@@ -194,9 +194,10 @@ a{text-decoration:none;color:inherit}
   margin-bottom:20px;background:#fff;border:1px solid var(--border);
   border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden
 }
-.tabs{display:flex;overflow-x:auto;padding:0 10px}
+.tabs{position:relative;z-index:30;display:flex;overflow-x:auto;padding:0 10px;pointer-events:auto}
 .tab-button{
-  z-index:2;
+  position:relative;
+  z-index:31;
   cursor:pointer;
   pointer-events:auto;
   position:relative;min-height:54px;padding:0 15px;border:0;background:transparent;
@@ -767,11 +768,11 @@ a{text-decoration:none;color:inherit}
   <div class="tabs">
 
     <button type="button" class="tab-button active" data-tab="overview" onclick="activateTab('overview')">Overview</button>
-    <button type="button" class="tab-button" data-tab="visits" onclick="activateTab(\'visits\')">Visits</button>
-    <button type="button" class="tab-button" data-tab="composition" onclick="activateTab(\'composition\')">Body Composition</button>
+    <button type="button" class="tab-button" data-tab="visits" onclick="activateTab('visits')">Visits</button>
+    <button type="button" class="tab-button" data-tab="composition" onclick="activateTab('composition')">Body Composition</button>
     
-    <button type="button" class="tab-button" data-tab="files" onclick="activateTab(\'files\')">Files & Photos</button>
-    <button type="button" class="tab-button" data-tab="appointments" onclick="activateTab(\'appointments\')">Appointments</button>
+    <button type="button" class="tab-button" data-tab="files" onclick="activateTab('files')">Files & Photos</button>
+    <button type="button" class="tab-button" data-tab="appointments" onclick="activateTab('appointments')">Appointments</button>
 
   </div>
 </div>
