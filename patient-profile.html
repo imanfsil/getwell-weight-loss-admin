@@ -143,6 +143,30 @@ a{text-decoration:none;color:inherit}
 .status-completed{color:var(--primary);background:var(--primary-soft)}
 .status-inactive{color:var(--muted);background:#F1F5F9}
 .status-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.panel-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 10px;
+  border-radius:999px;
+  background:#E8F2FF;
+  border:1px solid #C7DFFF;
+  color:#1D4ED8;
+  font-size:9px;
+  font-weight:600;
+  white-space:nowrap
+}
+.panel-badge.self-pay-badge{
+  background:#E8F2FF;
+  border-color:#C7DFFF;
+}
+.panel-badge-dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#3B82F6;
+}
+
 
 .primary-button,.secondary-button,.edit-button{
   display:inline-flex;align-items:center;justify-content:center;gap:7px
@@ -444,6 +468,324 @@ a{text-decoration:none;color:inherit}
   pointer-events:none;
 }
 
+
+.finance-summary-card{margin-bottom:20px}
+.finance-kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px
+}
+.finance-kpi{
+  padding:16px;
+  border:1px solid var(--border-light);
+  border-radius:11px;
+  background:#F8FBFF
+}
+.finance-kpi-label{
+  display:block;
+  font-size:10px;
+  color:var(--muted)
+}
+.finance-kpi-value{
+  display:block;
+  margin-top:4px;
+  font-size:20px;
+  font-weight:700;
+  color:var(--navy)
+}
+.finance-kpi-sub{
+  display:block;
+  margin-top:3px;
+  font-size:9px;
+  color:var(--muted)
+}
+.finance-claim-kpi{
+  border-color:#C9DCF7;
+  background:#F3F8FF
+}
+
+
+.finance-breakdown{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-top:14px
+}
+
+.finance-kpi.claim-summary-card{
+  min-height:86px;
+}
+.finance-kpi.claim-summary-card .finance-kpi-label{
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.01em;
+  color:#334155;
+}
+.finance-kpi.claim-summary-card .finance-kpi-value{
+  margin-top:7px;
+  font-size:20px;
+  font-weight:700;
+  color:var(--navy);
+}
+.finance-kpi.balance-card{
+  background:#FFF5E8;
+  border-color:#F2B24A;
+}
+.finance-kpi.balance-card .finance-kpi-label,
+.finance-kpi.balance-card .finance-kpi-value{
+  color:#92400E;
+}
+
+.finance-breakdown-item{
+  padding:13px;
+  border:1px solid var(--border-light);
+  border-radius:10px;
+  background:#fff
+}
+.finance-breakdown-item span{
+  display:block;
+  font-size:10px;
+  color:var(--muted)
+}
+.finance-breakdown-item strong{
+  display:block;
+  margin-top:3px;
+  font-size:14px;
+  color:var(--navy)
+}
+.billing-table-wrap,.billing-editor-table-wrap{
+  overflow-x:auto
+}
+.billing-table{
+  width:100%;
+  border-collapse:collapse
+}
+.billing-table th{
+  padding:10px 9px;
+  background:#F8FBFF;
+  border-bottom:1px solid var(--border);
+  color:var(--muted);
+  font-size:9px;
+  font-weight:600;
+  text-align:left;
+}
+.billing-table td{
+  padding:10px 9px;
+  border-bottom:1px solid var(--border-light);
+  color:var(--text);
+  font-size:10px;
+  vertical-align:middle
+}
+.billing-table tfoot td{
+  background:#F8FBFF
+}
+.billing-table input{
+  width:100%;
+  height:34px;
+  padding:0 8px;
+  border:1px solid var(--border);
+  border-radius:7px;
+  font-size:9px;
+  outline:0
+}
+.billing-total-editor{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:14px;
+  padding:13px 14px;
+  background:#EFF6FF;
+  border:1px solid #D7E7FB;
+  border-radius:10px
+}
+.billing-total-editor span{
+  font-size:10px;
+  color:var(--muted)
+}
+.billing-total-editor strong{
+  font-size:16px;
+  color:var(--navy)
+}
+
+.panel-claims-header-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end
+}
+.panel-claims-total,
+.panel-claims-claimed,
+.panel-claims-balance{
+  padding:7px 10px;
+  border-radius:8px;
+  background:#F8FBFF;
+  border:1px solid var(--border-light);
+  color:var(--muted);
+  font-size:9px;
+  white-space:nowrap
+}
+.panel-claims-total strong,
+.panel-claims-claimed strong,
+.panel-claims-balance strong{
+  color:var(--navy);
+  font-size:10px
+}
+.panel-claims-balance{
+  background:#FFF5E8;
+  border-color:#F2B24A
+}
+.panel-claims-balance strong{
+  color:#92400E
+}
+.panel-claims-notice{
+  padding:14px;
+  margin-bottom:14px;
+  border:1px solid #C7DFFF;
+  background:#EFF6FF;
+  color:#1D4ED8;
+  border-radius:10px;
+  font-size:10px;
+  line-height:16px
+}
+.panel-claims-table-wrap{
+  overflow-x:auto
+}
+.panel-claims-table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:930px
+}
+.panel-claims-table th{
+  padding:11px 9px;
+  border-bottom:1px solid var(--border);
+  background:#F8FBFF;
+  color:var(--muted);
+  font-size:9px;
+  font-weight:600;
+  text-align:left;
+  white-space:nowrap
+}
+.panel-claims-table td{
+  padding:10px 9px;
+  border-bottom:1px solid var(--border-light);
+  color:var(--text);
+  font-size:10px;
+  vertical-align:middle;
+  white-space:nowrap
+}
+.panel-claim-input{
+  width:115px;
+  height:31px;
+  padding:0 8px;
+  border:1px solid var(--border);
+  border-radius:7px;
+  font-size:10px;
+  color:var(--text);
+  outline:0
+}
+.panel-claim-input:focus{
+  border-color:#93C5FD;
+  box-shadow:0 0 0 3px rgba(59,130,246,.08)
+}
+.panel-claim-date{
+  width:120px
+}
+.panel-claim-save{
+  min-width:76px;
+  height:31px;
+  border:1px solid var(--border);
+  border-radius:7px;
+  background:#fff;
+  color:var(--primary);
+  font-size:9px;
+  font-weight:600;
+  cursor:pointer
+}
+.panel-claim-save:hover{
+  background:#F8FBFF
+}
+.panel-claim-status{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:9px;
+  font-weight:600
+}
+.panel-claim-status.unclaimed{
+  background:#FFF7ED;
+  color:#C2410C
+}
+.panel-claim-status.partial{
+  background:#EFF6FF;
+  color:#1D4ED8
+}
+.panel-claim-status.complete{
+  background:var(--success-soft);
+  color:var(--success)
+}
+.panel-claim-status-dot{
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:currentColor
+}
+.panel-claims-help{
+  margin-top:12px;
+  padding:10px 12px;
+  border-radius:9px;
+  background:#F8FBFF;
+  color:var(--muted);
+  font-size:9px;
+  line-height:15px
+}
+
+.claim-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin-top:12px
+}
+.claim-item{
+  padding:12px;
+  border:1px solid var(--border-light);
+  border-radius:9px;
+  background:#fff
+}
+.claim-item span{
+  display:block;
+  font-size:9px;
+  color:var(--muted)
+}
+.claim-item strong{
+  display:block;
+  margin-top:3px;
+  font-size:12px;
+  color:var(--navy)
+}
+.claim-validation{
+  margin-top:10px;
+  padding:9px 10px;
+  border-radius:8px;
+  font-size:9px;
+  line-height:15px
+}
+.claim-validation.valid{
+  background:var(--success-soft);
+  color:var(--success)
+}
+.claim-validation.invalid{
+  background:#FEF2F2;
+  color:var(--danger)
+}
+.billing-helper{
+  margin-top:9px;
+  font-size:9px;
+  line-height:15px;
+  color:var(--muted)
+}
 .simple-list{display:flex;flex-direction:column}
 .simple-row{
   display:grid;grid-template-columns:120px 1fr auto;gap:14px;align-items:center;
@@ -529,6 +871,10 @@ a{text-decoration:none;color:inherit}
   .visit-detail-grid{grid-template-columns:1fr}
 }
 @media(max-width:700px){
+  .finance-kpi-grid{grid-template-columns:1fr}
+  .finance-breakdown{grid-template-columns:1fr}
+  .claim-grid{grid-template-columns:1fr}
+
   .topbar{padding:0 15px}
   .search-box,.topbar-right .icon-button{display:none}
   .content{padding:20px 15px}
@@ -667,6 +1013,10 @@ a{text-decoration:none;color:inherit}
           <span class="status-dot"></span>
           <span id="patientStatus">Active</span>
         </span>
+        <span class="panel-badge" id="panelBadge" hidden>
+          <span class="panel-badge-dot"></span>
+          <span id="panelBadgeText">PMCare</span>
+        </span>
       </div>
     </div>
   </div>
@@ -745,6 +1095,32 @@ a{text-decoration:none;color:inherit}
 </div>
 
 
+<div class="finance-summary-card card">
+
+  <div class="card-header">
+
+    <div>
+      <h2>Program Financial Summary</h2>
+      <p id="financeSummarySubtitle">Overall spending and claim position for this patient.</p>
+    </div>
+
+    <button class="edit-button" onclick="activateTab('visits')">
+      View Visits →
+    </button>
+
+  </div>
+
+  <div class="card-body">
+
+    <div class="finance-kpi-grid" id="financeKpiGrid"></div>
+
+    <div class="finance-breakdown" id="financeBreakdown"></div>
+
+  </div>
+
+</div>
+
+
 <div class="upcoming-card">
 
   <div class="upcoming-left">
@@ -773,6 +1149,7 @@ a{text-decoration:none;color:inherit}
     
     <button type="button" class="tab-button" data-tab="files" onclick="activateTab('files')">Files & Photos</button>
     <button type="button" class="tab-button" data-tab="appointments" onclick="activateTab('appointments')">Appointments</button>
+    <button type="button" class="tab-button" data-tab="panelClaims" onclick="activateTab('panelClaims')">Panel Claims</button>
 
   </div>
 </div>
@@ -1174,6 +1551,74 @@ a{text-decoration:none;color:inherit}
      APPOINTMENTS
 ================================ -->
 
+
+<section class="tab-panel" id="panelClaims" hidden>
+
+  <div class="card">
+
+    <div class="card-header">
+
+      <div>
+        <h2>Panel Claims</h2>
+        <p>Track panel-eligible visit charges and the actual amount claimed by staff.</p>
+      </div>
+
+      <div class="panel-claims-header-actions">
+        <span class="panel-claims-total">
+          Total Claimable: <strong id="panelClaimsEligibleTotal">RM 0.00</strong>
+        </span>
+
+        <span class="panel-claims-claimed">
+          Total Claimed: <strong id="panelClaimsClaimedTotal">RM 0.00</strong>
+        </span>
+
+        <span class="panel-claims-balance">
+          Balance to Claim: <strong id="panelClaimsBalanceTotal">RM 0.00</strong>
+        </span>
+      </div>
+
+    </div>
+
+    <div class="card-body">
+
+      <div id="panelClaimsSelfPayNotice" class="panel-claims-notice" hidden>
+        This patient is currently marked as <strong>Self-Pay</strong>. Panel claims will appear here once a panel is selected in the patient profile.
+      </div>
+
+      <div class="panel-claims-table-wrap">
+
+        <table class="panel-claims-table">
+
+          <thead>
+            <tr>
+              <th>Visit</th>
+              <th>Visit Date</th>
+              <th>Invoice Total</th>
+              <th>Panel Eligible</th>
+              <th>Claim Amount</th>
+              <th>Claim Date</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody id="panelClaimsTableBody"></tbody>
+
+        </table>
+
+      </div>
+
+      <div class="panel-claims-help">
+        <strong>How this works:</strong>
+        the visit date is the date the patient received the service. Claim Date is the date staff actually submitted the panel claim, which can be different.
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
 <section class="tab-panel" id="appointments" hidden>
 
   <div class="card">
@@ -1460,6 +1905,59 @@ a{text-decoration:none;color:inherit}
       </div>
 
       <div class="detail-block">
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="detail-title">Billing & Claims</div>
+          <button class="edit-button" onclick="openVisitBillingEditFromDetail()">✎ Edit</button>
+        </div>
+
+        <div class="billing-table-wrap">
+
+          <table class="billing-table">
+
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Notes</th>
+                <th>Price</th>
+              </tr>
+            </thead>
+
+            <tbody id="visitBillingRows"></tbody>
+
+            <tfoot>
+              <tr>
+                <td colspan="2"><strong>Visit Total</strong></td>
+                <td><strong id="visitBillingTotal">RM 0.00</strong></td>
+              </tr>
+            </tfoot>
+
+          </table>
+
+        </div>
+
+        <div class="claim-grid">
+
+          <div class="claim-item">
+            <span>Panel / Insurance</span>
+            <strong id="visitPanelAmount">RM 0.00</strong>
+          </div>
+
+          <div class="claim-item">
+            <span>Self-Pay</span>
+            <strong id="visitSelfPayAmount">RM 0.00</strong>
+          </div>
+
+          
+
+        </div>
+
+        <div class="claim-validation" id="visitClaimValidation"></div>
+
+      </div>
+
+
+      <div class="detail-block">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
           <div class="detail-title">Files & Photos</div>
           <button class="edit-button" onclick="openVisitFilesEditFromDetail()">✎ Edit</button>
@@ -1493,6 +1991,125 @@ a{text-decoration:none;color:inherit}
       <button class="primary-button" onclick="openVisitEditFromDetail()">✎ Edit Visit</button>
     </div>
   </div>
+</div>
+
+
+<!-- ==============================
+     VISIT BILLING EDIT
+================================ -->
+
+<div class="modal-overlay" id="visitBillingEditModal">
+
+  <div class="modal">
+
+    <div class="modal-header">
+
+      <div>
+        <h2>Edit Billing & Claims</h2>
+        <span id="billingEditSubtitle">Selected visit</span>
+      </div>
+
+      <button class="modal-close" onclick="closeModal('visitBillingEditModal')">✕</button>
+
+    </div>
+
+    <div class="modal-body">
+
+      <div class="billing-editor-table-wrap">
+
+        <table class="billing-table">
+
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Notes</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr>
+              <td><strong>Injection</strong></td>
+              <td><input id="billingInjectionNotes" placeholder="e.g. Tirzepatide 2.5 mg"></td>
+              <td><input id="billingInjectionPrice" type="number" min="0" step="0.01" placeholder="0.00"></td>
+            </tr>
+
+            <tr>
+              <td><strong>Medication</strong></td>
+              <td><input id="billingMedicationNotes" placeholder="Medication / supplement"></td>
+              <td><input id="billingMedicationPrice" type="number" min="0" step="0.01" placeholder="0.00"></td>
+            </tr>
+
+            <tr>
+              <td><strong>Treatment</strong></td>
+              <td><input id="billingTreatmentNotes" placeholder="Any other treatment"></td>
+              <td><input id="billingTreatmentPrice" type="number" min="0" step="0.01" placeholder="0.00"></td>
+            </tr>
+
+            <tr>
+              <td><strong>Other</strong></td>
+              <td><input id="billingOtherNotes" placeholder="Optional"></td>
+              <td><input id="billingOtherPrice" type="number" min="0" step="0.01" placeholder="0.00"></td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <div class="billing-total-editor">
+        <span>Visit Total</span>
+        <strong id="billingEditorTotal">RM 0.00</strong>
+      </div>
+
+      <div class="form-grid" style="margin-top:14px">
+
+        <div class="form-group">
+          <label>Payment / Claim Type</label>
+          <select id="billingCoverageType" onchange="handleCoverageTypeChange()">
+            <option value="self">Self-Pay</option>
+            <option value="panel">Panel</option>
+          </select>
+        </div>
+
+        
+
+      </div>
+
+      <div class="form-grid" style="margin-top:14px">
+
+        <div class="form-group">
+          <label>Panel / Insurance Amount</label>
+          <input id="billingPanelAmount" type="number" min="0" step="0.01" oninput="updateBillingEditorTotal()">
+        </div>
+
+        <div class="form-group">
+          <label>Self-Pay Amount</label>
+          <input id="billingSelfPayAmount" type="number" min="0" step="0.01" oninput="updateBillingEditorTotal()">
+        </div>
+
+      </div>
+
+      <div class="claim-validation" id="billingEditorValidation"></div>
+
+      <div class="billing-helper">
+        Panel + Self-Pay must equal the Visit Total before the record can be saved.
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+
+      <button class="secondary-button" onclick="closeModal('visitBillingEditModal')">Cancel</button>
+
+      <button class="primary-button" onclick="saveVisitBilling()">Save Billing</button>
+
+    </div>
+
+  </div>
+
 </div>
 
 <!-- ==============================
@@ -1565,6 +2182,21 @@ a{text-decoration:none;color:inherit}
           <option>Dr Locum</option>
         </select>
       </div>
+      <div class="form-group">
+        <label>Panel / Insurance</label>
+        <select id="editPatientPanel" onchange="toggleOtherPanelField()">
+          <option value="SELF_PAY">Self-Pay</option>
+          <option value="PMCare">PMCare</option>
+          <option value="MiCare">MiCare</option>
+          <option value="HealthMetrics">HealthMetrics</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="otherPanelGroup" hidden>
+        <label>Panel Name</label>
+        <input id="editOtherPanel" placeholder="Enter panel / insurance name">
+      </div>
 
       <div class="form-group">
         <label>Program Status</label>
@@ -1586,7 +2218,7 @@ a{text-decoration:none;color:inherit}
 
   <div class="modal-footer">
     <button class="secondary-button" onclick="closeModal('patientEditModal')">Cancel</button>
-    <button class="primary-button" onclick="savePatientEdit()">Save Changes</button>
+    <button type="button" class="primary-button" id="savePatientChangesBtn">Save Changes</button>
   </div>
 
 </div>
@@ -2178,6 +2810,7 @@ const patients={
     phone:"",
     dob:"",
     gender:"Female",
+    panelProvider:"SELF_PAY",
     arboleafUsername:"",
     measurements:{
       "2026-08-06":{
@@ -2204,7 +2837,16 @@ const patients={
         injection:"Tirzepatide",dose:"2.5 mg",
         medication:"None recorded",additionalTreatment:"None recorded",
         notes:"Patient completed body composition measurement. Progress reviewed and treatment tolerated well.",
-        pdfName:"Arboleaf_20Aug2026.pdf",status:"Completed"
+        pdfName:"Arboleaf_20Aug2026.pdf",status:"Completed",billing:{
+  injection:{notes:"Tirzepatide 2.5 mg",price:120},
+  medication:{notes:"None",price:0},
+  treatment:{notes:"Gut Detox",price:50},
+  other:{notes:"",price:0},
+  panel:0,
+  selfPay:170,
+  claimStatus:"Unclaimed",
+  coverageType:"self"
+}
       },
       {
         id:"GW0001-V9",date:"13 Aug 2026",dateKey:"2026-08-13",
@@ -2213,7 +2855,16 @@ const patients={
         injection:"Tirzepatide",dose:"2.5 mg",
         medication:"None recorded",additionalTreatment:"None recorded",
         notes:"Weekly follow-up completed.",
-        pdfName:"Arboleaf_13Aug2026.pdf",status:"Completed"
+        pdfName:"Arboleaf_13Aug2026.pdf",status:"Completed",billing:{
+  injection:{notes:"Tirzepatide 2.5 mg",price:120},
+  medication:{notes:"Probiotics",price:30},
+  treatment:{notes:"",price:0},
+  other:{notes:"",price:0},
+  panel:0,
+  selfPay:150,
+  claimStatus:"Unclaimed",
+  coverageType:"self"
+}
       },
       {
         id:"GW0001-V8",date:"06 Aug 2026",dateKey:"2026-08-06",
@@ -2246,6 +2897,7 @@ const patients={
     phone:"",
     dob:"",
     gender:"Male",
+    panelProvider:"PMCare",
     arboleafUsername:"izzvape433",
     measurements:{
       "2026-07-30":{
@@ -2277,7 +2929,16 @@ const patients={
         injection:"Tirzepatide",dose:"2.5 mg",
         medication:"None recorded",additionalTreatment:"None recorded",
         notes:"Patient completed body composition measurement. Progress reviewed and treatment tolerated well.",
-        pdfName:"Arboleaf_20Aug2026.pdf",status:"Completed"
+        pdfName:"Arboleaf_20Aug2026.pdf",status:"Completed",billing:{
+  injection:{notes:"Tirzepatide 2.5 mg",price:150},
+  medication:{notes:"Medication",price:30},
+  treatment:{notes:"Gut Detox",price:50},
+  other:{notes:"",price:0},
+  panel:150,
+  selfPay:80,
+  claimStatus:"Partially Claimed",
+  coverageType:"panel"
+}
       },
       {
         id:"GW0002-V9",date:"13 Aug 2026",dateKey:"2026-08-13",
@@ -2345,21 +3006,42 @@ let appointment={
 
 
 function activateTab(tab){
+
   document.querySelectorAll(".tab-button").forEach(button=>{
-    button.classList.toggle("active", button.dataset.tab===tab);
+    button.classList.toggle("active",button.dataset.tab===tab);
   });
 
   document.querySelectorAll(".tab-panel").forEach(panel=>{
-    panel.hidden = panel.id !== tab;
+    panel.hidden=panel.id!==tab;
   });
 
-  if(tab==="overview") renderOverviewVisits();
-  if(tab==="visits") renderVisits();
+  if(tab==="overview"){
+    renderOverviewVisits();
+    renderFinancialSummary();
+  }
+
+  if(tab==="visits"){
+    renderVisits();
+  }
+
   if(tab==="composition"){
     const key=Object.keys(patient.measurements||{}).sort().slice(-1)[0];
-    if(key) updateOverallComposition(key);
+    if(key && typeof updateOverallComposition==="function"){
+      updateOverallComposition(key);
+    }
   }
-  if(tab==="files") renderFileVisits();
+
+  if(tab==="files"){
+    renderFileVisits();
+  }
+
+  if(tab==="appointments"){
+    renderAppointment();
+  }
+
+  if(tab==="panelClaims"){
+    renderPanelClaims();
+  }
 
   window.scrollTo({top:0,behavior:"smooth"});
 }
@@ -2389,9 +3071,584 @@ document.querySelectorAll(".modal-overlay").forEach(overlay=>{
 });
 
 
+
+/* =========================================================
+   BILLING / CLAIMS
+========================================================= */
+
+function ensureBilling(visit){
+
+  if(!visit.billing){
+    visit.billing={
+      injection:{notes:visit.injection ? visit.injection + (visit.dose ? " · "+visit.dose : "") : "",price:0},
+      medication:{notes:visit.medication && visit.medication!=="None recorded" ? visit.medication : "",price:0},
+      treatment:{notes:visit.additionalTreatment && visit.additionalTreatment!=="None recorded" ? visit.additionalTreatment : "",price:0},
+      other:{notes:"",price:0},
+      panel:0,
+      selfPay:0,
+      claimStatus:"Unclaimed",
+      coverageType:"self"
+    };
+  }
+
+  if(!visit.billing.panelClaimAmount && visit.billing.panelClaimAmount!==0){
+    visit.billing.panelClaimAmount=0;
+  }
+
+  if(!visit.billing.panelClaimDate){
+    visit.billing.panelClaimDate="";
+  }
+
+  if(!visit.billing.panelClaimRef){
+    visit.billing.panelClaimRef="";
+  }
+
+  return visit.billing;
+}
+
+function billingTotal(billing){
+  return Number(billing.injection.price||0)
+    +Number(billing.medication.price||0)
+    +Number(billing.treatment.price||0)
+    +Number(billing.other.price||0);
+}
+
+function showMoney(value){
+  return "RM "+Number(value||0).toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+
+
+
+function getPanelEligibleAmount(visit){
+  const b=ensureBilling(visit);
+  return Number(b.panel||0);
+}
+
+function getPanelClaimAmount(visit){
+  const b=ensureBilling(visit);
+  return Number(b.panelClaimAmount||0);
+}
+
+function getPanelClaimStatus(eligible, claimed){
+  if(claimed<=0)return {text:"Unclaimed",cls:"unclaimed"};
+  if(claimed<eligible)return {text:"Partially Claimed",cls:"partial"};
+  return {text:"Fully Claimed",cls:"complete"};
+}
+
+function renderPanelClaims(){
+
+  const tbody=document.getElementById("panelClaimsTableBody");
+  const notice=document.getElementById("panelClaimsSelfPayNotice");
+
+  if(!tbody)return;
+
+  const hasPanel=!!patient.panelProvider && patient.panelProvider!=="No Panel" && patient.panelProvider!=="SELF_PAY";
+
+  if(notice){
+    notice.hidden=hasPanel;
+  }
+
+  let eligibleTotal=0;
+  let claimedTotal=0;
+
+  const panelVisits=(patient.visits||[]);
+
+  tbody.innerHTML=panelVisits.length ? panelVisits.map(visit=>{
+
+    const b=ensureBilling(visit);
+    const invoiceTotal=billingTotal(b);
+    const eligible=getPanelEligibleAmount(visit);
+    const claimed=getPanelClaimAmount(visit);
+
+    eligibleTotal+=eligible;
+    claimedTotal+=claimed;
+
+    const status=getPanelClaimStatus(eligible,claimed);
+
+    if(!hasPanel){
+      return `
+        <tr>
+          <td>${visit.visit}</td>
+          <td>${visit.date}</td>
+          <td>${showMoney(invoiceTotal)}</td>
+          <td>${showMoney(eligible)}</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="panel-claim-status ${status.cls}"><span class="panel-claim-status-dot"></span>${status.text}</span></td>
+          <td>—</td>
+        </tr>
+      `;
+    }
+
+    return `
+      <tr>
+        <td><strong>${visit.visit}</strong></td>
+        <td>${visit.date}</td>
+        <td>${showMoney(invoiceTotal)}</td>
+        <td>${showMoney(eligible)}</td>
+
+        <td>
+          <input
+            class="panel-claim-input"
+            id="claimAmount-${visit.id}"
+            type="number"
+            min="0"
+            max="${eligible}"
+            step="0.01"
+            value="${claimed ? claimed.toFixed(2) : ""}"
+            placeholder="0.00"
+          >
+        </td>
+
+        <td>
+          <input
+            class="panel-claim-input panel-claim-date"
+            id="claimDate-${visit.id}"
+            type="date"
+            value="${b.panelClaimDate||""}"
+          >
+        </td>
+
+        <td>
+          <span class="panel-claim-status ${status.cls}">
+            <span class="panel-claim-status-dot"></span>
+            ${status.text}
+          </span>
+        </td>
+
+        <td>
+          <button
+            type="button"
+            class="panel-claim-save"
+            onclick="savePanelClaim('${visit.id}')"
+          >
+            Save
+          </button>
+        </td>
+      </tr>
+    `;
+
+  }).join("") : `
+    <tr>
+      <td colspan="8" style="padding:24px;color:var(--muted)">
+        No visits recorded yet.
+      </td>
+    </tr>
+  `;
+
+  const balance=Math.max(0,eligibleTotal-claimedTotal);
+
+  document.getElementById("panelClaimsEligibleTotal").textContent=showMoney(eligibleTotal);
+  document.getElementById("panelClaimsClaimedTotal").textContent=showMoney(claimedTotal);
+  document.getElementById("panelClaimsBalanceTotal").textContent=showMoney(balance);
+}
+
+function savePanelClaim(visitId){
+
+  const visit=patient.visits.find(v=>v.id===visitId);
+
+  if(!visit){
+    alert("Visit record not found.");
+    return;
+  }
+
+  const b=ensureBilling(visit);
+
+  const amountInput=document.getElementById("claimAmount-"+visitId);
+  const dateInput=document.getElementById("claimDate-"+visitId);
+
+  const amount=Number(amountInput.value||0);
+  const eligible=getPanelEligibleAmount(visit);
+
+  if(amount<0){
+    alert("Claim amount cannot be negative.");
+    return;
+  }
+
+  if(amount>eligible){
+    alert("Claim amount cannot be more than the panel-eligible amount for this visit.");
+    return;
+  }
+
+  b.panelClaimAmount=amount;
+  b.panelClaimDate=dateInput.value||"";
+
+  if(amount<=0){
+    b.claimStatus="Unclaimed";
+  }else if(amount<eligible){
+    b.claimStatus="Partially Claimed";
+  }else{
+    b.claimStatus="Fully Claimed";
+  }
+
+  try{
+    localStorage.setItem(
+      "getwell_patient_"+patient.id+"_panel_claims",
+      JSON.stringify(
+        (patient.visits||[]).map(v=>({
+          id:v.id,
+          panelClaimAmount:Number(ensureBilling(v).panelClaimAmount||0),
+          panelClaimDate:ensureBilling(v).panelClaimDate||""
+        }))
+      )
+    );
+  }catch(error){
+    console.warn("Panel claim local save unavailable:",error);
+  }
+
+  renderPanelClaims();
+  renderFinancialSummary();
+}
+
+function restorePanelClaimsLocal(){
+
+  try{
+
+    const raw=localStorage.getItem("getwell_patient_"+patient.id+"_panel_claims");
+
+    if(!raw)return;
+
+    const saved=JSON.parse(raw);
+
+    if(!Array.isArray(saved))return;
+
+    saved.forEach(item=>{
+
+      const visit=patient.visits.find(v=>v.id===item.id);
+
+      if(!visit)return;
+
+      const b=ensureBilling(visit);
+
+      b.panelClaimAmount=Number(item.panelClaimAmount||0);
+      b.panelClaimDate=item.panelClaimDate||"";
+
+      const eligible=getPanelEligibleAmount(visit);
+
+      if(b.panelClaimAmount<=0){
+        b.claimStatus="Unclaimed";
+      }else if(b.panelClaimAmount<eligible){
+        b.claimStatus="Partially Claimed";
+      }else{
+        b.claimStatus="Fully Claimed";
+      }
+    });
+
+  }catch(error){
+    console.warn("Panel claim restore unavailable:",error);
+  }
+}
+
+function renderFinancialSummary(){
+
+  let grand=0;
+  let claimed=0;
+  let claimable=0;
+  let injectionTotal=0;
+  let medicationTotal=0;
+  let treatmentTotal=0;
+  let selfPayTotal=0;
+
+  (patient.visits||[]).forEach(visit=>{
+    const b=ensureBilling(visit);
+
+    const total=billingTotal(b);
+
+    grand+=total;
+    claimable+=Number(b.panel||0);
+    claimed+=Number(b.panelClaimAmount||0);
+
+    injectionTotal+=Number(b.injection.price||0);
+    medicationTotal+=Number(b.medication.price||0);
+    treatmentTotal+=Number(b.treatment.price||0);
+    selfPayTotal+=Number(b.selfPay||0);
+  });
+
+  const balance=Math.max(0,claimable-claimed);
+  const hasPanel=!!patient.panelProvider && patient.panelProvider!=="No Panel" && patient.panelProvider!=="SELF_PAY";
+
+  const kpiGrid=document.getElementById("financeKpiGrid");
+  const breakdown=document.getElementById("financeBreakdown");
+  const subtitle=document.getElementById("financeSummarySubtitle");
+
+  if(!kpiGrid||!breakdown)return;
+
+  if(hasPanel){
+
+    subtitle.textContent="Claim summary and overall program spending for this panel patient.";
+
+    kpiGrid.innerHTML=`
+      <div class="finance-kpi claim-summary-card">
+        <span class="finance-kpi-label">GRAND TOTAL</span>
+        <span class="finance-kpi-value">${showMoney(grand)}</span>
+      </div>
+
+      <div class="finance-kpi claim-summary-card">
+        <span class="finance-kpi-label">TOTAL CLAIMED</span>
+        <span class="finance-kpi-value">${showMoney(claimed)}</span>
+      </div>
+
+      <div class="finance-kpi claim-summary-card balance-card">
+        <span class="finance-kpi-label">BALANCE TO CLAIM</span>
+        <span class="finance-kpi-value">${showMoney(balance)}</span>
+      </div>
+    `;
+
+    breakdown.innerHTML=`
+      <div class="finance-breakdown-item">
+        <span>Total Injection</span>
+        <strong>${showMoney(injectionTotal)}</strong>
+      </div>
+
+      <div class="finance-breakdown-item">
+        <span>Total Medication</span>
+        <strong>${showMoney(medicationTotal)}</strong>
+      </div>
+
+      <div class="finance-breakdown-item">
+        <span>Total Treatment</span>
+        <strong>${showMoney(treatmentTotal)}</strong>
+      </div>
+    `;
+
+  }else{
+
+    subtitle.textContent="Overall self-pay spending for this patient.";
+
+    kpiGrid.innerHTML=`
+      <div class="finance-kpi">
+        <span class="finance-kpi-label">GRAND TOTAL</span>
+        <span class="finance-kpi-value">${showMoney(grand)}</span>
+      </div>
+
+      <div class="finance-kpi">
+        <span class="finance-kpi-label">TOTAL INJECTION</span>
+        <span class="finance-kpi-value">${showMoney(injectionTotal)}</span>
+      </div>
+
+      <div class="finance-kpi">
+        <span class="finance-kpi-label">TOTAL MEDICATION</span>
+        <span class="finance-kpi-value">${showMoney(medicationTotal)}</span>
+      </div>
+    `;
+
+    breakdown.innerHTML=`
+      <div class="finance-breakdown-item">
+        <span>Total Treatment</span>
+        <strong>${showMoney(treatmentTotal)}</strong>
+      </div>
+
+      <div class="finance-breakdown-item">
+        <span>Overall Self-Pay</span>
+        <strong>${showMoney(selfPayTotal || grand)}</strong>
+      </div>
+    `;
+  }
+}
+function renderVisitBilling(){
+
+  if(!selectedVisit)return;
+
+  const b=ensureBilling(selectedVisit);
+
+  const rows=[
+    ["Injection",b.injection],
+    ["Medication",b.medication],
+    ["Treatment",b.treatment],
+    ["Other",b.other]
+  ];
+
+  const tbody=document.getElementById("visitBillingRows");
+
+  if(tbody){
+    tbody.innerHTML=rows.map(row=>`
+      <tr>
+        <td><strong>${row[0]}</strong></td>
+        <td>${row[1].notes||"—"}</td>
+        <td>${showMoney(row[1].price)}</td>
+      </tr>
+    `).join("");
+  }
+
+  const total=billingTotal(b);
+
+  document.getElementById("visitBillingTotal").textContent=showMoney(total);
+  document.getElementById("visitPanelAmount").textContent=showMoney(b.panel);
+  document.getElementById("visitSelfPayAmount").textContent=showMoney(b.selfPay);
+
+  const difference=Math.abs(total-(Number(b.panel||0)+Number(b.selfPay||0)));
+  const validation=document.getElementById("visitClaimValidation");
+
+  if(!validation)return;
+
+  if(difference<0.001){
+    validation.className="claim-validation valid";
+    validation.textContent="Panel + Self-Pay matches the Visit Total.";
+  }else{
+    validation.className="claim-validation invalid";
+    validation.textContent="Panel + Self-Pay does not match the Visit Total.";
+  }
+}
+
+function openVisitBillingEditFromDetail(){
+  closeModal("visitDetailModal");
+  openVisitBillingEdit();
+}
+
+function openVisitBillingEdit(){
+
+  if(!selectedVisit){
+    alert("Please select a visit first.");
+    return;
+  }
+
+  const b=ensureBilling(selectedVisit);
+
+  document.getElementById("billingEditSubtitle").textContent=
+    selectedVisit.date+" · "+selectedVisit.visit;
+
+  document.getElementById("billingInjectionNotes").value=b.injection.notes||"";
+  document.getElementById("billingInjectionPrice").value=b.injection.price||"";
+  document.getElementById("billingMedicationNotes").value=b.medication.notes||"";
+  document.getElementById("billingMedicationPrice").value=b.medication.price||"";
+  document.getElementById("billingTreatmentNotes").value=b.treatment.notes||"";
+  document.getElementById("billingTreatmentPrice").value=b.treatment.price||"";
+  document.getElementById("billingOtherNotes").value=b.other.notes||"";
+  document.getElementById("billingOtherPrice").value=b.other.price||"";
+  document.getElementById("billingCoverageType").value=b.coverageType||"self";
+  document.getElementById("billingPanelAmount").value=b.panel||0;
+  document.getElementById("billingSelfPayAmount").value=b.selfPay||0;
+
+  updateBillingEditorTotal();
+  openModal("visitBillingEditModal");
+}
+
+function updateBillingEditorTotal(){
+
+  const total=
+    Number(document.getElementById("billingInjectionPrice").value||0)+
+    Number(document.getElementById("billingMedicationPrice").value||0)+
+    Number(document.getElementById("billingTreatmentPrice").value||0)+
+    Number(document.getElementById("billingOtherPrice").value||0);
+
+  document.getElementById("billingEditorTotal").textContent=showMoney(total);
+
+  const panel=Number(document.getElementById("billingPanelAmount").value||0);
+  const selfPay=Number(document.getElementById("billingSelfPayAmount").value||0);
+  const diff=Math.abs(total-(panel+selfPay));
+  const validation=document.getElementById("billingEditorValidation");
+
+  if(diff<0.001){
+    validation.className="claim-validation valid";
+    validation.textContent="Panel + Self-Pay matches the Visit Total.";
+    return true;
+  }
+
+  validation.className="claim-validation invalid";
+  validation.textContent=`Panel + Self-Pay must equal ${showMoney(total)}. Current allocation is ${showMoney(panel+selfPay)}.`;
+  return false;
+}
+
+function handleCoverageTypeChange(){
+
+  const type=document.getElementById("billingCoverageType").value;
+
+  if(type==="self"){
+    const total=
+      Number(document.getElementById("billingInjectionPrice").value||0)+
+      Number(document.getElementById("billingMedicationPrice").value||0)+
+      Number(document.getElementById("billingTreatmentPrice").value||0)+
+      Number(document.getElementById("billingOtherPrice").value||0);
+
+    document.getElementById("billingPanelAmount").value=0;
+    document.getElementById("billingSelfPayAmount").value=total;
+  }
+
+  updateBillingEditorTotal();
+}
+
+function saveVisitBilling(){
+
+  if(!selectedVisit)return;
+
+  if(!updateBillingEditorTotal())return;
+
+  const total=
+    Number(document.getElementById("billingInjectionPrice").value||0)+
+    Number(document.getElementById("billingMedicationPrice").value||0)+
+    Number(document.getElementById("billingTreatmentPrice").value||0)+
+    Number(document.getElementById("billingOtherPrice").value||0);
+
+  const b=ensureBilling(selectedVisit);
+
+  b.injection={
+    notes:document.getElementById("billingInjectionNotes").value,
+    price:Number(document.getElementById("billingInjectionPrice").value||0)
+  };
+
+  b.medication={
+    notes:document.getElementById("billingMedicationNotes").value,
+    price:Number(document.getElementById("billingMedicationPrice").value||0)
+  };
+
+  b.treatment={
+    notes:document.getElementById("billingTreatmentNotes").value,
+    price:Number(document.getElementById("billingTreatmentPrice").value||0)
+  };
+
+  b.other={
+    notes:document.getElementById("billingOtherNotes").value,
+    price:Number(document.getElementById("billingOtherPrice").value||0)
+  };
+
+  b.panel=Number(document.getElementById("billingPanelAmount").value||0);
+  b.selfPay=Number(document.getElementById("billingSelfPayAmount").value||0);
+
+  const newPanelEligible=Number(b.panel||0);
+
+  if(Number(b.panelClaimAmount||0)>newPanelEligible){
+    b.panelClaimAmount=newPanelEligible;
+  }
+  b.coverageType=document.getElementById("billingCoverageType").value;
+
+  closeModal("visitBillingEditModal");
+
+  renderAll();
+  renderVisitBilling();
+  renderVisitDetailModal();
+
+  alert("Billing changes saved in the current UI.");
+}
+
 /* =========================================================
    PATIENT DISPLAY
 ========================================================= */
+
+
+function toggleOtherPanelField(){
+  const select=document.getElementById("editPatientPanel");
+  const group=document.getElementById("otherPanelGroup");
+  if(!select||!group)return;
+
+  const isOther=select.value==="Other";
+  group.hidden=!isOther;
+  group.style.display=isOther ? "" : "none";
+}
+
+function getPatientPanelName(){
+  const value=patient.panelProvider||"SELF_PAY";
+
+  if(value==="SELF_PAY" || value==="No Panel"){
+    return "Self-Pay";
+  }
+
+  if(value==="Other"){
+    return patient.otherPanelName||"Other Panel";
+  }
+
+  return value;
+}
 
 function refreshPatient(){
   document.title=patient.name+" | Getwell Weight Loss Admin";
@@ -2399,6 +3656,19 @@ function refreshPatient(){
   document.getElementById("patientName").textContent=patient.name;
   document.getElementById("patientId").textContent=patient.id;
   document.getElementById("patientStatus").textContent=patient.status;
+
+  const panelBadge=document.getElementById("panelBadge");
+  const panelBadgeText=document.getElementById("panelBadgeText");
+  const panelName=getPatientPanelName();
+
+  panelBadge.hidden=false;
+  panelBadgeText.textContent=panelName;
+
+  if(panelName==="Self-Pay"){
+    panelBadge.classList.add("self-pay-badge");
+  }else{
+    panelBadge.classList.remove("self-pay-badge");
+  }
   document.getElementById("startDate").textContent=patient.startDate;
   document.getElementById("doctor").textContent=patient.doctor;
   document.getElementById("lastVisit").textContent=patient.lastVisit;
@@ -2765,39 +4035,150 @@ function renderFileVisits(){
 
 function openPatientEdit(){
 
-  document.getElementById("editPatientName").value=patient.name;
-  document.getElementById("editPatientId").value=patient.id;
+  document.getElementById("editPatientName").value=patient.name||"";
   document.getElementById("editPatientPhone").value=patient.phone||"";
   document.getElementById("editPatientDob").value=patient.dob||"";
-  document.getElementById("editPatientGender").value=patient.gender||"Female";
+  document.getElementById("editPatientGender").value=patient.gender||"";
   document.getElementById("editPatientHeight").value=patient.height||"";
   document.getElementById("editPatientStartWeight").value=patient.startingWeight||"";
   document.getElementById("editPatientGoalWeight").value=patient.goalWeight||"";
   document.getElementById("editPatientDoctor").value=patient.doctor||"Dr Aaron";
   document.getElementById("editPatientStatus").value=patient.status||"Active";
-  document.getElementById("editArboleafUsername").value=patient.arboleafUsername||"";
+
+  const rawPanel=patient.panelProvider||"SELF_PAY";
+  const panelValue=(rawPanel==="No Panel" ? "SELF_PAY" : rawPanel);
+
+  const panelSelect=document.getElementById("editPatientPanel");
+  const otherInput=document.getElementById("editOtherPanel");
+
+  if(["SELF_PAY","PMCare","MiCare","HealthMetrics","Other"].includes(panelValue)){
+    panelSelect.value=panelValue;
+    otherInput.value=patient.otherPanelName||"";
+  }else{
+    panelSelect.value="Other";
+    otherInput.value=panelValue;
+  }
+
+  toggleOtherPanelField();
+
+  document.getElementById("editArboleafUsername").value=
+    patient.arboleafUsername||"";
 
   openModal("patientEditModal");
 }
 
-function savePatientEdit(){
+function restoreCurrentPatientLocal(){
 
-  patient.name=document.getElementById("editPatientName").value.trim();
-  patient.phone=document.getElementById("editPatientPhone").value;
-  patient.dob=document.getElementById("editPatientDob").value;
-  patient.gender=document.getElementById("editPatientGender").value;
-  patient.height=document.getElementById("editPatientHeight").value;
-  patient.startingWeight=document.getElementById("editPatientStartWeight").value;
-  patient.goalWeight=document.getElementById("editPatientGoalWeight").value;
-  patient.doctor=document.getElementById("editPatientDoctor").value;
-  patient.status=document.getElementById("editPatientStatus").value;
-  patient.arboleafUsername=document.getElementById("editArboleafUsername").value;
+  try{
 
-  refreshPatient();
-  closeModal("patientEditModal");
-  alert("Patient changes saved in the current UI.");
+    const raw=localStorage.getItem("getwell_patient_"+patient.id);
+
+    if(!raw)return;
+
+    const saved=JSON.parse(raw);
+
+    if(!saved || typeof saved!=="object")return;
+
+    if(saved.panelProvider!==undefined){
+      patient.panelProvider =
+        saved.panelProvider==="No Panel"
+          ? "SELF_PAY"
+          : saved.panelProvider;
+    }
+
+    if(saved.otherPanelName!==undefined){
+      patient.otherPanelName=saved.otherPanelName;
+    }
+
+  }catch(error){
+
+    console.warn("Local patient restore unavailable:",error);
+
+  }
 }
 
+function savePatientEdit(){
+
+  const panelSelectEl=document.getElementById("editPatientPanel");
+
+  if(!panelSelectEl){
+    alert("Panel / Insurance field could not be found.");
+    return;
+  }
+
+  const selectedPanel=panelSelectEl.value;
+
+  /* Normalize the explicit Self-Pay choice. */
+  patient.panelProvider =
+    selectedPanel==="SELF_PAY"
+      ? "SELF_PAY"
+      : selectedPanel;
+
+  if(patient.panelProvider==="Other"){
+    const otherInput=document.getElementById("editOtherPanel");
+    patient.otherPanelName =
+      otherInput ? (otherInput.value.trim() || "Other Panel") : "Other Panel";
+  }else{
+    patient.otherPanelName="";
+  }
+
+  /* Persist the payment type FIRST. */
+  try{
+
+    localStorage.setItem(
+      "getwell_patient_"+patient.id,
+      JSON.stringify({
+        panelProvider:patient.panelProvider,
+        otherPanelName:patient.otherPanelName
+      })
+    );
+
+    /* Verify what was written. */
+    const verify=JSON.parse(
+      localStorage.getItem("getwell_patient_"+patient.id)
+    );
+
+    if(!verify || verify.panelProvider!==patient.panelProvider){
+      throw new Error("Panel selection could not be verified after saving.");
+    }
+
+  }catch(error){
+
+    console.error("Panel selection save failed:",error);
+    alert("The Panel / Self-Pay selection could not be saved in this browser.");
+    return;
+
+  }
+
+  /* Save other patient details. */
+  const getValue=id=>{
+    const el=document.getElementById(id);
+    return el ? el.value : "";
+  };
+
+  patient.name=getValue("editPatientName").trim();
+  patient.phone=getValue("editPatientPhone");
+  patient.dob=getValue("editPatientDob");
+  patient.gender=getValue("editPatientGender");
+  patient.height=getValue("editPatientHeight");
+  patient.startingWeight=getValue("editPatientStartWeight");
+  patient.goalWeight=getValue("editPatientGoalWeight");
+  patient.doctor=getValue("editPatientDoctor");
+  patient.status=getValue("editPatientStatus");
+  patient.arboleafUsername=getValue("editArboleafUsername");
+
+  refreshPatient();
+
+  if(typeof renderFinancialSummary==="function"){
+    renderFinancialSummary();
+  }
+
+  if(typeof renderPanelClaims==="function"){
+    renderPanelClaims();
+  }
+
+  closeModal("patientEditModal");
+}
 
 /* =========================================================
    VISIT EDIT
@@ -3272,8 +4653,10 @@ function showComingSoon(section){
 }
 
 function renderAll(){
+  restorePanelClaimsLocal();
   refreshPatient();
   renderVisits();
+  renderFinancialSummary();
   renderOverviewVisits();
   refreshSelectedVisit();
   renderLatestMeasurement();
@@ -3281,10 +4664,9 @@ function renderAll(){
   const overallKey=Object.keys(patient.measurements||{}).sort().slice(-1)[0];
   if(overallKey)updateOverallComposition(overallKey);
   renderFileVisits();
+  renderPanelClaims();
   renderAppointment();
 
-  const latestKey=Object.keys(patient.measurements||{}).sort().slice(-1)[0];
-  if(latestKey)updateSegmentalVisual(latestKey);
 }
 
 
@@ -3318,8 +4700,127 @@ document.addEventListener("keydown",e=>{
    INITIALISE
 ========================================================= */
 
+restoreCurrentPatientLocal();
 renderAll();
 activateTab("overview");
+
+/* =========================================================
+   DEFINITIVE PATIENT PAYMENT SAVE HANDLER
+   Panel / Self-Pay is saved independently.
+========================================================= */
+
+window.savePatientPanelChoice = function(){
+
+  const select=document.getElementById("editPatientPanel");
+
+  if(!select){
+    alert("Panel / Insurance field not found.");
+    return false;
+  }
+
+  let value=select.value;
+
+  /* Explicit self-pay value. */
+  if(value==="No Panel" || value===""){
+    value="SELF_PAY";
+  }
+
+  if(!["SELF_PAY","PMCare","MiCare","HealthMetrics","Other"].includes(value)){
+    alert("Please select a valid Panel / Self-Pay option.");
+    return false;
+  }
+
+  let otherName="";
+  if(value==="Other"){
+    const other=document.getElementById("editOtherPanel");
+    otherName=other ? other.value.trim() : "";
+    if(!otherName){
+      alert("Please enter the panel name.");
+      return false;
+    }
+  }
+
+  /* Update in-memory patient immediately. */
+  patient.panelProvider=value;
+  patient.otherPanelName=otherName;
+
+  /* Persist immediately and independently. */
+  try{
+    localStorage.setItem(
+      "getwell_patient_"+patient.id,
+      JSON.stringify({
+        panelProvider:value,
+        otherPanelName:otherName
+      })
+    );
+
+    const saved=JSON.parse(
+      localStorage.getItem("getwell_patient_"+patient.id)
+    );
+
+    if(!saved || saved.panelProvider!==value){
+      throw new Error("Verification failed.");
+    }
+
+  }catch(error){
+    console.error("Panel save failed:",error);
+    alert("Save failed. Your browser did not allow this change to be stored.");
+    return false;
+  }
+
+  /* Update the visible header immediately. */
+  try{
+    if(typeof refreshPatient==="function"){
+      refreshPatient();
+    }
+  }catch(error){
+    console.error("Header refresh failed:",error);
+  }
+
+  /* Update the financial summary immediately. */
+  try{
+    if(typeof renderFinancialSummary==="function"){
+      renderFinancialSummary();
+    }
+  }catch(error){
+    console.error("Financial summary refresh failed:",error);
+  }
+
+  /* Update Panel Claims immediately. */
+  try{
+    if(typeof renderPanelClaims==="function"){
+      renderPanelClaims();
+    }
+  }catch(error){
+    console.error("Panel claims refresh failed:",error);
+  }
+
+  closeModal("patientEditModal");
+
+  return true;
+};
+
+window.bindPatientPanelSaveButton = function(){
+
+  const btn=document.getElementById("savePatientChangesBtn");
+
+  if(!btn)return;
+
+  btn.onclick=function(event){
+    event.preventDefault();
+    event.stopPropagation();
+    window.savePatientPanelChoice();
+    return false;
+  };
+};
+
+/* Bind now and again after DOM is ready. */
+window.bindPatientPanelSaveButton();
+
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",window.bindPatientPanelSaveButton);
+}
+
 </script>
 
 </body>
