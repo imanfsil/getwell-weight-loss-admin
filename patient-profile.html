@@ -189,11 +189,16 @@ a{text-decoration:none;color:inherit}
 .upcoming-actions{display:flex;align-items:center;gap:7px}
 
 .tabs-card{
+  position:relative;
+  z-index:20;
   margin-bottom:20px;background:#fff;border:1px solid var(--border);
   border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden
 }
 .tabs{display:flex;overflow-x:auto;padding:0 10px}
 .tab-button{
+  z-index:2;
+  cursor:pointer;
+  pointer-events:auto;
   position:relative;min-height:54px;padding:0 15px;border:0;background:transparent;
   color:var(--muted);font-size:11px;font-weight:500;white-space:nowrap
 }
@@ -329,9 +334,6 @@ a{text-decoration:none;color:inherit}
 .segmental-caption span{
   font-size:10px;
   color:var(--muted)
-}
-.overall-composition-content{
-  width:100%;
 }
 .segmental-side{
   display:flex;
@@ -764,12 +766,12 @@ a{text-decoration:none;color:inherit}
 <div class="tabs-card">
   <div class="tabs">
 
-    <button class="tab-button active" data-tab="overview">Overview</button>
-    <button class="tab-button" data-tab="visits">Visits</button>
-    <button class="tab-button" data-tab="composition">Body Composition</button>
+    <button type="button" class="tab-button active" data-tab="overview" onclick="activateTab('overview')">Overview</button>
+    <button type="button" class="tab-button" data-tab="visits" onclick="activateTab(\'visits\')">Visits</button>
+    <button type="button" class="tab-button" data-tab="composition" onclick="activateTab(\'composition\')">Body Composition</button>
     
-    <button class="tab-button" data-tab="files">Files & Photos</button>
-    <button class="tab-button" data-tab="appointments">Appointments</button>
+    <button type="button" class="tab-button" data-tab="files" onclick="activateTab(\'files\')">Files & Photos</button>
+    <button type="button" class="tab-button" data-tab="appointments" onclick="activateTab(\'appointments\')">Appointments</button>
 
   </div>
 </div>
@@ -1048,7 +1050,8 @@ a{text-decoration:none;color:inherit}
 
   </div>
 
-  <div class="card segmental-card">
+  
+  <div class="card">
 
     <div class="card-header">
 
@@ -1057,77 +1060,74 @@ a{text-decoration:none;color:inherit}
         <p>Use this area as a visual overview of the patient's overall body composition. The detailed values below come from the selected Arboleaf measurement.</p>
       </div>
 
-      <span class="segmental-note">Arboleaf body composition overview</span>
+      <span class="segmental-note" id="overallCompositionDate">
+        20 Aug 2026
+      </span>
 
     </div>
 
     <div class="card-body">
 
-      <div class="segmental-layout"><div class="segmental-side" style="width:100%">
+      <div class="measurement-grid" id="overallCompositionGrid">
 
-          <div class="segmental-summary">
+        <div class="measurement-item">
+          <span class="measurement-label">Weight</span>
+          <span class="measurement-value" id="overallWeight">—</span>
+        </div>
 
-            <div class="segmental-summary-title">
-              Overall Composition
-            </div>
+        <div class="measurement-item">
+          <span class="measurement-label">Body Fat</span>
+          <span class="measurement-value" id="overallBodyFat">—</span>
+        </div>
 
-            <div class="segmental-summary-text">
-              Use this area as a visual overview of the patient's overall body composition.
-              The detailed values below come from the selected Arboleaf measurement.
-            </div>
+        <div class="measurement-item">
+          <span class="measurement-label">BMI</span>
+          <span class="measurement-value" id="overallBMI">—</span>
+        </div>
 
-          </div>
+        <div class="measurement-item">
+          <span class="measurement-label">Skeletal Muscle</span>
+          <span class="measurement-value" id="overallSkeletalMuscle">—</span>
+        </div>
 
+        <div class="measurement-item">
+          <span class="measurement-label">Muscle Mass</span>
+          <span class="measurement-value" id="overallMuscleMass">—</span>
+        </div>
 
-          <div class="segmental-grid">
+        <div class="measurement-item">
+          <span class="measurement-label">Protein</span>
+          <span class="measurement-value" id="overallProtein">—</span>
+        </div>
 
-            <div class="segmental-item">
-              <span>Weight</span>
-              <strong id="generalWeight">Not available</strong>
-            </div>
+        <div class="measurement-item">
+          <span class="measurement-label">BMR</span>
+          <span class="measurement-value" id="overallBMR">—</span>
+        </div>
 
-            <div class="segmental-item">
-              <span>Body Fat</span>
-              <strong id="generalBodyFat">Not available</strong>
-            </div>
+        <div class="measurement-item">
+          <span class="measurement-label">Fat-Free Body Weight</span>
+          <span class="measurement-value" id="overallFatFree">—</span>
+        </div>
 
-            <div class="segmental-item">
-              <span>Skeletal Muscle</span>
-              <strong id="generalSkeletalMuscle">Not available</strong>
-            </div>
+        <div class="measurement-item">
+          <span class="measurement-label">Subcutaneous Fat</span>
+          <span class="measurement-value" id="overallSubcutaneous">—</span>
+        </div>
 
-            <div class="segmental-item">
-              <span>Muscle Mass</span>
-              <strong id="generalMuscleMass">Not available</strong>
-            </div>
+        <div class="measurement-item">
+          <span class="measurement-label">Visceral Fat</span>
+          <span class="measurement-value" id="overallVisceral">—</span>
+        </div>
 
-            <div class="segmental-item">
-              <span>Body Water</span>
-              <strong id="generalBodyWater">Not available</strong>
-            </div>
+        <div class="measurement-item">
+          <span class="measurement-label">Body Water</span>
+          <span class="measurement-value" id="overallBodyWater">—</span>
+        </div>
 
-            <div class="segmental-item">
-              <span>Visceral Fat</span>
-              <strong id="generalVisceralFat">Not available</strong>
-            </div>
-
-            <div class="segmental-item">
-              <span>BMI</span>
-              <strong id="generalBMI">Not available</strong>
-            </div>
-
-            <div class="segmental-item">
-              <span>Bone Mass</span>
-              <strong id="generalBoneMass">Not available</strong>
-            </div>
-
-          </div>
-
-          <div class="segmental-footnote">
-              This overview is designed to show the patient's overall body composition using the selected Arboleaf measurement.
-              Detailed values are read from the corresponding measurement record.
-            </div>
-
+        <div class="measurement-item">
+          <span class="measurement-label">Bone Mass</span>
+          <span class="measurement-value" id="overallBoneMass">—</span>
         </div>
 
       </div>
@@ -1135,6 +1135,7 @@ a{text-decoration:none;color:inherit}
     </div>
 
   </div>
+
 </section>
 
 
@@ -2191,12 +2192,7 @@ const patients={
       "2026-08-20":{
         weight:72.4,bodyFat:27.4,bmi:28.6,skeletalMuscle:34.8,muscleMass:56.0,
         protein:13.9,bmr:1620,fatFreeWeight:52.6,subcutaneousFat:24.3,visceralFat:11,
-        bodyWater:52.4,boneMass:2.98,
-          rightArm:{value:"2.63 kg / 325.1%",status:"Over"},
-          trunk:{value:"18 kg / 378.5%",status:"Over"},
-          leftLeg:{value:"3.57 kg / 164.9%",status:"Over"},
-          rightLeg:{value:"3.61 kg / 165.5%",status:"Over"}
-        }
+        bodyWater:52.4,boneMass:2.98
       }
     },
     visits:[
@@ -2344,18 +2340,28 @@ let appointment={
    TABS
 ========================================================= */
 
-const tabButtons=document.querySelectorAll(".tab-button");
-const tabPanels=document.querySelectorAll(".tab-panel");
+
+
 
 function activateTab(tab){
-  tabButtons.forEach(btn=>btn.classList.toggle("active",btn.dataset.tab===tab));
-  tabPanels.forEach(panel=>panel.hidden=panel.id!==tab);
+  document.querySelectorAll(".tab-button").forEach(button=>{
+    button.classList.toggle("active", button.dataset.tab===tab);
+  });
+
+  document.querySelectorAll(".tab-panel").forEach(panel=>{
+    panel.hidden = panel.id !== tab;
+  });
+
+  if(tab==="overview") renderOverviewVisits();
+  if(tab==="visits") renderVisits();
+  if(tab==="composition"){
+    const key=Object.keys(patient.measurements||{}).sort().slice(-1)[0];
+    if(key) updateOverallComposition(key);
+  }
+  if(tab==="files") renderFileVisits();
+
+  window.scrollTo({top:0,behavior:"smooth"});
 }
-
-tabButtons.forEach(btn=>{
-  btn.addEventListener("click",()=>activateTab(btn.dataset.tab));
-});
-
 
 /* =========================================================
    MODALS
@@ -2586,6 +2592,52 @@ function isImprovement(metric,change){
   return lower.includes(metric)?change<0:change>0;
 }
 
+
+function updateOverallComposition(dateKey){
+
+  const measurement=patient.measurements[dateKey] || {};
+  const visit=patient.visits.find(v=>v.dateKey===dateKey);
+
+  document.getElementById("overallCompositionDate").textContent =
+    visit ? visit.date : formatDateForDisplay(dateKey);
+
+  document.getElementById("overallWeight").textContent =
+    measurement.weight !== undefined ? formatNumber(measurement.weight)+" kg" : "—";
+
+  document.getElementById("overallBodyFat").textContent =
+    measurement.bodyFat !== undefined ? formatNumber(measurement.bodyFat)+"%" : "—";
+
+  document.getElementById("overallBMI").textContent =
+    measurement.bmi !== undefined ? formatNumber(measurement.bmi) : "—";
+
+  document.getElementById("overallSkeletalMuscle").textContent =
+    measurement.skeletalMuscle !== undefined ? formatNumber(measurement.skeletalMuscle)+" kg" : "—";
+
+  document.getElementById("overallMuscleMass").textContent =
+    measurement.muscleMass !== undefined ? formatNumber(measurement.muscleMass)+" kg" : "—";
+
+  document.getElementById("overallProtein").textContent =
+    measurement.protein !== undefined ? formatNumber(measurement.protein)+" kg" : "—";
+
+  document.getElementById("overallBMR").textContent =
+    measurement.bmr !== undefined ? formatNumber(measurement.bmr)+" kcal" : "—";
+
+  document.getElementById("overallFatFree").textContent =
+    measurement.fatFreeWeight !== undefined ? formatNumber(measurement.fatFreeWeight)+" kg" : "—";
+
+  document.getElementById("overallSubcutaneous").textContent =
+    measurement.subcutaneousFat !== undefined ? formatNumber(measurement.subcutaneousFat)+"%" : "—";
+
+  document.getElementById("overallVisceral").textContent =
+    measurement.visceralFat !== undefined ? formatNumber(measurement.visceralFat) : "—";
+
+  document.getElementById("overallBodyWater").textContent =
+    measurement.bodyWater !== undefined ? formatNumber(measurement.bodyWater)+"%" : "—";
+
+  document.getElementById("overallBoneMass").textContent =
+    measurement.boneMass !== undefined ? formatNumber(measurement.boneMass)+" kg" : "—";
+}
+
 function generateComparison(){
 
   const fromKey=document.getElementById("compareFrom").value;
@@ -2627,6 +2679,7 @@ function generateComparison(){
     }).join("");
 
   document.getElementById("comparisonResult").classList.add("show");
+  updateOverallComposition(toKey);
 }
 
 
@@ -3224,8 +3277,13 @@ function renderAll(){
   refreshSelectedVisit();
   renderLatestMeasurement();
   populateComparisonDates();
+  const overallKey=Object.keys(patient.measurements||{}).sort().slice(-1)[0];
+  if(overallKey)updateOverallComposition(overallKey);
   renderFileVisits();
   renderAppointment();
+
+  const latestKey=Object.keys(patient.measurements||{}).sort().slice(-1)[0];
+  if(latestKey)updateSegmentalVisual(latestKey);
 }
 
 
