@@ -1,52 +1,1057 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Patient Profile | Getwell</title><link rel="stylesheet" href="styles.css"><script src="app.js"></script></head><body>
+<!doctype html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  >
+
+  <title>
+    Patients | Getwell Weight Loss Admin
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="styles.css"
+  >
+
+  <script src="app.js"></script>
+
+</head>
+
+
+<body>
+
+
 <div id="root"></div>
-<div class="modal-wrap" id="visitModal"><div class="modal"><div class="modal-head"><div><h2>Add Visit Record</h2><p id="visitModalSub"></p></div><button class="modal-close" onclick="closeVisit()">×</button></div><div class="modal-body">
-<div class="visit-section-title">Visit Information</div><div class="form-grid">
-<div class="form-group"><label>Visit Date</label><input type="date" id="vDate"></div><div class="form-group"><label>Visit Number</label><input id="vNumber"></div><div class="form-group full"><label>Visit Type</label><input id="vType" placeholder="e.g. Weekly Follow-Up"></div>
+
+
+<!-- =========================================================
+     ADD PATIENT MODAL
+========================================================= -->
+
+<div
+  class="modal-wrap"
+  id="addPatientModal"
+>
+
+  <div class="modal">
+
+
+    <div class="modal-head">
+
+      <div>
+
+        <h2>
+          Add Patient
+        </h2>
+
+        <p>
+          Create one patient record.
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="modal-close"
+        onclick="closeAdd()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="modal-body">
+
+
+      <div class="form-grid">
+
+
+        <!-- FULL NAME -->
+
+        <div class="form-group">
+
+          <label>
+            Full Name
+          </label>
+
+          <input
+            id="pName"
+            placeholder="Enter patient name"
+          >
+
+        </div>
+
+
+        <!-- PATIENT ID -->
+
+        <div class="form-group">
+
+          <label>
+            Patient ID
+          </label>
+
+          <input
+            id="pId"
+            placeholder="e.g. GW0001"
+          >
+
+        </div>
+
+
+        <!-- PHONE -->
+
+        <div class="form-group">
+
+          <label>
+            Phone
+          </label>
+
+          <input
+            id="pPhone"
+            placeholder="Phone number"
+          >
+
+        </div>
+
+
+        <!-- DOB -->
+
+        <div class="form-group">
+
+          <label>
+            Date of Birth
+          </label>
+
+          <input
+            id="pDob"
+            type="date"
+          >
+
+        </div>
+
+
+        <!-- HEIGHT -->
+
+        <div class="form-group">
+
+          <label>
+            Height (cm)
+          </label>
+
+          <input
+            id="pHeight"
+            type="number"
+            min="0"
+            step="0.1"
+            placeholder="e.g. 165"
+          >
+
+        </div>
+
+
+        <!-- STARTING WEIGHT -->
+
+        <div class="form-group">
+
+          <label>
+            Starting Weight (kg)
+          </label>
+
+          <input
+            id="pStart"
+            type="number"
+            min="0"
+            step="0.1"
+            placeholder="e.g. 78"
+          >
+
+        </div>
+
+
+        <!-- GOAL WEIGHT -->
+
+        <div class="form-group">
+
+          <label>
+            Goal Weight (kg)
+          </label>
+
+          <input
+            id="pGoal"
+            type="number"
+            min="0"
+            step="0.1"
+            placeholder="e.g. 65"
+          >
+
+        </div>
+
+
+        <!-- PANEL / SELF PAY -->
+
+        <div class="form-group">
+
+          <label>
+            Panel / Insurance
+          </label>
+
+          <select
+            id="pPanel"
+          >
+
+            <option value="SELF_PAY">
+              Self-Pay
+            </option>
+
+            <option value="PANEL_A">
+              Panel A
+            </option>
+
+            <option value="PANEL_B">
+              Panel B
+            </option>
+
+            <option value="PANEL_C">
+              Panel C
+            </option>
+
+            <option value="Other">
+              Other Panel
+            </option>
+
+          </select>
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="modal-foot">
+
+      <button
+        type="button"
+        class="secondary"
+        onclick="closeAdd()"
+      >
+        Cancel
+      </button>
+
+
+      <button
+        type="button"
+        class="primary"
+        onclick="savePatient()"
+      >
+        Save Patient
+      </button>
+
+    </div>
+
+
+  </div>
+
 </div>
-<div class="visit-section-title">Arboleaf</div><div class="form-group"><label>Arboleaf PDF</label><input type="file" id="vPdf" accept="application/pdf"></div>
-<div class="visit-section-title">Visit Charges & Payment</div><div class="table-wrap"><table class="table"><thead><tr><th>Item</th><th>Details / Notes</th><th>Price</th></tr></thead><tbody>
-<tr><td>Injection</td><td><input class="claim-input" id="vInj" placeholder="Type + dose"><textarea class="form-group textarea" id="vInjNote" placeholder="Notes"></textarea></td><td><input class="claim-input" id="vInjPrice" type="number"></td></tr>
-<tr><td>Medication</td><td><input class="claim-input" id="vMed" placeholder="Medication"><textarea class="form-group textarea" id="vMedNote" placeholder="Notes"></textarea></td><td><input class="claim-input" id="vMedPrice" type="number"></td></tr>
-<tr><td>Treatment</td><td><input class="claim-input" id="vTreat" placeholder="Treatment"><textarea class="form-group textarea" id="vTreatNote" placeholder="Notes"></textarea></td><td><input class="claim-input" id="vTreatPrice" type="number"></td></tr>
-<tr><td>Additional</td><td><input class="claim-input" id="vOther" placeholder="Additional"><textarea class="form-group textarea" id="vOtherNote" placeholder="Notes"></textarea></td><td><input class="claim-input" id="vOtherPrice" type="number"></td></tr>
-</tbody></table></div>
-<div class="finance-card" style="margin-top:10px"><span class="label">Visit Total</span><div class="value" id="vTotal">RM 0.00</div></div>
-<div class="visit-section-title">Payment Allocation</div><div class="claim-grid"><div class="form-group"><label id="panelLabel">Panel / Insurance</label><input class="claim-input" id="vPanel" type="number"></div><div class="form-group"><label>Self-Pay / Co-Payment</label><input class="claim-input" id="vSelf" type="number"></div></div>
-<div id="vValidation" class="badge gray" style="margin-top:8px">Enter charges.</div>
-<div class="visit-section-title">Visit Notes</div><textarea class="form-group textarea" id="vNotes"></textarea>
-</div><div class="modal-foot"><button class="secondary" onclick="closeVisit()">Cancel</button><button class="primary" onclick="saveVisit()">Save Visit</button></div></div></div>
+
+
+
 <script>
-const id=new URLSearchParams(location.search).get("patient")||"PAT-0001";let p=getPatient(id);if(!p)location.href="patients.html";
-document.getElementById("root").innerHTML=shell("Patient Profile","Weight Loss Program Management","patients",`<a class="back" href="patients.html">← Back to Patients</a>
-<div class="patient-hero"><div class="patient-main"><div class="patient-avatar">${p.initials}</div><div class="patient-heading"><h1>${p.name}</h1><div class="meta">${p.id}<span>•</span><span>Weight Loss Program</span><span class="badge green">${p.status}</span><span class="panel-chip">${getPanelName(p)}</span></div></div></div><div class="hero-details"><div class="hero-detail"><span class="hero-label">Program Started</span><span class="hero-value">${p.startDate||"—"}</span></div><div class="hero-detail"><span class="hero-label">Last Visit</span><span class="hero-value">${latestVisit(p)?.dateKey||"—"}</span></div></div></div>
-<div class="card" style="margin-bottom:14px"><div class="card-head"><div><h2>Program Financial Summary</h2><p>Always calculated from the same patient visit data.</p></div></div><div class="card-body"><div class="finance-grid" id="finance"></div><div class="breakdown" id="breakdown"></div></div></div>
-<div class="patient-tabs"><button class="active" onclick="showSection('overview',this)">Overview</button><button onclick="showSection('visits',this)">Visits</button><button onclick="showSection('composition',this)">Body Composition</button><button onclick="showSection('files',this)">Files & Photos</button><button onclick="showSection('appointments',this)">Appointments</button><button onclick="showSection('claims',this)">Panel Claims</button></div>
-<section id="sec-overview" class="card"><div class="card-head"><div><h2>Recent Visits</h2><p>Select a visit to view its complete record.</p></div><button class="primary" onclick="openVisit()">＋ Add Visit</button></div><div class="list" id="overviewVisits"></div></section>
-<section id="sec-visits" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Visit History</h2><p>Every visit is a complete record.</p></div><button class="primary" onclick="openVisit()">＋ Add Visit</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Visit</th><th>Type</th><th>Injection</th><th>Weight</th><th>Invoice</th><th>Status</th></tr></thead><tbody id="visitRows"></tbody></table></div></section>
-<section id="sec-composition" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Body Composition</h2><p>Arboleaf measurements will connect here.</p></div></div><div class="card-body"><div class="notif-empty">Measurement history and two-date comparison UI ready for backend connection.</div></div></section>
-<section id="sec-files" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Files & Photos</h2><p>Files belong to their individual visits.</p></div></div><div id="filesRows"></div></section>
-<section id="sec-appointments" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Appointments</h2><p>Patient-specific appointments.</p></div></div><div class="notif-empty">Appointment records will use the shared patient store.</div></section>
-<section id="sec-claims" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Panel Claims</h2><p>Claim submission date and amount are entered separately from treatment date.</p></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Visit</th><th>Visit Date</th><th>Invoice Total</th><th>Panel Eligible</th><th>Claim Amount</th><th>Claim Date</th></tr></thead><tbody id="claimRows"></tbody></table></div></section>
-`);
-function refresh(){
- p=getPatient(id);
- const f=finance(p);
- document.getElementById("finance").innerHTML=patientUsesPanel(p)?`<div class="finance-card"><span class="label">GRAND TOTAL</span><div class="value">${money(f.grand)}</div></div><div class="finance-card"><span class="label">TOTAL CLAIMED</span><div class="value">${money(f.claimed)}</div></div><div class="finance-card balance"><span class="label">BALANCE TO CLAIM</span><div class="value">${money(f.balance)}</div></div>`:`<div class="finance-card"><span class="label">GRAND TOTAL</span><div class="value">${money(f.grand)}</div></div><div class="finance-card"><span class="label">TOTAL INJECTION</span><div class="value">${money(f.injection)}</div></div><div class="finance-card"><span class="label">TOTAL MEDICATION</span><div class="value">${money(f.medication)}</div></div>`;
- document.getElementById("breakdown").innerHTML=`<div class="break"><span>Total Injection</span><strong>${money(f.injection)}</strong></div><div class="break"><span>Total Medication</span><strong>${money(f.medication)}</strong></div><div class="break"><span>Total Treatment</span><strong>${money(f.treatment)}</strong></div><div class="break"><span>Self-Pay / Co-Payment</span><strong>${money(f.selfpay)}</strong></div>`;
- document.getElementById("overviewVisits").innerHTML=(p.visits||[]).length?p.visits.slice(0,5).map(v=>`<div class="row"><div class="avatar-small">${p.initials}</div><div class="row-main"><div class="row-title">${v.visit} · ${v.type}</div><div class="row-sub">${v.dateKey} · Invoice ${money(visitTotal(v))}</div></div><button class="secondary" style="padding:6px 9px" onclick="viewVisit('${v.id}')">View →</button></div>`).join(""):`<div class="notif-empty">No visits yet.</div>`;
- document.getElementById("visitRows").innerHTML=(p.visits||[]).map(v=>`<tr onclick="viewVisit('${v.id}')"><td>${v.dateKey}</td><td>${v.visit}</td><td>${v.type}</td><td>${v.injection||"—"}</td><td>${v.weight||"—"}</td><td>${money(visitTotal(v))}</td><td><span class="badge green">${v.status||"Completed"}</span></td></tr>`).join("");
- document.getElementById("filesRows").innerHTML=(p.visits||[]).map(v=>`<div class="row"><div class="row-main"><div class="row-title">${v.visit} · ${v.dateKey}</div><div class="row-sub">${v.pdfName||"No Arboleaf PDF"} · photos stored with visit</div></div></div>`).join("")||`<div class="notif-empty">No files.</div>`;
- document.getElementById("claimRows").innerHTML=(p.visits||[]).map(v=>{const b=ensureVisit(v).billing;return `<tr><td>${v.visit}</td><td>${v.dateKey}</td><td>${money(visitTotal(v))}</td><td>${money(panelEligible(v))}</td><td><input class="claim-input" id="cl-${v.id}" value="${b.panelClaimAmount||0}" type="number"></td><td><input class="claim-input" id="cd-${v.id}" value="${b.panelClaimDate||""}" type="date"></td><td><button class="secondary" onclick="event.stopPropagation();saveClaim('${v.id}')">Save</button></td></tr>`}).join("")||`<tr><td colspan="7">No visits yet.</td></tr>`;
+
+
+/* =========================================================
+   PAGE SETUP
+========================================================= */
+
+document.getElementById(
+  "root"
+).innerHTML =
+
+  shell(
+
+    "Patients",
+
+    "Weight Loss Program Management",
+
+    "patients",
+
+    `
+
+      <div class="page-head">
+
+
+        <div>
+
+          <h1>
+            Patients
+          </h1>
+
+          <p>
+            Manage patient records and monitor program participation.
+          </p>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="primary"
+          onclick="openAdd()"
+        >
+          ＋ Add Patient
+        </button>
+
+
+      </div>
+
+
+
+      <!-- ===================================================
+           KPI
+      ==================================================== -->
+
+      <div
+        class="kpi-grid"
+        id="patientKpis"
+      ></div>
+
+
+
+      <!-- ===================================================
+           PATIENT TABLE
+      ==================================================== -->
+
+      <div class="card">
+
+
+        <div class="card-head">
+
+
+          <div>
+
+            <h2>
+              Patient List
+            </h2>
+
+            <p>
+              One shared patient data source for the whole web.
+            </p>
+
+          </div>
+
+
+          <input
+            class="claim-input"
+            id="patientSearch"
+            placeholder="Search patient name or ID"
+            oninput="renderPatients(this.value)"
+          >
+
+
+        </div>
+
+
+        <div class="table-wrap">
+
+
+          <table class="table">
+
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Patient
+                </th>
+
+                <th>
+                  ID
+                </th>
+
+                <th>
+                  Panel / Payment
+                </th>
+
+                <th>
+                  Current
+                </th>
+
+                <th>
+                  Goal
+                </th>
+
+                <th>
+                  Last Visit
+                </th>
+
+                <th>
+                  Status
+                </th>
+
+                <th>
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody
+              id="patientRows"
+            ></tbody>
+
+
+          </table>
+
+
+        </div>
+
+
+      </div>
+
+    `
+
+);
+
+
+
+/* =========================================================
+   ADD PATIENT MODAL
+========================================================= */
+
+function openAdd(){
+
+  const modal =
+    document.getElementById(
+      "addPatientModal"
+    );
+
+  modal.classList.add("show");
+
 }
-function money(n){return "RM "+Number(n||0).toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2})}
-function showSection(s,btn){document.querySelectorAll("[id^=sec-]").forEach(x=>x.style.display="none");document.getElementById("sec-"+s).style.display="block";document.querySelectorAll(".patient-tabs button").forEach(x=>x.classList.remove("active"));btn.classList.add("active")}
-function openVisit(){document.getElementById("visitModal").classList.add("show");document.getElementById("vDate").value=new Date().toISOString().slice(0,10);document.getElementById("vNumber").value="Visit #"+(p.visits.length+1);document.getElementById("vType").value="";document.getElementById("vPanel").value=patientUsesPanel(p)?"0":"0";document.getElementById("vSelf").value="0";document.getElementById("panelLabel").textContent=getPanelName(p)+" / Insurance";["vInj","vMed","vTreat","vOther","vInjNote","vMedNote","vTreatNote","vOtherNote","vNotes","vInjPrice","vMedPrice","vTreatPrice","vOtherPrice"].forEach(x=>document.getElementById(x).value="");updateVisitTotal()}
-function closeVisit(){document.getElementById("visitModal").classList.remove("show")}
-function updateVisitTotal(){const total=+vInjPrice.value||0 + (+vMedPrice.value||0) + (+vTreatPrice.value||0) + (+vOtherPrice.value||0);vTotal.textContent=money(total);if(!patientUsesPanel(p)){vPanel.value=0;vSelf.value=total}}
-["vInjPrice","vMedPrice","vTreatPrice","vOtherPrice","vPanel","vSelf"].forEach(id=>document.getElementById(id).addEventListener("input",updateVisitTotal));
-function saveVisit(){const date=vDate.value;if(!date){alert("Select visit date");return}const total=+vInjPrice.value||0 + (+vMedPrice.value||0)+(+vTreatPrice.value||0)+(+vOtherPrice.value||0);if(patientUsesPanel(p)&&Math.abs(total-((+vPanel.value||0)+(+vSelf.value||0)))>.001){alert("Panel + Self-Pay must equal Visit Total");return}const v={id:p.id+"-V"+Date.now(),dateKey:date,visit:vNumber.value,type:vType.value||"Visit",weight:"—",injection:vInj.value,dose:vInj.value,medication:vMed.value,additionalTreatment:vTreat.value,notes:vNotes.value,pdfName:document.getElementById("vPdf")?.files?.[0]?.name||"",status:"Completed",billing:{injection:{price:+vInjPrice.value||0,notes:vInjNote.value},medication:{price:+vMedPrice.value||0,notes:vMedNote.value},treatment:{price:+vTreatPrice.value||0,notes:vTreatNote.value},other:{price:+vOtherPrice.value||0,notes:vOtherNote.value},panel:+vPanel.value||0,selfPay:+vSelf.value||0,panelClaimAmount:0,panelClaimDate:"",coverageType:patientUsesPanel(p)?"panel":"self"}};p.visits.unshift(v);p.currentWeight=v.weight;upsertPatient(p);closeVisit();refresh();renderNotifications()}
-function viewVisit(vid){const v=p.visits.find(x=>x.id===vid);if(!v)return;alert(`Visit ${v.visit}\n${v.dateKey}\nInvoice ${money(visitTotal(v))}\nPanel ${money(panelEligible(v))}\nSelf-Pay ${money(v.billing.selfPay)}`)}
-function saveClaim(vid){const v=p.visits.find(x=>x.id===vid);if(!v)return;const b=ensureVisit(v).billing;const amount=+document.getElementById("cl-"+vid).value||0;if(amount>panelEligible(v)){alert("Claim amount cannot exceed panel amount");return}b.panelClaimAmount=amount;b.panelClaimDate=document.getElementById("cd-"+vid).value||"";upsertPatient(p);refresh();renderNotifications()}
-refresh();
-</script></body></html>
+
+
+function closeAdd(){
+
+  const modal =
+    document.getElementById(
+      "addPatientModal"
+    );
+
+  modal.classList.remove("show");
+
+}
+
+
+
+/* =========================================================
+   RENDER PATIENT LIST
+========================================================= */
+
+function renderPatients(
+  search = ""
+){
+
+  const query =
+    search
+      .trim()
+      .toLowerCase();
+
+
+  const patients =
+    store()
+      .patients
+      .filter(
+        patient => {
+
+          const text =
+            (
+              patient.name +
+              " " +
+              patient.id
+            )
+              .toLowerCase();
+
+
+          return text.includes(
+            query
+          );
+
+        }
+      );
+
+
+
+  document.getElementById(
+    "patientRows"
+  ).innerHTML =
+
+
+    patients.length
+
+
+      ? patients
+          .map(
+            patient => {
+
+              const visit =
+                latestVisit(
+                  patient
+                );
+
+
+              return `
+
+                <tr>
+
+
+                  <!-- PATIENT -->
+
+                  <td>
+
+                    <strong>
+                      ${patient.name}
+                    </strong>
+
+                    <div
+                      style="
+                        font-size:9px;
+                        color:#94A3B8;
+                        margin-top:3px;
+                      "
+                    >
+                      ${patient.id}
+                    </div>
+
+                  </td>
+
+
+                  <!-- ID -->
+
+                  <td>
+                    ${patient.id}
+                  </td>
+
+
+                  <!-- PANEL -->
+
+                  <td>
+
+                    <span
+                      class="panel-chip"
+                    >
+                      ${getPanelName(
+                        patient
+                      )}
+                    </span>
+
+                  </td>
+
+
+                  <!-- CURRENT WEIGHT -->
+
+                  <td>
+
+                    ${
+                      patient.currentWeight !==
+                      undefined
+                        ? `${patient.currentWeight} kg`
+                        : "—"
+                    }
+
+                  </td>
+
+
+                  <!-- GOAL -->
+
+                  <td>
+
+                    ${
+                      patient.goalWeight
+                        ? `${patient.goalWeight} kg`
+                        : "—"
+                    }
+
+                  </td>
+
+
+                  <!-- LAST VISIT -->
+
+                  <td>
+
+                    ${
+                      visit?.dateKey ||
+                      "—"
+                    }
+
+                  </td>
+
+
+                  <!-- STATUS -->
+
+                  <td>
+
+                    <span
+                      class="
+                        badge
+                        ${
+                          patient.status ===
+                          "Active"
+                            ? "green"
+                            : patient.status ===
+                              "Completed"
+                              ? "blue"
+                              : "gray"
+                        }
+                      "
+                    >
+                      ${patient.status}
+                    </span>
+
+                  </td>
+
+
+                  <!-- OPEN -->
+
+                  <td>
+
+                    <a
+                      class="secondary"
+                      style="
+                        padding:7px 9px;
+                      "
+                      href="
+                        patient-profile.html?patient=${encodeURIComponent(
+                          patient.id
+                        )}
+                      "
+                    >
+                      Open →
+                    </a>
+
+                  </td>
+
+
+                </tr>
+
+              `;
+
+            }
+          )
+          .join("")
+
+
+      : `
+
+          <tr>
+
+            <td
+              colspan="8"
+              style="
+                text-align:center;
+                padding:28px;
+                color:var(--muted);
+              "
+            >
+
+              No patients found.
+
+            </td>
+
+          </tr>
+
+        `;
+
+
+
+  /* =======================================================
+     KPI
+  ======================================================== */
+
+  const all =
+    store().patients;
+
+
+  const active =
+    all.filter(
+      patient =>
+        patient.status ===
+        "Active"
+    ).length;
+
+
+  const completed =
+    all.filter(
+      patient =>
+        patient.status ===
+        "Completed"
+    ).length;
+
+
+  const inactive =
+    all.filter(
+      patient =>
+        patient.status ===
+        "Inactive"
+    ).length;
+
+
+
+  document.getElementById(
+    "patientKpis"
+  ).innerHTML = `
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        TOTAL PATIENTS
+      </div>
+
+      <div class="kpi-value">
+        ${all.length}
+      </div>
+
+      <div class="kpi-sub">
+        All registered patients
+      </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        ACTIVE PATIENTS
+      </div>
+
+      <div class="kpi-value">
+        ${active}
+      </div>
+
+      <div class="kpi-sub">
+        Currently in program
+      </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        COMPLETED
+      </div>
+
+      <div class="kpi-value">
+        ${completed}
+      </div>
+
+      <div class="kpi-sub">
+        Program completed
+      </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        INACTIVE
+      </div>
+
+      <div class="kpi-value">
+        ${inactive}
+      </div>
+
+      <div class="kpi-sub">
+        Currently inactive
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+
+/* =========================================================
+   SAVE PATIENT
+========================================================= */
+
+function savePatient(){
+
+
+  const name =
+    document.getElementById(
+      "pName"
+    ).value.trim();
+
+
+  const patientId =
+    document.getElementById(
+      "pId"
+    ).value.trim();
+
+
+  const phone =
+    document.getElementById(
+      "pPhone"
+    ).value.trim();
+
+
+  const dob =
+    document.getElementById(
+      "pDob"
+    ).value;
+
+
+  const height =
+    document.getElementById(
+      "pHeight"
+    ).value;
+
+
+  const startingWeight =
+    Number(
+      document.getElementById(
+        "pStart"
+      ).value
+    ) || 0;
+
+
+  const goalWeight =
+    Number(
+      document.getElementById(
+        "pGoal"
+      ).value
+    ) || 0;
+
+
+  const panelProvider =
+    document.getElementById(
+      "pPanel"
+    ).value;
+
+
+
+  /* =======================================================
+     VALIDATION
+  ======================================================== */
+
+  if(!name){
+
+    alert(
+      "Please enter the patient name."
+    );
+
+    return;
+  }
+
+
+  if(!patientId){
+
+    alert(
+      "Please enter the patient ID."
+    );
+
+    return;
+  }
+
+
+
+  /* Prevent duplicate Patient ID */
+
+  const exists =
+    store()
+      .patients
+      .some(
+        patient =>
+          patient.id.toLowerCase() ===
+          patientId.toLowerCase()
+      );
+
+
+  if(exists){
+
+    alert(
+      "This Patient ID already exists."
+    );
+
+    return;
+  }
+
+
+
+  /* =======================================================
+     CREATE PATIENT OBJECT
+  ======================================================== */
+
+  const initials =
+    name
+      .split(/\s+/)
+      .filter(Boolean)
+      .map(
+        part =>
+          part.charAt(0)
+      )
+      .join("")
+      .slice(0,2)
+      .toUpperCase();
+
+
+  const today =
+    new Date()
+      .toISOString()
+      .slice(0,10);
+
+
+  const patient = {
+
+    id:patientId,
+
+    name:name,
+
+    initials:
+      initials || "PT",
+
+    status:"Active",
+
+    panelProvider:
+      panelProvider,
+
+    otherPanelName:"",
+
+    startDate:
+      today,
+
+    doctor:"",
+
+    phone:phone,
+
+    dob:dob,
+
+    height:height,
+
+    gender:"",
+
+    startingWeight:
+      startingWeight,
+
+    currentWeight:
+      startingWeight,
+
+    goalWeight:
+      goalWeight,
+
+    visits:[],
+
+    measurements:[],
+
+    appointments:[]
+
+  };
+
+
+
+  /* =======================================================
+     SAVE TO SHARED STORE
+  ======================================================== */
+
+  upsertPatient(
+    patient
+  );
+
+
+  /* Close modal */
+
+  closeAdd();
+
+
+  /* Clear fields */
+
+  document.getElementById(
+    "pName"
+  ).value = "";
+
+  document.getElementById(
+    "pId"
+  ).value = "";
+
+  document.getElementById(
+    "pPhone"
+  ).value = "";
+
+  document.getElementById(
+    "pDob"
+  ).value = "";
+
+  document.getElementById(
+    "pHeight"
+  ).value = "";
+
+  document.getElementById(
+    "pStart"
+  ).value = "";
+
+  document.getElementById(
+    "pGoal"
+  ).value = "";
+
+  document.getElementById(
+    "pPanel"
+  ).value = "SELF_PAY";
+
+
+  /* Refresh */
+
+  renderPatients();
+
+  renderNotifications();
+
+
+  /* Go directly to patient profile */
+
+  setTimeout(
+    () => {
+
+      window.location.href =
+        "patient-profile.html?patient=" +
+        encodeURIComponent(
+          patient.id
+        );
+
+    },
+    250
+  );
+
+}
+
+
+
+/* =========================================================
+   INITIAL RENDER
+========================================================= */
+
+renderPatients();
+
+
+renderNotifications();
+
+
+</script>
+
+
+</body>
+</html>
