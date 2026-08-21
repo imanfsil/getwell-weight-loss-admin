@@ -1,93 +1,1314 @@
 <!doctype html>
-
-<html>
+<html lang="en">
 
 <head>
 
-<meta charset="utf-8">
+  <meta charset="utf-8">
 
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1"
->
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  >
 
-<title>
-  Appointments | Getwell
-</title>
+  <title>
+    Appointments | Getwell Weight Loss Admin
+  </title>
 
-<link
-  rel="stylesheet"
-  href="styles.css"
->
+  <link
+    rel="stylesheet"
+    href="styles.css"
+  >
 
-<script src="app.js"></script>
+  <script src="app.js"></script>
 
 </head>
 
+
 <body>
+
 
 <div id="root"></div>
 
+
+
+<!-- =========================================================
+     ADD / EDIT APPOINTMENT MODAL
+========================================================= -->
+
+<div
+  class="modal-wrap"
+  id="appointmentModal"
+>
+
+  <div class="modal">
+
+
+    <div class="modal-head">
+
+      <div>
+
+        <h2 id="appointmentModalTitle">
+          Add Appointment
+        </h2>
+
+        <p>
+          Patient appointment scheduling
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="modal-close"
+        onclick="closeAppointmentModal()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="modal-body">
+
+
+      <div class="form-grid">
+
+
+        <!-- PATIENT -->
+
+        <div class="form-group full">
+
+          <label>
+            Patient
+          </label>
+
+          <select
+            id="appointmentPatient"
+          ></select>
+
+        </div>
+
+
+        <!-- DATE -->
+
+        <div class="form-group">
+
+          <label>
+            Appointment Date
+          </label>
+
+          <input
+            id="appointmentDate"
+            type="date"
+          >
+
+        </div>
+
+
+        <!-- TIME -->
+
+        <div class="form-group">
+
+          <label>
+            Appointment Time
+          </label>
+
+          <input
+            id="appointmentTime"
+            type="time"
+          >
+
+        </div>
+
+
+        <!-- TYPE -->
+
+        <div class="form-group full">
+
+          <label>
+            Appointment Type
+          </label>
+
+          <input
+            id="appointmentType"
+            placeholder="e.g. Weekly Follow-Up, Body Composition Review"
+          >
+
+        </div>
+
+
+        <!-- NOTES -->
+
+        <div class="form-group full">
+
+          <label>
+            Notes
+          </label>
+
+          <textarea
+            id="appointmentNotes"
+            placeholder="Optional appointment notes..."
+          ></textarea>
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="modal-foot">
+
+
+      <button
+        type="button"
+        class="secondary"
+        onclick="closeAppointmentModal()"
+      >
+        Cancel
+      </button>
+
+
+      <button
+        type="button"
+        class="primary"
+        onclick="saveAppointment()"
+      >
+        Save Appointment
+      </button>
+
+
+    </div>
+
+
+  </div>
+
+</div>
+
+
+
 <script>
+
+
+/* =========================================================
+   PAGE
+========================================================= */
 
 document.getElementById(
   "root"
 ).innerHTML =
 
-  shell(
-    "Appointments",
-    "Weight Loss Program Management",
-    "appointments",
+shell(
 
-    `
+  "Appointments",
 
-      <div class="page-head">
+  "Weight Loss Program Management",
+
+  "appointments",
+
+  `
+
+    <div class="page-head">
+
+
+      <div>
+
+        <h1>
+          Appointments
+        </h1>
+
+        <p>
+          Manage patient appointments from the shared patient data.
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="primary"
+        onclick="openAddAppointment()"
+      >
+        ＋ Add Appointment
+      </button>
+
+
+    </div>
+
+
+
+    <!-- =================================================
+         APPOINTMENT KPIs
+    ================================================== -->
+
+    <div
+      class="kpi-grid"
+      id="appointmentKpis"
+    ></div>
+
+
+
+    <!-- =================================================
+         FILTER / SEARCH
+    ================================================== -->
+
+    <div
+      class="card"
+      style="
+        margin-bottom:15px;
+      "
+    >
+
+      <div class="card-body">
+
+
+        <div class="form-grid">
+
+
+          <div class="form-group">
+
+            <label>
+              Search Patient
+            </label>
+
+            <input
+              id="appointmentSearch"
+              placeholder="Patient name or ID"
+              oninput="renderAppointments(this.value)"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Date
+            </label>
+
+            <input
+              id="appointmentFilterDate"
+              type="date"
+              onchange="
+                renderAppointments(
+                  document.getElementById(
+                    'appointmentSearch'
+                  ).value
+                )
+              "
+            >
+
+          </div>
+
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         APPOINTMENT TABLE
+    ================================================== -->
+
+    <div class="card">
+
+
+      <div class="card-head">
+
 
         <div>
 
-          <h1>
-            Appointments
-          </h1>
+          <h2>
+            Appointment List
+          </h2>
 
           <p>
-            Appointments will use the same patient store.
+            Appointments are stored under the corresponding patient.
           </p>
 
         </div>
 
-      </div>
-
-
-      <div class="card">
-
-        <div class="card-head">
-
-          <div>
-
-            <h2>
-              Upcoming / Recent Appointments
-            </h2>
-
-            <p>
-              Use patient visit records as the clinical source of truth.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <div class="notif-empty">
-          Appointment module ready for the same shared data source.
-        </div>
 
       </div>
 
-    `
+
+      <div class="table-wrap">
+
+
+        <table class="table">
+
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Date
+              </th>
+
+              <th>
+                Time
+              </th>
+
+              <th>
+                Patient
+              </th>
+
+              <th>
+                Patient ID
+              </th>
+
+              <th>
+                Appointment
+              </th>
+
+              <th>
+                Status
+              </th>
+
+              <th>
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody
+            id="appointmentRows"
+          ></tbody>
+
+
+        </table>
+
+
+      </div>
+
+
+    </div>
+
+
+  `
+
+);
+
+
+
+/* =========================================================
+   APPOINTMENT STATE
+========================================================= */
+
+let editingAppointmentId =
+  null;
+
+
+
+/* =========================================================
+   GET ALL APPOINTMENTS
+========================================================= */
+
+function getAllAppointments(){
+
+  const patients =
+    store().patients || [];
+
+
+  const results = [];
+
+
+  patients.forEach(
+    patient => {
+
+      (
+        patient.appointments ||
+        []
+      ).forEach(
+        appointment => {
+
+          results.push({
+
+            ...appointment,
+
+            patientId:
+              patient.id,
+
+            patientName:
+              patient.name
+
+          });
+
+        }
+      );
+
+    }
   );
+
+
+  return results.sort(
+    (a,b) => {
+
+      const aValue =
+        `${a.date || ""} ${a.time || ""}`;
+
+      const bValue =
+        `${b.date || ""} ${b.time || ""}`;
+
+      return aValue.localeCompare(
+        bValue
+      );
+
+    }
+  );
+
+}
+
+
+
+/* =========================================================
+   APPOINTMENT STATUS
+========================================================= */
+
+function getAppointmentStatus(
+  appointment
+){
+
+  if(
+    appointment.status
+  ){
+
+    return appointment.status;
+  }
+
+
+  if(
+    !appointment.date
+  ){
+
+    return "Upcoming";
+  }
+
+
+  const appointmentDate =
+    new Date(
+      `${appointment.date}T${
+        appointment.time ||
+        "00:00"
+      }`
+    );
+
+
+  const now =
+    new Date();
+
+
+  if(
+    appointmentDate <
+    now
+  ){
+
+    return "Past";
+
+  }
+
+
+  return "Upcoming";
+
+}
+
+
+
+/* =========================================================
+   KPIs
+========================================================= */
+
+function renderAppointmentKpis(){
+
+  const all =
+    getAllAppointments();
+
+
+  const todayKey =
+    new Date()
+      .toISOString()
+      .slice(0,10);
+
+
+  const today =
+    all.filter(
+      appointment =>
+        appointment.date ===
+        todayKey
+    );
+
+
+  const upcoming =
+    all.filter(
+      appointment =>
+        getAppointmentStatus(
+          appointment
+        ) === "Upcoming"
+    );
+
+
+  const past =
+    all.filter(
+      appointment =>
+        getAppointmentStatus(
+          appointment
+        ) === "Past"
+    );
+
+
+  const missing =
+    today.filter(
+      appointment =>
+        appointment.status ===
+        "No Show"
+    );
+
+
+  document.getElementById(
+    "appointmentKpis"
+  ).innerHTML = `
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        TODAY
+      </div>
+
+      <div class="kpi-value">
+        ${today.length}
+      </div>
+
+      <div class="kpi-sub">
+        Appointments today
+      </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        UPCOMING
+      </div>
+
+      <div class="kpi-value">
+        ${upcoming.length}
+      </div>
+
+      <div class="kpi-sub">
+        Future appointments
+      </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        COMPLETED / PAST
+      </div>
+
+      <div class="kpi-value">
+        ${past.length}
+      </div>
+
+      <div class="kpi-sub">
+        Previous appointment records
+      </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        NO SHOW
+      </div>
+
+      <div class="kpi-value">
+        ${missing.length}
+      </div>
+
+      <div class="kpi-sub">
+        Today's no-show records
+      </div>
+
+    </div>
+
+
+  `;
+
+}
+
+
+
+/* =========================================================
+   RENDER APPOINTMENTS
+========================================================= */
+
+function renderAppointments(
+  search = ""
+){
+
+  const searchText =
+    search
+      .trim()
+      .toLowerCase();
+
+
+  const filterDate =
+    document.getElementById(
+      "appointmentFilterDate"
+    )?.value || "";
+
+
+  const all =
+    getAllAppointments();
+
+
+  const filtered =
+    all.filter(
+      appointment => {
+
+        const text =
+          (
+            appointment.patientName +
+            " " +
+            appointment.patientId +
+            " " +
+            (
+              appointment.type ||
+              ""
+            )
+          )
+            .toLowerCase();
+
+
+        const matchSearch =
+          !searchText ||
+          text.includes(
+            searchText
+          );
+
+
+        const matchDate =
+          !filterDate ||
+          appointment.date ===
+          filterDate;
+
+
+        return (
+          matchSearch &&
+          matchDate
+        );
+
+      }
+    );
+
+
+  const body =
+    document.getElementById(
+      "appointmentRows"
+    );
+
+
+  body.innerHTML =
+
+    filtered.length
+
+      ? filtered
+          .map(
+            appointment => {
+
+              const status =
+                getAppointmentStatus(
+                  appointment
+                );
+
+
+              let statusClass =
+                "gray";
+
+
+              if(
+                status === "Upcoming"
+              ){
+
+                statusClass =
+                  "blue";
+
+              }
+
+
+              if(
+                status === "Completed"
+              ){
+
+                statusClass =
+                  "green";
+
+              }
+
+
+              if(
+                status === "No Show"
+              ){
+
+                statusClass =
+                  "red";
+
+              }
+
+
+              return `
+
+                <tr>
+
+
+                  <td>
+                    ${
+                      appointment.date ||
+                      "—"
+                    }
+                  </td>
+
+
+                  <td>
+                    ${
+                      appointment.time ||
+                      "—"
+                    }
+                  </td>
+
+
+                  <td>
+
+                    <strong>
+                      ${
+                        appointment.patientName
+                      }
+                    </strong>
+
+                  </td>
+
+
+                  <td>
+                    ${appointment.patientId}
+                  </td>
+
+
+                  <td>
+
+                    <div>
+
+                      ${
+                        appointment.type ||
+                        "Appointment"
+                      }
+
+                    </div>
+
+
+                    ${
+                      appointment.notes
+                        ? `
+                          <div
+                            style="
+                              font-size:9px;
+                              color:var(--muted);
+                              margin-top:3px;
+                            "
+                          >
+                            ${
+                              appointment.notes
+                            }
+                          </div>
+                        `
+                        : ""
+                    }
+
+                  </td>
+
+
+                  <td>
+
+                    <span
+                      class="
+                        badge
+                        ${statusClass}
+                      "
+                    >
+                      ${status}
+                    </span>
+
+                  </td>
+
+
+                  <td>
+
+                    <button
+                      type="button"
+                      class="secondary"
+                      style="
+                        padding:7px 9px;
+                      "
+                      onclick="
+                        openEditAppointment(
+                          '${appointment.patientId}',
+                          '${appointment.id}'
+                        )
+                      "
+                    >
+                      Edit
+                    </button>
+
+                  </td>
+
+
+                </tr>
+
+              `;
+
+            }
+          )
+          .join("")
+
+
+      : `
+
+        <tr>
+
+          <td
+            colspan="7"
+            style="
+              text-align:center;
+              padding:30px;
+              color:var(--muted);
+            "
+          >
+            No appointments found.
+          </td>
+
+        </tr>
+
+      `;
+
+
+
+  renderAppointmentKpis();
+
+}
+
+
+
+/* =========================================================
+   OPEN ADD APPOINTMENT
+========================================================= */
+
+function openAddAppointment(){
+
+  editingAppointmentId =
+    null;
+
+
+  document.getElementById(
+    "appointmentModalTitle"
+  ).textContent =
+    "Add Appointment";
+
+
+  populatePatientSelect();
+
+
+  document.getElementById(
+    "appointmentDate"
+  ).value =
+    new Date()
+      .toISOString()
+      .slice(0,10);
+
+
+  document.getElementById(
+    "appointmentTime"
+  ).value =
+    "";
+
+
+  document.getElementById(
+    "appointmentType"
+  ).value =
+    "";
+
+
+  document.getElementById(
+    "appointmentNotes"
+  ).value =
+    "";
+
+
+  document.getElementById(
+    "appointmentModal"
+  ).classList.add("show");
+
+}
+
+
+
+/* =========================================================
+   PATIENT SELECT
+========================================================= */
+
+function populatePatientSelect(
+  selectedPatientId = ""
+){
+
+  const select =
+    document.getElementById(
+      "appointmentPatient"
+    );
+
+
+  const patients =
+    store().patients || [];
+
+
+  select.innerHTML =
+
+    patients
+      .map(
+        patient => `
+
+          <option
+            value="${patient.id}"
+            ${
+              patient.id ===
+              selectedPatientId
+                ? "selected"
+                : ""
+            }
+          >
+            ${patient.name}
+            ·
+            ${patient.id}
+          </option>
+
+        `
+      )
+      .join("");
+
+
+}
+
+
+
+/* =========================================================
+   OPEN EDIT APPOINTMENT
+========================================================= */
+
+function openEditAppointment(
+  patientId,
+  appointmentId
+){
+
+  const patient =
+    getPatient(
+      patientId
+    );
+
+
+  if(!patient){
+    return;
+  }
+
+
+  const appointment =
+    (
+      patient.appointments ||
+      []
+    ).find(
+      item =>
+        item.id ===
+        appointmentId
+    );
+
+
+  if(!appointment){
+    return;
+  }
+
+
+  editingAppointmentId =
+    appointmentId;
+
+
+  document.getElementById(
+    "appointmentModalTitle"
+  ).textContent =
+    "Edit Appointment";
+
+
+  populatePatientSelect(
+    patientId
+  );
+
+
+  document.getElementById(
+    "appointmentDate"
+  ).value =
+    appointment.date ||
+    "";
+
+
+  document.getElementById(
+    "appointmentTime"
+  ).value =
+    appointment.time ||
+    "";
+
+
+  document.getElementById(
+    "appointmentType"
+  ).value =
+    appointment.type ||
+    "";
+
+
+  document.getElementById(
+    "appointmentNotes"
+  ).value =
+    appointment.notes ||
+    "";
+
+
+  document.getElementById(
+    "appointmentModal"
+  ).classList.add("show");
+
+}
+
+
+
+/* =========================================================
+   CLOSE
+========================================================= */
+
+function closeAppointmentModal(){
+
+  document
+    .getElementById(
+      "appointmentModal"
+    )
+    .classList.remove(
+      "show"
+    );
+
+
+  editingAppointmentId =
+    null;
+
+}
+
+
+
+/* =========================================================
+   SAVE APPOINTMENT
+========================================================= */
+
+function saveAppointment(){
+
+  const patientId =
+    document.getElementById(
+      "appointmentPatient"
+    ).value;
+
+
+  const date =
+    document.getElementById(
+      "appointmentDate"
+    ).value;
+
+
+  const time =
+    document.getElementById(
+      "appointmentTime"
+    ).value;
+
+
+  const type =
+    document.getElementById(
+      "appointmentType"
+    ).value.trim();
+
+
+  const notes =
+    document.getElementById(
+      "appointmentNotes"
+    ).value.trim();
+
+
+
+  if(!patientId){
+
+    alert(
+      "Please select a patient."
+    );
+
+    return;
+  }
+
+
+  if(!date){
+
+    alert(
+      "Please select an appointment date."
+    );
+
+    return;
+  }
+
+
+  if(!type){
+
+    alert(
+      "Please enter the appointment type."
+    );
+
+    return;
+  }
+
+
+
+  let patient =
+    getPatient(
+      patientId
+    );
+
+
+  if(!patient){
+    return;
+  }
+
+
+  if(!Array.isArray(
+    patient.appointments
+  )){
+
+    patient.appointments =
+      [];
+
+  }
+
+
+  if(editingAppointmentId){
+
+    /* =========================================
+       EDIT
+    ========================================== */
+
+    const index =
+      patient.appointments
+        .findIndex(
+          appointment =>
+            appointment.id ===
+            editingAppointmentId
+        );
+
+
+    if(index >= 0){
+
+      patient.appointments[
+        index
+      ] = {
+
+        ...patient.appointments[
+          index
+        ],
+
+        date:date,
+
+        time:time,
+
+        type:type,
+
+        notes:notes,
+
+        status:
+          patient.appointments[
+            index
+          ].status ||
+          "Upcoming"
+
+      };
+
+    }
+
+
+  }else{
+
+    /* =========================================
+       CREATE
+    ========================================== */
+
+    patient.appointments.push({
+
+      id:
+        `${patient.id}-A${Date.now()}`,
+
+      date:date,
+
+      time:time,
+
+      type:type,
+
+      notes:notes,
+
+      status:
+        "Upcoming"
+
+    });
+
+  }
+
+
+  upsertPatient(
+    patient
+  );
+
+
+  closeAppointmentModal();
+
+
+  renderAppointments();
+
+
+  renderNotifications();
+
+}
+
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+renderAppointments();
+
+renderNotifications();
+
 
 </script>
 
-</body>
 
+</body>
 </html>
