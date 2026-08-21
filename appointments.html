@@ -23,12 +23,10 @@
 
 </head>
 
-
 <body>
 
 
 <div id="root"></div>
-
 
 
 <!-- =========================================================
@@ -41,7 +39,6 @@
 >
 
   <div class="modal">
-
 
     <div class="modal-head">
 
@@ -162,7 +159,6 @@
 
     <div class="modal-foot">
 
-
       <button
         type="button"
         class="secondary"
@@ -180,21 +176,17 @@
         Save Appointment
       </button>
 
-
     </div>
-
 
   </div>
 
 </div>
 
 
-
 <script>
 
-
 /* =========================================================
-   PAGE
+   PAGE SETUP
 ========================================================= */
 
 document.getElementById(
@@ -212,7 +204,6 @@ shell(
   `
 
     <div class="page-head">
-
 
       <div>
 
@@ -235,14 +226,12 @@ shell(
         ＋ Add Appointment
       </button>
 
-
     </div>
 
 
-
-    <!-- =================================================
-         APPOINTMENT KPIs
-    ================================================== -->
+    <!-- ===================================================
+         KPI
+    ==================================================== -->
 
     <div
       class="kpi-grid"
@@ -250,20 +239,16 @@ shell(
     ></div>
 
 
-
-    <!-- =================================================
-         FILTER / SEARCH
-    ================================================== -->
+    <!-- ===================================================
+         FILTERS
+    ==================================================== -->
 
     <div
       class="card"
-      style="
-        margin-bottom:15px;
-      "
+      style="margin-bottom:15px"
     >
 
       <div class="card-body">
-
 
         <div class="form-grid">
 
@@ -276,8 +261,12 @@ shell(
 
             <input
               id="appointmentSearch"
-              placeholder="Patient name or ID"
-              oninput="renderAppointments(this.value)"
+              placeholder="Patient name, ID or appointment type"
+              oninput="
+                renderAppointments(
+                  this.value
+                )
+              "
             >
 
           </div>
@@ -286,7 +275,7 @@ shell(
           <div class="form-group">
 
             <label>
-              Date
+              Filter Date
             </label>
 
             <input
@@ -303,25 +292,20 @@ shell(
 
           </div>
 
-
         </div>
-
 
       </div>
 
     </div>
 
 
-
-    <!-- =================================================
+    <!-- ===================================================
          APPOINTMENT TABLE
-    ================================================== -->
+    ==================================================== -->
 
     <div class="card">
 
-
       <div class="card-head">
-
 
         <div>
 
@@ -335,15 +319,12 @@ shell(
 
         </div>
 
-
       </div>
 
 
       <div class="table-wrap">
 
-
         <table class="table">
-
 
           <thead>
 
@@ -385,29 +366,22 @@ shell(
             id="appointmentRows"
           ></tbody>
 
-
         </table>
-
 
       </div>
 
-
     </div>
-
 
   `
 
 );
 
 
-
 /* =========================================================
    APPOINTMENT STATE
 ========================================================= */
 
-let editingAppointmentId =
-  null;
-
+let editingAppointmentId = null;
 
 
 /* =========================================================
@@ -418,7 +392,6 @@ function getAllAppointments(){
 
   const patients =
     store().patients || [];
-
 
   const results = [];
 
@@ -470,27 +443,20 @@ function getAllAppointments(){
 }
 
 
-
 /* =========================================================
-   APPOINTMENT STATUS
+   STATUS
 ========================================================= */
 
 function getAppointmentStatus(
   appointment
 ){
 
-  if(
-    appointment.status
-  ){
-
+  if(appointment.status){
     return appointment.status;
   }
 
 
-  if(
-    !appointment.date
-  ){
-
+  if(!appointment.date){
     return "Upcoming";
   }
 
@@ -523,14 +489,13 @@ function getAppointmentStatus(
 }
 
 
-
 /* =========================================================
-   KPIs
+   KPI
 ========================================================= */
 
 function renderAppointmentKpis(){
 
-  const all =
+  const appointments =
     getAllAppointments();
 
 
@@ -541,7 +506,7 @@ function renderAppointmentKpis(){
 
 
   const today =
-    all.filter(
+    appointments.filter(
       appointment =>
         appointment.date ===
         todayKey
@@ -549,7 +514,7 @@ function renderAppointmentKpis(){
 
 
   const upcoming =
-    all.filter(
+    appointments.filter(
       appointment =>
         getAppointmentStatus(
           appointment
@@ -558,7 +523,7 @@ function renderAppointmentKpis(){
 
 
   const past =
-    all.filter(
+    appointments.filter(
       appointment =>
         getAppointmentStatus(
           appointment
@@ -566,8 +531,8 @@ function renderAppointmentKpis(){
     );
 
 
-  const missing =
-    today.filter(
+  const noShow =
+    appointments.filter(
       appointment =>
         appointment.status ===
         "No Show"
@@ -577,7 +542,6 @@ function renderAppointmentKpis(){
   document.getElementById(
     "appointmentKpis"
   ).innerHTML = `
-
 
     <div class="kpi">
 
@@ -616,7 +580,7 @@ function renderAppointmentKpis(){
     <div class="kpi">
 
       <div class="kpi-label">
-        COMPLETED / PAST
+        PAST
       </div>
 
       <div class="kpi-value">
@@ -624,7 +588,7 @@ function renderAppointmentKpis(){
       </div>
 
       <div class="kpi-sub">
-        Previous appointment records
+        Previous appointments
       </div>
 
     </div>
@@ -637,20 +601,18 @@ function renderAppointmentKpis(){
       </div>
 
       <div class="kpi-value">
-        ${missing.length}
+        ${noShow.length}
       </div>
 
       <div class="kpi-sub">
-        Today's no-show records
+        No-show records
       </div>
 
     </div>
 
-
   `;
 
 }
-
 
 
 /* =========================================================
@@ -673,12 +635,12 @@ function renderAppointments(
     )?.value || "";
 
 
-  const all =
+  const appointments =
     getAllAppointments();
 
 
   const filtered =
-    all.filter(
+    appointments.filter(
       appointment => {
 
         const text =
@@ -692,25 +654,25 @@ function renderAppointments(
               ""
             )
           )
-            .toLowerCase();
+          .toLowerCase();
 
 
-        const matchSearch =
+        const matchesSearch =
           !searchText ||
           text.includes(
             searchText
           );
 
 
-        const matchDate =
+        const matchesDate =
           !filterDate ||
           appointment.date ===
           filterDate;
 
 
         return (
-          matchSearch &&
-          matchDate
+          matchesSearch &&
+          matchesDate
         );
 
       }
@@ -723,186 +685,204 @@ function renderAppointments(
     );
 
 
+  if(!filtered.length){
+
+    body.innerHTML = `
+
+      <tr>
+
+        <td
+          colspan="7"
+          style="
+            text-align:center;
+            padding:32px;
+            color:var(--muted);
+          "
+        >
+
+          No appointments found.
+
+        </td>
+
+      </tr>
+
+    `;
+
+    renderAppointmentKpis();
+
+    return;
+
+  }
+
+
   body.innerHTML =
 
-    filtered.length
+    filtered
+      .map(
+        appointment => {
 
-      ? filtered
-          .map(
-            appointment => {
-
-              const status =
-                getAppointmentStatus(
-                  appointment
-                );
+          const status =
+            getAppointmentStatus(
+              appointment
+            );
 
 
-              let statusClass =
-                "gray";
+          let statusClass =
+            "gray";
 
 
-              if(
-                status === "Upcoming"
-              ){
-
-                statusClass =
-                  "blue";
-
-              }
+          if(
+            status === "Upcoming"
+          ){
+            statusClass =
+              "blue";
+          }
 
 
-              if(
-                status === "Completed"
-              ){
-
-                statusClass =
-                  "green";
-
-              }
+          if(
+            status === "Completed"
+          ){
+            statusClass =
+              "green";
+          }
 
 
-              if(
-                status === "No Show"
-              ){
-
-                statusClass =
-                  "red";
-
-              }
+          if(
+            status === "No Show"
+          ){
+            statusClass =
+              "red";
+          }
 
 
-              return `
-
-                <tr>
-
-
-                  <td>
-                    ${
-                      appointment.date ||
-                      "—"
-                    }
-                  </td>
+          if(
+            status === "Cancelled"
+          ){
+            statusClass =
+              "orange";
+          }
 
 
-                  <td>
-                    ${
-                      appointment.time ||
-                      "—"
-                    }
-                  </td>
+          return `
+
+            <tr>
 
 
-                  <td>
+              <td>
 
-                    <strong>
-                      ${
-                        appointment.patientName
-                      }
-                    </strong>
+                ${
+                  appointment.date ||
+                  "—"
+                }
 
-                  </td>
-
-
-                  <td>
-                    ${appointment.patientId}
-                  </td>
+              </td>
 
 
-                  <td>
+              <td>
 
-                    <div>
+                ${
+                  appointment.time ||
+                  "—"
+                }
 
-                      ${
-                        appointment.type ||
-                        "Appointment"
-                      }
-
-                    </div>
+              </td>
 
 
-                    ${
-                      appointment.notes
-                        ? `
-                          <div
-                            style="
-                              font-size:9px;
-                              color:var(--muted);
-                              margin-top:3px;
-                            "
-                          >
-                            ${
-                              appointment.notes
-                            }
-                          </div>
-                        `
-                        : ""
-                    }
+              <td>
 
-                  </td>
+                <strong>
+                  ${
+                    appointment.patientName
+                  }
+                </strong>
+
+              </td>
 
 
-                  <td>
-
-                    <span
-                      class="
-                        badge
-                        ${statusClass}
-                      "
-                    >
-                      ${status}
-                    </span>
-
-                  </td>
+              <td>
+                ${appointment.patientId}
+              </td>
 
 
-                  <td>
+              <td>
 
-                    <button
-                      type="button"
-                      class="secondary"
-                      style="
-                        padding:7px 9px;
-                      "
-                      onclick="
-                        openEditAppointment(
-                          '${appointment.patientId}',
-                          '${appointment.id}'
-                        )
-                      "
-                    >
-                      Edit
-                    </button>
+                <div>
 
-                  </td>
+                  ${
+                    appointment.type ||
+                    "Appointment"
+                  }
+
+                </div>
 
 
-                </tr>
+                ${
+                  appointment.notes
 
-              `;
+                    ? `
 
-            }
-          )
-          .join("")
+                      <div
+                        style="
+                          font-size:10px;
+                          color:var(--muted);
+                          margin-top:4px;
+                        "
+                      >
+                        ${
+                          appointment.notes
+                        }
+                      </div>
+
+                    `
+
+                    : ""
+                }
+
+              </td>
 
 
-      : `
+              <td>
 
-        <tr>
+                <span
+                  class="
+                    badge
+                    ${statusClass}
+                  "
+                >
+                  ${status}
+                </span>
 
-          <td
-            colspan="7"
-            style="
-              text-align:center;
-              padding:30px;
-              color:var(--muted);
-            "
-          >
-            No appointments found.
-          </td>
+              </td>
 
-        </tr>
 
-      `;
+              <td>
+
+                <button
+                  type="button"
+                  class="secondary"
+                  style="
+                    padding:7px 9px;
+                  "
+                  onclick="
+                    openEditAppointment(
+                      '${appointment.patientId}',
+                      '${appointment.id}'
+                    )
+                  "
+                >
+                  Edit
+                </button>
+
+              </td>
+
+
+            </tr>
+
+          `;
+
+        }
+      )
+      .join("");
 
 
 
@@ -911,9 +891,57 @@ function renderAppointments(
 }
 
 
+/* =========================================================
+   PATIENT SELECT
+========================================================= */
+
+function populatePatientSelect(
+  selectedPatientId = ""
+){
+
+  const select =
+    document.getElementById(
+      "appointmentPatient"
+    );
+
+
+  const patients =
+    store().patients || [];
+
+
+  select.innerHTML =
+
+    patients
+      .map(
+        patient => `
+
+          <option
+            value="${patient.id}"
+            ${
+              patient.id ===
+              selectedPatientId
+                ? "selected"
+                : ""
+            }
+          >
+
+            ${patient.name}
+
+            ·
+
+            ${patient.id}
+
+          </option>
+
+        `
+      )
+      .join("");
+
+}
+
 
 /* =========================================================
-   OPEN ADD APPOINTMENT
+   OPEN ADD
 ========================================================= */
 
 function openAddAppointment(){
@@ -959,61 +987,15 @@ function openAddAppointment(){
 
   document.getElementById(
     "appointmentModal"
-  ).classList.add("show");
+  ).classList.add(
+    "show"
+  );
 
 }
 
 
-
 /* =========================================================
-   PATIENT SELECT
-========================================================= */
-
-function populatePatientSelect(
-  selectedPatientId = ""
-){
-
-  const select =
-    document.getElementById(
-      "appointmentPatient"
-    );
-
-
-  const patients =
-    store().patients || [];
-
-
-  select.innerHTML =
-
-    patients
-      .map(
-        patient => `
-
-          <option
-            value="${patient.id}"
-            ${
-              patient.id ===
-              selectedPatientId
-                ? "selected"
-                : ""
-            }
-          >
-            ${patient.name}
-            ·
-            ${patient.id}
-          </option>
-
-        `
-      )
-      .join("");
-
-
-}
-
-
-
-/* =========================================================
-   OPEN EDIT APPOINTMENT
+   OPEN EDIT
 ========================================================= */
 
 function openEditAppointment(
@@ -1093,14 +1075,15 @@ function openEditAppointment(
 
   document.getElementById(
     "appointmentModal"
-  ).classList.add("show");
+  ).classList.add(
+    "show"
+  );
 
 }
 
 
-
 /* =========================================================
-   CLOSE
+   CLOSE MODAL
 ========================================================= */
 
 function closeAppointmentModal(){
@@ -1120,14 +1103,13 @@ function closeAppointmentModal(){
 }
 
 
-
 /* =========================================================
-   SAVE APPOINTMENT
+   SAVE
 ========================================================= */
 
 function saveAppointment(){
 
-  const patientId =
+  const selectedPatientId =
     document.getElementById(
       "appointmentPatient"
     ).value;
@@ -1157,14 +1139,14 @@ function saveAppointment(){
     ).value.trim();
 
 
-
-  if(!patientId){
+  if(!selectedPatientId){
 
     alert(
       "Please select a patient."
     );
 
     return;
+
   }
 
 
@@ -1175,6 +1157,7 @@ function saveAppointment(){
     );
 
     return;
+
   }
 
 
@@ -1185,13 +1168,13 @@ function saveAppointment(){
     );
 
     return;
+
   }
 
 
-
-  let patient =
+  const patient =
     getPatient(
-      patientId
+      selectedPatientId
     );
 
 
@@ -1200,9 +1183,11 @@ function saveAppointment(){
   }
 
 
-  if(!Array.isArray(
-    patient.appointments
-  )){
+  if(
+    !Array.isArray(
+      patient.appointments
+    )
+  ){
 
     patient.appointments =
       [];
@@ -1211,10 +1196,6 @@ function saveAppointment(){
 
 
   if(editingAppointmentId){
-
-    /* =========================================
-       EDIT
-    ========================================== */
 
     const index =
       patient.appointments
@@ -1227,51 +1208,41 @@ function saveAppointment(){
 
     if(index >= 0){
 
+      const existing =
+        patient.appointments[
+          index
+        ];
+
+
       patient.appointments[
         index
       ] = {
 
-        ...patient.appointments[
-          index
-        ],
+        ...existing,
 
-        date:date,
-
-        time:time,
-
-        type:type,
-
-        notes:notes,
-
-        status:
-          patient.appointments[
-            index
-          ].status ||
-          "Upcoming"
+        date,
+        time,
+        type,
+        notes
 
       };
 
     }
 
-
   }else{
-
-    /* =========================================
-       CREATE
-    ========================================== */
 
     patient.appointments.push({
 
       id:
         `${patient.id}-A${Date.now()}`,
 
-      date:date,
+      date,
 
-      time:time,
+      time,
 
-      type:type,
+      type,
 
-      notes:notes,
+      notes,
 
       status:
         "Upcoming"
@@ -1297,7 +1268,6 @@ function saveAppointment(){
 }
 
 
-
 /* =========================================================
    INITIALIZE
 ========================================================= */
@@ -1305,7 +1275,6 @@ function saveAppointment(){
 renderAppointments();
 
 renderNotifications();
-
 
 </script>
 
