@@ -5,8 +5,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Panel | Getwell</title>
-<link rel="stylesheet" href="styles.css">
-<script src="app.js"></script>
+<link rel="stylesheet" href="styles.css?v=20260822-final3">
+<script src="app.js?v=20260822-final3"></script>
 </head>
 
 <body>
@@ -97,7 +97,20 @@ document.getElementById("root").innerHTML = shell(
           onchange="
             renderPanelPage()
           "
-        ></select>
+        >
+          <option value="ALL">All Panels</option>
+          <option value="PMCARE">PMCARE</option>
+          <option value="UITM">UITM</option>
+          <option value="COMPUMED">COMPUMED</option>
+          <option value="MICARE">MICARE</option>
+          <option value="SELCARE">SELCARE</option>
+          <option value="IHP">IHP</option>
+          <option value="ASP">ASP</option>
+          <option value="HEALTHCONNECT">HEALTHCONNECT</option>
+          <option value="EMAS">EMAS</option>
+          <option value="SELFPAY">SELFPAY</option>
+          <option value="SPONSORED">SPONSORED</option>
+        </select>
 
       </div>
 
@@ -156,6 +169,15 @@ document.getElementById("root").innerHTML = shell(
 
     </div>
 
+
+    <div
+      id="suspendedPanelSummary"
+      class="card-body"
+      style="
+        padding-top:12px;
+        padding-bottom:12px;
+      "
+    ></div>
 
     <div class="table-wrap">
 
@@ -251,10 +273,52 @@ document.getElementById("root").innerHTML = shell(
 
 
       <div
-        id="suspendedTotal"
-        class="badge orange"
+        style="
+          display:flex;
+          align-items:flex-end;
+          gap:8px;
+          flex-wrap:wrap;
+          justify-content:flex-end;
+        "
       >
-        Outstanding: RM 0.00
+
+        <div
+          class="form-group"
+          style="min-width:160px"
+        >
+
+          <label>
+            Panel Filter
+          </label>
+
+          <select
+            id="suspendedPanelFilter"
+            class="claim-input"
+            onchange="renderSuspendedPatients()"
+          >
+            <option value="ALL">All Panels</option>
+            <option value="PMCARE">PMCARE</option>
+            <option value="UITM">UITM</option>
+            <option value="COMPUMED">COMPUMED</option>
+            <option value="MICARE">MICARE</option>
+            <option value="SELCARE">SELCARE</option>
+            <option value="IHP">IHP</option>
+            <option value="ASP">ASP</option>
+            <option value="HEALTHCONNECT">HEALTHCONNECT</option>
+            <option value="EMAS">EMAS</option>
+            <option value="SELFPAY">SELFPAY</option>
+            <option value="SPONSORED">SPONSORED</option>
+          </select>
+
+        </div>
+
+        <div
+          id="suspendedTotal"
+          class="badge orange"
+        >
+          Outstanding: RM 0.00
+        </div>
+
       </div>
 
     </div>
@@ -317,58 +381,51 @@ document.getElementById("root").innerHTML = shell(
 
 function buildPanelFilter(){
 
-  const names = new Set([
-    "MiCare",
-    "PMCare",
-    "Other Panel"
-  ]);
-
-
-  getPanelPatientsRaw().forEach(
-    patient => {
-
-      const name =
-        getPanelName(
-          patient
-        );
-
-      if(name){
-        names.add(name);
-      }
-
-    }
-  );
-
-
-  const sorted =
-    [...names]
-      .sort(
-        (a,b) =>
-          a.localeCompare(b)
-      );
-
+  const current =
+    panelFilter.value ||
+    "ALL";
 
   panelFilter.innerHTML = `
-
-    <option value="ALL">
-      All Panels
-    </option>
-
+    <option value="ALL">All Panels</option>
     ${
-      sorted
-        .map(
-          name => `
-            <option
-              value="${name.replace(/"/g,"&quot;")}"
-            >
-              ${name}
-            </option>
-          `
-        )
-        .join("")
+      [
+        "PMCARE",
+        "UITM",
+        "COMPUMED",
+        "MICARE",
+        "SELCARE",
+        "IHP",
+        "ASP",
+        "HEALTHCONNECT",
+        "EMAS",
+        "SELFPAY",
+        "SPONSORED"
+      ]
+      .map(
+        name =>
+          `<option value="${name}">${name}</option>`
+      )
+      .join("")
     }
-
   `;
+
+  panelFilter.value =
+    [
+      "ALL",
+      "PMCARE",
+      "UITM",
+      "COMPUMED",
+      "MICARE",
+      "SELCARE",
+      "IHP",
+      "ASP",
+      "HEALTHCONNECT",
+      "EMAS",
+      "SELFPAY",
+      "SPONSORED"
+    ].includes(current)
+      ? current
+      : "ALL";
 
 }
 
@@ -462,124 +519,15 @@ function getFilteredPanelPatients(){
 ========================================================= */
 
 function renderPanelKpis(){
-
-  const patients =
-    getFilteredPanelPatients();
-
-
-  let grand = 0;
-  let claimed = 0;
-
-
-  patients.forEach(
-    patient => {
-
-      const f =
-        finance(
-          patient
-        );
-
-      grand +=
-        f.grand;
-
-      claimed +=
-        f.claimed;
-
-    }
-  );
-
-
-  const balance =
-    Math.max(
-      0,
-      grand -
-      claimed
-    );
-
-
-  panelKpis.innerHTML = `
-
-    <div class="kpi">
-
-      <div class="kpi-label">
-        PANEL PATIENTS
-      </div>
-
-      <div class="kpi-value">
-        ${patients.length}
-      </div>
-
-      <div class="kpi-sub">
-        ${
-          panelFilter.value === "ALL"
-            ? "All panel patients"
-            : `Filtered: ${panelFilter.value}`
-        }
-      </div>
-
-    </div>
-
-
-    <div class="kpi">
-
-      <div class="kpi-label">
-        GRAND TOTAL
-      </div>
-
-      <div class="kpi-value">
-        ${money(grand)}
-      </div>
-
-      <div class="kpi-sub">
-        All recorded visit invoices
-      </div>
-
-    </div>
-
-
-    <div class="kpi">
-
-      <div class="kpi-label">
-        TOTAL CLAIMED
-      </div>
-
-      <div class="kpi-value">
-        ${money(claimed)}
-      </div>
-
-      <div class="kpi-sub">
-        All submitted claim transactions
-      </div>
-
-    </div>
-
-
-    <div class="kpi">
-
-      <div class="kpi-label">
-        BALANCE TO CLAIM
-      </div>
-
-      <div
-        class="kpi-value"
-        style="
-          color:
-            ${balance > 0
-              ? "#C2410C"
-              : "#15803D"};
-        "
-      >
-        ${money(balance)}
-      </div>
-
-      <div class="kpi-sub">
-        Remaining balance
-      </div>
-
-    </div>
-
-  `;
-
+const selectedPanel=panelFilter?.value||"ALL";
+const ps=getPanelPatients().filter(p=>selectedPanel==="ALL"||getPanelName(p)===selectedPanel);
+let g=0,c=0;
+ps.forEach(p=>{const f=finance(p);g+=f.grand;c+=f.claimed});
+panelKpis.innerHTML=`
+<div class="kpi"><div class="kpi-label">PANEL PATIENTS</div><div class="kpi-value">${ps.length}</div><div class="kpi-sub">${selectedPanel==="ALL"?"All panel types":selectedPanel}</div></div>
+<div class="kpi"><div class="kpi-label">GRAND TOTAL</div><div class="kpi-value">${money(g)}</div></div>
+<div class="kpi"><div class="kpi-label">TOTAL CLAIMED</div><div class="kpi-value">${money(c)}</div></div>
+<div class="kpi"><div class="kpi-label">BALANCE TO CLAIM</div><div class="kpi-value">${money(Math.max(0,g-c))}</div></div>`;
 }
 
 
@@ -730,28 +678,89 @@ function renderPanelPatients(){
    SUSPENDED / DANGER ZONE
 ========================================================= */
 
+function buildSuspendedPanelFilter(){
+
+  const current =
+    suspendedPanelFilter.value ||
+    "ALL";
+
+  suspendedPanelFilter.innerHTML = `
+    <option value="ALL">All Panels</option>
+    ${
+      [
+        "PMCARE",
+        "UITM",
+        "COMPUMED",
+        "MICARE",
+        "SELCARE",
+        "IHP",
+        "ASP",
+        "HEALTHCONNECT",
+        "EMAS",
+        "SELFPAY",
+        "SPONSORED"
+      ]
+      .map(
+        name =>
+          `<option value="${name}">${name}</option>`
+      )
+      .join("")
+    }
+  `;
+
+  suspendedPanelFilter.value =
+    [
+      "ALL",
+      "PMCARE",
+      "UITM",
+      "COMPUMED",
+      "MICARE",
+      "SELCARE",
+      "IHP",
+      "ASP",
+      "HEALTHCONNECT",
+      "EMAS",
+      "SELFPAY",
+      "SPONSORED"
+    ].includes(current)
+      ? current
+      : "ALL";
+
+}
+
+
 function getSuspendedPatients(){
 
-  return getFilteredPanelPatients()
+  const selected =
+    suspendedPanelFilter.value ||
+    "ALL";
+
+  return getPanelPatientsRaw()
     .filter(
       patient => {
+
+        const panel =
+          getPanelName(
+            patient
+          );
 
         const f =
           finance(
             patient
           );
 
-
         return (
           isPanelSuspended(
             patient
           ) &&
-          f.balance > 0
+          f.balance > 0 &&
+          (
+            selected === "ALL" ||
+            panel === selected
+          )
         );
-
       }
     );
-
 }
 
 
@@ -760,9 +769,8 @@ function renderSuspendedPatients(){
   const patients =
     getSuspendedPatients();
 
-
-  let totalOutstanding = 0;
-
+  let totalOutstanding =
+    0;
 
   patients.forEach(
     patient => {
@@ -775,16 +783,65 @@ function renderSuspendedPatients(){
     }
   );
 
+  const selected =
+    suspendedPanelFilter.value ||
+    "ALL";
 
   suspendedCount.textContent =
     patients.length;
-
 
   suspendedTotal.textContent =
     `Outstanding: ${money(
       totalOutstanding
     )}`;
 
+  suspendedPanelSummary.innerHTML = `
+
+    <div class="finance-grid">
+
+      <div class="finance-card">
+
+        <div class="label">
+          SUSPENDED PATIENTS
+        </div>
+
+        <div class="value">
+          ${patients.length}
+        </div>
+
+        <div
+          style="
+            font-size:10px;
+            color:var(--muted);
+            margin-top:3px;
+          "
+        >
+          ${
+            selected === "ALL"
+              ? "All panel types"
+              : selected
+          }
+        </div>
+
+      </div>
+
+      <div class="finance-card balance">
+
+        <div class="label">
+          TOTAL OUTSTANDING / HUTANG
+        </div>
+
+        <div class="value">
+          ${money(
+            totalOutstanding
+          )}
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
 
   suspendedRows.innerHTML =
 
@@ -799,24 +856,20 @@ function renderSuspendedPatients(){
                   patient
                 ).balance;
 
-
               const note =
                 panelSuspensionNote(
                   patient
                 );
 
-
               return `
 
                 <tr>
-
 
                   <td>
 
                     <strong>
                       ${patient.name}
                     </strong>
-
 
                     <div
                       class="row-sub"
@@ -825,7 +878,6 @@ function renderSuspendedPatients(){
                     </div>
 
                   </td>
-
 
                   <td>
 
@@ -839,7 +891,6 @@ function renderSuspendedPatients(){
 
                   </td>
 
-
                   <td>
 
                     <span
@@ -852,7 +903,6 @@ function renderSuspendedPatients(){
 
                   </td>
 
-
                   <td>
 
                     <span
@@ -863,7 +913,6 @@ function renderSuspendedPatients(){
 
                   </td>
 
-
                   <td>
 
                     <div
@@ -872,16 +921,13 @@ function renderSuspendedPatients(){
                         line-height:16px;
                       "
                     >
-
                       ${
                         note ||
                         "No suspension note entered."
                       }
-
                     </div>
 
                   </td>
-
 
                   <td>
 
@@ -903,7 +949,6 @@ function renderSuspendedPatients(){
 
                   </td>
 
-
                 </tr>
 
               `;
@@ -911,7 +956,6 @@ function renderSuspendedPatients(){
             }
           )
           .join("")
-
 
       : `
 
@@ -925,10 +969,13 @@ function renderSuspendedPatients(){
               color:var(--muted);
             "
           >
-
             No suspended-policy patients
-            with outstanding balance.
-
+            with outstanding balance
+            ${
+              selected === "ALL"
+                ? "."
+                : ` for ${selected}.`
+            }
           </td>
 
         </tr>
@@ -1406,6 +1453,7 @@ function closePanelDetail(){
 ========================================================= */
 
 buildPanelFilter();
+buildSuspendedPanelFilter();
 renderPanelPage();
 renderNotifications();
 
