@@ -1,11 +1,12 @@
 /* =========================================================
    GETWELL WEIGHT LOSS ADMIN
    CENTRAL APP.JS
+   Compatible with existing settings.html
 ========================================================= */
 
 
 /* =========================================================
-   STORAGE
+   STORAGE KEYS
 ========================================================= */
 
 const STORE_KEY =
@@ -24,13 +25,19 @@ const SETTINGS_UPDATED_KEY =
   "GETWELL_SETTINGS_UPDATED";
 
 
+/* =========================================================
+   DEFAULT DATA
+========================================================= */
+
 const seed = {
   patients: []
 };
 
 
 /* =========================================================
-   DEFAULT SYSTEM SETTINGS
+   DEFAULT SETTINGS
+   Used only when settings.html has not
+   created the configuration yet.
 ========================================================= */
 
 const DEFAULT_SYSTEM_SETTINGS = {
@@ -299,7 +306,7 @@ const DEFAULT_SYSTEM_SETTINGS = {
 
 
 /* =========================================================
-   CONFIG HELPERS
+   DEEP CLONE
 ========================================================= */
 
 function cloneObject(
@@ -314,6 +321,10 @@ function cloneObject(
 
 }
 
+
+/* =========================================================
+   MERGE SETTINGS
+========================================================= */
 
 function mergeSystemSettings(
   defaults,
@@ -380,7 +391,7 @@ function mergeSystemSettings(
 
 
 /* =========================================================
-   GET SYSTEM SETTINGS
+   SYSTEM SETTINGS
 ========================================================= */
 
 function getSystemSettings(){
@@ -391,83 +402,60 @@ function getSystemSettings(){
     );
 
 
-  if(!raw){
+  /*
+    IMPORTANT:
+    If settings.html has already created
+    the configuration, use that exact
+    configuration.
+  */
 
-    const defaults =
-      cloneObject(
-        DEFAULT_SYSTEM_SETTINGS
-      );
+  if(raw){
 
+    try{
 
-    localStorage.setItem(
-      SETTINGS_KEY,
-      JSON.stringify(
-        defaults
-      )
-    );
-
-
-    return defaults;
-
-  }
+      const saved =
+        JSON.parse(
+          raw
+        );
 
 
-  try{
-
-    const saved =
-      JSON.parse(
-        raw
-      );
-
-
-    const merged =
-      mergeSystemSettings(
+      return mergeSystemSettings(
         DEFAULT_SYSTEM_SETTINGS,
         saved
       );
 
+    }catch(error){
 
-    /*
-      Automatically update missing
-      settings introduced by future
-      versions.
-    */
-
-    localStorage.setItem(
-      SETTINGS_KEY,
-      JSON.stringify(
-        merged
-      )
-    );
-
-
-    return merged;
-
-  }catch(error){
-
-    console.error(
-      "Unable to read Getwell settings:",
-      error
-    );
-
-
-    const defaults =
-      cloneObject(
-        DEFAULT_SYSTEM_SETTINGS
+      console.error(
+        "Getwell settings error:",
+        error
       );
 
+    }
 
-    localStorage.setItem(
-      SETTINGS_KEY,
-      JSON.stringify(
-        defaults
-      )
+  }
+
+
+  /*
+    Only create defaults when the
+    configuration doesn't exist yet.
+  */
+
+  const defaults =
+    cloneObject(
+      DEFAULT_SYSTEM_SETTINGS
     );
 
 
-    return defaults;
+  localStorage.setItem(
+    SETTINGS_KEY,
+    JSON.stringify(
+      defaults
+    )
+  );
 
-  }
+
+  return defaults;
 
 }
 
@@ -479,17 +467,6 @@ function getSystemSettings(){
 function saveSystemSettings(
   settings
 ){
-
-  if(
-    !settings ||
-    typeof settings !==
-      "object"
-  ){
-
-    return false;
-
-  }
-
 
   localStorage.setItem(
     SETTINGS_KEY,
@@ -506,14 +483,11 @@ function saveSystemSettings(
     )
   );
 
-
-  return true;
-
 }
 
 
 /* =========================================================
-   GLOBAL CONFIG ACCESS
+   SETTINGS ALIAS
 ========================================================= */
 
 function systemSettings(){
@@ -533,11 +507,8 @@ function getPatientStatuses(){
     getSystemSettings();
 
 
-  return (
-    settings.patient &&
-    Array.isArray(
-      settings.patient.statuses
-    )
+  return Array.isArray(
+    settings.patient?.statuses
   )
     ? settings.patient.statuses
     : [];
@@ -563,7 +534,7 @@ function getDefaultPatientStatus(){
     getSystemSettings();
 
 
-  const statuses =
+  const active =
     getActivePatientStatuses();
 
 
@@ -572,20 +543,22 @@ function getDefaultPatientStatus(){
       ?.defaultStatus;
 
 
-  if(
-    statuses.some(
+  const match =
+    active.find(
       status =>
         status.name ===
         wanted
-    )
-  ){
+    );
 
-    return wanted;
+
+  if(match){
+
+    return match.name;
 
   }
 
 
-  return statuses[0]
+  return active[0]
     ?.name ||
     "Active";
 
@@ -593,7 +566,7 @@ function getDefaultPatientStatus(){
 
 
 /* =========================================================
-   PATIENT ID
+   PATIENT ID SETTINGS
 ========================================================= */
 
 function getPatientIdSettings(){
@@ -641,6 +614,10 @@ function getPatientIdSettings(){
 }
 
 
+/* =========================================================
+   FORMAT PATIENT ID
+========================================================= */
+
 function formatPatientId(
   number
 ){
@@ -663,6 +640,10 @@ function formatPatientId(
 }
 
 
+/* =========================================================
+   NEXT PATIENT ID
+========================================================= */
+
 function getNextPatientId(){
 
   const config =
@@ -675,6 +656,10 @@ function getNextPatientId(){
 
 }
 
+
+/* =========================================================
+   RESERVE PATIENT ID
+========================================================= */
 
 function reserveNextPatientId(){
 
@@ -749,8 +734,11 @@ function getPanelById(
   id
 ){
 
-  if(!id)
+  if(!id){
+
     return null;
+
+  }
 
 
   return getAllPanels()
@@ -764,7 +752,8 @@ function getPanelById(
           id
         )
         .toUpperCase()
-    ) || null;
+    ) ||
+    null;
 
 }
 
@@ -773,8 +762,11 @@ function getPanelByName(
   name
 ){
 
-  if(!name)
+  if(!name){
+
     return null;
+
+  }
 
 
   return getAllPanels()
@@ -788,10 +780,15 @@ function getPanelByName(
           name
         )
         .toLowerCase()
-    ) || null;
+    ) ||
+    null;
 
 }
 
+
+/* =========================================================
+   PANEL OPTIONS
+========================================================= */
 
 function getPanelOptions(){
 
@@ -817,7 +814,7 @@ function getPanelOptions(){
 
 
 /* =========================================================
-   PANEL NAME RESOLUTION
+   PANEL NAME
 ========================================================= */
 
 function getPanelName(
@@ -835,10 +832,6 @@ function getPanelName(
   }
 
 
-  /*
-    New Settings-based panel IDs.
-  */
-
   const configured =
     getPanelById(
       p.panelProvider
@@ -853,23 +846,8 @@ function getPanelName(
 
 
   /*
-    Existing / legacy panel values.
-    Kept so existing patients are
-    NOT broken.
+    Legacy support.
   */
-
-  if(
-    p.panelProvider ===
-      "Other"
-  ){
-
-    return (
-      p.otherPanelName ||
-      "Panel"
-    );
-
-  }
-
 
   if(
     p.panelProvider ===
@@ -901,6 +879,19 @@ function getPanelName(
   }
 
 
+  if(
+    p.panelProvider ===
+      "Other"
+  ){
+
+    return (
+      p.otherPanelName ||
+      "Panel"
+    );
+
+  }
+
+
   return (
     p.otherPanelName ||
     p.panelProvider ||
@@ -911,78 +902,55 @@ function getPanelName(
 
 
 /* =========================================================
-   NORMALIZE PANEL TYPE
+   PANEL CHECK
 ========================================================= */
 
-function normalizePanelType(
-  value
+function patientUsesPanel(
+  p
 ){
 
-  if(
-    !value ||
-    value ===
+  return !!(
+    p?.panelProvider &&
+    p.panelProvider !==
       "SELF_PAY"
-  ){
+  );
 
-    return "SELF_PAY";
-
-  }
+}
 
 
-  /*
-    If the value already belongs
-    to the current Settings list,
-    preserve it.
-  */
+/* =========================================================
+   PANEL SUSPENSION
+========================================================= */
 
-  const configured =
-    getPanelById(
-      value
-    );
+function isPanelSuspended(
+  p
+){
 
+  return (
+    patientUsesPanel(
+      p
+    ) &&
+    (
+      p.panelStatus ===
+        "Suspended" ||
 
-  if(configured){
+      p.insuranceStatus ===
+        "Suspended"
+    )
+  );
 
-    return configured.id;
-
-  }
-
-
-  /*
-    Legacy values.
-  */
-
-  if(
-    value ===
-      "MiCare"
-  ){
-
-    return "PANEL_A";
-
-  }
+}
 
 
-  if(
-    value ===
-      "PMCare"
-  ){
+function panelSuspensionNote(
+  p
+){
 
-    return "PANEL_B";
-
-  }
-
-
-  if(
-    value ===
-      "Other Panel"
-  ){
-
-    return "PANEL_C";
-
-  }
-
-
-  return value;
+  return (
+    p.panelSuspensionNote ||
+    p.insuranceSuspensionNote ||
+    ""
+  );
 
 }
 
@@ -1019,7 +987,7 @@ function getDefaultAppointmentStatus(){
     getSystemSettings();
 
 
-  const statuses =
+  const active =
     getAppointmentStatuses();
 
 
@@ -1028,20 +996,22 @@ function getDefaultAppointmentStatus(){
       ?.defaultStatus;
 
 
-  if(
-    statuses.some(
+  const match =
+    active.find(
       status =>
         status.name ===
         wanted
-    )
-  ){
+    );
 
-    return wanted;
+
+  if(match){
+
+    return match.name;
 
   }
 
 
-  return statuses[0]
+  return active[0]
     ?.name ||
     "Upcoming";
 
@@ -1114,12 +1084,6 @@ function isFeatureEnabled(
   const settings =
     getSystemSettings();
 
-
-  /*
-    Unknown features remain
-    enabled so older pages
-    don't unexpectedly disappear.
-  */
 
   if(
     !settings.features ||
@@ -1197,7 +1161,7 @@ function rawStore(){
     );
 
 
-    return structuredClone(
+    return cloneObject(
       seed
     );
 
@@ -1210,7 +1174,13 @@ function rawStore(){
       raw
     );
 
-  }catch(e){
+  }catch(error){
+
+    console.error(
+      "Getwell data error:",
+      error
+    );
+
 
     localStorage.setItem(
       STORE_KEY,
@@ -1220,7 +1190,7 @@ function rawStore(){
     );
 
 
-    return structuredClone(
+    return cloneObject(
       seed
     );
 
@@ -1252,6 +1222,7 @@ function migrateLegacyIds(
   const used =
     new Set();
 
+
   const map =
     {};
 
@@ -1270,18 +1241,18 @@ function migrateLegacyIds(
         );
 
 
-      const m =
+      const match =
         old.match(
           /^PAT-(\d+)$/i
         );
 
 
-      if(m){
+      if(match){
 
-        const n =
+        const number =
           String(
             Number(
-              m[1]
+              match[1]
             )
           )
           .padStart(
@@ -1290,20 +1261,20 @@ function migrateLegacyIds(
           );
 
 
-        const neu =
-          `GW-${n}`;
+        const newer =
+          `GW-${number}`;
 
 
         map[old] =
-          neu;
+          newer;
 
 
         p.id =
-          neu;
+          newer;
 
 
         used.add(
-          neu
+          newer
         );
 
       }
@@ -1383,16 +1354,18 @@ function migrateLegacyIds(
         []
       )
       .forEach(
-        a => {
+        appointment => {
 
           if(
-            a.patientId &&
-            map[a.patientId]
+            appointment.patientId &&
+            map[
+              appointment.patientId
+            ]
           ){
 
-            a.patientId =
+            appointment.patientId =
               map[
-                a.patientId
+                appointment.patientId
               ];
 
           }
@@ -1441,13 +1414,13 @@ function store(){
 ========================================================= */
 
 function saveStore(
-  d
+  data
 ){
 
   localStorage.setItem(
     STORE_KEY,
     JSON.stringify(
-      d
+      data
     )
   );
 
@@ -1455,7 +1428,51 @@ function saveStore(
 
 
 /* =========================================================
-   PATIENT
+   MAP LEGACY PATIENT ID
+========================================================= */
+
+function mapLegacyId(
+  id
+){
+
+  const value =
+    String(
+      id ||
+      ""
+    );
+
+
+  const match =
+    value.match(
+      /^PAT-(\d+)$/i
+    );
+
+
+  if(match){
+
+    return (
+      "GW-" +
+      String(
+        Number(
+          match[1]
+        )
+      )
+      .padStart(
+        4,
+        "0"
+      )
+    );
+
+  }
+
+
+  return value;
+
+}
+
+
+/* =========================================================
+   GET PATIENT
 ========================================================= */
 
 function getPatient(
@@ -1473,35 +1490,11 @@ function getPatient(
     []
   )
   .find(
-    p =>
-      p.id ===
+    patient =>
+      patient.id ===
       wanted
   ) ||
   null;
-
-}
-
-
-function mapLegacyId(
-  id
-){
-
-  const s =
-    String(
-      id ||
-      ""
-    );
-
-
-  const m =
-    s.match(
-      /^PAT-(\d+)$/i
-    );
-
-
-  return m
-    ? `GW-${String(Number(m[1])).padStart(4,"0")}`
-    : s;
 
 }
 
@@ -1511,38 +1504,38 @@ function mapLegacyId(
 ========================================================= */
 
 function upsertPatient(
-  p
+  patient
 ){
 
-  const d =
+  const data =
     store();
 
 
-  const i =
-    d.patients
+  const index =
+    data.patients
       .findIndex(
-        x =>
-          x.id ===
-          p.id
+        existing =>
+          existing.id ===
+          patient.id
       );
 
 
-  if(i >= 0){
+  if(index >= 0){
 
-    d.patients[i] =
-      p;
+    data.patients[index] =
+      patient;
 
   }else{
 
-    d.patients.push(
-      p
+    data.patients.push(
+      patient
     );
 
   }
 
 
   saveStore(
-    d
+    data
   );
 
 }
@@ -1553,22 +1546,22 @@ function upsertPatient(
 ========================================================= */
 
 function ensureClaims(
-  p
+  patient
 ){
 
   if(
     !Array.isArray(
-      p.claims
+      patient.claims
     )
   ){
 
-    p.claims =
+    patient.claims =
       [];
 
   }
 
 
-  return p.claims;
+  return patient.claims;
 
 }
 
@@ -1578,62 +1571,62 @@ function ensureClaims(
 ========================================================= */
 
 function ensureVisit(
-  v
+  visit
 ){
 
   if(
-    !v.billing
+    !visit.billing
   ){
 
-    v.billing =
+    visit.billing =
       {};
 
   }
 
 
-  v.billing.injection ||=
+  visit.billing.injection ||=
     {
       price:0,
       notes:""
     };
 
 
-  v.billing.medication ||=
+  visit.billing.medication ||=
     {
       price:0,
       notes:""
     };
 
 
-  v.billing.treatment ||=
+  visit.billing.treatment ||=
     {
       price:0,
       notes:""
     };
 
 
-  v.billing.other ||=
+  visit.billing.other ||=
     {
       price:0,
       notes:""
     };
 
 
-  v.billing.panel =
+  visit.billing.panel =
     Number(
-      v.billing.panel ||
+      visit.billing.panel ||
       0
     );
 
 
-  v.billing.selfPay =
+  visit.billing.selfPay =
     Number(
-      v.billing.selfPay ||
+      visit.billing.selfPay ||
       0
     );
 
 
-  return v;
+  return visit;
 
 }
 
@@ -1643,100 +1636,48 @@ function ensureVisit(
 ========================================================= */
 
 function visitTotal(
-  v
+  visit
 ){
 
-  const b =
+  const billing =
     ensureVisit(
-      v
+      visit
     )
     .billing;
 
 
   return (
-    (+b.injection.price || 0) +
-    (+b.medication.price || 0) +
-    (+b.treatment.price || 0) +
-    (+b.other.price || 0)
+    (+billing.injection.price || 0) +
+    (+billing.medication.price || 0) +
+    (+billing.treatment.price || 0) +
+    (+billing.other.price || 0)
   );
 
 }
 
 
 /* =========================================================
-   PANEL CHECK
+   CLAIM TOTAL
 ========================================================= */
 
-function patientUsesPanel(
-  p
+function claimsTotal(
+  patient
 ){
 
-  return !!(
-    p?.panelProvider &&
-    p.panelProvider !==
-      "SELF_PAY"
-  );
-
-}
-
-
-/* =========================================================
-   PANEL SUSPENSION
-========================================================= */
-
-function isPanelSuspended(
-  p
-){
-
-  return (
-    patientUsesPanel(
-      p
-    ) &&
-    (
-      p.panelStatus ===
-        "Suspended" ||
-
-      p.insuranceStatus ===
-        "Suspended"
-    )
-  );
-
-}
-
-
-function panelSuspensionNote(
-  p
-){
-
-  return (
-    p.panelSuspensionNote ||
-    p.insuranceSuspensionNote ||
-    ""
-  );
-
-}
-
-
-/* =========================================================
-   TOTALS
-========================================================= */
-
-function grandTotal(
-  p
-){
-
-  return (
-    p.visits ||
-    []
+  return ensureClaims(
+    patient
   )
   .reduce(
     (
-      s,
-      v
+      total,
+      claim
     ) =>
-      s +
-      visitTotal(
-        v
+      total +
+      (
+        Number(
+          claim.amount
+        ) ||
+        0
       ),
     0
   );
@@ -1744,22 +1685,26 @@ function grandTotal(
 }
 
 
-function claimsTotal(
-  p
+/* =========================================================
+   GRAND TOTAL
+========================================================= */
+
+function grandTotal(
+  patient
 ){
 
-  return ensureClaims(
-    p
+  return (
+    patient.visits ||
+    []
   )
   .reduce(
     (
-      s,
-      c
+      total,
+      visit
     ) =>
-      s +
-      (
-        +c.amount ||
-        0
+      total +
+      visitTotal(
+        visit
       ),
     0
   );
@@ -1772,7 +1717,7 @@ function claimsTotal(
 ========================================================= */
 
 function finance(
-  p
+  patient
 ){
 
   let injection =
@@ -1789,36 +1734,44 @@ function finance(
 
 
   (
-    p.visits ||
+    patient.visits ||
     []
   )
   .forEach(
-    v => {
+    visit => {
 
-      const b =
+      const billing =
         ensureVisit(
-          v
+          visit
         )
         .billing;
 
 
       injection +=
-        +b.injection.price ||
+        Number(
+          billing.injection.price
+        ) ||
         0;
 
 
       medication +=
-        +b.medication.price ||
+        Number(
+          billing.medication.price
+        ) ||
         0;
 
 
       treatment +=
-        +b.treatment.price ||
+        Number(
+          billing.treatment.price
+        ) ||
         0;
 
 
       selfpay +=
-        +b.selfPay ||
+        Number(
+          billing.selfPay
+        ) ||
         0;
 
     }
@@ -1827,13 +1780,13 @@ function finance(
 
   const grand =
     grandTotal(
-      p
+      patient
     );
 
 
   const claimed =
     claimsTotal(
-      p
+      patient
     );
 
 
@@ -1868,11 +1821,11 @@ function finance(
 ========================================================= */
 
 function latestVisit(
-  p
+  patient
 ){
 
   return [
-    ...(p.visits ||
+    ...(patient.visits ||
       [])
   ]
   .sort(
@@ -1880,13 +1833,15 @@ function latestVisit(
       a,
       b
     ) =>
-      (
+      String(
         a.dateKey ||
         ""
       )
       .localeCompare(
-        b.dateKey ||
-        ""
+        String(
+          b.dateKey ||
+          ""
+        )
       )
   )
   .at(
@@ -1902,25 +1857,28 @@ function latestVisit(
 ========================================================= */
 
 function daysSince(
-  d
+  date
 ){
 
-  if(!d)
+  if(!date){
+
     return null;
 
+  }
 
-  const a =
+
+  const start =
     new Date(
-      d +
+      date +
       "T00:00:00"
     );
 
 
-  const b =
+  const today =
     new Date();
 
 
-  b.setHours(
+  today.setHours(
     0,
     0,
     0,
@@ -1930,8 +1888,8 @@ function daysSince(
 
   return Math.floor(
     (
-      b -
-      a
+      today -
+      start
     ) /
     86400000
   );
@@ -1954,20 +1912,23 @@ function alerts(){
     []
   )
   .map(
-    p => {
+    patient => {
 
-      const d =
+      const last =
+        latestVisit(
+          patient
+        );
+
+
+      const days =
         daysSince(
-          latestVisit(
-            p
-          )
-          ?.dateKey
+          last?.dateKey
         );
 
 
       if(
-        d === null ||
-        d <
+        days === null ||
+        days <
           config.dueAfterDays
       ){
 
@@ -1979,16 +1940,15 @@ function alerts(){
       return {
 
         id:
-          p.id,
+          patient.id,
 
         name:
-          p.name,
+          patient.name,
 
-        days:
-          d,
+        days,
 
         level:
-          d >=
+          days >=
             config.overdueAfterDays
             ? "overdue"
             : "warning"
@@ -2017,13 +1977,13 @@ function alerts(){
 ========================================================= */
 
 function money(
-  n
+  value
 ){
 
   return (
     "RM " +
     Number(
-      n ||
+      value ||
       0
     )
     .toLocaleString(
@@ -2046,11 +2006,11 @@ function money(
 ========================================================= */
 
 function applyTheme(
-  t
+  theme
 ){
 
-  t =
-    t ===
+  theme =
+    theme ===
       "dark"
       ? "dark"
       : "light";
@@ -2058,32 +2018,32 @@ function applyTheme(
 
   document.documentElement
     .dataset.theme =
-    t;
+    theme;
 
 
   localStorage.setItem(
     THEME_KEY,
-    t
+    theme
   );
 
 
-  const b =
+  const button =
     document.getElementById(
       "themeToggle"
     );
 
 
-  if(b){
+  if(button){
 
-    b.textContent =
-      t ===
+    button.textContent =
+      theme ===
         "dark"
         ? "☀"
         : "☾";
 
 
-    b.title =
-      t ===
+    button.title =
+      theme ===
         "dark"
         ? "Switch to Day Mode"
         : "Switch to Night Mode";
@@ -2107,19 +2067,17 @@ function initTheme(){
 
 function toggleTheme(){
 
+  const current =
+    document.documentElement
+      .dataset.theme ||
+    "light";
+
+
   applyTheme(
-
-    (
-      document.documentElement
-        .dataset.theme ||
-      "light"
-    ) ===
+    current ===
       "dark"
-
       ? "light"
-
       : "dark"
-
   );
 
 }
@@ -2258,10 +2216,6 @@ function sidebar(
   active
 ){
 
-  const settings =
-    getSystemSettings();
-
-
   const showPatients =
     isFeatureEnabled(
       "patients"
@@ -2299,11 +2253,11 @@ function sidebar(
     onclick="goHome()"
     onkeydown="
       if(
-        event.key==='Enter' ||
-        event.key===' '
+        event.key === 'Enter' ||
+        event.key === ' '
       ){
         event.preventDefault();
-        goHome()
+        goHome();
       }
     "
   >
@@ -2393,9 +2347,7 @@ function sidebar(
 
     <div
       class="nav-label"
-      style="
-        margin-top:18px
-      "
+      style="margin-top:18px"
     >
       MANAGEMENT
     </div>
@@ -2550,31 +2502,38 @@ function shell(
 ========================================================= */
 
 function toggleNotifications(
-  e
+  event
 ){
 
-  e.stopPropagation();
+  if(event){
+
+    event.stopPropagation();
+
+  }
 
 
-  const p =
+  const panel =
     document.getElementById(
       "notifPanel"
     );
 
 
-  if(p){
+  if(!panel){
 
-    p.hidden =
-      !p.hidden;
+    return;
+
+  }
 
 
-    if(
-      !p.hidden
-    ){
+  panel.hidden =
+    !panel.hidden;
 
-      renderNotifications();
 
-    }
+  if(
+    !panel.hidden
+  ){
+
+    renderNotifications();
 
   }
 
@@ -2583,25 +2542,25 @@ function toggleNotifications(
 
 function renderNotifications(){
 
-  const a =
+  const list =
     alerts();
 
 
-  const c =
+  const count =
     document.getElementById(
       "notifCount"
     );
 
 
-  const b =
+  const body =
     document.getElementById(
       "notifBody"
     );
 
 
   if(
-    !c ||
-    !b
+    !count ||
+    !body
   ){
 
     return;
@@ -2609,92 +2568,95 @@ function renderNotifications(){
   }
 
 
-  c.hidden =
-    !a.length;
+  count.hidden =
+    list.length ===
+    0;
 
 
-  c.textContent =
-    a.length >
+  count.textContent =
+    list.length >
       99
       ? "99+"
-      : a.length;
+      : list.length;
 
 
-  b.innerHTML =
-    a.length
+  if(!list.length){
 
-      ? a
-          .map(
-            x => `
+    body.innerHTML = `
 
-              <div
-                class="notif-item"
-                onclick="
-                  location.href=
-                    'patient-profile.html?patient='+
-                    encodeURIComponent(
-                      '${String(
-                        x.id
-                      )
-                      .replace(
-                        /'/g,
-                        "\\'"
-                      )}'
-                    )
-                "
-              >
+      <div class="notif-empty">
+        No patients are due.
+      </div>
 
-                <span
-                  class="
-                    notif-dot
-                    ${x.level}
-                  "
-                ></span>
+    `;
 
 
-                <div>
+    return;
 
-                  <div
-                    class="notif-name"
-                  >
-                    ${x.name}
-                  </div>
+  }
 
 
-                  <div
-                    class="notif-text"
-                  >
+  body.innerHTML =
+    list
+      .map(
+        patient => `
 
-                    ${
-                      x.level ===
-                        "overdue"
-                        ? "Overdue"
-                        : "Due for Follow-Up"
-                    }
+          <div
+            class="notif-item"
+            onclick="
+              location.href=
+                'patient-profile.html?patient=' +
+                encodeURIComponent(
+                  '${String(
+                    patient.id
+                  )
+                  .replace(
+                    /'/g,
+                    "\\'"
+                  )}'
+                )
+            "
+          >
 
-                    ·
+            <span
+              class="
+                notif-dot
+                ${patient.level}
+              "
+            ></span>
 
-                    ${x.days}
 
-                    days since last visit.
+            <div>
 
-                  </div>
+              <div class="notif-name">
+                ${patient.name}
+              </div>
 
-                </div>
+
+              <div class="notif-text">
+
+                ${
+                  patient.level ===
+                    "overdue"
+                    ? "Overdue"
+                    : "Due for Follow-Up"
+                }
+
+                ·
+
+                ${patient.days}
+
+                days since last visit.
 
               </div>
 
-            `
-          )
-          .join("")
+            </div>
 
-      : `
-
-          <div class="notif-empty">
-            No patients are due.
           </div>
 
-        `;
+        `
+      )
+      .join("");
 
 }
 
@@ -2705,29 +2667,29 @@ function renderNotifications(){
 
 document.addEventListener(
   "click",
-  e => {
+  event => {
 
-    const w =
+    const wrapper =
       document.getElementById(
         "notifWrap"
       );
 
 
-    const p =
+    const panel =
       document.getElementById(
         "notifPanel"
       );
 
 
     if(
-      w &&
-      p &&
-      !w.contains(
-        e.target
+      wrapper &&
+      panel &&
+      !wrapper.contains(
+        event.target
       )
     ){
 
-      p.hidden =
+      panel.hidden =
         true;
 
     }
@@ -2737,7 +2699,7 @@ document.addEventListener(
 
 
 /* =========================================================
-   SETTINGS CHANGE LISTENER
+   SETTINGS CROSS-TAB UPDATE
 ========================================================= */
 
 window.addEventListener(
@@ -2750,15 +2712,24 @@ window.addEventListener(
     ){
 
       /*
-        Settings were changed in
-        another browser tab.
+        Do NOT reload settings.html
+        here unnecessarily.
 
-        Reload the current page so
-        the new configuration is
-        immediately applied.
+        Other pages reload so they
+        immediately use the new config.
       */
 
-      location.reload();
+      if(
+        !location.pathname
+          .toLowerCase()
+          .endsWith(
+            "settings.html"
+          )
+      ){
+
+        location.reload();
+
+      }
 
     }
 
@@ -2767,7 +2738,7 @@ window.addEventListener(
 
 
 /* =========================================================
-   SETTINGS READY
+   INITIALIZATION
 ========================================================= */
 
 document.addEventListener(
@@ -2775,9 +2746,9 @@ document.addEventListener(
   () => {
 
     /*
-      Make sure the configuration
-      exists before pages start
-      using it.
+      Ensure settings exist.
+      This does not overwrite
+      existing Settings data.
     */
 
     getSystemSettings();
