@@ -1,0 +1,1431 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  >
+
+  <title>
+    Panel | Getwell Weight Loss Admin
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="styles.css"
+  >
+
+  <script src="app.js"></script>
+
+</head>
+
+
+<body>
+
+
+<div id="root"></div>
+
+
+
+<!-- =========================================================
+     PANEL PATIENT DETAIL MODAL
+========================================================= -->
+
+<div
+  class="modal-wrap"
+  id="panelDetailModal"
+>
+
+  <div
+    class="modal"
+    style="
+      width:min(1050px,96vw);
+    "
+  >
+
+
+    <div
+      class="modal-head"
+    >
+
+
+      <div>
+
+        <h2
+          id="panelDetailTitle"
+        >
+          Panel Patient
+        </h2>
+
+
+        <p
+          id="panelDetailSub"
+        >
+          Panel claim details
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="modal-close"
+        onclick="
+          closePanelDetail()
+        "
+      >
+        ×
+      </button>
+
+
+    </div>
+
+
+
+    <div
+      class="modal-body"
+      id="panelDetailContent"
+    ></div>
+
+
+  </div>
+
+</div>
+
+
+
+<script>
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+document.getElementById(
+  "root"
+).innerHTML =
+
+shell(
+
+  "Panel",
+
+  "Panel & Insurance Claim Management",
+
+  "panel",
+
+  `
+
+
+    <div
+      class="page-head"
+    >
+
+
+      <div>
+
+        <h1>
+          Panel Claims
+        </h1>
+
+
+        <p>
+          Track panel patients, submitted claims and remaining balances.
+        </p>
+
+      </div>
+
+
+    </div>
+
+
+
+    <!-- =================================================
+         PANEL KPIs
+    ================================================== -->
+
+    <div
+      class="kpi-grid"
+      id="panelKpis"
+    ></div>
+
+
+
+    <!-- =================================================
+         PANEL PATIENT LIST
+    ================================================== -->
+
+    <div
+      class="card"
+    >
+
+
+      <div
+        class="card-head"
+      >
+
+
+        <div>
+
+          <h2>
+            Panel Patients
+          </h2>
+
+
+          <p>
+            Only patients using panel / insurance are shown.
+          </p>
+
+        </div>
+
+
+
+        <div
+          style="
+            width:240px;
+          "
+        >
+
+          <input
+            class="claim-input"
+            id="panelSearch"
+            placeholder="
+              Search patient or panel
+            "
+            oninput="
+              renderPanelPatients(
+                this.value
+              )
+            "
+          >
+
+        </div>
+
+
+      </div>
+
+
+
+      <div
+        class="table-wrap"
+      >
+
+
+        <table
+          class="table"
+        >
+
+
+          <thead>
+
+
+            <tr>
+
+
+              <th>
+                Patient
+              </th>
+
+
+              <th>
+                Panel
+              </th>
+
+
+              <th>
+                GRAND TOTAL
+              </th>
+
+
+              <th>
+                TOTAL CLAIMED
+              </th>
+
+
+              <th>
+                BALANCE TO CLAIM
+              </th>
+
+
+              <th>
+              </th>
+
+
+            </tr>
+
+
+          </thead>
+
+
+
+          <tbody
+            id="panelRows"
+          ></tbody>
+
+
+        </table>
+
+
+      </div>
+
+
+    </div>
+
+
+  `
+
+);
+
+
+
+/* =========================================================
+   PANEL PATIENTS
+========================================================= */
+
+function getPanelPatients(){
+
+  return store()
+    .patients
+    .filter(
+      patient =>
+        patientUsesPanel(
+          patient
+        )
+    );
+
+}
+
+
+
+/* =========================================================
+   RENDER PANEL PATIENTS
+========================================================= */
+
+function renderPanelPatients(
+  search = ""
+){
+
+  const query =
+    search
+      .trim()
+      .toLowerCase();
+
+
+  const patients =
+    getPanelPatients()
+      .filter(
+        patient => {
+
+
+          const searchable =
+
+            (
+              patient.name ||
+              ""
+            )
+
+            +
+
+            " "
+
+            +
+
+            (
+              patient.id ||
+              ""
+            )
+
+            +
+
+            " "
+
+            +
+
+            (
+              getPanelName(
+                patient
+              ) || ""
+            );
+
+
+          return searchable
+            .toLowerCase()
+            .includes(
+              query
+            );
+
+
+        }
+      );
+
+
+
+  const rows =
+    document.getElementById(
+      "panelRows"
+    );
+
+
+
+  rows.innerHTML =
+
+
+    patients.length
+
+      ? patients
+          .map(
+            patient => {
+
+
+              const data =
+                finance(
+                  patient
+                );
+
+
+              const balanceClass =
+
+                data.balance > 0
+
+                  ? "orange"
+
+                  : "green";
+
+
+
+              return `
+
+
+                <tr>
+
+
+
+                  <!-- PATIENT -->
+
+                  <td>
+
+
+                    <strong>
+                      ${patient.name}
+                    </strong>
+
+
+                    <div
+                      style="
+                        font-size:10px;
+                        color:var(--muted);
+                        margin-top:3px;
+                      "
+                    >
+                      ${patient.id}
+                    </div>
+
+
+                  </td>
+
+
+
+                  <!-- PANEL -->
+
+                  <td>
+
+
+                    <span
+                      class="panel-chip"
+                    >
+
+                      ${getPanelName(
+                        patient
+                      )}
+
+                    </span>
+
+
+                  </td>
+
+
+
+                  <!-- GRAND TOTAL -->
+
+                  <td>
+
+
+                    <strong>
+
+                      ${money(
+                        data.grand
+                      )}
+
+                    </strong>
+
+
+                  </td>
+
+
+
+                  <!-- TOTAL CLAIMED -->
+
+                  <td>
+
+
+                    ${money(
+                      data.claimed
+                    )}
+
+
+                  </td>
+
+
+
+                  <!-- BALANCE -->
+
+                  <td>
+
+
+                    <span
+                      class="
+                        badge
+                        ${balanceClass}
+                      "
+                      style="
+                        font-size:11px;
+                        padding:
+                          6px
+                          10px;
+                      "
+                    >
+
+                      ${money(
+                        data.balance
+                      )}
+
+                    </span>
+
+
+                  </td>
+
+
+
+                  <!-- OPEN -->
+
+                  <td>
+
+
+                    <button
+                      type="button"
+                      class="secondary"
+                      style="
+                        padding:
+                          7px
+                          10px;
+                      "
+                      onclick="
+                        openPanelDetail(
+                          '${patient.id}'
+                        )
+                      "
+                    >
+
+                      View Claims →
+
+                    </button>
+
+
+                  </td>
+
+
+                </tr>
+
+
+              `;
+
+            }
+          )
+          .join("")
+
+
+      : `
+
+
+        <tr>
+
+
+          <td
+            colspan="6"
+            style="
+              text-align:center;
+              padding:32px;
+              color:var(--muted);
+            "
+          >
+
+            No panel patients found.
+
+
+          </td>
+
+
+        </tr>
+
+
+      `;
+
+
+
+  renderPanelKpis();
+
+}
+
+
+
+/* =========================================================
+   PANEL KPIs
+========================================================= */
+
+function renderPanelKpis(){
+
+  const patients =
+    getPanelPatients();
+
+
+  let grand =
+    0;
+
+
+  let claimed =
+    0;
+
+
+
+  patients.forEach(
+    patient => {
+
+
+      const data =
+        finance(
+          patient
+        );
+
+
+      grand +=
+        data.grand;
+
+
+      claimed +=
+        data.claimed;
+
+
+    }
+  );
+
+
+
+  const balance =
+    Math.max(
+      0,
+      grand -
+      claimed
+    );
+
+
+
+  document.getElementById(
+    "panelKpis"
+  ).innerHTML = `
+
+
+
+    <!-- PANEL PATIENTS -->
+
+    <div
+      class="kpi"
+    >
+
+      <div
+        class="kpi-label"
+      >
+        PANEL PATIENTS
+      </div>
+
+
+      <div
+        class="kpi-value"
+      >
+        ${patients.length}
+      </div>
+
+
+      <div
+        class="kpi-sub"
+      >
+        Patients using panel / insurance
+      </div>
+
+    </div>
+
+
+
+    <!-- GRAND TOTAL -->
+
+    <div
+      class="kpi"
+    >
+
+      <div
+        class="kpi-label"
+      >
+        GRAND TOTAL
+      </div>
+
+
+      <div
+        class="kpi-value"
+      >
+        ${money(
+          grand
+        )}
+      </div>
+
+
+      <div
+        class="kpi-sub"
+      >
+        All recorded visit invoices
+      </div>
+
+    </div>
+
+
+
+    <!-- TOTAL CLAIMED -->
+
+    <div
+      class="kpi"
+    >
+
+      <div
+        class="kpi-label"
+      >
+        TOTAL CLAIMED
+      </div>
+
+
+      <div
+        class="kpi-value"
+      >
+        ${money(
+          claimed
+        )}
+      </div>
+
+
+      <div
+        class="kpi-sub"
+      >
+        All claim transactions
+      </div>
+
+    </div>
+
+
+
+    <!-- BALANCE -->
+
+    <div
+      class="kpi"
+    >
+
+      <div
+        class="kpi-label"
+      >
+        BALANCE TO CLAIM
+      </div>
+
+
+      <div
+        class="kpi-value"
+        style="
+          color:
+          ${
+            balance > 0
+              ? "#C2410C"
+              : "#15803D"
+          };
+        "
+      >
+
+        ${money(
+          balance
+        )}
+
+      </div>
+
+
+      <div
+        class="kpi-sub"
+      >
+        Remaining balance
+      </div>
+
+    </div>
+
+
+  `;
+
+}
+
+
+
+/* =========================================================
+   OPEN PANEL PATIENT
+========================================================= */
+
+function openPanelDetail(
+  patientId
+){
+
+  const patient =
+    getPatient(
+      patientId
+    );
+
+
+  if(!patient){
+
+    return;
+
+  }
+
+
+
+  const data =
+    finance(
+      patient
+    );
+
+
+  const claims =
+    ensureClaims(
+      patient
+    );
+
+
+
+  document.getElementById(
+    "panelDetailTitle"
+  ).textContent =
+    patient.name;
+
+
+
+  document.getElementById(
+    "panelDetailSub"
+  ).textContent =
+
+    `${patient.id} · ${getPanelName(
+      patient
+    )}`;
+
+
+
+  document.getElementById(
+    "panelDetailContent"
+  ).innerHTML = `
+
+
+
+    <!-- =================================================
+         SUMMARY
+    ================================================== -->
+
+    <div
+      class="finance-grid"
+      style="
+        margin-bottom:18px;
+      "
+    >
+
+
+
+      <div
+        class="finance-card"
+      >
+
+        <div
+          class="label"
+        >
+          GRAND TOTAL
+        </div>
+
+
+        <div
+          class="value"
+        >
+          ${money(
+            data.grand
+          )}
+        </div>
+
+      </div>
+
+
+
+      <div
+        class="finance-card"
+      >
+
+        <div
+          class="label"
+        >
+          TOTAL CLAIMED
+        </div>
+
+
+        <div
+          class="value"
+        >
+          ${money(
+            data.claimed
+          )}
+        </div>
+
+      </div>
+
+
+
+      <div
+        class="
+          finance-card
+          balance
+        "
+      >
+
+        <div
+          class="label"
+        >
+          BALANCE TO CLAIM
+        </div>
+
+
+        <div
+          class="value"
+        >
+          ${money(
+            data.balance
+          )}
+        </div>
+
+      </div>
+
+
+    </div>
+
+
+
+    <!-- =================================================
+         CLAIM HISTORY HEADER
+    ================================================== -->
+
+    <div
+      style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:15px;
+        margin-bottom:11px;
+      "
+    >
+
+
+      <div>
+
+
+        <div
+          style="
+            font-size:14px;
+            font-weight:600;
+          "
+        >
+
+          Claim History
+
+        </div>
+
+
+
+        <div
+          style="
+            font-size:10px;
+            line-height:16px;
+            color:var(--muted);
+            margin-top:3px;
+          "
+        >
+
+          Claims can be entered on the visit date,
+          a later date, or a day when the patient did not visit.
+
+        </div>
+
+
+      </div>
+
+
+
+      <button
+        type="button"
+        class="primary"
+        onclick="
+          openProfileClaim(
+            '${patient.id}'
+          )
+        "
+      >
+
+        ＋ Add Claim
+
+      </button>
+
+
+    </div>
+
+
+
+    <!-- =================================================
+         CLAIM HISTORY
+    ================================================== -->
+
+    <div
+      class="table-wrap"
+    >
+
+
+      <table
+        class="table"
+      >
+
+
+        <thead>
+
+
+          <tr>
+
+
+            <th>
+              Claim Date
+            </th>
+
+
+            <th>
+              Related Visit
+            </th>
+
+
+            <th>
+              Claim Amount
+            </th>
+
+
+            <th>
+              Notes
+            </th>
+
+
+          </tr>
+
+
+        </thead>
+
+
+
+        <tbody>
+
+
+          ${
+            claims.length
+
+              ? claims
+
+                  .slice()
+
+                  .sort(
+                    (
+                      a,
+                      b
+                    ) =>
+
+                      (
+                        b.claimDate ||
+                        ""
+                      )
+                      .localeCompare(
+                        a.claimDate ||
+                        ""
+                      )
+
+                  )
+
+                  .map(
+                    claim => {
+
+
+                      const visit =
+                        (
+                          patient.visits ||
+                          []
+                        )
+                        .find(
+                          item =>
+                            item.id ===
+                            claim.visitId
+                        );
+
+
+
+                      return `
+
+
+                        <tr>
+
+
+                          <td>
+
+                            ${
+                              claim.claimDate ||
+                              "—"
+                            }
+
+                          </td>
+
+
+
+                          <td>
+
+                            ${
+                              visit?.visit ||
+                              "No specific visit"
+                            }
+
+                          </td>
+
+
+
+                          <td>
+
+
+                            <strong>
+
+                              ${money(
+                                claim.amount
+                              )}
+
+                            </strong>
+
+
+                          </td>
+
+
+
+                          <td>
+
+                            ${
+                              claim.notes ||
+                              "—"
+                            }
+
+                          </td>
+
+
+                        </tr>
+
+
+                      `;
+
+                    }
+                  )
+                  .join("")
+
+              : `
+
+
+                <tr>
+
+
+                  <td
+                    colspan="4"
+                    style="
+                      text-align:center;
+                      padding:28px;
+                      color:var(--muted);
+                    "
+                  >
+
+                    No claims recorded yet.
+
+                  </td>
+
+
+                </tr>
+
+
+              `
+          }
+
+
+        </tbody>
+
+
+      </table>
+
+
+    </div>
+
+
+
+    <!-- =================================================
+         VISIT HISTORY
+    ================================================== -->
+
+    <div
+      style="
+        margin-top:22px;
+      "
+    >
+
+
+      <div
+        style="
+          font-size:14px;
+          font-weight:600;
+          margin-bottom:4px;
+        "
+      >
+
+        Visit History
+
+      </div>
+
+
+      <div
+        style="
+          font-size:10px;
+          color:var(--muted);
+          margin-bottom:10px;
+        "
+      >
+
+        Visit invoices are included in the patient's Grand Total.
+
+      </div>
+
+
+
+      <div
+        class="table-wrap"
+      >
+
+
+        <table
+          class="table"
+        >
+
+
+          <thead>
+
+
+            <tr>
+
+
+              <th>
+                Visit
+              </th>
+
+
+              <th>
+                Visit Date
+              </th>
+
+
+              <th>
+                Invoice
+              </th>
+
+
+            </tr>
+
+
+          </thead>
+
+
+
+          <tbody>
+
+
+            ${
+              (
+                patient.visits ||
+                []
+              ).length
+
+                ? (
+                    patient.visits ||
+                    []
+                  )
+                  .map(
+                    visit => `
+
+
+                      <tr>
+
+
+                        <td>
+
+                          ${visit.visit}
+
+                        </td>
+
+
+
+                        <td>
+
+                          ${visit.dateKey}
+
+                        </td>
+
+
+
+                        <td>
+
+                          ${money(
+                            visitTotal(
+                              visit
+                            )
+                          )}
+
+                        </td>
+
+
+                      </tr>
+
+
+                    `
+                  )
+                  .join("")
+
+
+                : `
+
+
+                  <tr>
+
+
+                    <td
+                      colspan="3"
+                      style="
+                        text-align:center;
+                        padding:28px;
+                        color:var(--muted);
+                      "
+                    >
+
+                      No visits recorded.
+
+                    </td>
+
+
+                  </tr>
+
+
+                `
+            }
+
+
+          </tbody>
+
+
+        </table>
+
+
+      </div>
+
+
+    </div>
+
+
+
+  `;
+
+
+
+  document
+    .getElementById(
+      "panelDetailModal"
+    )
+    .classList.add(
+      "show"
+    );
+
+}
+
+
+
+/* =========================================================
+   CLOSE PANEL DETAIL
+========================================================= */
+
+function closePanelDetail(){
+
+  document
+    .getElementById(
+      "panelDetailModal"
+    )
+    .classList.remove(
+      "show"
+    );
+
+}
+
+
+
+/* =========================================================
+   OPEN PATIENT CLAIM SCREEN
+========================================================= */
+
+function openProfileClaim(
+  patientId
+){
+
+  window.location.href =
+
+    "patient-profile.html" +
+
+    "?patient=" +
+
+    encodeURIComponent(
+      patientId
+    ) +
+
+    "&openClaim=1";
+
+}
+
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+renderPanelPatients();
+
+renderPanelKpis();
+
+renderNotifications();
+
+</script>
+
+
+</body>
+</html>
