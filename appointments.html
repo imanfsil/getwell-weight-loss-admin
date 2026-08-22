@@ -1,12 +1,314 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Appointments | Getwell</title><link rel="stylesheet" href="styles.css"><script src="app.js"></script></head><body><div id="root"></div>
-<div class="modal-wrap" id="appointmentModal"><div class="modal"><div class="modal-head"><div><h2 id="appointmentModalTitle">Add Appointment</h2><p>Patient appointment scheduling</p></div><button class="modal-close" onclick="closeAppointmentModal()">×</button></div><div class="modal-body"><div class="form-grid"><div class="form-group full"><label>Patient</label><select id="appointmentPatient"></select></div><div class="form-group"><label>Date</label><input id="appointmentDate" type="date"></div><div class="form-group"><label>Time</label><input id="appointmentTime" type="time"></div><div class="form-group full"><label>Appointment Type</label><input id="appointmentType"></div><div class="form-group"><label>Status</label><select id="appointmentStatus"><option>Upcoming</option><option>Completed</option><option>No Show</option><option>Cancelled</option></select></div><div class="form-group"><label>Notes</label><input id="appointmentNotes"></div></div></div><div class="modal-foot"><button class="secondary" onclick="closeAppointmentModal()">Cancel</button><button class="primary" onclick="saveAppointment()">Save Appointment</button></div></div></div>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Appointments | Getwell</title><link rel="stylesheet" href="styles.css?v=20260822-final3"><script src="app.js?v=20260822-final3"></script></head><body><div id="root"></div>
+<div class="modal-wrap" id="appointmentModal"><div class="modal"><div class="modal-head"><div><h2 id="appointmentModalTitle">Add Appointment</h2><p>Patient appointment scheduling</p></div><button class="modal-close" onclick="closeAppointmentModal()">×</button></div><div class="modal-body"><div class="form-grid"><div class="form-group full"><label>Patient</label><div
+      class="patient-picker"
+      style="
+        position:relative;
+      "
+    >
+      <input
+        id="appointmentPatientSearch"
+        class="claim-input"
+        autocomplete="off"
+        placeholder="Search patient name or ID..."
+        oninput="renderAppointmentPatientOptions(this.value)"
+        onfocus="renderAppointmentPatientOptions(this.value)"
+      >
+
+      <input
+        id="appointmentPatient"
+        type="hidden"
+      >
+
+      <div
+        id="appointmentPatientDropdown"
+        class="combobox-menu"
+        hidden
+        style="display:none"
+      ></div>
+
+      <div
+        id="appointmentPatientSelected"
+        class="picker-selected"
+        hidden
+      ></div>
+    </div></div><div class="form-group"><label>Date</label><input id="appointmentDate" type="date"></div><div class="form-group"><label>Time</label><input id="appointmentTime" type="time"></div><div class="form-group full"><label>Appointment Type</label><input id="appointmentType"></div><div class="form-group"><label>Status</label><select id="appointmentStatus"><option>Upcoming</option><option>Completed</option><option>No Show</option><option>Cancelled</option></select></div><div class="form-group"><label>Notes</label><input id="appointmentNotes"></div></div></div><div class="modal-foot"><button class="secondary" onclick="closeAppointmentModal()">Cancel</button><button class="primary" onclick="saveAppointment()">Save Appointment</button></div></div></div>
 <script>
 let editingAppointmentId=null;
 function getAllAppointments(){return store().patients.flatMap(p=>(p.appointments||[]).map(a=>({...a,patientId:p.id,patientName:p.name}))).sort((a,b)=>(`${a.date||""} ${a.time||""}`).localeCompare(`${b.date||""} ${b.time||""}`))}
-function openAddAppointment(){editingAppointmentId=null;appointmentModalTitle.textContent="Add Appointment";appointmentPatient.innerHTML=store().patients.map(p=>`<option value="${p.id}">${p.name} · ${p.id}</option>`).join("");appointmentDate.value=new Date().toISOString().slice(0,10);appointmentTime.value="";appointmentType.value="";appointmentStatus.value="Upcoming";appointmentNotes.value="";appointmentModal.classList.add("show")}
-function openEditAppointment(pid,aid){const p=getPatient(pid),a=p?.appointments?.find(x=>x.id===aid);if(!a)return;editingAppointmentId=aid;appointmentModalTitle.textContent="Edit Appointment";appointmentPatient.innerHTML=store().patients.map(x=>`<option value="${x.id}" ${x.id===pid?"selected":""}>${x.name} · ${x.id}</option>`).join("");appointmentDate.value=a.date||"";appointmentTime.value=a.time||"";appointmentType.value=a.type||"";appointmentStatus.value=a.status||"Upcoming";appointmentNotes.value=a.notes||"";appointmentModal.classList.add("show")}
-function closeAppointmentModal(){appointmentModal.classList.remove("show");editingAppointmentId=null}
-function saveAppointment(){const pid=appointmentPatient.value,p=getPatient(pid);if(!p)return;if(!p.appointments)p.appointments=[];const a={id:editingAppointmentId||`${p.id}-A${Date.now()}`,date:appointmentDate.value,time:appointmentTime.value,type:appointmentType.value, status:appointmentStatus.value,notes:appointmentNotes.value};const i=p.appointments.findIndex(x=>x.id===editingAppointmentId);if(i>=0)p.appointments[i]=a;else p.appointments.push(a);upsertPatient(p);closeAppointmentModal();renderAppointments()}
+
+function setAppointmentPatient(
+  patientId
+){
+
+  const patient =
+    getPatient(
+      patientId
+    );
+
+  if(!patient){
+    return;
+  }
+
+  appointmentPatient.value =
+    patient.id;
+
+  appointmentPatientSearch.value =
+    `${patient.name} · ${patient.id}`;
+
+  appointmentPatientSelected.textContent =
+    `Selected: ${patient.name} · ${patient.id}`;
+
+  appointmentPatientSelected.hidden =
+    false;
+
+  appointmentPatientDropdown.style.display =
+    "none";
+
+}
+
+function renderAppointmentPatientOptions(
+  query=""
+){
+
+  const search =
+    String(
+      query || ""
+    )
+    .trim()
+    .toLowerCase();
+
+
+  const patients =
+    store()
+      .patients
+      .filter(
+        patient => {
+
+          const text =
+            (
+              patient.name ||
+              ""
+            )
+            +
+            " "
+            +
+            (
+              patient.id ||
+              ""
+            )
+            +
+            " "
+            +
+            (
+              patient.phone ||
+              ""
+            );
+
+          return (
+            !search ||
+            text
+              .toLowerCase()
+              .includes(
+                search
+              )
+          );
+
+        }
+      )
+      .slice(
+        0,
+        10
+      );
+
+
+  appointmentPatientDropdown.innerHTML =
+    patients.length
+
+      ? patients
+          .map(
+            patient => `
+
+              <button
+                type="button"
+                class="combobox-option"
+                onclick="
+                  setAppointmentPatient(
+                    '${patient.id}'
+                  )
+                "
+              >
+
+                <strong>
+                  ${patient.name}
+                </strong>
+
+                <span>
+                  ${patient.id}
+                </span>
+
+              </button>
+
+            `
+          )
+          .join("")
+
+      : `
+
+          <div
+            class="combobox-empty"
+          >
+            No patients found.
+          </div>
+
+        `;
+
+
+  appointmentPatientDropdown.style.display =
+    "block";
+
+}
+
+function openAddAppointment(){
+  editingAppointmentId=null;
+  appointmentModalTitle.textContent="Add Appointment";
+
+  appointmentPatient.value="";
+  appointmentPatientSearch.value="";
+  appointmentPatientSelected.hidden=true;
+  appointmentPatientDropdown.hidden=true;
+
+  appointmentDate.value=new Date().toISOString().slice(0,10);
+  appointmentTime.value="";
+  appointmentType.value="";
+  appointmentStatus.value="Upcoming";
+  appointmentNotes.value="";
+
+  appointmentModal.classList.add("show");
+}
+
+function closeAppointmentModal(){
+
+  appointmentModal.classList.remove(
+    "show"
+  );
+
+  appointmentPatientDropdown.style.display =
+    "none";
+
+  editingAppointmentId =
+    null;
+
+}
+function saveAppointment(){
+
+  const patientId =
+    appointmentPatient.value;
+
+  if(!patientId){
+
+    alert(
+      "Please select a patient."
+    );
+
+    return;
+
+  }
+
+  const patient =
+    getPatient(
+      patientId
+    );
+
+  if(!patient){
+    return;
+  }
+
+  if(!patient.appointments){
+    patient.appointments=[];
+  }
+
+  const appointment = {
+
+    id:
+      editingAppointmentId ||
+      `${patient.id}-A${Date.now()}`,
+
+    date:
+      appointmentDate.value,
+
+    time:
+      appointmentTime.value,
+
+    type:
+      appointmentType.value,
+
+    status:
+      appointmentStatus.value,
+
+    notes:
+      appointmentNotes.value
+
+  };
+
+  const index =
+    patient.appointments.findIndex(
+      item =>
+        item.id ===
+        editingAppointmentId
+    );
+
+  if(index >= 0){
+
+    patient.appointments[index] =
+      appointment;
+
+  }else{
+
+    patient.appointments.push(
+      appointment
+    );
+
+  }
+
+  upsertPatient(
+    patient
+  );
+
+  closeAppointmentModal();
+
+  renderAppointments();
+
+}
+
 function renderAppointments(q=""){const all=getAllAppointments(),date=appointmentFilterDate.value,ps=all.filter(a=>(!q||(a.patientName+" "+a.patientId+" "+a.type).toLowerCase().includes(q.toLowerCase()))&&(!date||a.date===date));appointmentRows.innerHTML=ps.map(a=>`<tr><td>${a.date||"—"}</td><td>${a.time||"—"}</td><td>${a.patientName}</td><td>${a.patientId}</td><td>${a.type}</td><td><span class="badge ${a.status==="Completed"?"green":a.status==="No Show"?"red":"blue"}">${a.status}</span></td><td><button class="secondary" style="padding:7px 9px" onclick="openEditAppointment('${a.patientId}','${a.id}')">Edit</button></td></tr>`).join("")||`<tr><td colspan="7" class="notif-empty">No appointments found.</td></tr>`;const today=new Date().toISOString().slice(0,10);const upcoming=all.filter(a=>a.date>=today&&a.status==="Upcoming").length;appointmentKpis.innerHTML=`<div class="kpi"><div class="kpi-label">TODAY</div><div class="kpi-value">${all.filter(a=>a.date===today).length}</div></div><div class="kpi"><div class="kpi-label">UPCOMING</div><div class="kpi-value">${upcoming}</div></div><div class="kpi"><div class="kpi-label">COMPLETED</div><div class="kpi-value">${all.filter(a=>a.status==="Completed").length}</div></div><div class="kpi"><div class="kpi-label">NO SHOW</div><div class="kpi-value">${all.filter(a=>a.status==="No Show").length}</div></div>`}
 document.getElementById("root").innerHTML=shell("Appointments","appointments",`<div class="page-head"><div><h1>Appointments</h1><p>Manage patient appointments.</p></div><button class="primary" onclick="openAddAppointment()">＋ Add Appointment</button></div><div class="kpi-grid" id="appointmentKpis"></div><div class="card" style="margin-bottom:15px"><div class="card-body"><div class="form-grid"><div class="form-group"><label>Search</label><input id="appointmentSearch" oninput="renderAppointments(this.value)"></div><div class="form-group"><label>Filter Date</label><input id="appointmentFilterDate" type="date" onchange="renderAppointments(appointmentSearch.value)"></div></div></div></div><div class="card"><div class="card-head"><div><h2>Appointment List</h2></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Time</th><th>Patient</th><th>ID</th><th>Type</th><th>Status</th><th></th></tr></thead><tbody id="appointmentRows"></tbody></table></div></div>`);renderAppointments();renderNotifications();
 </script></body></html>
+<script>
+document.addEventListener(
+  "click",
+  event => {
+
+    const picker =
+      document.querySelector(
+        ".patient-picker"
+      );
+
+    const menu =
+      document.getElementById(
+        "appointmentPatientDropdown"
+      );
+
+    if(
+      picker &&
+      menu &&
+      !picker.contains(event.target)
+    ){
+
+      menu.style.display =
+        "none";
+
+    }
+
+  }
+);
+</script>
