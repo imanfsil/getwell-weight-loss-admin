@@ -5,8 +5,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Panel | Getwell</title>
-<link rel="stylesheet" href="styles.css">
-<script src="app.js"></script>
+<link rel="stylesheet" href="styles.css?v=20260822fix">
+<script src="app.js?v=20260822fix"></script>
 </head>
 
 <body>
@@ -97,7 +97,20 @@ document.getElementById("root").innerHTML = shell(
           onchange="
             renderPanelPage()
           "
-        ></select>
+        >
+          <option value="ALL">All Panels</option>
+          <option value="PMCARE">PMCARE</option>
+          <option value="UITM">UITM</option>
+          <option value="COMPUMED">COMPUMED</option>
+          <option value="MICARE">MICARE</option>
+          <option value="SELCARE">SELCARE</option>
+          <option value="IHP">IHP</option>
+          <option value="ASP">ASP</option>
+          <option value="HEALTHCONNECT">HEALTHCONNECT</option>
+          <option value="EMAS">EMAS</option>
+          <option value="SELFPAY">SELFPAY</option>
+          <option value="SPONSORED">SPONSORED</option>
+        </select>
 
       </div>
 
@@ -317,36 +330,9 @@ document.getElementById("root").innerHTML = shell(
 
 function buildPanelFilter(){
 
-  const names = new Set([
-    "MiCare",
-    "PMCare",
-    "Other Panel"
-  ]);
-
-
-  getPanelPatientsRaw().forEach(
-    patient => {
-
-      const name =
-        getPanelName(
-          patient
-        );
-
-      if(name){
-        names.add(name);
-      }
-
-    }
-  );
-
-
-  const sorted =
-    [...names]
-      .sort(
-        (a,b) =>
-          a.localeCompare(b)
-      );
-
+  const current =
+    panelFilter.value ||
+    "ALL";
 
   panelFilter.innerHTML = `
 
@@ -355,11 +341,11 @@ function buildPanelFilter(){
     </option>
 
     ${
-      sorted
+      PANEL_TYPES
         .map(
           name => `
             <option
-              value="${name.replace(/"/g,"&quot;")}"
+              value="${name}"
             >
               ${name}
             </option>
@@ -369,6 +355,14 @@ function buildPanelFilter(){
     }
 
   `;
+
+  panelFilter.value =
+    (
+      current === "ALL" ||
+      PANEL_TYPES.includes(current)
+    )
+      ? current
+      : "ALL";
 
 }
 
@@ -462,124 +456,15 @@ function getFilteredPanelPatients(){
 ========================================================= */
 
 function renderPanelKpis(){
-
-  const patients =
-    getFilteredPanelPatients();
-
-
-  let grand = 0;
-  let claimed = 0;
-
-
-  patients.forEach(
-    patient => {
-
-      const f =
-        finance(
-          patient
-        );
-
-      grand +=
-        f.grand;
-
-      claimed +=
-        f.claimed;
-
-    }
-  );
-
-
-  const balance =
-    Math.max(
-      0,
-      grand -
-      claimed
-    );
-
-
-  panelKpis.innerHTML = `
-
-    <div class="kpi">
-
-      <div class="kpi-label">
-        PANEL PATIENTS
-      </div>
-
-      <div class="kpi-value">
-        ${patients.length}
-      </div>
-
-      <div class="kpi-sub">
-        ${
-          panelFilter.value === "ALL"
-            ? "All panel patients"
-            : `Filtered: ${panelFilter.value}`
-        }
-      </div>
-
-    </div>
-
-
-    <div class="kpi">
-
-      <div class="kpi-label">
-        GRAND TOTAL
-      </div>
-
-      <div class="kpi-value">
-        ${money(grand)}
-      </div>
-
-      <div class="kpi-sub">
-        All recorded visit invoices
-      </div>
-
-    </div>
-
-
-    <div class="kpi">
-
-      <div class="kpi-label">
-        TOTAL CLAIMED
-      </div>
-
-      <div class="kpi-value">
-        ${money(claimed)}
-      </div>
-
-      <div class="kpi-sub">
-        All submitted claim transactions
-      </div>
-
-    </div>
-
-
-    <div class="kpi">
-
-      <div class="kpi-label">
-        BALANCE TO CLAIM
-      </div>
-
-      <div
-        class="kpi-value"
-        style="
-          color:
-            ${balance > 0
-              ? "#C2410C"
-              : "#15803D"};
-        "
-      >
-        ${money(balance)}
-      </div>
-
-      <div class="kpi-sub">
-        Remaining balance
-      </div>
-
-    </div>
-
-  `;
-
+const selectedPanel=panelFilter?.value||"ALL";
+const ps=getPanelPatients().filter(p=>selectedPanel==="ALL"||getPanelName(p)===selectedPanel);
+let g=0,c=0;
+ps.forEach(p=>{const f=finance(p);g+=f.grand;c+=f.claimed});
+panelKpis.innerHTML=`
+<div class="kpi"><div class="kpi-label">PANEL PATIENTS</div><div class="kpi-value">${ps.length}</div><div class="kpi-sub">${selectedPanel==="ALL"?"All panel types":selectedPanel}</div></div>
+<div class="kpi"><div class="kpi-label">GRAND TOTAL</div><div class="kpi-value">${money(g)}</div></div>
+<div class="kpi"><div class="kpi-label">TOTAL CLAIMED</div><div class="kpi-value">${money(c)}</div></div>
+<div class="kpi"><div class="kpi-label">BALANCE TO CLAIM</div><div class="kpi-value">${money(Math.max(0,g-c))}</div></div>`;
 }
 
 
@@ -732,7 +617,7 @@ function renderPanelPatients(){
 
 function getSuspendedPatients(){
 
-  return getFilteredPanelPatients()
+  return getPanelPatientsRaw()
     .filter(
       patient => {
 
@@ -741,11 +626,11 @@ function getSuspendedPatients(){
             patient
           );
 
-
         return (
           isPanelSuspended(
             patient
-          ) &&
+          )
+          &&
           f.balance > 0
         );
 
