@@ -95,7 +95,8 @@ document.getElementById("root").innerHTML = shell(
           id="panelFilter"
           class="claim-input"
           onchange="
-            renderPanelPage()
+            renderPanelKpis();
+            renderPanelPatients();
           "
         >
           <option value="ALL">All Panels</option>
@@ -126,7 +127,7 @@ document.getElementById("root").innerHTML = shell(
           class="claim-input"
           placeholder="Search patient, ID or panel"
           oninput="
-            renderPanelPage()
+            renderPanelPatients()
           "
         >
 
@@ -519,15 +520,46 @@ function getFilteredPanelPatients(){
 ========================================================= */
 
 function renderPanelKpis(){
-const selectedPanel=panelFilter?.value||"ALL";
-const ps=getPanelPatients().filter(p=>selectedPanel==="ALL"||getPanelName(p)===selectedPanel);
-let g=0,c=0;
-ps.forEach(p=>{const f=finance(p);g+=f.grand;c+=f.claimed});
-panelKpis.innerHTML=`
-<div class="kpi"><div class="kpi-label">PANEL PATIENTS</div><div class="kpi-value">${ps.length}</div><div class="kpi-sub">${selectedPanel==="ALL"?"All panel types":selectedPanel}</div></div>
-<div class="kpi"><div class="kpi-label">GRAND TOTAL</div><div class="kpi-value">${money(g)}</div></div>
-<div class="kpi"><div class="kpi-label">TOTAL CLAIMED</div><div class="kpi-value">${money(c)}</div></div>
-<div class="kpi"><div class="kpi-label">BALANCE TO CLAIM</div><div class="kpi-value">${money(Math.max(0,g-c))}</div></div>`;
+
+  const selectedPanel =
+    panelFilter?.value || "ALL";
+
+  const ps =
+    getPanelPatientsRaw().filter(
+      p =>
+        selectedPanel === "ALL" ||
+        getPanelName(p) === selectedPanel
+    );
+
+  let g = 0;
+  let c = 0;
+
+  ps.forEach(
+    p => {
+      const f = finance(p);
+      g += f.grand;
+      c += f.claimed;
+    }
+  );
+
+  panelKpis.innerHTML = `
+    <div class="kpi">
+      <div class="kpi-label">PANEL PATIENTS</div>
+      <div class="kpi-value">${ps.length}</div>
+      <div class="kpi-sub">${selectedPanel === "ALL" ? "All panel types" : selectedPanel}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">GRAND TOTAL</div>
+      <div class="kpi-value">${money(g)}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">TOTAL CLAIMED</div>
+      <div class="kpi-value">${money(c)}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">BALANCE TO CLAIM</div>
+      <div class="kpi-value">${money(Math.max(0,g-c))}</div>
+    </div>`;
 }
 
 
