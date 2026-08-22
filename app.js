@@ -34,6 +34,8 @@ function migrateLegacyIds(data){
       p.id=`GW-${String(next).padStart(4,"0")}`;
       used.add(p.id); next++;
     }
+    if(!p.panelStatus && patientUsesPanel(p)) p.panelStatus="Active";
+    if(!p.panelSuspensionNote) p.panelSuspensionNote="";
     (p.appointments||[]).forEach(a=>{
       if(a.patientId && map[a.patientId]) a.patientId=map[a.patientId];
     });
@@ -75,12 +77,21 @@ function visitTotal(v){
   return (+b.injection.price||0)+(+b.medication.price||0)+(+b.treatment.price||0)+(+b.other.price||0)
 }
 function patientUsesPanel(p){return !!p?.panelProvider && p.panelProvider!=="SELF_PAY"}
+function isPanelSuspended(p){
+  return patientUsesPanel(p) && (
+    p.panelStatus === "Suspended" ||
+    p.insuranceStatus === "Suspended"
+  );
+}
+function panelSuspensionNote(p){
+  return p.panelSuspensionNote || p.insuranceSuspensionNote || "";
+}
 function getPanelName(p){
   if(!p||p.panelProvider==="SELF_PAY")return "Self-Pay";
   if(p.panelProvider==="Other")return p.otherPanelName||"Panel";
-  if(p.panelProvider==="PANEL_A")return "Panel A";
-  if(p.panelProvider==="PANEL_B")return "Panel B";
-  if(p.panelProvider==="PANEL_C")return "Panel C";
+  if(p.panelProvider==="PANEL_A")return "MiCare";
+  if(p.panelProvider==="PANEL_B")return "PMCare";
+  if(p.panelProvider==="PANEL_C")return "Other Panel";
   return "Panel";
 }
 function grandTotal(p){return (p.visits||[]).reduce((s,v)=>s+visitTotal(v),0)}
@@ -128,7 +139,10 @@ function header(){
 return `<header class="topbar"><div class="topbar-left"><div><div class="page-title">${document.title.split("|")[0].trim()}</div><div class="page-subtitle">Getwell Weight Loss Admin</div></div></div><div class="topbar-right"><div class="search-box"><span>⌕</span><input id="globalSearch" placeholder="Search patient or ID"></div><div id="notifWrap" class="global-notification-wrap"><button class="icon-button" onclick="toggleNotifications(event)">🔔<span class="notification-count" id="notifCount" hidden>0</span></button><div id="notifPanel" class="global-notification-panel" hidden><div class="notif-head"><div><strong>Follow-Up Alerts</strong><span>5 days due · 7 days overdue</span></div></div><div id="notifBody"></div></div></div><button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☾</button><div class="user-avatar">A</div></div></header>`
 }
 function sidebar(active){
-return `<aside class="sidebar"><div class="brand"><div class="brand-mark">G</div><div><div class="brand-name">GETWELL</div><div class="brand-sub">Weight Loss Admin</div></div></div><nav class="nav"><div class="nav-label">MAIN</div><a class="${active==="dashboard"?"active":""}" href="index.html">⌂ Dashboard</a><a class="${active==="patients"?"active":""}" href="patients.html">♙ Patients</a><a class="${active==="appointments"?"active":""}" href="appointments.html">▣ Appointments</a><div class="nav-label" style="margin-top:18px">MANAGEMENT</div><a class="${active==="panel"?"active":""}" href="panel.html">▣ Panel</a><a href="appointments.html">▤ Reports</a><a href="appointments.html">⚙ Settings</a></nav><div class="sidebar-user"><div class="user-card"><div class="user-dot">A</div><div><div class="user-name">Administrator</div><div class="user-role">Weight Loss Program</div></div></div></div></aside>`
+return `<aside class="sidebar"><div class="brand" role="button" tabindex="0" aria-label="Go to Dashboard" onclick="goHome()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goHome()}"><div class="brand-mark">G</div><div><div class="brand-name">GETWELL</div><div class="brand-sub">Weight Loss Admin</div></div></div><nav class="nav"><div class="nav-label">MAIN</div><a class="${active==="dashboard"?"active":""}" href="index.html">⌂ Dashboard</a><a class="${active==="patients"?"active":""}" href="patients.html">♙ Patients</a><a class="${active==="appointments"?"active":""}" href="appointments.html">▣ Appointments</a><div class="nav-label" style="margin-top:18px">MANAGEMENT</div><a class="${active==="panel"?"active":""}" href="panel.html">▣ Panel</a><a href="appointments.html">▤ Reports</a><a href="appointments.html">⚙ Settings</a></nav><div class="sidebar-user"><div class="user-card"><div class="user-dot">A</div><div><div class="user-name">Administrator</div><div class="user-role">Weight Loss Program</div></div></div></div></aside>`
+}
+function goHome(){
+  window.location.href = "index.html";
 }
 function shell(title,active,body){
 document.title=title+" | Getwell";
