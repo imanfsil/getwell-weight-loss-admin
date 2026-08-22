@@ -4,10 +4,34 @@
 <div class="form-group"><label>Phone</label><input id="editPhone"></div><div class="form-group"><label>Date of Birth</label><input id="editDob" type="date"></div>
 <div class="form-group"><label>Gender</label><select id="editGender"><option value="">Select</option><option>Male</option><option>Female</option></select></div><div class="form-group"><label>Height (cm)</label><input id="editHeight" type="number"></div>
 <div class="form-group"><label>Starting Weight (kg)</label><input id="editStartingWeight" type="number"></div><div class="form-group"><label>Goal Weight (kg)</label><input id="editGoalWeight" type="number"></div>
-<div class="form-group"><label>Program Start Date</label><input id="editStartDate" type="date"></div><div class="form-group"><label>Panel / Payment</label><select id="editPanel"><option value="SELF_PAY">Self-Pay</option><option value="PANEL_A">MiCare</option><option value="PANEL_B">PMCare</option><option value="PANEL_C">Other Panel</option><option value="Other">Other Panel</option></select></div>
+<div class="form-group"><label>Program Start Date</label><input id="editStartDate" type="date"></div><div class="form-group">
+
+          <label>
+            Panel / Payment
+          </label>
+
+          <select
+            id="editPanel"
+          >
+
+            <option value="PMCARE">PMCARE</option>
+<option value="UITM">UITM</option>
+<option value="COMPUMED">COMPUMED</option>
+<option value="MICARE">MICARE</option>
+<option value="SELCARE">SELCARE</option>
+<option value="IHP">IHP</option>
+<option value="ASP">ASP</option>
+<option value="HEALTHCONNECT">HEALTHCONNECT</option>
+<option value="EMAS">EMAS</option>
+<option value="SELFPAY">SELFPAY</option>
+<option value="SPONSORED">SPONSORED</option>
+
+          </select>
+
+        </div>
 <div class="form-group"><label>Insurance / Panel Status</label><select id="editPanelStatus"><option value="Active">Active</option><option value="Suspended">Suspended</option></select></div>
 <div class="form-group full"><label>Suspension / Claim Hold Notes</label><textarea id="editPanelSuspensionNote" placeholder="e.g. Policy suspended, renewal pending, claim hold, insurer issue..."></textarea></div>
-<div class="form-group" id="editOtherPanelGroup" style="display:none"><label>Panel Name</label><input id="editOtherPanel"></div><div class="form-group"><label>Doctor</label><input id="editDoctor"></div>
+<div class="form-group"><label>Doctor</label><input id="editDoctor"></div>
 <div class="form-group"><label>Status</label><select id="editStatus"><option>Active</option><option>Completed</option><option>Inactive</option></select></div>
 </div></div><div class="modal-foot"><button class="secondary" onclick="closeEditPatient()">Cancel</button><button class="primary" onclick="savePatientChanges()">Save Changes</button></div></div></div>
 
@@ -32,8 +56,8 @@ const params=new URLSearchParams(location.search);const id=mapLegacyId(params.ge
 let editingVisitId=null,editingClaimId=null;
 function openEditPatient(){editName.value=p.name||"";editPatientId.value=p.id;editPhone.value=p.phone||"";editDob.value=p.dob||"";editGender.value=p.gender||"";editHeight.value=p.height||"";editStartingWeight.value=p.startingWeight||"";editGoalWeight.value=p.goalWeight||"";editStartDate.value=p.startDate||"";editPanel.value=p.panelProvider||"SELF_PAY";editOtherPanel.value=p.otherPanelName||"";editPanelStatus.value=p.panelStatus||"Active";editPanelSuspensionNote.value=p.panelSuspensionNote||"";editDoctor.value=p.doctor||"";editStatus.value=p.status||"Active";editOtherPanelGroup.style.display=editPanel.value==="Other"?"block":"none";editPatientModal.classList.add("show")}
 function closeEditPatient(){editPatientModal.classList.remove("show")}
-editPanel.addEventListener("change",()=>editOtherPanelGroup.style.display=editPanel.value==="Other"?"block":"none");
-function savePatientChanges(){p.name=editName.value.trim();p.phone=editPhone.value;p.dob=editDob.value;p.gender=editGender.value;p.height=editHeight.value;p.startingWeight=+editStartingWeight.value||0;p.goalWeight=+editGoalWeight.value||0;p.startDate=editStartDate.value;p.panelProvider=editPanel.value;p.otherPanelName=editPanel.value==="Other"?editOtherPanel.value.trim():"";p.panelStatus=patientUsesPanel(p)?editPanelStatus.value:"Active";p.panelSuspensionNote=patientUsesPanel(p)?editPanelSuspensionNote.value.trim():"";p.doctor=editDoctor.value.trim();p.status=editStatus.value;upsertPatient(p);p=getPatient(p.id);closeEditPatient();refresh()}
+editPanel.addEventListener("change",()=>{editPanel.value=normalizePanelType(editPanel.value)});
+function savePatientChanges(){p.name=editName.value.trim();p.phone=editPhone.value;p.dob=editDob.value;p.gender=editGender.value;p.height=editHeight.value;p.startingWeight=+editStartingWeight.value||0;p.goalWeight=+editGoalWeight.value||0;p.startDate=editStartDate.value;p.panelProvider=normalizePanelType(editPanel.value);p.otherPanelName="";p.panelStatus=patientUsesPanel(p)?editPanelStatus.value:"Active";p.panelSuspensionNote=patientUsesPanel(p)?editPanelSuspensionNote.value.trim():"";p.doctor=editDoctor.value.trim();p.status=editStatus.value;upsertPatient(p);p=getPatient(p.id);closeEditPatient();refresh()}
 function showSection(s,b){document.querySelectorAll("[id^='sec-']").forEach(x=>x.style.display="none");document.getElementById("sec-"+s).style.display="block";document.querySelectorAll(".patient-tabs button").forEach(x=>x.classList.remove("active"));if(b)b.classList.add("active")}
 function openAddVisit(){editingVisitId=null;resetVisit();visitModalTitle.textContent="Add Visit";visitModalSub.textContent=p.name;visitModal.classList.add("show")}
 function closeVisit(){visitModal.classList.remove("show");editingVisitId=null}
