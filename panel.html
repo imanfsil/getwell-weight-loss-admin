@@ -1,9 +1,1415 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Panel | Getwell</title><link rel="stylesheet" href="styles.css"><script src="app.js"></script></head><body><div id="root"></div><div class="modal-wrap" id="panelDetailModal"><div class="modal" style="width:min(1050px,96vw)"><div class="modal-head"><div><h2 id="panelDetailTitle">Panel Patient</h2><p id="panelDetailSub"></p></div><button class="modal-close" onclick="closePanelDetail()">×</button></div><div class="modal-body" id="panelDetailContent"></div></div></div>
+<!doctype html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel | Getwell</title>
+<link rel="stylesheet" href="styles.css">
+<script src="app.js"></script>
+</head>
+
+<body>
+
+<div id="root"></div>
+
+
+<!-- =========================================================
+     PANEL PATIENT DETAIL
+========================================================= -->
+
+<div class="modal-wrap" id="panelDetailModal">
+
+  <div class="modal" style="width:min(1050px,96vw)">
+
+    <div class="modal-head">
+
+      <div>
+        <h2 id="panelDetailTitle">Panel Patient</h2>
+        <p id="panelDetailSub"></p>
+      </div>
+
+      <button
+        type="button"
+        class="modal-close"
+        onclick="closePanelDetail()"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div
+      class="modal-body"
+      id="panelDetailContent"
+    ></div>
+
+  </div>
+
+</div>
+
+
 <script>
-function getPanelPatients(){return store().patients.filter(patientUsesPanel)}
-function renderPanelKpis(){const ps=getPanelPatients();let g=0,c=0;ps.forEach(p=>{const f=finance(p);g+=f.grand;c+=f.claimed});panelKpis.innerHTML=`<div class="kpi"><div class="kpi-label">PANEL PATIENTS</div><div class="kpi-value">${ps.length}</div></div><div class="kpi"><div class="kpi-label">GRAND TOTAL</div><div class="kpi-value">${money(g)}</div></div><div class="kpi"><div class="kpi-label">TOTAL CLAIMED</div><div class="kpi-value">${money(c)}</div></div><div class="kpi"><div class="kpi-label">BALANCE TO CLAIM</div><div class="kpi-value">${money(Math.max(0,g-c))}</div></div>`}
-function renderPanelPatients(q=""){const ps=getPanelPatients().filter(p=>(p.name+" "+p.id+" "+getPanelName(p)).toLowerCase().includes(q.toLowerCase()));panelRows.innerHTML=ps.map(p=>{const f=finance(p);return `<tr><td><strong>${p.name}</strong><div class="row-sub">${p.id}</div></td><td><span class="panel-chip">${getPanelName(p)}</span></td><td>${money(f.grand)}</td><td>${money(f.claimed)}</td><td><span class="badge ${f.balance>0?"orange":"green"}">${money(f.balance)}</span></td><td><button class="secondary" style="padding:7px 9px" onclick="openPanelDetail('${p.id}')">View Claims →</button></td></tr>`}).join("")||`<tr><td colspan="6" class="notif-empty">No panel patients found.</td></tr>`;renderPanelKpis()}
-function openPanelDetail(pid){const p=getPatient(pid);if(!p)return;const f=finance(p),cs=ensureClaims(p);panelDetailTitle.textContent=p.name;panelDetailSub.textContent=`${p.id} · ${getPanelName(p)}`;panelDetailContent.innerHTML=`<div class="finance-grid"><div class="finance-card"><div class="label">GRAND TOTAL</div><div class="value">${money(f.grand)}</div></div><div class="finance-card"><div class="label">TOTAL CLAIMED</div><div class="value">${money(f.claimed)}</div></div><div class="finance-card balance"><div class="label">BALANCE TO CLAIM</div><div class="value">${money(f.balance)}</div></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin:20px 0 10px"><div><strong>Claim History</strong><div class="row-sub">Claims can be on the visit date, later date, or non-visit day.</div></div><a class="primary" style="padding:8px 11px" href="patient-profile.html?patient=${p.id}&openClaim=1">＋ Add Claim</a></div><div class="table-wrap"><table class="table"><thead><tr><th>Claim Date</th><th>Related Visit</th><th>Claim Amount</th><th>Notes</th></tr></thead><tbody>${cs.map(c=>`<tr><td>${c.claimDate}</td><td>${p.visits.find(v=>v.id===c.visitId)?.visit||"No specific visit"}</td><td>${money(c.amount)}</td><td>${c.notes||"—"}</td></tr>`).join("")||`<tr><td colspan="4" class="notif-empty">No claims recorded.</td></tr>`}</tbody></table></div><div style="margin-top:22px"><strong>Visit History</strong><div class="table-wrap"><table class="table"><thead><tr><th>Visit</th><th>Date</th><th>Invoice</th></tr></thead><tbody>${(p.visits||[]).map(v=>`<tr><td>${v.visit}</td><td>${v.dateKey}</td><td>${money(visitTotal(v))}</td></tr>`).join("")||`<tr><td colspan="3" class="notif-empty">No visits.</td></tr>`}</tbody></table></div></div>`;panelDetailModal.classList.add("show")}
-function closePanelDetail(){panelDetailModal.classList.remove("show")}
-document.getElementById("root").innerHTML=shell("Panel","panel",`<div class="page-head"><div><h1>Panel Claims</h1><p>Track panel patients and remaining claim balances.</p></div></div><div class="kpi-grid" id="panelKpis"></div><div class="card"><div class="card-head"><div><h2>Panel Patients</h2><p>Only panel / insurance patients are listed.</p></div><input class="claim-input" style="max-width:240px" oninput="renderPanelPatients(this.value)" placeholder="Search patient or panel"></div><div class="table-wrap"><table class="table"><thead><tr><th>Patient</th><th>Panel</th><th>GRAND TOTAL</th><th>TOTAL CLAIMED</th><th>BALANCE TO CLAIM</th><th></th></tr></thead><tbody id="panelRows"></tbody></table></div></div>`);renderPanelPatients();renderNotifications();
-</script></body></html>
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+document.getElementById("root").innerHTML = shell(
+  "Panel",
+  "panel",
+  `
+
+  <div class="page-head">
+
+    <div>
+
+      <h1>
+        Panel Claims
+      </h1>
+
+      <p>
+        Track panel patients, claim progress and outstanding balances.
+      </p>
+
+    </div>
+
+
+    <div
+      style="
+        display:flex;
+        gap:8px;
+        align-items:flex-end;
+        flex-wrap:wrap;
+        justify-content:flex-end;
+      "
+    >
+
+      <div class="form-group" style="min-width:170px">
+
+        <label>
+          Panel Filter
+        </label>
+
+        <select
+          id="panelFilter"
+          class="claim-input"
+          onchange="
+            renderPanelPage()
+          "
+        ></select>
+
+      </div>
+
+
+      <div class="form-group" style="min-width:220px">
+
+        <label>
+          Search
+        </label>
+
+        <input
+          id="panelSearch"
+          class="claim-input"
+          placeholder="Search patient, ID or panel"
+          oninput="
+            renderPanelPage()
+          "
+        >
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =======================================================
+       PANEL KPI
+  ======================================================== -->
+
+  <div
+    class="kpi-grid"
+    id="panelKpis"
+  ></div>
+
+
+  <!-- =======================================================
+       PANEL PATIENTS
+  ======================================================== -->
+
+  <div class="card">
+
+    <div class="card-head">
+
+      <div>
+
+        <h2>
+          Panel Patients
+        </h2>
+
+        <p>
+          The figures below follow the selected panel filter.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table class="table">
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Patient
+            </th>
+
+            <th>
+              Panel
+            </th>
+
+            <th>
+              GRAND TOTAL
+            </th>
+
+            <th>
+              TOTAL CLAIMED
+            </th>
+
+            <th>
+              BALANCE TO CLAIM
+            </th>
+
+            <th>
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody
+          id="panelRows"
+        ></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- =======================================================
+       DANGER / SUSPENDED POLICY
+  ======================================================== -->
+
+  <div
+    class="card"
+    style="
+      margin-top:16px;
+      border-color:#F59E0B;
+    "
+  >
+
+    <div class="card-head">
+
+      <div>
+
+        <div
+          style="
+            display:flex;
+            align-items:center;
+            gap:8px;
+          "
+        >
+
+          <h2>
+            Policy Suspended — Action Required
+          </h2>
+
+
+          <span
+            id="suspendedCount"
+            class="badge red"
+          >
+            0
+          </span>
+
+        </div>
+
+
+        <p>
+          Panel patients who still have a balance to claim but their insurance policy is suspended.
+        </p>
+
+      </div>
+
+
+      <div
+        id="suspendedTotal"
+        class="badge orange"
+      >
+        Outstanding: RM 0.00
+      </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table class="table">
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Patient
+            </th>
+
+            <th>
+              Panel
+            </th>
+
+            <th>
+              BALANCE / OUTSTANDING
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Notes
+            </th>
+
+            <th>
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody
+          id="suspendedRows"
+        ></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  `
+);
+
+
+/* =========================================================
+   PANEL FILTER OPTIONS
+========================================================= */
+
+function buildPanelFilter(){
+
+  const names = new Set([
+    "MiCare",
+    "PMCare",
+    "Other Panel"
+  ]);
+
+
+  getPanelPatientsRaw().forEach(
+    patient => {
+
+      const name =
+        getPanelName(
+          patient
+        );
+
+      if(name){
+        names.add(name);
+      }
+
+    }
+  );
+
+
+  const sorted =
+    [...names]
+      .sort(
+        (a,b) =>
+          a.localeCompare(b)
+      );
+
+
+  panelFilter.innerHTML = `
+
+    <option value="ALL">
+      All Panels
+    </option>
+
+    ${
+      sorted
+        .map(
+          name => `
+            <option
+              value="${name.replace(/"/g,"&quot;")}"
+            >
+              ${name}
+            </option>
+          `
+        )
+        .join("")
+    }
+
+  `;
+
+}
+
+
+/* =========================================================
+   RAW PANEL PATIENTS
+========================================================= */
+
+function getPanelPatientsRaw(){
+
+  return store()
+    .patients
+    .filter(
+      patient =>
+        patientUsesPanel(
+          patient
+        )
+    );
+
+}
+
+
+/* =========================================================
+   SELECTED PANEL PATIENTS
+========================================================= */
+
+function getFilteredPanelPatients(){
+
+  const selected =
+    panelFilter.value || "ALL";
+
+
+  const search =
+    (
+      panelSearch.value ||
+      ""
+    )
+    .trim()
+    .toLowerCase();
+
+
+  return getPanelPatientsRaw()
+    .filter(
+      patient => {
+
+        const panel =
+          getPanelName(
+            patient
+          );
+
+
+        const matchesPanel =
+          selected === "ALL" ||
+          panel === selected;
+
+
+        const searchable =
+          (
+            patient.name ||
+            ""
+          )
+          + " " +
+          (
+            patient.id ||
+            ""
+          )
+          + " " +
+          panel;
+
+
+        const matchesSearch =
+          !search ||
+          searchable
+            .toLowerCase()
+            .includes(search);
+
+
+        return (
+          matchesPanel &&
+          matchesSearch
+        );
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+   KPI
+========================================================= */
+
+function renderPanelKpis(){
+
+  const patients =
+    getFilteredPanelPatients();
+
+
+  let grand = 0;
+  let claimed = 0;
+
+
+  patients.forEach(
+    patient => {
+
+      const f =
+        finance(
+          patient
+        );
+
+      grand +=
+        f.grand;
+
+      claimed +=
+        f.claimed;
+
+    }
+  );
+
+
+  const balance =
+    Math.max(
+      0,
+      grand -
+      claimed
+    );
+
+
+  panelKpis.innerHTML = `
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        PANEL PATIENTS
+      </div>
+
+      <div class="kpi-value">
+        ${patients.length}
+      </div>
+
+      <div class="kpi-sub">
+        ${
+          panelFilter.value === "ALL"
+            ? "All panel patients"
+            : `Filtered: ${panelFilter.value}`
+        }
+      </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        GRAND TOTAL
+      </div>
+
+      <div class="kpi-value">
+        ${money(grand)}
+      </div>
+
+      <div class="kpi-sub">
+        All recorded visit invoices
+      </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        TOTAL CLAIMED
+      </div>
+
+      <div class="kpi-value">
+        ${money(claimed)}
+      </div>
+
+      <div class="kpi-sub">
+        All submitted claim transactions
+      </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        BALANCE TO CLAIM
+      </div>
+
+      <div
+        class="kpi-value"
+        style="
+          color:
+            ${balance > 0
+              ? "#C2410C"
+              : "#15803D"};
+        "
+      >
+        ${money(balance)}
+      </div>
+
+      <div class="kpi-sub">
+        Remaining balance
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================================================
+   PANEL TABLE
+========================================================= */
+
+function renderPanelPatients(){
+
+  const patients =
+    getFilteredPanelPatients();
+
+
+  panelRows.innerHTML =
+
+    patients.length
+
+      ? patients
+          .map(
+            patient => {
+
+              const f =
+                finance(
+                  patient
+                );
+
+
+              return `
+
+                <tr>
+
+                  <td>
+
+                    <strong>
+                      ${patient.name}
+                    </strong>
+
+
+                    <div
+                      class="row-sub"
+                    >
+                      ${patient.id}
+                    </div>
+
+                  </td>
+
+
+                  <td>
+
+                    <span
+                      class="panel-chip"
+                    >
+                      ${getPanelName(
+                        patient
+                      )}
+                    </span>
+
+                  </td>
+
+
+                  <td>
+                    ${money(
+                      f.grand
+                    )}
+                  </td>
+
+
+                  <td>
+                    ${money(
+                      f.claimed
+                    )}
+                  </td>
+
+
+                  <td>
+
+                    <span
+                      class="
+                        badge
+                        ${
+                          f.balance > 0
+                            ? "orange"
+                            : "green"
+                        }
+                      "
+                    >
+                      ${money(
+                        f.balance
+                      )}
+                    </span>
+
+                  </td>
+
+
+                  <td>
+
+                    <button
+                      type="button"
+                      class="secondary"
+                      style="
+                        padding:
+                          7px
+                          9px;
+                      "
+                      onclick="
+                        openPanelDetail(
+                          '${patient.id}'
+                        )
+                      "
+                    >
+                      View Claims →
+                    </button>
+
+                  </td>
+
+                </tr>
+
+              `;
+
+            }
+          )
+          .join("")
+
+
+      : `
+
+        <tr>
+
+          <td
+            colspan="6"
+            style="
+              text-align:center;
+              padding:30px;
+              color:var(--muted);
+            "
+          >
+            No panel patients found.
+          </td>
+
+        </tr>
+
+      `;
+
+}
+
+
+/* =========================================================
+   SUSPENDED / DANGER ZONE
+========================================================= */
+
+function getSuspendedPatients(){
+
+  return getFilteredPanelPatients()
+    .filter(
+      patient => {
+
+        const f =
+          finance(
+            patient
+          );
+
+
+        return (
+          isPanelSuspended(
+            patient
+          ) &&
+          f.balance > 0
+        );
+
+      }
+    );
+
+}
+
+
+function renderSuspendedPatients(){
+
+  const patients =
+    getSuspendedPatients();
+
+
+  let totalOutstanding = 0;
+
+
+  patients.forEach(
+    patient => {
+
+      totalOutstanding +=
+        finance(
+          patient
+        ).balance;
+
+    }
+  );
+
+
+  suspendedCount.textContent =
+    patients.length;
+
+
+  suspendedTotal.textContent =
+    `Outstanding: ${money(
+      totalOutstanding
+    )}`;
+
+
+  suspendedRows.innerHTML =
+
+    patients.length
+
+      ? patients
+          .map(
+            patient => {
+
+              const balance =
+                finance(
+                  patient
+                ).balance;
+
+
+              const note =
+                panelSuspensionNote(
+                  patient
+                );
+
+
+              return `
+
+                <tr>
+
+
+                  <td>
+
+                    <strong>
+                      ${patient.name}
+                    </strong>
+
+
+                    <div
+                      class="row-sub"
+                    >
+                      ${patient.id}
+                    </div>
+
+                  </td>
+
+
+                  <td>
+
+                    <span
+                      class="panel-chip"
+                    >
+                      ${getPanelName(
+                        patient
+                      )}
+                    </span>
+
+                  </td>
+
+
+                  <td>
+
+                    <span
+                      class="badge red"
+                    >
+                      ${money(
+                        balance
+                      )}
+                    </span>
+
+                  </td>
+
+
+                  <td>
+
+                    <span
+                      class="badge red"
+                    >
+                      SUSPENDED
+                    </span>
+
+                  </td>
+
+
+                  <td>
+
+                    <div
+                      style="
+                        max-width:390px;
+                        line-height:16px;
+                      "
+                    >
+
+                      ${
+                        note ||
+                        "No suspension note entered."
+                      }
+
+                    </div>
+
+                  </td>
+
+
+                  <td>
+
+                    <a
+                      class="secondary"
+                      style="
+                        padding:
+                          7px
+                          9px;
+                      "
+                      href="
+                        patient-profile.html?patient=${encodeURIComponent(
+                          patient.id
+                        )}
+                      "
+                    >
+                      Open Patient
+                    </a>
+
+                  </td>
+
+
+                </tr>
+
+              `;
+
+            }
+          )
+          .join("")
+
+
+      : `
+
+        <tr>
+
+          <td
+            colspan="6"
+            style="
+              text-align:center;
+              padding:30px;
+              color:var(--muted);
+            "
+          >
+
+            No suspended-policy patients
+            with outstanding balance.
+
+          </td>
+
+        </tr>
+
+      `;
+
+}
+
+
+/* =========================================================
+   COMPLETE PANEL PAGE RENDER
+========================================================= */
+
+function renderPanelPage(){
+
+  renderPanelKpis();
+
+  renderPanelPatients();
+
+  renderSuspendedPatients();
+
+}
+
+
+/* =========================================================
+   PANEL DETAIL
+========================================================= */
+
+function openPanelDetail(
+  patientId
+){
+
+  const patient =
+    getPatient(
+      patientId
+    );
+
+
+  if(!patient){
+    return;
+  }
+
+
+  const f =
+    finance(
+      patient
+    );
+
+
+  const claims =
+    ensureClaims(
+      patient
+    );
+
+
+  panelDetailTitle.textContent =
+    patient.name;
+
+
+  panelDetailSub.textContent =
+    `${patient.id} · ${getPanelName(
+      patient
+    )}`;
+
+
+  panelDetailContent.innerHTML = `
+
+    <div
+      class="finance-grid"
+      style="
+        margin-bottom:18px;
+      "
+    >
+
+      <div class="finance-card">
+
+        <div class="label">
+          GRAND TOTAL
+        </div>
+
+        <div class="value">
+          ${money(
+            f.grand
+          )}
+        </div>
+
+      </div>
+
+
+      <div class="finance-card">
+
+        <div class="label">
+          TOTAL CLAIMED
+        </div>
+
+        <div class="value">
+          ${money(
+            f.claimed
+          )}
+        </div>
+
+      </div>
+
+
+      <div
+        class="
+          finance-card
+          balance
+        "
+      >
+
+        <div class="label">
+          BALANCE TO CLAIM
+        </div>
+
+        <div class="value">
+          ${money(
+            f.balance
+          )}
+        </div>
+
+      </div>
+
+    </div>
+
+
+    ${
+      isPanelSuspended(
+        patient
+      )
+        ? `
+
+          <div
+            style="
+              padding:14px;
+              border:
+                1px solid
+                #F59E0B;
+              background:#FFF7ED;
+              border-radius:10px;
+              margin-bottom:18px;
+            "
+          >
+
+            <div
+              style="
+                font-weight:700;
+                color:#B45309;
+              "
+            >
+              ⚠ Policy Suspended
+            </div>
+
+
+            <div
+              style="
+                font-size:10px;
+                color:#92400E;
+                margin-top:4px;
+              "
+            >
+              ${
+                panelSuspensionNote(
+                  patient
+                ) ||
+                "No suspension note entered."
+              }
+            </div>
+
+          </div>
+
+        `
+        : ""
+    }
+
+
+    <div
+      style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:15px;
+        margin-bottom:10px;
+      "
+    >
+
+      <div>
+
+        <strong>
+          Claim History
+        </strong>
+
+        <div
+          class="row-sub"
+        >
+          Claims may be submitted on the visit date,
+          a later date, or a non-visit day.
+        </div>
+
+      </div>
+
+
+      <a
+        class="primary"
+        style="
+          padding:
+            8px
+            11px;
+        "
+        href="
+          patient-profile.html?patient=${encodeURIComponent(
+            patient.id
+          )}&openClaim=1
+        "
+      >
+        ＋ Add Claim
+      </a>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table class="table">
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Claim Date
+            </th>
+
+            <th>
+              Related Visit
+            </th>
+
+            <th>
+              Claim Amount
+            </th>
+
+            <th>
+              Notes
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          ${
+            claims.length
+
+              ? claims
+                  .slice()
+                  .sort(
+                    (a,b) =>
+                      (
+                        b.claimDate ||
+                        ""
+                      )
+                      .localeCompare(
+                        a.claimDate ||
+                        ""
+                      )
+                  )
+                  .map(
+                    claim => {
+
+                      const visit =
+                        (
+                          patient.visits ||
+                          []
+                        )
+                        .find(
+                          v =>
+                            v.id ===
+                            claim.visitId
+                        );
+
+
+                      return `
+
+                        <tr>
+
+                          <td>
+                            ${
+                              claim.claimDate ||
+                              "—"
+                            }
+                          </td>
+
+                          <td>
+                            ${
+                              visit?.visit ||
+                              "No specific visit"
+                            }
+                          </td>
+
+                          <td>
+                            ${money(
+                              claim.amount
+                            )}
+                          </td>
+
+                          <td>
+                            ${
+                              claim.notes ||
+                              "—"
+                            }
+                          </td>
+
+                        </tr>
+
+                      `;
+
+                    }
+                  )
+                  .join("")
+
+              : `
+
+                <tr>
+
+                  <td
+                    colspan="4"
+                    style="
+                      text-align:center;
+                      padding:28px;
+                      color:var(--muted);
+                    "
+                  >
+                    No claims recorded.
+                  </td>
+
+                </tr>
+
+              `
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <div
+      style="
+        margin-top:22px;
+      "
+    >
+
+      <strong>
+        Visit History
+      </strong>
+
+      <div
+        class="table-wrap"
+        style="
+          margin-top:8px;
+        "
+      >
+
+        <table class="table">
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Visit
+              </th>
+
+              <th>
+                Date
+              </th>
+
+              <th>
+                Invoice
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            ${
+              (
+                patient.visits ||
+                []
+              )
+              .map(
+                visit => `
+
+                  <tr>
+
+                    <td>
+                      ${visit.visit}
+                    </td>
+
+                    <td>
+                      ${visit.dateKey}
+                    </td>
+
+                    <td>
+                      ${money(
+                        visitTotal(
+                          visit
+                        )
+                      )}
+                    </td>
+
+                  </tr>
+
+                `
+              )
+              .join("")
+
+              ||
+
+              `
+
+                <tr>
+
+                  <td
+                    colspan="3"
+                    style="
+                      text-align:center;
+                      padding:28px;
+                      color:var(--muted);
+                    "
+                  >
+                    No visits recorded.
+                  </td>
+
+                </tr>
+
+              `
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  panelDetailModal
+    .classList
+    .add("show");
+
+}
+
+
+function closePanelDetail(){
+
+  panelDetailModal
+    .classList
+    .remove("show");
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+buildPanelFilter();
+renderPanelPage();
+renderNotifications();
+
+</script>
+
+</body>
+</html>
