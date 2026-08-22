@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
 
   <meta charset="utf-8">
@@ -22,7 +23,9 @@
 
 </head>
 
+
 <body>
+
 
 <script>
 
@@ -44,11 +47,13 @@ document.write(
 
       <div class="page-head">
 
+
         <div>
 
           <h1>
             Good afternoon, Admin
           </h1>
+
 
           <p>
             Here's what's happening with the weight loss program today.
@@ -56,8 +61,14 @@ document.write(
 
         </div>
 
+
       </div>
 
+
+
+      <!-- =================================================
+           KPI
+      ================================================== -->
 
       <div
         class="kpi-grid"
@@ -65,14 +76,22 @@ document.write(
       ></div>
 
 
+
+      <!-- =================================================
+           DASHBOARD TWO-COLUMN AREA
+      ================================================== -->
+
       <div class="grid-2">
 
 
-        <!-- TODAY'S APPOINTMENTS -->
+
+        <!-- TODAY'S / RECENT PATIENT ACTIVITY -->
 
         <div class="card">
 
+
           <div class="card-head">
+
 
             <div>
 
@@ -80,27 +99,34 @@ document.write(
                 Today's Appointments
               </h2>
 
+
               <p>
-                Upcoming and completed patient appointments.
+                Upcoming and recent patient activity.
               </p>
 
             </div>
 
+
           </div>
+
 
           <div
             id="todayList"
             class="list"
           ></div>
 
+
         </div>
 
 
-        <!-- PATIENTS NEEDING ATTENTION -->
+
+        <!-- FOLLOW-UP -->
 
         <div class="card">
 
+
           <div class="card-head">
+
 
             <div>
 
@@ -108,18 +134,22 @@ document.write(
                 Patients Needing Attention
               </h2>
 
+
               <p>
                 Based on the latest recorded visit.
               </p>
 
             </div>
 
+
           </div>
+
 
           <div
             id="attentionList"
             class="list"
           ></div>
+
 
         </div>
 
@@ -127,14 +157,21 @@ document.write(
       </div>
 
 
-      <!-- FOLLOW-UP SUMMARY -->
+
+      <!-- =================================================
+           FOLLOW-UP SUMMARY
+      ================================================== -->
 
       <div
         class="card"
-        style="margin-top:16px"
+        style="
+          margin-top:16px;
+        "
       >
 
+
         <div class="card-head">
+
 
           <div>
 
@@ -142,12 +179,13 @@ document.write(
               Follow-Up Summary
             </h2>
 
+
             <p>
-              Patients are flagged from the latest recorded visit,
-              not their appointment date.
+              5 days = due for follow-up · 7 days = overdue.
             </p>
 
           </div>
+
 
         </div>
 
@@ -157,48 +195,124 @@ document.write(
           class="list"
         ></div>
 
+
+      </div>
+
+
+
+      <!-- =================================================
+           PANEL SUMMARY
+      ================================================== -->
+
+      <div
+        class="card"
+        style="
+          margin-top:16px;
+        "
+      >
+
+
+        <div class="card-head">
+
+
+          <div>
+
+            <h2>
+              Panel Claim Overview
+            </h2>
+
+
+            <p>
+              Quick view of the current panel claim workload.
+            </p>
+
+          </div>
+
+
+          <a
+            href="panel.html"
+            class="secondary"
+            style="
+              padding:
+                8px
+                11px;
+            "
+          >
+            Open Panel →
+          </a>
+
+
+        </div>
+
+
+        <div
+          id="panelSummary"
+          style="
+            padding:
+              18px;
+          "
+        ></div>
+
+
       </div>
 
     `
+
   )
 
 );
 
 
+
 /* =========================================================
-   DASHBOARD DATA
+   GET DATA
 ========================================================= */
 
-const dashboardStore =
+const dashboardData =
   store();
 
+
 const dashboardPatients =
-  dashboardStore.patients || [];
+  dashboardData.patients ||
+  [];
 
 
-const dashboardActive =
+
+/* =========================================================
+   BASIC COUNTS
+========================================================= */
+
+const totalPatients =
+  dashboardPatients.length;
+
+
+const activePatients =
   dashboardPatients.filter(
     patient =>
-      patient.status === "Active"
+      patient.status ===
+      "Active"
   ).length;
 
 
-const dashboardCompleted =
+const completedPatients =
   dashboardPatients.filter(
     patient =>
-      patient.status === "Completed"
+      patient.status ===
+      "Completed"
   ).length;
 
 
-const dashboardInactive =
+const inactivePatients =
   dashboardPatients.filter(
     patient =>
-      patient.status === "Inactive"
+      patient.status ===
+      "Inactive"
   ).length;
 
 
-const dashboardAlerts =
+const followUpAlerts =
   alerts();
+
 
 
 /* =========================================================
@@ -214,189 +328,252 @@ document.getElementById(
 
   <div class="kpi">
 
+
     <div class="kpi-label">
       TOTAL PATIENTS
     </div>
 
+
     <div class="kpi-value">
-      ${dashboardPatients.length}
+      ${totalPatients}
     </div>
+
 
     <div class="kpi-sub">
       All registered patients
     </div>
 
+
   </div>
 
 
-  <!-- ACTIVE PATIENTS -->
+
+  <!-- ACTIVE -->
 
   <div class="kpi">
+
 
     <div class="kpi-label">
       ACTIVE PATIENTS
     </div>
 
+
     <div class="kpi-value">
-      ${dashboardActive}
+      ${activePatients}
     </div>
+
 
     <div class="kpi-sub">
       Currently in program
     </div>
 
+
   </div>
 
 
-  <!-- DUE FOLLOW-UP -->
+
+  <!-- FOLLOW-UP -->
 
   <div class="kpi">
+
 
     <div class="kpi-label">
       DUE FOLLOW-UP
     </div>
 
+
     <div class="kpi-value">
-      ${dashboardAlerts.length}
+      ${followUpAlerts.length}
     </div>
 
+
     <div class="kpi-sub">
-      5+ days since last visit
+      5+ days since latest visit
     </div>
+
 
   </div>
 
 
-  <!-- GOALS COMPLETED -->
+
+  <!-- COMPLETED -->
 
   <div class="kpi">
+
 
     <div class="kpi-label">
       GOALS COMPLETED
     </div>
 
+
     <div class="kpi-value">
-      ${dashboardCompleted}
+      ${completedPatients}
     </div>
+
 
     <div class="kpi-sub">
-      ${dashboardInactive} inactive patients
+      ${inactivePatients}
+      inactive patients
     </div>
 
+
   </div>
+
 
 `;
 
 
+
 /* =========================================================
-   TODAY'S / RECENT PATIENT ACTIVITY
+   RECENT PATIENT ACTIVITY
 ========================================================= */
 
-document.getElementById(
-  "todayList"
-).innerHTML =
+const todayList =
+  document.getElementById(
+    "todayList"
+  );
+
+
+todayList.innerHTML =
 
   dashboardPatients.length
 
     ? dashboardPatients
-        .slice(0, 8)
-        .map(patient => {
-
-          const visit =
-            latestVisit(patient);
-
-          return `
-
-            <div class="row">
+        .slice(
+          0,
+          8
+        )
+        .map(
+          patient => {
 
 
-              <div class="avatar-small">
-                ${patient.initials}
-              </div>
+            const visit =
+              latestVisit(
+                patient
+              );
 
 
-              <div class="row-main">
+            return `
 
-                <div class="row-title">
-                  ${patient.name}
-                </div>
-
-
-                <div class="row-sub">
-
-                  ${
-                    visit?.type ||
-                    "No visit recorded"
-                  }
-
-                  ·
-
-                  ${
-                    visit?.dateKey ||
-                    "—"
-                  }
-
-                </div>
-
-              </div>
-
-
-              <a
-                class="secondary"
-                style="
-                  padding:7px 9px
-                "
-                href="
-                  patient-profile.html?patient=${encodeURIComponent(
-                    patient.id
-                  )}
-                "
+              <div
+                class="row"
               >
-                View
-              </a>
 
 
-            </div>
+                <div
+                  class="avatar-small"
+                >
+                  ${patient.initials}
+                </div>
 
-          `;
 
-        })
+                <div
+                  class="row-main"
+                >
+
+
+                  <div
+                    class="row-title"
+                  >
+                    ${patient.name}
+                  </div>
+
+
+                  <div
+                    class="row-sub"
+                  >
+
+                    ${
+                      visit?.type ||
+                      "No visit recorded"
+                    }
+
+                    ·
+
+                    ${
+                      visit?.dateKey ||
+                      "—"
+                    }
+
+                  </div>
+
+
+                </div>
+
+
+                <a
+                  href="
+                    patient-profile.html?patient=${encodeURIComponent(
+                      patient.id
+                    )}
+                  "
+                  class="secondary"
+                  style="
+                    padding:
+                      7px
+                      9px;
+                  "
+                >
+                  View
+                </a>
+
+
+              </div>
+
+            `;
+
+          }
+        )
         .join("")
+
 
     : `
 
-      <div class="notif-empty">
-        No patient records yet.
+      <div
+        class="notif-empty"
+      >
+
+        No patient activity yet.
+
       </div>
 
     `;
+
 
 
 /* =========================================================
    PATIENTS NEEDING ATTENTION
 ========================================================= */
 
-document.getElementById(
-  "attentionList"
-).innerHTML =
+const attentionList =
+  document.getElementById(
+    "attentionList"
+  );
 
-  dashboardAlerts.length
 
-    ? dashboardAlerts
-        .slice(0, 8)
-        .map(item => {
+attentionList.innerHTML =
 
-          return `
+  followUpAlerts.length
+
+    ? followUpAlerts
+        .slice(
+          0,
+          8
+        )
+        .map(
+          item => `
 
             <div
               class="row"
+              style="
+                cursor:pointer;
+              "
               onclick="
                 location.href=
                 'patient-profile.html?patient=${encodeURIComponent(
                   item.id
                 )}'
               "
-              style="cursor:pointer"
             >
 
 
@@ -408,24 +585,37 @@ document.getElementById(
               ></span>
 
 
-              <div class="row-main">
+              <div
+                class="row-main"
+              >
 
-                <div class="row-title">
+
+                <div
+                  class="row-title"
+                >
                   ${item.name}
                 </div>
 
 
-                <div class="row-sub">
+                <div
+                  class="row-sub"
+                >
 
                   ${
-                    item.level === "overdue"
+                    item.level ===
+                    "overdue"
+
                       ? "Overdue"
+
                       : "Due for Follow-Up"
+
                   }
 
                   ·
 
-                  ${item.days}
+                  ${
+                    item.days
+                  }
 
                   day${
                     item.days === 1
@@ -434,6 +624,7 @@ document.getElementById(
                   }
 
                 </div>
+
 
               </div>
 
@@ -445,53 +636,63 @@ document.getElementById(
 
             </div>
 
-          `;
-
-        })
+          `
+        )
         .join("")
+
 
     : `
 
-      <div class="notif-empty">
+      <div
+        class="notif-empty"
+      >
+
         No patients need attention.
+
       </div>
 
     `;
+
 
 
 /* =========================================================
    FOLLOW-UP SUMMARY
 ========================================================= */
 
-document.getElementById(
-  "followUpSummary"
-).innerHTML =
-
-  dashboardAlerts.length
-
-    ? dashboardAlerts
-        .map(item => {
-
-          const colorClass =
-            item.level === "overdue"
-              ? "red"
-              : "orange";
+const followUpSummary =
+  document.getElementById(
+    "followUpSummary"
+  );
 
 
-          return `
+followUpSummary.innerHTML =
 
-            <div class="row">
+  followUpAlerts.length
+
+    ? followUpAlerts
+        .map(
+          item => `
+
+            <div
+              class="row"
+            >
 
 
               <span
                 class="
                   badge
-                  ${colorClass}
+                  ${
+                    item.level ===
+                    "overdue"
+                      ? "red"
+                      : "orange"
+                  }
                 "
               >
 
                 ${
-                  item.level === "overdue"
+                  item.level ===
+                  "overdue"
                     ? "OVERDUE"
                     : "DUE"
                 }
@@ -499,14 +700,21 @@ document.getElementById(
               </span>
 
 
-              <div class="row-main">
+              <div
+                class="row-main"
+              >
 
-                <div class="row-title">
+
+                <div
+                  class="row-title"
+                >
                   ${item.name}
                 </div>
 
 
-                <div class="row-sub">
+                <div
+                  class="row-sub"
+                >
 
                   Latest recorded visit:
 
@@ -518,18 +726,21 @@ document.getElementById(
 
                 </div>
 
+
               </div>
 
 
               <a
-                class="secondary"
-                style="
-                  padding:7px 9px
-                "
                 href="
                   patient-profile.html?patient=${encodeURIComponent(
                     item.id
                   )}
+                "
+                class="secondary"
+                style="
+                  padding:
+                    7px
+                    9px;
                 "
               >
                 Open Patient
@@ -538,30 +749,198 @@ document.getElementById(
 
             </div>
 
-          `;
-
-        })
+          `
+        )
         .join("")
+
 
     : `
 
-      <div class="notif-empty">
+      <div
+        class="notif-empty"
+      >
 
-        All patients are currently within
-        the follow-up window.
+        All patients are currently
+        within the follow-up window.
 
       </div>
 
     `;
 
 
+
 /* =========================================================
-   REFRESH NOTIFICATION COUNT
+   PANEL OVERVIEW
+========================================================= */
+
+const panelPatients =
+  dashboardPatients.filter(
+    patient =>
+      patientUsesPanel(
+        patient
+      )
+  );
+
+
+let panelGrandTotal = 0;
+
+let panelClaimed = 0;
+
+
+
+panelPatients.forEach(
+  patient => {
+
+    const data =
+      finance(
+        patient
+      );
+
+
+    panelGrandTotal +=
+      data.grand;
+
+
+    panelClaimed +=
+      data.claimed;
+
+  }
+);
+
+
+const panelBalance =
+  Math.max(
+    0,
+    panelGrandTotal -
+    panelClaimed
+  );
+
+
+
+document.getElementById(
+  "panelSummary"
+).innerHTML = `
+
+
+  <div
+    class="finance-grid"
+  >
+
+
+    <div
+      class="finance-card"
+    >
+
+      <div
+        class="label"
+      >
+        PANEL PATIENTS
+      </div>
+
+
+      <div
+        class="value"
+      >
+        ${panelPatients.length}
+      </div>
+
+
+    </div>
+
+
+
+    <div
+      class="finance-card"
+    >
+
+      <div
+        class="label"
+      >
+        GRAND TOTAL
+      </div>
+
+
+      <div
+        class="value"
+      >
+        ${money(
+          panelGrandTotal
+        )}
+      </div>
+
+
+    </div>
+
+
+
+    <div
+      class="finance-card"
+    >
+
+      <div
+        class="label"
+      >
+        TOTAL CLAIMED
+      </div>
+
+
+      <div
+        class="value"
+      >
+        ${money(
+          panelClaimed
+        )}
+      </div>
+
+
+    </div>
+
+
+
+    <div
+      class="
+        finance-card
+        balance
+      "
+      style="
+        grid-column:
+          span 1;
+      "
+    >
+
+      <div
+        class="label"
+      >
+        BALANCE TO CLAIM
+      </div>
+
+
+      <div
+        class="value"
+      >
+        ${money(
+          panelBalance
+        )}
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+`;
+
+
+
+/* =========================================================
+   REFRESH NOTIFICATION
 ========================================================= */
 
 renderNotifications();
 
 </script>
+
 
 </body>
 </html>
