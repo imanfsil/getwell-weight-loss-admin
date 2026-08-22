@@ -30,6 +30,7 @@
 <div id="root"></div>
 
 
+
 <!-- =========================================================
      ADD PATIENT MODAL
 ========================================================= -->
@@ -44,14 +45,16 @@
 
     <div class="modal-head">
 
+
       <div>
 
         <h2>
           Add Patient
         </h2>
 
+
         <p>
-          Create one patient record.
+          Create a new patient record.
         </p>
 
       </div>
@@ -65,7 +68,9 @@
         ×
       </button>
 
+
     </div>
+
 
 
     <div class="modal-body">
@@ -82,12 +87,14 @@
             Full Name
           </label>
 
+
           <input
             id="pName"
             placeholder="Enter patient name"
           >
 
         </div>
+
 
 
         <!-- PATIENT ID -->
@@ -98,12 +105,14 @@
             Patient ID
           </label>
 
+
           <input
             id="pId"
             placeholder="e.g. GW0001"
           >
 
         </div>
+
 
 
         <!-- PHONE -->
@@ -114,12 +123,14 @@
             Phone
           </label>
 
+
           <input
             id="pPhone"
             placeholder="Phone number"
           >
 
         </div>
+
 
 
         <!-- DOB -->
@@ -130,12 +141,45 @@
             Date of Birth
           </label>
 
+
           <input
             id="pDob"
             type="date"
           >
 
         </div>
+
+
+
+        <!-- GENDER -->
+
+        <div class="form-group">
+
+          <label>
+            Gender
+          </label>
+
+
+          <select
+            id="pGender"
+          >
+
+            <option value="">
+              Select
+            </option>
+
+            <option value="Male">
+              Male
+            </option>
+
+            <option value="Female">
+              Female
+            </option>
+
+          </select>
+
+        </div>
+
 
 
         <!-- HEIGHT -->
@@ -145,6 +189,7 @@
           <label>
             Height (cm)
           </label>
+
 
           <input
             id="pHeight"
@@ -157,6 +202,7 @@
         </div>
 
 
+
         <!-- STARTING WEIGHT -->
 
         <div class="form-group">
@@ -164,6 +210,7 @@
           <label>
             Starting Weight (kg)
           </label>
+
 
           <input
             id="pStart"
@@ -176,6 +223,7 @@
         </div>
 
 
+
         <!-- GOAL WEIGHT -->
 
         <div class="form-group">
@@ -183,6 +231,7 @@
           <label>
             Goal Weight (kg)
           </label>
+
 
           <input
             id="pGoal"
@@ -195,13 +244,33 @@
         </div>
 
 
-        <!-- PANEL / SELF PAY -->
+
+        <!-- PROGRAM START DATE -->
 
         <div class="form-group">
 
           <label>
-            Panel / Insurance
+            Program Start Date
           </label>
+
+
+          <input
+            id="pStartDate"
+            type="date"
+          >
+
+        </div>
+
+
+
+        <!-- PANEL -->
+
+        <div class="form-group">
+
+          <label>
+            Panel / Payment Type
+          </label>
+
 
           <select
             id="pPanel"
@@ -232,13 +301,55 @@
         </div>
 
 
+
+        <!-- OTHER PANEL NAME -->
+
+        <div
+          class="form-group"
+          id="otherPanelGroup"
+          style="display:none"
+        >
+
+          <label>
+            Panel Name
+          </label>
+
+
+          <input
+            id="pOtherPanel"
+            placeholder="Enter panel name"
+          >
+
+        </div>
+
+
+
+        <!-- DOCTOR -->
+
+        <div class="form-group">
+
+          <label>
+            Doctor
+          </label>
+
+
+          <input
+            id="pDoctor"
+            placeholder="Doctor name"
+          >
+
+        </div>
+
+
       </div>
 
 
     </div>
 
 
+
     <div class="modal-foot">
+
 
       <button
         type="button"
@@ -257,6 +368,7 @@
         Save Patient
       </button>
 
+
     </div>
 
 
@@ -270,193 +382,297 @@
 
 
 /* =========================================================
-   PAGE SETUP
+   PAGE
 ========================================================= */
 
 document.getElementById(
   "root"
 ).innerHTML =
 
-  shell(
+shell(
 
-    "Patients",
+  "Patients",
 
-    "Weight Loss Program Management",
+  "Weight Loss Program Management",
 
-    "patients",
+  "patients",
 
-    `
+  `
 
-      <div class="page-head">
-
-
-        <div>
-
-          <h1>
-            Patients
-          </h1>
-
-          <p>
-            Manage patient records and monitor program participation.
-          </p>
-
-        </div>
+    <div class="page-head">
 
 
-        <button
-          type="button"
-          class="primary"
-          onclick="openAdd()"
-        >
-          ＋ Add Patient
-        </button>
+      <div>
 
+        <h1>
+          Patients
+        </h1>
+
+
+        <p>
+          Manage patient records and program participation.
+        </p>
 
       </div>
 
 
-
-      <!-- ===================================================
-           KPI
-      ==================================================== -->
-
-      <div
-        class="kpi-grid"
-        id="patientKpis"
-      ></div>
+      <button
+        type="button"
+        class="primary"
+        onclick="openAdd()"
+      >
+        ＋ Add Patient
+      </button>
 
 
-
-      <!-- ===================================================
-           PATIENT TABLE
-      ==================================================== -->
-
-      <div class="card">
+    </div>
 
 
-        <div class="card-head">
+
+    <!-- =================================================
+         KPI
+    ================================================== -->
+
+    <div
+      class="kpi-grid"
+      id="patientKpis"
+    ></div>
 
 
-          <div>
 
-            <h2>
-              Patient List
-            </h2>
+    <!-- =================================================
+         SEARCH
+    ================================================== -->
 
-            <p>
-              One shared patient data source for the whole web.
-            </p>
+    <div
+      class="card"
+      style="
+        margin-bottom:15px;
+      "
+    >
 
-          </div>
+
+      <div class="card-body">
+
+
+        <div
+          class="form-group"
+          style="max-width:500px"
+        >
+
+          <label>
+            Search Patient
+          </label>
 
 
           <input
             class="claim-input"
             id="patientSearch"
-            placeholder="Search patient name or ID"
-            oninput="renderPatients(this.value)"
+            placeholder="Search by patient name, ID or phone"
+            oninput="
+              renderPatients(
+                this.value
+              )
+            "
           >
-
-
-        </div>
-
-
-        <div class="table-wrap">
-
-
-          <table class="table">
-
-
-            <thead>
-
-              <tr>
-
-                <th>
-                  Patient
-                </th>
-
-                <th>
-                  ID
-                </th>
-
-                <th>
-                  Panel / Payment
-                </th>
-
-                <th>
-                  Current
-                </th>
-
-                <th>
-                  Goal
-                </th>
-
-                <th>
-                  Last Visit
-                </th>
-
-                <th>
-                  Status
-                </th>
-
-                <th>
-                </th>
-
-              </tr>
-
-            </thead>
-
-
-            <tbody
-              id="patientRows"
-            ></tbody>
-
-
-          </table>
-
 
         </div>
 
 
       </div>
 
-    `
+
+    </div>
+
+
+
+    <!-- =================================================
+         PATIENT TABLE
+    ================================================== -->
+
+    <div class="card">
+
+
+      <div class="card-head">
+
+
+        <div>
+
+          <h2>
+            Patient List
+          </h2>
+
+
+          <p>
+            One shared patient data source for the whole system.
+          </p>
+
+        </div>
+
+
+      </div>
+
+
+
+      <div class="table-wrap">
+
+
+        <table class="table">
+
+
+          <thead>
+
+
+            <tr>
+
+
+              <th>
+                Patient
+              </th>
+
+
+              <th>
+                ID
+              </th>
+
+
+              <th>
+                Panel / Payment
+              </th>
+
+
+              <th>
+                Current
+              </th>
+
+
+              <th>
+                Goal
+              </th>
+
+
+              <th>
+                Last Visit
+              </th>
+
+
+              <th>
+                Status
+              </th>
+
+
+              <th>
+              </th>
+
+
+            </tr>
+
+
+          </thead>
+
+
+
+          <tbody
+            id="patientRows"
+          ></tbody>
+
+
+        </table>
+
+
+      </div>
+
+
+    </div>
+
+  `
 
 );
 
 
 
 /* =========================================================
-   ADD PATIENT MODAL
+   PANEL SELECT
+========================================================= */
+
+document.getElementById(
+  "pPanel"
+).addEventListener(
+  "change",
+  function(){
+
+    document.getElementById(
+      "otherPanelGroup"
+    ).style.display =
+      this.value === "Other"
+        ? "block"
+        : "none";
+
+  }
+);
+
+
+
+/* =========================================================
+   OPEN MODAL
 ========================================================= */
 
 function openAdd(){
 
-  const modal =
-    document.getElementById(
+  document
+    .getElementById(
       "addPatientModal"
+    )
+    .classList.add(
+      "show"
     );
 
-  modal.classList.add("show");
 
-}
-
-
-function closeAdd(){
-
-  const modal =
+  const startDate =
     document.getElementById(
-      "addPatientModal"
+      "pStartDate"
     );
 
-  modal.classList.remove("show");
+
+  if(
+    startDate &&
+    !startDate.value
+  ){
+
+    startDate.value =
+      new Date()
+        .toISOString()
+        .slice(
+          0,
+          10
+        );
+
+  }
 
 }
 
 
 
 /* =========================================================
-   RENDER PATIENT LIST
+   CLOSE MODAL
+========================================================= */
+
+function closeAdd(){
+
+  document
+    .getElementById(
+      "addPatientModal"
+    )
+    .classList.remove(
+      "show"
+    );
+
+}
+
+
+
+/* =========================================================
+   RENDER PATIENTS
 ========================================================= */
 
 function renderPatients(
@@ -475,31 +691,68 @@ function renderPatients(
       .filter(
         patient => {
 
-          const text =
+          const searchableText =
+
             (
-              patient.name +
-              " " +
-              patient.id
+              patient.name ||
+              ""
             )
-              .toLowerCase();
+
+            +
+
+            " "
+
+            +
+
+            (
+              patient.id ||
+              ""
+            )
+
+            +
+
+            " "
+
+            +
+
+            (
+              patient.phone ||
+              ""
+            )
+
+            +
+
+            " "
+
+            +
+
+            (
+              getPanelName(
+                patient
+              ) || ""
+            );
 
 
-          return text.includes(
-            query
-          );
+          return searchableText
+            .toLowerCase()
+            .includes(
+              query
+            );
 
         }
       );
 
 
 
-  document.getElementById(
-    "patientRows"
-  ).innerHTML =
+  const rows =
+    document.getElementById(
+      "patientRows"
+    );
 
+
+  rows.innerHTML =
 
     patients.length
-
 
       ? patients
           .map(
@@ -524,24 +777,32 @@ function renderPatients(
                       ${patient.name}
                     </strong>
 
+
                     <div
                       style="
-                        font-size:9px;
-                        color:#94A3B8;
+                        font-size:10px;
+                        color:var(--muted);
                         margin-top:3px;
                       "
                     >
-                      ${patient.id}
+                      ${
+                        patient.phone ||
+                        "No phone"
+                      }
                     </div>
 
                   </td>
 
 
+
                   <!-- ID -->
 
                   <td>
+
                     ${patient.id}
+
                   </td>
+
 
 
                   <!-- PANEL -->
@@ -551,26 +812,29 @@ function renderPatients(
                     <span
                       class="panel-chip"
                     >
+
                       ${getPanelName(
                         patient
                       )}
+
                     </span>
 
                   </td>
 
 
-                  <!-- CURRENT WEIGHT -->
+
+                  <!-- CURRENT -->
 
                   <td>
 
                     ${
-                      patient.currentWeight !==
-                      undefined
+                      patient.currentWeight
                         ? `${patient.currentWeight} kg`
                         : "—"
                     }
 
                   </td>
+
 
 
                   <!-- GOAL -->
@@ -586,6 +850,7 @@ function renderPatients(
                   </td>
 
 
+
                   <!-- LAST VISIT -->
 
                   <td>
@@ -598,38 +863,57 @@ function renderPatients(
                   </td>
 
 
+
                   <!-- STATUS -->
 
                   <td>
 
+
                     <span
                       class="
                         badge
+
                         ${
                           patient.status ===
                           "Active"
+
                             ? "green"
-                            : patient.status ===
-                              "Completed"
-                              ? "blue"
-                              : "gray"
+
+                            :
+
+                          patient.status ===
+                          "Completed"
+
+                            ? "blue"
+
+                            : "gray"
                         }
                       "
                     >
-                      ${patient.status}
+
+                      ${
+                        patient.status ||
+                        "Active"
+                      }
+
                     </span>
 
+
                   </td>
+
 
 
                   <!-- OPEN -->
 
                   <td>
 
+
                     <a
                       class="secondary"
                       style="
-                        padding:7px 9px;
+                        padding:
+                          7px
+                          9px;
                       "
                       href="
                         patient-profile.html?patient=${encodeURIComponent(
@@ -637,8 +921,11 @@ function renderPatients(
                         )}
                       "
                     >
+
                       Open →
+
                     </a>
+
 
                   </td>
 
@@ -654,24 +941,26 @@ function renderPatients(
 
       : `
 
-          <tr>
+        <tr>
 
-            <td
-              colspan="8"
-              style="
-                text-align:center;
-                padding:28px;
-                color:var(--muted);
-              "
-            >
 
-              No patients found.
+          <td
+            colspan="8"
+            style="
+              text-align:center;
+              padding:32px;
+              color:var(--muted);
+            "
+          >
 
-            </td>
+            No patients found.
 
-          </tr>
+          </td>
 
-        `;
+
+        </tr>
+
+      `;
 
 
 
@@ -679,32 +968,50 @@ function renderPatients(
      KPI
   ======================================================== */
 
-  const all =
-    store().patients;
+  const allPatients =
+    store()
+      .patients;
 
 
   const active =
-    all.filter(
-      patient =>
-        patient.status ===
-        "Active"
-    ).length;
+    allPatients
+      .filter(
+        patient =>
+          patient.status ===
+          "Active"
+      )
+      .length;
 
 
   const completed =
-    all.filter(
-      patient =>
-        patient.status ===
-        "Completed"
-    ).length;
+    allPatients
+      .filter(
+        patient =>
+          patient.status ===
+          "Completed"
+      )
+      .length;
 
 
   const inactive =
-    all.filter(
-      patient =>
-        patient.status ===
-        "Inactive"
-    ).length;
+    allPatients
+      .filter(
+        patient =>
+          patient.status ===
+          "Inactive"
+      )
+      .length;
+
+
+  const panel =
+    allPatients
+      .filter(
+        patient =>
+          patientUsesPanel(
+            patient
+          )
+      )
+      .length;
 
 
 
@@ -713,15 +1020,19 @@ function renderPatients(
   ).innerHTML = `
 
 
+    <!-- TOTAL -->
+
     <div class="kpi">
 
       <div class="kpi-label">
         TOTAL PATIENTS
       </div>
 
+
       <div class="kpi-value">
-        ${all.length}
+        ${allPatients.length}
       </div>
+
 
       <div class="kpi-sub">
         All registered patients
@@ -730,15 +1041,20 @@ function renderPatients(
     </div>
 
 
+
+    <!-- ACTIVE -->
+
     <div class="kpi">
 
       <div class="kpi-label">
         ACTIVE PATIENTS
       </div>
 
+
       <div class="kpi-value">
         ${active}
       </div>
+
 
       <div class="kpi-sub">
         Currently in program
@@ -747,22 +1063,30 @@ function renderPatients(
     </div>
 
 
+
+    <!-- PANEL -->
+
     <div class="kpi">
 
       <div class="kpi-label">
-        COMPLETED
+        PANEL PATIENTS
       </div>
+
 
       <div class="kpi-value">
-        ${completed}
+        ${panel}
       </div>
 
+
       <div class="kpi-sub">
-        Program completed
+        Using insurance / panel
       </div>
 
     </div>
 
+
+
+    <!-- INACTIVE -->
 
     <div class="kpi">
 
@@ -770,15 +1094,19 @@ function renderPatients(
         INACTIVE
       </div>
 
+
       <div class="kpi-value">
         ${inactive}
       </div>
 
+
       <div class="kpi-sub">
-        Currently inactive
+        ${completed}
+        completed
       </div>
 
     </div>
+
 
   `;
 
@@ -792,62 +1120,114 @@ function renderPatients(
 
 function savePatient(){
 
-
   const name =
-    document.getElementById(
-      "pName"
-    ).value.trim();
+    document
+      .getElementById(
+        "pName"
+      )
+      .value
+      .trim();
 
 
   const patientId =
-    document.getElementById(
-      "pId"
-    ).value.trim();
+    document
+      .getElementById(
+        "pId"
+      )
+      .value
+      .trim();
 
 
   const phone =
-    document.getElementById(
-      "pPhone"
-    ).value.trim();
+    document
+      .getElementById(
+        "pPhone"
+      )
+      .value
+      .trim();
 
 
   const dob =
-    document.getElementById(
-      "pDob"
-    ).value;
+    document
+      .getElementById(
+        "pDob"
+      )
+      .value;
+
+
+  const gender =
+    document
+      .getElementById(
+        "pGender"
+      )
+      .value;
 
 
   const height =
-    document.getElementById(
-      "pHeight"
-    ).value;
+    document
+      .getElementById(
+        "pHeight"
+      )
+      .value;
 
 
   const startingWeight =
     Number(
-      document.getElementById(
-        "pStart"
-      ).value
+      document
+        .getElementById(
+          "pStart"
+        )
+        .value
     ) || 0;
 
 
   const goalWeight =
     Number(
-      document.getElementById(
-        "pGoal"
-      ).value
+      document
+        .getElementById(
+          "pGoal"
+        )
+        .value
     ) || 0;
 
 
+  const startDate =
+    document
+      .getElementById(
+        "pStartDate"
+      )
+      .value;
+
+
   const panelProvider =
-    document.getElementById(
-      "pPanel"
-    ).value;
+    document
+      .getElementById(
+        "pPanel"
+      )
+      .value;
+
+
+  const otherPanelName =
+    document
+      .getElementById(
+        "pOtherPanel"
+      )
+      .value
+      .trim();
+
+
+  const doctor =
+    document
+      .getElementById(
+        "pDoctor"
+      )
+      .value
+      .trim();
 
 
 
   /* =======================================================
-     VALIDATION
+     REQUIRED FIELDS
   ======================================================== */
 
   if(!name){
@@ -857,116 +1237,184 @@ function savePatient(){
     );
 
     return;
+
   }
 
 
   if(!patientId){
 
     alert(
-      "Please enter the patient ID."
+      "Please enter the Patient ID."
     );
 
     return;
+
   }
 
 
 
-  /* Prevent duplicate Patient ID */
+  /* =======================================================
+     DUPLICATE ID
+  ======================================================== */
 
-  const exists =
+  const duplicate =
     store()
       .patients
       .some(
         patient =>
-          patient.id.toLowerCase() ===
-          patientId.toLowerCase()
+
+          patient.id
+            .toLowerCase() ===
+          patientId
+            .toLowerCase()
       );
 
 
-  if(exists){
+  if(duplicate){
 
     alert(
       "This Patient ID already exists."
     );
 
     return;
+
   }
 
 
 
   /* =======================================================
-     CREATE PATIENT OBJECT
+     INITIALS
   ======================================================== */
 
   const initials =
+
     name
-      .split(/\s+/)
-      .filter(Boolean)
+
+      .split(
+        /\s+/
+      )
+
+      .filter(
+        Boolean
+      )
+
       .map(
         part =>
-          part.charAt(0)
+          part
+            .charAt(
+              0
+            )
       )
+
       .join("")
-      .slice(0,2)
+
+      .slice(
+        0,
+        2
+      )
+
       .toUpperCase();
 
 
-  const today =
-    new Date()
-      .toISOString()
-      .slice(0,10);
 
+  /* =======================================================
+     CREATE PATIENT
+  ======================================================== */
 
   const patient = {
 
-    id:patientId,
+    id:
+      patientId,
 
-    name:name,
+
+    name:
+      name,
+
 
     initials:
-      initials || "PT",
+      initials ||
+      "PT",
 
-    status:"Active",
+
+    status:
+      "Active",
+
 
     panelProvider:
       panelProvider,
 
-    otherPanelName:"",
+
+    otherPanelName:
+
+      panelProvider ===
+      "Other"
+
+        ? otherPanelName
+
+        : "",
+
 
     startDate:
-      today,
+      startDate ||
 
-    doctor:"",
 
-    phone:phone,
+      new Date()
+        .toISOString()
+        .slice(
+          0,
+          10
+        ),
 
-    dob:dob,
 
-    height:height,
+    doctor:
+      doctor,
 
-    gender:"",
+
+    phone:
+      phone,
+
+
+    dob:
+      dob,
+
+
+    gender:
+      gender,
+
+
+    height:
+      height,
+
 
     startingWeight:
       startingWeight,
 
+
     currentWeight:
       startingWeight,
+
 
     goalWeight:
       goalWeight,
 
+
     visits:[],
 
-    measurements:[],
 
-    appointments:[]
+    claims:[],
+
+
+    appointments:[],
+
+
+    measurements:[]
 
   };
 
 
 
   /* =======================================================
-     SAVE TO SHARED STORE
+     SAVE
   ======================================================== */
 
   upsertPatient(
@@ -974,54 +1422,99 @@ function savePatient(){
   );
 
 
-  /* Close modal */
+
+  /* =======================================================
+     CLOSE
+  ======================================================== */
 
   closeAdd();
 
 
-  /* Clear fields */
+
+  /* =======================================================
+     CLEAR
+  ======================================================== */
 
   document.getElementById(
     "pName"
   ).value = "";
 
+
   document.getElementById(
     "pId"
   ).value = "";
+
 
   document.getElementById(
     "pPhone"
   ).value = "";
 
+
   document.getElementById(
     "pDob"
   ).value = "";
+
+
+  document.getElementById(
+    "pGender"
+  ).value = "";
+
 
   document.getElementById(
     "pHeight"
   ).value = "";
 
+
   document.getElementById(
     "pStart"
   ).value = "";
 
+
   document.getElementById(
     "pGoal"
   ).value = "";
+
+
+  document.getElementById(
+    "pStartDate"
+  ).value = "";
+
 
   document.getElementById(
     "pPanel"
   ).value = "SELF_PAY";
 
 
-  /* Refresh */
+  document.getElementById(
+    "pOtherPanel"
+  ).value = "";
+
+
+  document.getElementById(
+    "pDoctor"
+  ).value = "";
+
+
+  document.getElementById(
+    "otherPanelGroup"
+  ).style.display =
+    "none";
+
+
+
+  /* =======================================================
+     REFRESH
+  ======================================================== */
 
   renderPatients();
 
   renderNotifications();
 
 
-  /* Go directly to patient profile */
+
+  /* =======================================================
+     OPEN NEW PATIENT
+  ======================================================== */
 
   setTimeout(
     () => {
@@ -1046,9 +1539,7 @@ function savePatient(){
 
 renderPatients();
 
-
 renderNotifications();
-
 
 </script>
 
