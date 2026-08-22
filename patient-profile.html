@@ -30,6 +30,7 @@
 <div id="root"></div>
 
 
+
 <!-- =========================================================
      ADD / EDIT VISIT MODAL
 ========================================================= -->
@@ -39,10 +40,16 @@
   id="visitModal"
 >
 
-  <div class="modal">
+  <div
+    class="modal"
+    style="
+      width:min(920px,96vw);
+    "
+  >
 
 
     <div class="modal-head">
+
 
       <div>
 
@@ -50,8 +57,9 @@
           Add Visit Record
         </h2>
 
+
         <p id="visitModalSub">
-          Complete visit record
+          Record the patient's visit.
         </p>
 
       </div>
@@ -60,12 +68,14 @@
       <button
         type="button"
         class="modal-close"
-        onclick="closeVisitModal()"
+        onclick="closeVisit()"
       >
         ×
       </button>
 
+
     </div>
+
 
 
     <div class="modal-body">
@@ -75,7 +85,9 @@
            VISIT INFORMATION
       ==================================================== -->
 
-      <div class="visit-section-title">
+      <div
+        class="visit-section-title"
+      >
         Visit Information
       </div>
 
@@ -89,12 +101,14 @@
             Visit Date
           </label>
 
+
           <input
-            id="vDate"
             type="date"
+            id="vDate"
           >
 
         </div>
+
 
 
         <div class="form-group">
@@ -102,6 +116,7 @@
           <label>
             Visit Number
           </label>
+
 
           <input
             id="vNumber"
@@ -111,15 +126,56 @@
         </div>
 
 
-        <div class="form-group full">
+
+        <div
+          class="form-group full"
+        >
 
           <label>
             Visit Type
           </label>
 
+
           <input
             id="vType"
-            placeholder="e.g. Weekly Follow-Up"
+            placeholder="e.g. Weekly Follow-Up / Treatment / Body Composition"
+          >
+
+        </div>
+
+
+        <div
+          class="form-group"
+        >
+
+          <label>
+            Weight (kg)
+          </label>
+
+
+          <input
+            id="vWeight"
+            type="number"
+            min="0"
+            step="0.1"
+            placeholder="Current weight"
+          >
+
+        </div>
+
+
+        <div
+          class="form-group"
+        >
+
+          <label>
+            Invoice / Visit Reference
+          </label>
+
+
+          <input
+            id="vInvoiceRef"
+            placeholder="Optional invoice number"
           >
 
         </div>
@@ -133,22 +189,34 @@
            ARBOLEAF
       ==================================================== -->
 
-      <div class="visit-section-title">
+      <div
+        class="visit-section-title"
+      >
         Arboleaf
       </div>
 
 
-      <div class="form-group">
+      <div
+        class="form-grid"
+      >
 
-        <label>
-          Arboleaf Body Composition PDF
-        </label>
-
-        <input
-          type="file"
-          id="vPdf"
-          accept="application/pdf"
+        <div
+          class="form-group full"
         >
+
+          <label>
+            Arboleaf Body Composition PDF
+          </label>
+
+
+          <input
+            type="file"
+            id="vPdf"
+            accept="application/pdf"
+          >
+
+        </div>
+
 
       </div>
 
@@ -158,19 +226,26 @@
            FULL BODY PHOTOS
       ==================================================== -->
 
-      <div class="visit-section-title">
+      <div
+        class="visit-section-title"
+      >
         Full Body Photos
       </div>
 
 
-      <div class="form-grid">
+      <div
+        class="form-grid"
+      >
 
 
-        <div class="form-group">
+        <div
+          class="form-group"
+        >
 
           <label>
             Front
           </label>
+
 
           <input
             type="file"
@@ -181,11 +256,15 @@
         </div>
 
 
-        <div class="form-group">
+
+        <div
+          class="form-group"
+        >
 
           <label>
             Side
           </label>
+
 
           <input
             type="file"
@@ -196,11 +275,15 @@
         </div>
 
 
-        <div class="form-group">
+
+        <div
+          class="form-group"
+        >
 
           <label>
             Back
           </label>
+
 
           <input
             type="file"
@@ -219,12 +302,16 @@
            VISIT CHARGES & PAYMENT
       ==================================================== -->
 
-      <div class="visit-section-title">
+      <div
+        class="visit-section-title"
+      >
         Visit Charges & Payment
       </div>
 
 
-      <div class="table-wrap">
+      <div
+        class="table-wrap"
+      >
 
 
         <table class="table">
@@ -258,19 +345,25 @@
 
             <tr>
 
+
               <td>
+
                 <strong>
                   Injection
                 </strong>
+
               </td>
 
+
               <td>
+
 
                 <input
                   class="claim-input"
                   id="vInjection"
                   placeholder="Injection type"
                 >
+
 
                 <input
                   class="claim-input"
@@ -281,8 +374,9 @@
                   "
                 >
 
+
                 <textarea
-                  id="vInjectionNotes"
+                  id="vInjNote"
                   class="form-group textarea"
                   placeholder="Injection notes"
                   style="
@@ -292,20 +386,25 @@
                   "
                 ></textarea>
 
+
               </td>
+
 
               <td>
 
+
                 <input
                   class="claim-input"
-                  id="vInjectionPrice"
+                  id="vInjPrice"
                   type="number"
                   min="0"
                   step="0.01"
                   placeholder="0.00"
                 >
 
+
               </td>
+
 
             </tr>
 
@@ -315,22 +414,28 @@
 
             <tr>
 
+
               <td>
+
                 <strong>
                   Medication
                 </strong>
+
               </td>
+
 
               <td>
 
+
                 <input
                   class="claim-input"
-                  id="vMedication"
+                  id="vMed"
                   placeholder="Medication / supplement"
                 >
 
+
                 <textarea
-                  id="vMedicationNotes"
+                  id="vMedNote"
                   class="form-group textarea"
                   placeholder="Medication notes"
                   style="
@@ -340,20 +445,25 @@
                   "
                 ></textarea>
 
+
               </td>
+
 
               <td>
 
+
                 <input
                   class="claim-input"
-                  id="vMedicationPrice"
+                  id="vMedPrice"
                   type="number"
                   min="0"
                   step="0.01"
                   placeholder="0.00"
                 >
 
+
               </td>
+
 
             </tr>
 
@@ -363,22 +473,28 @@
 
             <tr>
 
+
               <td>
+
                 <strong>
                   Treatment
                 </strong>
+
               </td>
+
 
               <td>
 
+
                 <input
                   class="claim-input"
-                  id="vTreatment"
+                  id="vTreat"
                   placeholder="Treatment received"
                 >
 
+
                 <textarea
-                  id="vTreatmentNotes"
+                  id="vTreatNote"
                   class="form-group textarea"
                   placeholder="Treatment notes"
                   style="
@@ -388,20 +504,25 @@
                   "
                 ></textarea>
 
+
               </td>
+
 
               <td>
 
+
                 <input
                   class="claim-input"
-                  id="vTreatmentPrice"
+                  id="vTreatPrice"
                   type="number"
                   min="0"
                   step="0.01"
                   placeholder="0.00"
                 >
 
+
               </td>
+
 
             </tr>
 
@@ -411,22 +532,28 @@
 
             <tr>
 
+
               <td>
+
                 <strong>
                   Additional
                 </strong>
+
               </td>
+
 
               <td>
 
+
                 <input
                   class="claim-input"
-                  id="vAdditional"
+                  id="vOther"
                   placeholder="Additional item / service"
                 >
 
+
                 <textarea
-                  id="vAdditionalNotes"
+                  id="vOtherNote"
                   class="form-group textarea"
                   placeholder="Additional notes"
                   style="
@@ -436,20 +563,25 @@
                   "
                 ></textarea>
 
+
               </td>
+
 
               <td>
 
+
                 <input
                   class="claim-input"
-                  id="vAdditionalPrice"
+                  id="vOtherPrice"
                   type="number"
                   min="0"
                   step="0.01"
                   placeholder="0.00"
                 >
 
+
               </td>
+
 
             </tr>
 
@@ -476,12 +608,13 @@
       >
 
         <div class="label">
-          Visit Total
+          VISIT TOTAL
         </div>
+
 
         <div
           class="value"
-          id="vTotal"
+          id="visitTotal"
         >
           RM 0.00
         </div>
@@ -494,22 +627,28 @@
            PAYMENT ALLOCATION
       ==================================================== -->
 
-      <div class="visit-section-title">
+      <div
+        class="visit-section-title"
+      >
         Payment Allocation
       </div>
 
 
-      <div class="claim-grid">
+      <div
+        class="claim-grid"
+      >
 
 
         <div
           class="form-group"
-          id="panelPaymentGroup"
         >
 
-          <label id="panelPaymentLabel">
+          <label
+            id="panelPaymentLabel"
+          >
             Panel / Insurance
           </label>
+
 
           <input
             class="claim-input"
@@ -523,11 +662,15 @@
         </div>
 
 
-        <div class="form-group">
+
+        <div
+          class="form-group"
+        >
 
           <label>
             Self-Pay / Co-Payment
           </label>
+
 
           <input
             class="claim-input"
@@ -545,10 +688,10 @@
 
 
       <div
-        id="vValidation"
+        id="paymentValidation"
         class="badge gray"
         style="
-          margin-top:9px;
+          margin-top:10px;
         "
       >
         Enter the visit charges.
@@ -560,12 +703,16 @@
            VISIT NOTES
       ==================================================== -->
 
-      <div class="visit-section-title">
+      <div
+        class="visit-section-title"
+      >
         Visit Notes
       </div>
 
 
-      <div class="form-group">
+      <div
+        class="form-group"
+      >
 
         <textarea
           id="vNotes"
@@ -578,12 +725,16 @@
     </div>
 
 
-    <div class="modal-foot">
+
+    <div
+      class="modal-foot"
+    >
+
 
       <button
         type="button"
         class="secondary"
-        onclick="closeVisitModal()"
+        onclick="closeVisit()"
       >
         Cancel
       </button>
@@ -592,10 +743,11 @@
       <button
         type="button"
         class="primary"
-        onclick="saveVisitRecord()"
+        onclick="saveVisit()"
       >
         Save Visit
       </button>
+
 
     </div>
 
@@ -606,26 +758,207 @@
 
 
 
+
 <!-- =========================================================
-     PATIENT PROFILE
+     ADD / EDIT CLAIM MODAL
 ========================================================= -->
+
+<div
+  class="modal-wrap"
+  id="claimModal"
+>
+
+  <div class="modal">
+
+
+    <div class="modal-head">
+
+
+      <div>
+
+        <h2
+          id="claimModalTitle"
+        >
+          Add Claim
+        </h2>
+
+
+        <p>
+          Claim can be recorded on the visit date,
+          a later date, or a day when the patient did not visit.
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="modal-close"
+        onclick="closeClaimModal()"
+      >
+        ×
+      </button>
+
+
+    </div>
+
+
+
+    <div class="modal-body">
+
+
+      <div
+        class="form-grid"
+      >
+
+
+        <!-- CLAIM DATE -->
+
+        <div
+          class="form-group"
+        >
+
+          <label>
+            Claim Date
+          </label>
+
+
+          <input
+            type="date"
+            id="claimDateInput"
+          >
+
+        </div>
+
+
+
+        <!-- CLAIM AMOUNT -->
+
+        <div
+          class="form-group"
+        >
+
+          <label>
+            Claim Amount
+          </label>
+
+
+          <input
+            type="number"
+            id="claimAmountInput"
+            min="0"
+            step="0.01"
+            placeholder="e.g. 200.00"
+          >
+
+        </div>
+
+
+
+        <!-- RELATED VISIT -->
+
+        <div
+          class="form-group full"
+        >
+
+          <label>
+            Related Visit (Optional)
+          </label>
+
+
+          <select
+            id="claimVisitInput"
+          ></select>
+
+        </div>
+
+
+
+        <!-- NOTES -->
+
+        <div
+          class="form-group full"
+        >
+
+          <label>
+            Claim Notes
+          </label>
+
+
+          <textarea
+            id="claimNotesInput"
+            placeholder="e.g. Split claim / continued claim / insurer limit..."
+          ></textarea>
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+
+
+    <div
+      class="modal-foot"
+    >
+
+
+      <button
+        type="button"
+        class="secondary"
+        onclick="closeClaimModal()"
+      >
+        Cancel
+      </button>
+
+
+      <button
+        type="button"
+        class="primary"
+        onclick="saveClaim()"
+      >
+        Save Claim
+      </button>
+
+
+    </div>
+
+
+  </div>
+
+</div>
+
+
+
 
 <script>
 
 
-const patientId =
+/* =========================================================
+   PATIENT
+========================================================= */
+
+const params =
   new URLSearchParams(
     window.location.search
-  ).get("patient");
-
-
-let patient =
-  getPatient(
-    patientId || "PAT-0001"
   );
 
 
-if(!patient){
+const id =
+  params.get(
+    "patient"
+  );
+
+
+let p =
+  getPatient(
+    id
+  );
+
+
+if(!p){
 
   document.body.innerHTML = `
 
@@ -635,7 +968,6 @@ if(!patient){
         display:grid;
         place-items:center;
         padding:30px;
-        font-family:Poppins,Arial,sans-serif;
       "
     >
 
@@ -649,18 +981,20 @@ if(!patient){
           Patient not found
         </h2>
 
+
         <p
           style="
-            color:#64748B;
-            font-size:14px;
+            color:var(--muted);
+            font-size:12px;
           "
         >
           The patient record could not be found.
         </p>
 
+
         <a
-          class="primary"
           href="patients.html"
+          class="primary"
         >
           Back to Patients
         </a>
@@ -671,6 +1005,7 @@ if(!patient){
 
   `;
 
+
   throw new Error(
     "Patient not found"
   );
@@ -680,7 +1015,7 @@ if(!patient){
 
 
 /* =========================================================
-   PAGE LAYOUT
+   PAGE
 ========================================================= */
 
 document.getElementById(
@@ -697,49 +1032,67 @@ shell(
 
   `
 
+
     <a
-      class="back"
       href="patients.html"
+      class="back"
     >
       ← Back to Patients
     </a>
 
 
 
-    <!-- =================================================
+    <!-- ===================================================
          PATIENT HERO
-    ================================================== -->
+    ==================================================== -->
 
-    <div class="patient-hero">
+    <div
+      class="patient-hero"
+    >
 
 
-      <div class="patient-main">
+      <div
+        class="patient-main"
+      >
 
 
         <div
           class="patient-avatar"
           id="patientAvatar"
         >
-          ${patient.initials}
+          ${p.initials}
         </div>
 
 
-        <div class="patient-heading">
 
-          <h1 id="patientName">
-            ${patient.name}
+        <div
+          class="patient-heading"
+        >
+
+
+          <h1
+            id="patientName"
+          >
+            ${p.name}
           </h1>
 
 
-          <div class="meta">
+          <div
+            class="meta"
+          >
 
-            <span id="patientId">
-              ${patient.id}
+
+            <span
+              id="patientId"
+            >
+              ${p.id}
             </span>
+
 
             <span>
               •
             </span>
+
 
             <span>
               Weight Loss Program
@@ -750,7 +1103,7 @@ shell(
               class="badge green"
               id="patientStatus"
             >
-              ${patient.status}
+              ${p.status}
             </span>
 
 
@@ -758,8 +1111,9 @@ shell(
               class="panel-chip"
               id="patientPaymentBadge"
             >
-              ${getPanelName(patient)}
+              ${getPanelName(p)}
             </span>
+
 
           </div>
 
@@ -770,52 +1124,67 @@ shell(
       </div>
 
 
-      <div class="hero-details">
+
+      <div
+        class="hero-details"
+      >
 
 
-        <div class="hero-detail">
+        <div
+          class="hero-detail"
+        >
 
-          <span class="hero-label">
+          <span
+            class="hero-label"
+          >
             Program Started
           </span>
+
 
           <span
             class="hero-value"
             id="programStart"
           >
-            ${patient.startDate || "—"}
+            ${p.startDate || "—"}
           </span>
 
         </div>
 
 
-        <div class="hero-detail">
 
-          <span class="hero-label">
+        <div
+          class="hero-detail"
+        >
+
+          <span
+            class="hero-label"
+          >
             Last Visit
           </span>
+
 
           <span
             class="hero-value"
             id="lastVisit"
           >
-            ${latestVisit(patient)?.dateKey || "—"}
+            ${
+              latestVisit(p)
+                ?.dateKey ||
+              "—"
+            }
           </span>
 
         </div>
 
 
-        <div class="hero-detail">
 
-          <button
-            type="button"
-            class="secondary"
-            onclick="editPatient()"
-          >
-            ✎ Edit Patient
-          </button>
-
-        </div>
+        <button
+          type="button"
+          class="secondary"
+          onclick="editPatient()"
+        >
+          ✎ Edit Patient
+        </button>
 
 
       </div>
@@ -825,16 +1194,22 @@ shell(
 
 
 
-    <!-- =================================================
-         FINANCIAL SUMMARY
-    ================================================== -->
+    <!-- ===================================================
+         FINANCE
+    ==================================================== -->
 
     <div
       class="card"
-      style="margin-bottom:15px"
+      style="
+        margin-bottom:15px;
+      "
     >
 
-      <div class="card-head">
+
+      <div
+        class="card-head"
+      >
+
 
         <div>
 
@@ -842,81 +1217,118 @@ shell(
             Program Financial Summary
           </h2>
 
+
           <p>
-            Automatically calculated from every recorded visit.
+            Automatically calculated from recorded visits and claims.
           </p>
 
         </div>
 
+
       </div>
 
 
-      <div class="card-body">
+      <div
+        class="card-body"
+      >
 
 
         <div
           class="finance-grid"
-          id="financeGrid"
+          id="finance"
         ></div>
 
 
         <div
           class="breakdown"
-          id="financeBreakdown"
+          id="breakdown"
         ></div>
 
 
       </div>
 
+
     </div>
 
 
 
-    <!-- =================================================
+    <!-- ===================================================
          TABS
-    ================================================== -->
+    ==================================================== -->
 
-    <div class="patient-tabs">
+    <div
+      class="patient-tabs"
+    >
 
 
       <button
         class="active"
-        onclick="showTab('overview',this)"
+        onclick="
+          showSection(
+            'overview',
+            this
+          )
+        "
       >
         Overview
       </button>
 
 
       <button
-        onclick="showTab('visits',this)"
+        onclick="
+          showSection(
+            'visits',
+            this
+          )
+        "
       >
         Visits
       </button>
 
 
       <button
-        onclick="showTab('composition',this)"
+        onclick="
+          showSection(
+            'composition',
+            this
+          )
+        "
       >
         Body Composition
       </button>
 
 
       <button
-        onclick="showTab('files',this)"
+        onclick="
+          showSection(
+            'files',
+            this
+          )
+        "
       >
         Files & Photos
       </button>
 
 
       <button
-        onclick="showTab('appointments',this)"
+        onclick="
+          showSection(
+            'appointments',
+            this
+          )
+        "
       >
         Appointments
       </button>
 
 
       <button
-        onclick="showTab('claims',this)"
+        onclick="
+          showSection(
+            'claims',
+            this
+          )
+        "
       >
         Panel Claims
       </button>
@@ -926,16 +1338,19 @@ shell(
 
 
 
-    <!-- =================================================
+    <!-- ===================================================
          OVERVIEW
-    ================================================== -->
+    ==================================================== -->
 
     <section
-      id="section-overview"
+      id="sec-overview"
       class="card"
     >
 
-      <div class="card-head">
+
+      <div
+        class="card-head"
+      >
 
 
         <div>
@@ -944,8 +1359,9 @@ shell(
             Recent Visits
           </h2>
 
+
           <p>
-            Select a visit to view the complete record.
+            Select a visit to view its record.
           </p>
 
         </div>
@@ -954,7 +1370,7 @@ shell(
         <button
           type="button"
           class="primary"
-          onclick="openAddVisit()"
+          onclick="openVisit()"
         >
           ＋ Add Visit
         </button>
@@ -964,8 +1380,8 @@ shell(
 
 
       <div
-        class="list"
         id="overviewVisits"
+        class="list"
       ></div>
 
 
@@ -973,20 +1389,23 @@ shell(
 
 
 
-    <!-- =================================================
+    <!-- ===================================================
          VISITS
-    ================================================== -->
+    ==================================================== -->
 
     <section
-      id="section-visits"
+      id="sec-visits"
       class="card"
       style="
         display:none;
-        margin-top:15px;
+        margin-top:14px;
       "
     >
 
-      <div class="card-head">
+
+      <div
+        class="card-head"
+      >
 
 
         <div>
@@ -995,8 +1414,9 @@ shell(
             Visit History
           </h2>
 
+
           <p>
-            Every visit is stored as one complete record.
+            Each visit contains its treatment, medication, injection and charges.
           </p>
 
         </div>
@@ -1005,7 +1425,7 @@ shell(
         <button
           type="button"
           class="primary"
-          onclick="openAddVisit()"
+          onclick="openVisit()"
         >
           ＋ Add Visit
         </button>
@@ -1014,13 +1434,18 @@ shell(
       </div>
 
 
-      <div class="table-wrap">
+      <div
+        class="table-wrap"
+      >
 
 
-        <table class="table">
+        <table
+          class="table"
+        >
 
 
           <thead>
+
 
             <tr>
 
@@ -1028,34 +1453,39 @@ shell(
                 Visit Date
               </th>
 
+
               <th>
                 Visit
               </th>
+
 
               <th>
                 Type
               </th>
 
+
               <th>
                 Injection
               </th>
+
 
               <th>
                 Weight
               </th>
 
+
               <th>
                 Invoice
               </th>
+
 
               <th>
                 Status
               </th>
 
-              <th>
-              </th>
 
             </tr>
+
 
           </thead>
 
@@ -1075,20 +1505,24 @@ shell(
 
 
 
-    <!-- =================================================
+    <!-- ===================================================
          BODY COMPOSITION
-    ================================================== -->
+    ==================================================== -->
 
     <section
-      id="section-composition"
+      id="sec-composition"
       class="card"
       style="
         display:none;
-        margin-top:15px;
+        margin-top:14px;
       "
     >
 
-      <div class="card-head">
+
+      <div
+        class="card-head"
+      >
+
 
         <div>
 
@@ -1096,18 +1530,20 @@ shell(
             Body Composition
           </h2>
 
+
           <p>
             Arboleaf measurements associated with patient visits.
           </p>
 
         </div>
 
+
       </div>
 
 
       <div
         class="card-body"
-        id="compositionContent"
+        id="composition"
       ></div>
 
 
@@ -1115,20 +1551,24 @@ shell(
 
 
 
-    <!-- =================================================
+    <!-- ===================================================
          FILES & PHOTOS
-    ================================================== -->
+    ==================================================== -->
 
     <section
-      id="section-files"
+      id="sec-files"
       class="card"
       style="
         display:none;
-        margin-top:15px;
+        margin-top:14px;
       "
     >
 
-      <div class="card-head">
+
+      <div
+        class="card-head"
+      >
+
 
         <div>
 
@@ -1136,17 +1576,18 @@ shell(
             Files & Photos
           </h2>
 
+
           <p>
-            Files remain associated with their specific visit.
+            Files belong to their individual visits.
           </p>
 
         </div>
+
 
       </div>
 
 
       <div
-        class="list"
         id="filesRows"
       ></div>
 
@@ -1155,20 +1596,24 @@ shell(
 
 
 
-    <!-- =================================================
+    <!-- ===================================================
          APPOINTMENTS
-    ================================================== -->
+    ==================================================== -->
 
     <section
-      id="section-appointments"
+      id="sec-appointments"
       class="card"
       style="
         display:none;
-        margin-top:15px;
+        margin-top:14px;
       "
     >
 
-      <div class="card-head">
+
+      <div
+        class="card-head"
+      >
+
 
         <div>
 
@@ -1176,39 +1621,49 @@ shell(
             Appointments
           </h2>
 
+
           <p>
-            Patient-specific appointments.
+            Patient-specific appointment records.
           </p>
 
         </div>
+
 
       </div>
 
 
       <div
-        class="list"
-        id="appointmentRows"
-      ></div>
+        class="notif-empty"
+      >
+
+        Appointment records are managed
+        from the Appointments page.
+
+      </div>
 
 
     </section>
 
 
 
-    <!-- =================================================
+    <!-- ===================================================
          PANEL CLAIMS
-    ================================================== -->
+    ==================================================== -->
 
     <section
-      id="section-claims"
+      id="sec-claims"
       class="card"
       style="
         display:none;
-        margin-top:15px;
+        margin-top:14px;
       "
     >
 
-      <div class="card-head">
+
+      <div
+        class="card-head"
+      >
+
 
         <div>
 
@@ -1216,16 +1671,29 @@ shell(
             Panel Claims
           </h2>
 
+
           <p>
-            Claim amount/date are entered separately from the treatment date.
+            Claim transactions can be entered separately from treatment dates.
           </p>
 
         </div>
 
+
+        <button
+          type="button"
+          class="primary"
+          onclick="openClaimModal()"
+        >
+          ＋ Add Claim
+        </button>
+
+
       </div>
 
 
-      <div class="card-body">
+      <div
+        class="card-body"
+      >
 
 
         <div
@@ -1237,44 +1705,47 @@ shell(
       </div>
 
 
-      <div class="table-wrap">
+      <div
+        class="table-wrap"
+      >
 
 
-        <table class="table">
+        <table
+          class="table"
+        >
 
 
           <thead>
 
+
             <tr>
-
-              <th>
-                Visit
-              </th>
-
-              <th>
-                Visit Date
-              </th>
-
-              <th>
-                Invoice Total
-              </th>
-
-              <th>
-                Panel Eligible
-              </th>
-
-              <th>
-                Claim Amount
-              </th>
 
               <th>
                 Claim Date
               </th>
 
+
+              <th>
+                Related Visit
+              </th>
+
+
+              <th>
+                Claim Amount
+              </th>
+
+
+              <th>
+                Notes
+              </th>
+
+
               <th>
               </th>
 
+
             </tr>
+
 
           </thead>
 
@@ -1303,26 +1774,29 @@ shell(
    TAB SWITCHING
 ========================================================= */
 
-function showTab(
-  tab,
+function showSection(
+  section,
   button
 ){
 
   document
     .querySelectorAll(
-      "[id^='section-']"
+      "[id^='sec-']"
     )
-    .forEach(section => {
+    .forEach(
+      element => {
 
-      section.style.display =
-        "none";
+        element.style.display =
+          "none";
 
-    });
+      }
+    );
 
 
   const target =
     document.getElementById(
-      "section-" + tab
+      "sec-" +
+      section
     );
 
 
@@ -1338,13 +1812,15 @@ function showTab(
     .querySelectorAll(
       ".patient-tabs button"
     )
-    .forEach(btn => {
+    .forEach(
+      tab => {
 
-      btn.classList.remove(
-        "active"
-      );
+        tab.classList.remove(
+          "active"
+        );
 
-    });
+      }
+    );
 
 
   if(button){
@@ -1356,223 +1832,15 @@ function showTab(
   }
 
 
-  if(tab === "composition"){
+
+  if(
+    section ===
+    "composition"
+  ){
 
     renderComposition();
 
   }
-
-}
-
-
-
-/* =========================================================
-   FINANCE
-========================================================= */
-
-function renderFinance(){
-
-  patient =
-    getPatient(
-      patientId
-    );
-
-
-  const data =
-    finance(
-      patient
-    );
-
-
-  const hasPanel =
-    patientUsesPanel(
-      patient
-    );
-
-
-  const financeGrid =
-    document.getElementById(
-      "financeGrid"
-    );
-
-
-  const breakdown =
-    document.getElementById(
-      "financeBreakdown"
-    );
-
-
-  if(hasPanel){
-
-    financeGrid.innerHTML = `
-
-      <div class="finance-card">
-
-        <div class="label">
-          GRAND TOTAL
-        </div>
-
-        <div class="value">
-          ${money(
-            data.grand
-          )}
-        </div>
-
-      </div>
-
-
-      <div class="finance-card">
-
-        <div class="label">
-          TOTAL CLAIMED
-        </div>
-
-        <div class="value">
-          ${money(
-            data.claimed
-          )}
-        </div>
-
-      </div>
-
-
-      <div
-        class="
-          finance-card
-          balance
-        "
-      >
-
-        <div class="label">
-          BALANCE TO CLAIM
-        </div>
-
-        <div class="value">
-          ${money(
-            data.balance
-          )}
-        </div>
-
-      </div>
-
-    `;
-
-  }else{
-
-    financeGrid.innerHTML = `
-
-      <div class="finance-card">
-
-        <div class="label">
-          GRAND TOTAL
-        </div>
-
-        <div class="value">
-          ${money(
-            data.grand
-          )}
-        </div>
-
-      </div>
-
-
-      <div class="finance-card">
-
-        <div class="label">
-          TOTAL INJECTION
-        </div>
-
-        <div class="value">
-          ${money(
-            data.injection
-          )}
-        </div>
-
-      </div>
-
-
-      <div class="finance-card">
-
-        <div class="label">
-          TOTAL MEDICATION
-        </div>
-
-        <div class="value">
-          ${money(
-            data.medication
-          )}
-        </div>
-
-      </div>
-
-    `;
-
-  }
-
-
-
-  breakdown.innerHTML = `
-
-    <div class="break">
-
-      <span>
-        Total Injection
-      </span>
-
-      <strong>
-        ${money(
-          data.injection
-        )}
-      </strong>
-
-    </div>
-
-
-    <div class="break">
-
-      <span>
-        Total Medication
-      </span>
-
-      <strong>
-        ${money(
-          data.medication
-        )}
-      </strong>
-
-    </div>
-
-
-    <div class="break">
-
-      <span>
-        Total Treatment
-      </span>
-
-      <strong>
-        ${money(
-          data.treatment
-        )}
-      </strong>
-
-    </div>
-
-
-    <div class="break">
-
-      <span>
-        Self-Pay / Co-Payment
-      </span>
-
-      <strong>
-        ${money(
-          data.selfpay
-        )}
-      </strong>
-
-    </div>
-
-  `;
 
 }
 
@@ -1587,13 +1855,18 @@ function money(
 ){
 
   return "RM " +
+
     Number(
       value || 0
-    ).toLocaleString(
+    )
+    .toLocaleString(
       "en-MY",
       {
-        minimumFractionDigits:2,
-        maximumFractionDigits:2
+        minimumFractionDigits:
+          2,
+
+        maximumFractionDigits:
+          2
       }
     );
 
@@ -1602,137 +1875,574 @@ function money(
 
 
 /* =========================================================
-   OVERVIEW VISITS
+   REFRESH PAGE
 ========================================================= */
 
-function renderOverviewVisits(){
+function refresh(){
 
-  const container =
+  p =
+    getPatient(
+      id
+    );
+
+
+  if(!p){
+
+    return;
+
+  }
+
+
+  const f =
+    finance(
+      p
+    );
+
+
+
+  /* =======================================================
+     HEADER
+  ======================================================== */
+
+  const avatar =
+    document.getElementById(
+      "patientAvatar"
+    );
+
+
+  const name =
+    document.getElementById(
+      "patientName"
+    );
+
+
+  const patientId =
+    document.getElementById(
+      "patientId"
+    );
+
+
+  const status =
+    document.getElementById(
+      "patientStatus"
+    );
+
+
+  const payment =
+    document.getElementById(
+      "patientPaymentBadge"
+    );
+
+
+  const programStart =
+    document.getElementById(
+      "programStart"
+    );
+
+
+  const lastVisit =
+    document.getElementById(
+      "lastVisit"
+    );
+
+
+  if(avatar){
+
+    avatar.textContent =
+      p.initials ||
+      "PT";
+
+  }
+
+
+  if(name){
+
+    name.textContent =
+      p.name;
+
+  }
+
+
+  if(patientId){
+
+    patientId.textContent =
+      p.id;
+
+  }
+
+
+  if(status){
+
+    status.textContent =
+      p.status ||
+      "Active";
+
+  }
+
+
+  if(payment){
+
+    payment.textContent =
+      getPanelName(
+        p
+      );
+
+  }
+
+
+  if(programStart){
+
+    programStart.textContent =
+      p.startDate ||
+      "—";
+
+  }
+
+
+  if(lastVisit){
+
+    lastVisit.textContent =
+      latestVisit(
+        p
+      )?.dateKey ||
+      "—";
+
+  }
+
+
+
+  /* =======================================================
+     FINANCE
+  ======================================================== */
+
+  const financeContainer =
+    document.getElementById(
+      "finance"
+    );
+
+
+  if(financeContainer){
+
+    if(
+      patientUsesPanel(
+        p
+      )
+    ){
+
+      financeContainer.innerHTML = `
+
+
+        <div
+          class="finance-card"
+        >
+
+          <div
+            class="label"
+          >
+            GRAND TOTAL
+          </div>
+
+
+          <div
+            class="value"
+          >
+            ${money(
+              f.grand
+            )}
+          </div>
+
+        </div>
+
+
+
+        <div
+          class="finance-card"
+        >
+
+          <div
+            class="label"
+          >
+            TOTAL CLAIMED
+          </div>
+
+
+          <div
+            class="value"
+          >
+            ${money(
+              f.claimed
+            )}
+          </div>
+
+        </div>
+
+
+
+        <div
+          class="
+            finance-card
+            balance
+          "
+        >
+
+          <div
+            class="label"
+          >
+            BALANCE TO CLAIM
+          </div>
+
+
+          <div
+            class="value"
+          >
+            ${money(
+              f.balance
+            )}
+          </div>
+
+        </div>
+
+
+      `;
+
+    }else{
+
+
+      financeContainer.innerHTML = `
+
+
+        <div
+          class="finance-card"
+        >
+
+          <div
+            class="label"
+          >
+            GRAND TOTAL
+          </div>
+
+
+          <div
+            class="value"
+          >
+            ${money(
+              f.grand
+            )}
+          </div>
+
+        </div>
+
+
+
+        <div
+          class="finance-card"
+        >
+
+          <div
+            class="label"
+          >
+            TOTAL INJECTION
+          </div>
+
+
+          <div
+            class="value"
+          >
+            ${money(
+              f.injection
+            )}
+          </div>
+
+        </div>
+
+
+
+        <div
+          class="finance-card"
+        >
+
+          <div
+            class="label"
+          >
+            TOTAL MEDICATION
+          </div>
+
+
+          <div
+            class="value"
+          >
+            ${money(
+              f.medication
+            )}
+          </div>
+
+        </div>
+
+
+      `;
+
+    }
+
+  }
+
+
+
+  /* =======================================================
+     BREAKDOWN
+  ======================================================== */
+
+  const breakdown =
+    document.getElementById(
+      "breakdown"
+    );
+
+
+  if(breakdown){
+
+    breakdown.innerHTML = `
+
+
+      <div
+        class="break"
+      >
+
+        <span>
+          Total Injection
+        </span>
+
+
+        <strong>
+          ${money(
+            f.injection
+          )}
+        </strong>
+
+      </div>
+
+
+
+      <div
+        class="break"
+      >
+
+        <span>
+          Total Medication
+        </span>
+
+
+        <strong>
+          ${money(
+            f.medication
+          )}
+        </strong>
+
+      </div>
+
+
+
+      <div
+        class="break"
+      >
+
+        <span>
+          Total Treatment
+        </span>
+
+
+        <strong>
+          ${money(
+            f.treatment
+          )}
+        </strong>
+
+      </div>
+
+
+
+      <div
+        class="break"
+      >
+
+        <span>
+          Self-Pay / Co-Payment
+        </span>
+
+
+        <strong>
+          ${money(
+            f.selfpay
+          )}
+        </strong>
+
+      </div>
+
+
+    `;
+
+  }
+
+
+
+  /* =======================================================
+     OVERVIEW VISITS
+  ======================================================== */
+
+  const overview =
     document.getElementById(
       "overviewVisits"
     );
 
 
-  if(!container){
-    return;
-  }
+  if(overview){
+
+    overview.innerHTML =
+
+      (
+        p.visits ||
+        []
+      )
+      .length
+
+        ? (
+            p.visits ||
+            []
+          )
+          .slice(
+            0,
+            8
+          )
+          .map(
+            visit => `
+
+              <div
+                class="row"
+              >
 
 
-  const visits =
-    patient.visits || [];
+                <div
+                  class="avatar-small"
+                >
+                  ${
+                    p.initials ||
+                    "PT"
+                  }
+                </div>
 
 
-  if(!visits.length){
-
-    container.innerHTML = `
-
-      <div class="notif-empty">
-
-        No visits recorded yet.
-
-      </div>
-
-    `;
-
-    return;
-  }
+                <div
+                  class="row-main"
+                >
 
 
-  container.innerHTML =
+                  <div
+                    class="row-title"
+                  >
 
-    visits
-      .slice(0,8)
-      .map(
-        visit => `
+                    ${visit.visit}
 
-          <div class="row">
+                    ·
 
+                    ${visit.type}
 
-            <div class="avatar-small">
-              ${patient.initials}
-            </div>
+                  </div>
 
 
-            <div class="row-main">
+                  <div
+                    class="row-sub"
+                  >
 
-              <div class="row-title">
+                    ${visit.dateKey}
 
-                ${visit.visit}
+                    ·
 
-                ·
+                    Invoice
 
-                ${visit.type}
+                    ${money(
+                      visitTotal(
+                        visit
+                      )
+                    )}
+
+                  </div>
+
+
+                </div>
+
+
+                <button
+                  type="button"
+                  class="secondary"
+                  style="
+                    padding:
+                      7px
+                      9px;
+                  "
+                  onclick="
+                    viewVisit(
+                      '${visit.id}'
+                    )
+                  "
+                >
+
+                  View →
+
+                </button>
+
 
               </div>
 
-
-              <div class="row-sub">
-
-                ${visit.dateKey}
-
-                ·
-
-                Invoice
-
-                ${money(
-                  visitTotal(
-                    visit
-                  )
-                )}
-
-              </div>
-
-            </div>
+            `
+          )
+          .join("")
 
 
-            <button
-              type="button"
-              class="secondary"
-              style="
-                padding:7px 9px
-              "
-              onclick="
-                viewVisit('${visit.id}')
-              "
-            >
-              View →
-            </button>
+        : `
 
+          <div
+            class="notif-empty"
+          >
+
+            No visits recorded yet.
 
           </div>
 
-        `
-      )
-      .join("");
+        `;
 
-}
+  }
 
 
 
-/* =========================================================
-   VISIT TABLE
-========================================================= */
+  /* =======================================================
+     VISIT TABLE
+  ======================================================== */
 
-function renderVisits(){
-
-  const body =
+  const visitRows =
     document.getElementById(
       "visitRows"
     );
 
 
-  if(!body){
-    return;
-  }
+  if(visitRows){
 
+    visitRows.innerHTML =
 
-  body.innerHTML =
-
-    (patient.visits || [])
+      (
+        p.visits ||
+        []
+      )
       .map(
         visit => `
 
-          <tr>
+          <tr
+            onclick="
+              viewVisit(
+                '${visit.id}'
+              )
+            "
+            style="
+              cursor:pointer;
+            "
+          >
 
             <td>
               ${visit.dateKey || "—"}
@@ -1740,9 +2450,7 @@ function renderVisits(){
 
 
             <td>
-              <strong>
-                ${visit.visit || "—"}
-              </strong>
+              ${visit.visit || "—"}
             </td>
 
 
@@ -1752,12 +2460,18 @@ function renderVisits(){
 
 
             <td>
-              ${visit.injection || "—"}
+              ${
+                visit.injection ||
+                "—"
+              }
             </td>
 
 
             <td>
-              ${visit.weight || "—"}
+              ${
+                visit.weight ||
+                "—"
+              }
             </td>
 
 
@@ -1772,7 +2486,9 @@ function renderVisits(){
 
             <td>
 
-              <span class="badge green">
+              <span
+                class="badge green"
+              >
 
                 ${
                   visit.status ||
@@ -1784,29 +2500,404 @@ function renderVisits(){
             </td>
 
 
-            <td>
-
-              <button
-                type="button"
-                class="secondary"
-                style="
-                  padding:7px 9px
-                "
-                onclick="
-                  viewVisit('${visit.id}')
-                "
-              >
-                View
-              </button>
-
-            </td>
-
           </tr>
 
         `
       )
-      .join("");
+      .join("")
 
+      ||
+
+      `
+
+        <tr>
+
+          <td
+            colspan="7"
+            style="
+              text-align:center;
+              padding:30px;
+              color:var(--muted);
+            "
+          >
+
+            No visits recorded yet.
+
+          </td>
+
+        </tr>
+
+      `;
+
+  }
+
+
+
+  /* =======================================================
+     FILES
+  ======================================================== */
+
+  const files =
+    document.getElementById(
+      "filesRows"
+    );
+
+
+  if(files){
+
+    files.innerHTML =
+
+      (
+        p.visits ||
+        []
+      )
+      .map(
+        visit => `
+
+          <div
+            class="row"
+          >
+
+            <div
+              class="row-main"
+            >
+
+
+              <div
+                class="row-title"
+              >
+
+                ${visit.visit}
+
+                ·
+
+                ${visit.dateKey}
+
+              </div>
+
+
+              <div
+                class="row-sub"
+              >
+
+                ${
+                  visit.pdfName ||
+                  "No Arboleaf PDF"
+                }
+
+                ·
+
+                photos stored with visit
+
+              </div>
+
+
+            </div>
+
+
+            <button
+              type="button"
+              class="secondary"
+              style="
+                padding:
+                  7px
+                  9px;
+              "
+              onclick="
+                viewVisit(
+                  '${visit.id}'
+                )
+              "
+            >
+
+              View Visit →
+
+            </button>
+
+
+          </div>
+
+        `
+      )
+      .join("")
+
+
+      ||
+
+      `
+
+        <div
+          class="notif-empty"
+        >
+
+          No files recorded yet.
+
+        </div>
+
+      `;
+
+  }
+
+
+
+  /* =======================================================
+     CLAIM SUMMARY
+  ======================================================== */
+
+  const claimSummary =
+    document.getElementById(
+      "claimSummary"
+    );
+
+
+  if(claimSummary){
+
+    claimSummary.innerHTML = `
+
+
+      <div
+        class="finance-card"
+      >
+
+        <div
+          class="label"
+        >
+          GRAND TOTAL
+        </div>
+
+
+        <div
+          class="value"
+        >
+          ${money(
+            f.grand
+          )}
+        </div>
+
+      </div>
+
+
+
+      <div
+        class="finance-card"
+      >
+
+        <div
+          class="label"
+        >
+          TOTAL CLAIMED
+        </div>
+
+
+        <div
+          class="value"
+        >
+          ${money(
+            f.claimed
+          )}
+        </div>
+
+      </div>
+
+
+
+      <div
+        class="
+          finance-card
+          balance
+        "
+      >
+
+        <div
+          class="label"
+        >
+          BALANCE TO CLAIM
+        </div>
+
+
+        <div
+          class="value"
+        >
+          ${money(
+            f.balance
+          )}
+        </div>
+
+      </div>
+
+
+    `;
+
+  }
+
+
+
+  /* =======================================================
+     CLAIM TABLE
+  ======================================================== */
+
+  const claimRows =
+    document.getElementById(
+      "claimRows"
+    );
+
+
+  if(claimRows){
+
+    const claims =
+      ensureClaims(
+        p
+      );
+
+
+    claimRows.innerHTML =
+
+      claims.length
+
+        ? claims
+            .slice()
+            .sort(
+              (
+                a,
+                b
+              ) =>
+
+                (
+                  b.claimDate ||
+                  ""
+                )
+                .localeCompare(
+                  a.claimDate ||
+                  ""
+                )
+            )
+            .map(
+              claim => {
+
+
+                const visit =
+                  (
+                    p.visits ||
+                    []
+                  )
+                  .find(
+                    item =>
+                      item.id ===
+                      claim.visitId
+                  );
+
+
+                return `
+
+                  <tr>
+
+
+                    <td>
+                      ${
+                        claim.claimDate ||
+                        "—"
+                      }
+                    </td>
+
+
+                    <td>
+
+                      ${
+                        visit?.visit ||
+                        "No specific visit"
+                      }
+
+                    </td>
+
+
+                    <td>
+
+                      <strong>
+                        ${money(
+                          claim.amount
+                        )}
+                      </strong>
+
+                    </td>
+
+
+                    <td>
+
+                      ${
+                        claim.notes ||
+                        "—"
+                      }
+
+                    </td>
+
+
+                    <td>
+
+
+                      <button
+                        type="button"
+                        class="secondary"
+                        style="
+                          padding:
+                            7px
+                            9px;
+                        "
+                        onclick="
+                          editClaim(
+                            '${claim.id}'
+                          )
+                        "
+                      >
+
+                        Edit
+
+                      </button>
+
+
+                    </td>
+
+
+                  </tr>
+
+                `;
+
+              }
+            )
+            .join("")
+
+
+        : `
+
+          <tr>
+
+
+            <td
+              colspan="5"
+              style="
+                text-align:center;
+                padding:30px;
+                color:var(--muted);
+              "
+            >
+
+              No claim transactions recorded.
+
+            </td>
+
+
+          </tr>
+
+        `;
+
+  }
+
+
+
+  /* =======================================================
+     BODY COMPOSITION
+  ======================================================== */
+
+  renderComposition();
 
 }
 
@@ -1820,439 +2911,215 @@ function renderComposition(){
 
   const container =
     document.getElementById(
-      "compositionContent"
+      "composition"
     );
 
 
   if(!container){
+
     return;
-  }
 
-
-  container.innerHTML = `
-
-    <div
-      class="notif-empty"
-    >
-
-      Arboleaf body composition data
-      will appear here when measurements
-      are attached to visits.
-
-    </div>
-
-  `;
-
-}
-
-
-
-/* =========================================================
-   FILES
-========================================================= */
-
-function renderFiles(){
-
-  const container =
-    document.getElementById(
-      "filesRows"
-    );
-
-
-  if(!container){
-    return;
   }
 
 
   const visits =
-    patient.visits || [];
+    p.visits || [];
 
 
   if(!visits.length){
 
     container.innerHTML = `
 
-      <div class="notif-empty">
-        No files recorded yet.
+      <div
+        class="notif-empty"
+      >
+
+        Upload an Arboleaf PDF
+        from a visit to show
+        body composition data.
+
       </div>
 
     `;
 
+
     return;
+
   }
 
 
-  container.innerHTML =
-
-    visits
-      .map(
-        visit => `
-
-          <div class="row">
-
-            <div class="row-main">
-
-              <div class="row-title">
-
-                ${visit.visit}
-
-                ·
-
-                ${visit.dateKey}
-
-              </div>
-
-
-              <div class="row-sub">
-
-                ${
-                  visit.pdfName ||
-                  "No Arboleaf PDF recorded"
-                }
-
-              </div>
-
-            </div>
-
-
-            <span class="badge gray">
-
-              ${
-                visit.pdfName
-                  ? "File Recorded"
-                  : "No File"
-              }
-
-            </span>
-
-
-          </div>
-
-        `
-      )
-      .join("");
-
-}
-
-
-
-/* =========================================================
-   APPOINTMENTS
-========================================================= */
-
-function renderAppointments(){
-
-  const container =
-    document.getElementById(
-      "appointmentRows"
-    );
-
-
-  if(!container){
-    return;
-  }
-
-
-  const appointments =
-    patient.appointments ||
-    [];
-
-
-  container.innerHTML =
-    appointments.length
-
-      ? appointments
-          .map(
-            appointment => `
-
-              <div class="row">
-
-                <div class="row-main">
-
-                  <div class="row-title">
-                    ${
-                      appointment.date ||
-                      "—"
-                    }
-                  </div>
-
-                  <div class="row-sub">
-                    ${
-                      appointment.type ||
-                      "Appointment"
-                    }
-                  </div>
-
-                </div>
-
-              </div>
-
-            `
-          )
-          .join("")
-
-      : `
-
-        <div class="notif-empty">
-          No appointments recorded.
-        </div>
-
-      `;
-
-}
-
-
-
-/* =========================================================
-   PANEL CLAIMS
-========================================================= */
-
-function renderClaims(){
-
-  const summary =
-    document.getElementById(
-      "claimSummary"
-    );
-
-
-  const rows =
-    document.getElementById(
-      "claimRows"
-    );
-
-
-  if(!summary || !rows){
-    return;
-  }
-
-
-  const data =
-    finance(
-      patient
-    );
-
-
-  summary.innerHTML = `
-
-    <div class="finance-card">
-
-      <div class="label">
-        CLAIMABLE
-      </div>
-
-      <div class="value">
-        ${money(
-          data.claimable
-        )}
-      </div>
-
-    </div>
-
-
-    <div class="finance-card">
-
-      <div class="label">
-        TOTAL CLAIMED
-      </div>
-
-      <div class="value">
-        ${money(
-          data.claimed
-        )}
-      </div>
-
-    </div>
-
+  container.innerHTML = `
 
     <div
-      class="
-        finance-card
-        balance
+      class="card"
+      style="
+        border-radius:10px;
+        box-shadow:none;
       "
     >
 
-      <div class="label">
-        BALANCE TO CLAIM
-      </div>
+      <div
+        class="card-body"
+      >
 
-      <div class="value">
-        ${money(
-          data.balance
-        )}
+        <div
+          style="
+            font-size:14px;
+            font-weight:600;
+            margin-bottom:5px;
+          "
+        >
+
+          Latest Arboleaf Measurement
+
+        </div>
+
+
+        <div
+          style="
+            font-size:10px;
+            color:var(--muted);
+            margin-bottom:16px;
+          "
+        >
+
+          Detailed body composition values
+          should come from the selected
+          Arboleaf PDF.
+
+        </div>
+
+
+        <div
+          class="table-wrap"
+        >
+
+
+          <table
+            class="table"
+          >
+
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Visit
+                </th>
+
+                <th>
+                  Date
+                </th>
+
+                <th>
+                  Weight
+                </th>
+
+                <th>
+                  Arboleaf File
+                </th>
+
+                <th>
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              ${
+
+                visits
+                  .map(
+                    visit => `
+
+                      <tr>
+
+                        <td>
+                          ${visit.visit}
+                        </td>
+
+
+                        <td>
+                          ${visit.dateKey}
+                        </td>
+
+
+                        <td>
+                          ${
+                            visit.weight ||
+                            "—"
+                          }
+                        </td>
+
+
+                        <td>
+                          ${
+                            visit.pdfName ||
+                            "No file"
+                          }
+                        </td>
+
+
+                        <td>
+
+                          <button
+                            type="button"
+                            class="secondary"
+                            style="
+                              padding:
+                                7px
+                                9px;
+                            "
+                            onclick="
+                              viewVisit(
+                                '${visit.id}'
+                              )
+                            "
+                          >
+                            View Visit
+                          </button>
+
+                        </td>
+
+                      </tr>
+
+                    `
+                  )
+                  .join("")
+
+              }
+
+            </tbody>
+
+
+          </table>
+
+
+        </div>
+
+
       </div>
 
     </div>
 
   `;
 
-
-  rows.innerHTML =
-
-    (patient.visits || [])
-      .map(
-        visit => {
-
-          const billing =
-            ensureVisit(
-              visit
-            ).billing;
-
-
-          return `
-
-            <tr>
-
-
-              <td>
-                ${visit.visit}
-              </td>
-
-
-              <td>
-                ${visit.dateKey}
-              </td>
-
-
-              <td>
-                ${money(
-                  visitTotal(
-                    visit
-                  )
-                )}
-              </td>
-
-
-              <td>
-                ${money(
-                  panelEligible(
-                    visit
-                  )
-                )}
-              </td>
-
-
-              <td>
-
-                ${
-                  patientUsesPanel(
-                    patient
-                  )
-
-                    ? `
-
-                      <input
-                        class="claim-input"
-                        id="
-                          claim-${visit.id}
-                        "
-                        value="${
-                          billing.panelClaimAmount ||
-                          0
-                        }"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        style="
-                          min-width:110px;
-                        "
-                      >
-
-                    `
-
-                    : "—"
-
-                }
-
-              </td>
-
-
-              <td>
-
-                ${
-                  patientUsesPanel(
-                    patient
-                  )
-
-                    ? `
-
-                      <input
-                        class="claim-input"
-                        id="
-                          claimDate-${visit.id}
-                        "
-                        value="${
-                          billing.panelClaimDate ||
-                          ""
-                        }"
-                        type="date"
-                        style="
-                          min-width:125px;
-                        "
-                      >
-
-                    `
-
-                    : "—"
-
-                }
-
-              </td>
-
-
-              <td>
-
-                ${
-                  patientUsesPanel(
-                    patient
-                  )
-
-                    ? `
-
-                      <button
-                        type="button"
-                        class="secondary"
-                        style="
-                          padding:7px 9px;
-                        "
-                        onclick="
-                          saveClaim('${visit.id}')
-                        "
-                      >
-                        Save
-                      </button>
-
-                    `
-
-                    : "—"
-
-                }
-
-              </td>
-
-
-            </tr>
-
-          `;
-
-        }
-      )
-      .join("");
-
-
 }
 
 
 
 /* =========================================================
-   ADD VISIT
+   OPEN VISIT
 ========================================================= */
 
-let editingVisitId = null;
+function openVisit(){
 
+  resetVisitForm();
 
-function openAddVisit(){
-
-  editingVisitId = null;
 
   document.getElementById(
     "visitModalTitle"
@@ -2263,66 +3130,26 @@ function openAddVisit(){
   document.getElementById(
     "visitModalSub"
   ).textContent =
-    patient.name;
+    `${p.name} · Add new visit`;
 
 
-  resetVisitForm();
-
-
-  document.getElementById(
-    "visitModal"
-  ).classList.add("show");
-
-}
-
-
-
-function openEditVisit(
-  visitId
-){
-
-  const visit =
-    patient.visits.find(
-      item =>
-        item.id === visitId
+  document
+    .getElementById(
+      "visitModal"
+    )
+    .classList.add(
+      "show"
     );
 
-
-  if(!visit){
-    return;
-  }
-
-
-  editingVisitId =
-    visitId;
-
-
-  document.getElementById(
-    "visitModalTitle"
-  ).textContent =
-    "Edit Visit Charges & Payment";
-
-
-  document.getElementById(
-    "visitModalSub"
-  ).textContent =
-    `${patient.name} · ${visit.visit}`;
-
-
-  fillVisitForm(
-    visit
-  );
-
-
-  document.getElementById(
-    "visitModal"
-  ).classList.add("show");
-
 }
 
 
 
-function closeVisitModal(){
+/* =========================================================
+   CLOSE VISIT
+========================================================= */
+
+function closeVisit(){
 
   document
     .getElementById(
@@ -2332,12 +3159,13 @@ function closeVisitModal(){
       "show"
     );
 
-  editingVisitId =
-    null;
-
 }
 
 
+
+/* =========================================================
+   RESET VISIT
+========================================================= */
 
 function resetVisitForm(){
 
@@ -2346,15 +3174,17 @@ function resetVisitForm(){
     "vDate",
     "vNumber",
     "vType",
+    "vWeight",
+    "vInvoiceRef",
     "vInjection",
     "vDose",
-    "vInjectionNotes",
-    "vMedication",
-    "vMedicationNotes",
-    "vTreatment",
-    "vTreatmentNotes",
-    "vAdditional",
-    "vAdditionalNotes",
+    "vInjNote",
+    "vMed",
+    "vMedNote",
+    "vTreat",
+    "vTreatNote",
+    "vOther",
+    "vOtherNote",
     "vNotes"
 
   ];
@@ -2368,201 +3198,93 @@ function resetVisitForm(){
           id
         );
 
+
       if(element){
+
         element.value =
           "";
+
       }
 
     }
   );
 
 
-  document.getElementById(
-    "vInjectionPrice"
-  ).value = "";
-
 
   document.getElementById(
-    "vMedicationPrice"
-  ).value = "";
+    "vInjPrice"
+  ).value =
+    "";
 
 
   document.getElementById(
-    "vTreatmentPrice"
-  ).value = "";
+    "vMedPrice"
+  ).value =
+    "";
 
 
   document.getElementById(
-    "vAdditionalPrice"
-  ).value = "";
+    "vTreatPrice"
+  ).value =
+    "";
+
+
+  document.getElementById(
+    "vOtherPrice"
+  ).value =
+    "";
 
 
   document.getElementById(
     "vPanel"
-  ).value = "0";
+  ).value =
+    "0";
 
 
   document.getElementById(
     "vSelf"
-  ).value = "0";
+  ).value =
+    "0";
 
 
   document.getElementById(
     "vDate"
   ).value =
+
     new Date()
       .toISOString()
-      .slice(0,10);
+      .slice(
+        0,
+        10
+      );
 
 
   document.getElementById(
     "vNumber"
   ).value =
+
     `Visit #${
-      (patient.visits || []).length + 1
+      (
+        p.visits ||
+        []
+      ).length +
+      1
     }`;
 
 
   document.getElementById(
     "panelPaymentLabel"
   ).textContent =
-    `${getPanelName(patient)} / Insurance`;
 
+    patientUsesPanel(
+      p
+    )
 
-  updateVisitTotal();
+      ? `${getPanelName(
+          p
+        )} / Insurance`
 
-}
-
-
-
-function fillVisitForm(
-  visit
-){
-
-  const billing =
-    ensureVisit(
-      visit
-    ).billing;
-
-
-  document.getElementById(
-    "vDate"
-  ).value =
-    visit.dateKey || "";
-
-
-  document.getElementById(
-    "vNumber"
-  ).value =
-    visit.visit || "";
-
-
-  document.getElementById(
-    "vType"
-  ).value =
-    visit.type || "";
-
-
-  document.getElementById(
-    "vInjection"
-  ).value =
-    visit.injection || "";
-
-
-  document.getElementById(
-    "vDose"
-  ).value =
-    visit.dose || "";
-
-
-  document.getElementById(
-    "vInjectionNotes"
-  ).value =
-    billing.injection.notes || "";
-
-
-  document.getElementById(
-    "vInjectionPrice"
-  ).value =
-    billing.injection.price || "";
-
-
-  document.getElementById(
-    "vMedication"
-  ).value =
-    visit.medication || "";
-
-
-  document.getElementById(
-    "vMedicationNotes"
-  ).value =
-    billing.medication.notes || "";
-
-
-  document.getElementById(
-    "vMedicationPrice"
-  ).value =
-    billing.medication.price || "";
-
-
-  document.getElementById(
-    "vTreatment"
-  ).value =
-    visit.additionalTreatment || "";
-
-
-  document.getElementById(
-    "vTreatmentNotes"
-  ).value =
-    billing.treatment.notes || "";
-
-
-  document.getElementById(
-    "vTreatmentPrice"
-  ).value =
-    billing.treatment.price || "";
-
-
-  document.getElementById(
-    "vAdditional"
-  ).value =
-    billing.other.notes || "";
-
-
-  document.getElementById(
-    "vAdditionalNotes"
-  ).value =
-    "";
-
-
-  document.getElementById(
-    "vAdditionalPrice"
-  ).value =
-    billing.other.price || "";
-
-
-  document.getElementById(
-    "vPanel"
-  ).value =
-    billing.panel || 0;
-
-
-  document.getElementById(
-    "vSelf"
-  ).value =
-    billing.selfPay || 0;
-
-
-  document.getElementById(
-    "vNotes"
-  ).value =
-    visit.notes || "";
-
-
-  document.getElementById(
-    "panelPaymentLabel"
-  ).textContent =
-    `${getPanelName(patient)} / Insurance`;
+      : "Panel / Insurance";
 
 
   updateVisitTotal();
@@ -2572,7 +3294,7 @@ function fillVisitForm(
 
 
 /* =========================================================
-   VISIT TOTAL VALIDATION
+   VISIT TOTAL
 ========================================================= */
 
 function calculateVisitTotal(){
@@ -2581,32 +3303,36 @@ function calculateVisitTotal(){
 
     Number(
       document.getElementById(
-        "vInjectionPrice"
-      ).value || 0
+        "vInjPrice"
+      ).value ||
+      0
     )
 
     +
 
     Number(
       document.getElementById(
-        "vMedicationPrice"
-      ).value || 0
+        "vMedPrice"
+      ).value ||
+      0
     )
 
     +
 
     Number(
       document.getElementById(
-        "vTreatmentPrice"
-      ).value || 0
+        "vTreatPrice"
+      ).value ||
+      0
     )
 
     +
 
     Number(
       document.getElementById(
-        "vAdditionalPrice"
-      ).value || 0
+        "vOtherPrice"
+      ).value ||
+      0
     )
 
   );
@@ -2615,6 +3341,10 @@ function calculateVisitTotal(){
 
 
 
+/* =========================================================
+   PAYMENT VALIDATION
+========================================================= */
+
 function updateVisitTotal(){
 
   const total =
@@ -2622,48 +3352,47 @@ function updateVisitTotal(){
 
 
   document.getElementById(
-    "vTotal"
+    "visitTotal"
   ).textContent =
-    money(total);
-
-
-  const panel =
-    Number(
-      document.getElementById(
-        "vPanel"
-      ).value || 0
-    );
-
-
-  const selfPay =
-    Number(
-      document.getElementById(
-        "vSelf"
-      ).value || 0
+    money(
+      total
     );
 
 
   const validation =
     document.getElementById(
-      "vValidation"
+      "paymentValidation"
     );
 
 
+  const panelInput =
+    document.getElementById(
+      "vPanel"
+    );
+
+
+  const selfInput =
+    document.getElementById(
+      "vSelf"
+    );
+
+
+
+  /* -------------------------------------------------------
+     SELF PAY
+  -------------------------------------------------------- */
+
   if(
     !patientUsesPanel(
-      patient
+      p
     )
   ){
 
-    document.getElementById(
-      "vPanel"
-    ).value =
+    panelInput.value =
       0;
 
 
-    document.getElementById(
-      "vSelf"
-    ).value =
+    selfInput.value =
       total;
 
 
@@ -2674,23 +3403,47 @@ function updateVisitTotal(){
     validation.textContent =
       "Self-Pay patient: full visit total is assigned to Self-Pay.";
 
+
     return true;
 
   }
 
 
+
+  /* -------------------------------------------------------
+     PANEL
+  -------------------------------------------------------- */
+
+  const panel =
+    Number(
+      panelInput.value ||
+      0
+    );
+
+
+  const selfPay =
+    Number(
+      selfInput.value ||
+      0
+    );
+
+
   const difference =
+
     Math.abs(
+
       total -
       (
         panel +
         selfPay
       )
+
     );
 
 
   if(
-    difference < 0.001
+    difference <
+    0.001
   ){
 
     validation.className =
@@ -2699,13 +3452,13 @@ function updateVisitTotal(){
 
     validation.textContent =
       `${getPanelName(
-        patient
+        p
       )} + Self-Pay / Co-Payment matches the Visit Total.`;
-
 
     return true;
 
   }
+
 
 
   validation.className =
@@ -2714,7 +3467,7 @@ function updateVisitTotal(){
 
   validation.textContent =
     `${getPanelName(
-      patient
+      p
     )} + Self-Pay / Co-Payment must equal ${money(
       total
     )}.`;
@@ -2727,14 +3480,14 @@ function updateVisitTotal(){
 
 
 /* =========================================================
-   LISTEN FOR PRICE CHANGES
+   WATCH PAYMENT INPUTS
 ========================================================= */
 
 [
-  "vInjectionPrice",
-  "vMedicationPrice",
-  "vTreatmentPrice",
-  "vAdditionalPrice",
+  "vInjPrice",
+  "vMedPrice",
+  "vTreatPrice",
+  "vOtherPrice",
   "vPanel",
   "vSelf"
 ]
@@ -2765,7 +3518,7 @@ function updateVisitTotal(){
    SAVE VISIT
 ========================================================= */
 
-function saveVisitRecord(){
+function saveVisit(){
 
   const date =
     document.getElementById(
@@ -2779,6 +3532,12 @@ function saveVisitRecord(){
     ).value.trim();
 
 
+  const weight =
+    document.getElementById(
+      "vWeight"
+    ).value;
+
+
   if(!date){
 
     alert(
@@ -2786,6 +3545,7 @@ function saveVisitRecord(){
     );
 
     return;
+
   }
 
 
@@ -2796,6 +3556,7 @@ function saveVisitRecord(){
     );
 
     return;
+
   }
 
 
@@ -2816,7 +3577,8 @@ function saveVisitRecord(){
     Number(
       document.getElementById(
         "vPanel"
-      ).value || 0
+      ).value ||
+      0
     );
 
 
@@ -2824,205 +3586,121 @@ function saveVisitRecord(){
     Number(
       document.getElementById(
         "vSelf"
-      ).value || 0
+      ).value ||
+      0
     );
 
+
+  /* =======================================================
+     FILE NAMES
+  ======================================================== */
 
   const pdf =
     document.getElementById(
       "vPdf"
-    ).files[0];
+    )
+    ?.files?.[0];
 
 
   const front =
     document.getElementById(
       "vFront"
-    ).files[0];
+    )
+    ?.files?.[0];
 
 
   const side =
     document.getElementById(
       "vSide"
-    ).files[0];
+    )
+    ?.files?.[0];
 
 
   const back =
     document.getElementById(
       "vBack"
-    ).files[0];
+    )
+    ?.files?.[0];
 
 
-  const billing = {
 
-    injection:{
+  /* =======================================================
+     CREATE VISIT
+  ======================================================== */
 
-      price:
-        Number(
-          document.getElementById(
-            "vInjectionPrice"
-          ).value || 0
-        ),
-
-      notes:
-        document.getElementById(
-          "vInjectionNotes"
-        ).value.trim()
-
-    },
-
-
-    medication:{
-
-      price:
-        Number(
-          document.getElementById(
-            "vMedicationPrice"
-          ).value || 0
-        ),
-
-      notes:
-        document.getElementById(
-          "vMedicationNotes"
-        ).value.trim()
-
-    },
-
-
-    treatment:{
-
-      price:
-        Number(
-          document.getElementById(
-            "vTreatmentPrice"
-          ).value || 0
-        ),
-
-      notes:
-        document.getElementById(
-          "vTreatmentNotes"
-        ).value.trim()
-
-    },
-
-
-    other:{
-
-      price:
-        Number(
-          document.getElementById(
-            "vAdditionalPrice"
-          ).value || 0
-        ),
-
-      notes:
-        (
-          document.getElementById(
-            "vAdditional"
-          ).value.trim()
-          +
-          (
-            document.getElementById(
-              "vAdditionalNotes"
-            ).value.trim()
-              ? " · " +
-                document.getElementById(
-                  "vAdditionalNotes"
-                ).value.trim()
-              : ""
-          )
-        )
-
-    },
-
-
-    panel:
-      patientUsesPanel(
-        patient
-      )
-        ? panel
-        : 0,
-
-
-    selfPay:
-      patientUsesPanel(
-        patient
-      )
-        ? selfPay
-        : total,
-
-
-    panelClaimAmount:0,
-
-    panelClaimDate:"",
-
-    coverageType:
-      patientUsesPanel(
-        patient
-      )
-        ? "panel"
-        : "self"
-
-  };
-
-
-  const visitData = {
+  const visit = {
 
     id:
-      editingVisitId ||
-      `${patient.id}-V${Date.now()}`,
+
+      `${p.id}-V${Date.now()}`,
+
 
     dateKey:
       date,
 
+
     visit:
+
       document.getElementById(
         "vNumber"
       ).value.trim(),
 
+
     type:
       type,
 
+
     weight:
-      "—",
+      weight || "—",
+
+
+    invoiceReference:
+
+      document.getElementById(
+        "vInvoiceRef"
+      ).value.trim(),
+
 
     injection:
+
       document.getElementById(
         "vInjection"
       ).value.trim(),
 
+
     dose:
+
       document.getElementById(
         "vDose"
       ).value.trim(),
 
+
     medication:
+
       document.getElementById(
-        "vMedication"
+        "vMed"
       ).value.trim(),
+
 
     additionalTreatment:
+
       document.getElementById(
-        "vTreatment"
+        "vTreat"
       ).value.trim(),
 
+
     notes:
+
       document.getElementById(
         "vNotes"
       ).value.trim(),
 
+
     pdfName:
+
       pdf
         ? pdf.name
-        : editingVisitId
-          ? (
-              patient.visits.find(
-                visit =>
-                  visit.id ===
-                  editingVisitId
-              )?.pdfName ||
-              ""
-            )
-          : "",
+        : "",
 
 
     photos:{
@@ -3032,10 +3710,12 @@ function saveVisitRecord(){
           ? front.name
           : "",
 
+
       side:
         side
           ? side.name
           : "",
+
 
       back:
         back
@@ -3049,80 +3729,197 @@ function saveVisitRecord(){
       "Completed",
 
 
-    billing:
-      billing
+    /*
+      IMPORTANT:
+
+      We do NOT create a claim here.
+
+      Visit only records the invoice/
+      payment allocation.
+
+      Actual insurance claim submission
+      is entered separately through
+      Panel Claims.
+    */
+
+    billing:{
+
+      injection:{
+
+        price:
+
+          Number(
+            document.getElementById(
+              "vInjPrice"
+            ).value ||
+            0
+          ),
+
+        notes:
+
+          document.getElementById(
+            "vInjNote"
+          ).value.trim()
+
+      },
+
+
+      medication:{
+
+        price:
+
+          Number(
+            document.getElementById(
+              "vMedPrice"
+            ).value ||
+            0
+          ),
+
+        notes:
+
+          document.getElementById(
+            "vMedNote"
+          ).value.trim()
+
+      },
+
+
+      treatment:{
+
+        price:
+
+          Number(
+            document.getElementById(
+              "vTreatPrice"
+            ).value ||
+            0
+          ),
+
+        notes:
+
+          document.getElementById(
+            "vTreatNote"
+          ).value.trim()
+
+      },
+
+
+      other:{
+
+        price:
+
+          Number(
+            document.getElementById(
+              "vOtherPrice"
+            ).value ||
+            0
+          ),
+
+        notes:
+
+          (
+            document.getElementById(
+              "vOther"
+            ).value.trim()
+
+            +
+
+            (
+              document.getElementById(
+                "vOtherNote"
+              ).value.trim()
+
+                ? " · " +
+                  document.getElementById(
+                    "vOtherNote"
+                  ).value.trim()
+
+                : ""
+
+            )
+
+          )
+
+      },
+
+
+      panel:
+
+        patientUsesPanel(
+          p
+        )
+
+          ? panel
+          : 0,
+
+
+      selfPay:
+
+        patientUsesPanel(
+          p
+        )
+
+          ? selfPay
+          : total,
+
+
+      /* Legacy fields retained
+         but no longer used for
+         finance calculation. */
+
+      panelClaimAmount:0,
+
+      panelClaimDate:"",
+
+      coverageType:
+
+        patientUsesPanel(
+          p
+        )
+
+          ? "panel"
+          : "self"
+
+    }
 
   };
 
 
 
   /* =======================================================
-     EDIT EXISTING
+     SAVE VISIT
   ======================================================== */
 
-  if(editingVisitId){
+  p.visits.unshift(
+    visit
+  );
 
-    const index =
-      patient.visits.findIndex(
-        visit =>
-          visit.id ===
-          editingVisitId
+
+  if(weight){
+
+    p.currentWeight =
+      Number(
+        weight
       );
-
-
-    if(index >= 0){
-
-      /* Preserve old claim amount/date */
-
-      const oldVisit =
-        patient.visits[index];
-
-
-      billing.panelClaimAmount =
-        oldVisit.billing?.panelClaimAmount ||
-        0;
-
-
-      billing.panelClaimDate =
-        oldVisit.billing?.panelClaimDate ||
-        "";
-
-
-      patient.visits[index] =
-        visitData;
-
-    }
-
-
-  }else{
-
-    patient.visits.unshift(
-      visitData
-    );
 
   }
 
 
-
-  /* =======================================================
-     SAVE
-  ======================================================== */
-
   upsertPatient(
-    patient
+    p
   );
 
 
-  patient =
+  p =
     getPatient(
-      patientId
+      id
     );
 
 
-  closeVisitModal();
+  closeVisit();
 
 
-  refreshAll();
+  refresh();
 
 
   renderNotifications();
@@ -3132,7 +3929,7 @@ function saveVisitRecord(){
 
 
 /* =========================================================
-   OPEN VIEW / EDIT VISIT
+   VIEW VISIT
 ========================================================= */
 
 function viewVisit(
@@ -3140,7 +3937,11 @@ function viewVisit(
 ){
 
   const visit =
-    patient.visits.find(
+    (
+      p.visits ||
+      []
+    )
+    .find(
       item =>
         item.id ===
         visitId
@@ -3148,12 +3949,50 @@ function viewVisit(
 
 
   if(!visit){
+
     return;
+
   }
 
 
-  openEditVisit(
-    visitId
+  alert(
+
+    `Visit ${
+      visit.visit
+    }\n` +
+
+    `Date: ${
+      visit.dateKey
+    }\n\n` +
+
+    `Type: ${
+      visit.type ||
+      "—"
+    }\n` +
+
+    `Injection: ${
+      visit.injection ||
+      "—"
+    }\n` +
+
+    `Medication: ${
+      visit.medication ||
+      "—"
+    }\n` +
+
+    `Treatment: ${
+      visit.additionalTreatment ||
+      "—"
+    }\n\n` +
+
+    `Invoice Total: ${
+      money(
+        visitTotal(
+          visit
+        )
+      )
+    }`
+
   );
 
 }
@@ -3161,96 +4000,440 @@ function viewVisit(
 
 
 /* =========================================================
-   SAVE PANEL CLAIM
+   CLAIM MODAL
 ========================================================= */
 
-function saveClaim(
-  visitId
+let editingClaimId =
+  null;
+
+
+
+function openClaimModal(
+  claim = null
 ){
 
-  const visit =
-    patient.visits.find(
-      item =>
-        item.id ===
-        visitId
+  editingClaimId =
+    claim?.id ||
+    null;
+
+
+  const select =
+    document.getElementById(
+      "claimVisitInput"
     );
 
 
-  if(!visit){
+  select.innerHTML = `
+
+
+    <option value="">
+      No specific visit
+    </option>
+
+
+    ${
+      (
+        p.visits ||
+        []
+      )
+      .map(
+        visit => `
+
+          <option
+            value="${visit.id}"
+            ${
+              claim?.visitId ===
+              visit.id
+                ? "selected"
+                : ""
+            }
+          >
+
+            ${visit.visit}
+
+            ·
+
+            ${visit.dateKey}
+
+            ·
+
+            ${money(
+              visitTotal(
+                visit
+              )
+            )}
+
+          </option>
+
+        `
+      )
+      .join("")
+
+    }
+
+  `;
+
+
+
+  document.getElementById(
+    "claimDateInput"
+  ).value =
+
+    claim?.claimDate ||
+
+    new Date()
+      .toISOString()
+      .slice(
+        0,
+        10
+      );
+
+
+
+  document.getElementById(
+    "claimAmountInput"
+  ).value =
+
+    claim?.amount ||
+    "";
+
+
+
+  document.getElementById(
+    "claimNotesInput"
+  ).value =
+
+    claim?.notes ||
+    "";
+
+
+
+  document.getElementById(
+    "claimModalTitle"
+  ).textContent =
+
+    claim
+      ? "Edit Claim"
+      : "Add Claim";
+
+
+
+  document
+    .getElementById(
+      "claimModal"
+    )
+    .classList.add(
+      "show"
+    );
+
+}
+
+
+
+/* =========================================================
+   CLOSE CLAIM
+========================================================= */
+
+function closeClaimModal(){
+
+  document
+    .getElementById(
+      "claimModal"
+    )
+    .classList.remove(
+      "show"
+    );
+
+
+  editingClaimId =
+    null;
+
+}
+
+
+
+/* =========================================================
+   EDIT CLAIM
+========================================================= */
+
+function editClaim(
+  claimId
+){
+
+  const claim =
+    ensureClaims(
+      p
+    )
+    .find(
+      item =>
+        item.id ===
+        claimId
+    );
+
+
+  if(!claim){
+
     return;
+
   }
 
 
-  const billing =
-    ensureVisit(
-      visit
-    ).billing;
+  openClaimModal(
+    claim
+  );
+
+}
 
 
-  const amountInput =
-    document.getElementById(
-      `claim-${visitId}`
-    );
 
+/* =========================================================
+   SAVE CLAIM
+=========================================================
 
-  const dateInput =
-    document.getElementById(
-      `claimDate-${visitId}`
-    );
+Important:
 
+A claim is NOT tied one-to-one with a visit.
+
+Examples:
+
+Visit #1:
+RM1,000
+
+Claim #1:
+RM200 on 22/08
+
+Claim #2:
+RM300 on 29/08
+
+Claim #3:
+RM500 on 05/09
+
+This is allowed.
+
+Related Visit is optional.
+
+========================================================= */
+
+function saveClaim(){
 
   const amount =
     Number(
-      amountInput?.value || 0
+      document.getElementById(
+        "claimAmountInput"
+      ).value ||
+      0
     );
 
 
-  const eligible =
-    panelEligible(
-      visit
-    );
+  const claimDate =
+    document.getElementById(
+      "claimDateInput"
+    ).value;
 
 
-  if(amount < 0){
+  const visitId =
+    document.getElementById(
+      "claimVisitInput"
+    ).value;
+
+
+  const notes =
+    document.getElementById(
+      "claimNotesInput"
+    ).value.trim();
+
+
+
+  /* -------------------------------------------------------
+     VALIDATION
+  -------------------------------------------------------- */
+
+  if(
+    amount <= 0
+  ){
 
     alert(
-      "Claim amount cannot be negative."
+      "Please enter a claim amount greater than RM0."
     );
 
     return;
+
   }
 
 
-  if(amount > eligible){
+  if(!claimDate){
 
     alert(
-      "Claim amount cannot exceed the Panel / Insurance amount for this visit."
+      "Please select the claim date."
     );
 
     return;
+
   }
 
 
-  billing.panelClaimAmount =
-    amount;
+
+  const claims =
+    ensureClaims(
+      p
+    );
 
 
-  billing.panelClaimDate =
-    dateInput?.value || "";
 
+  /* -------------------------------------------------------
+     EXISTING CLAIM BEING EDITED
+  -------------------------------------------------------- */
+
+  const editing =
+    editingClaimId
+
+      ? claims.find(
+          claim =>
+            claim.id ===
+            editingClaimId
+        )
+
+      : null;
+
+
+
+  /*
+    When editing an existing claim,
+    remove its current amount from
+    the calculation first.
+  */
+
+  const claimedExcludingCurrent =
+
+    finance(
+      p
+    ).claimed
+
+    -
+
+    (
+      editing
+        ? Number(
+            editing.amount ||
+            0
+          )
+        : 0
+    );
+
+
+
+  const availableBalance =
+
+    Math.max(
+
+      0,
+
+      finance(
+        p
+      ).grand -
+
+      claimedExcludingCurrent
+
+    );
+
+
+
+  /* -------------------------------------------------------
+     CLAIM CANNOT EXCEED BALANCE
+  -------------------------------------------------------- */
+
+  if(
+    amount >
+    availableBalance
+  ){
+
+    alert(
+
+      `Claim amount cannot exceed the remaining balance of ${money(
+        availableBalance
+      )}.`
+
+    );
+
+    return;
+
+  }
+
+
+
+  /* -------------------------------------------------------
+     UPDATE
+  -------------------------------------------------------- */
+
+  if(editing){
+
+    editing.amount =
+      amount;
+
+
+    editing.claimDate =
+      claimDate;
+
+
+    editing.visitId =
+      visitId;
+
+
+    editing.notes =
+      notes;
+
+  }
+
+
+
+  /* -------------------------------------------------------
+     NEW CLAIM
+  -------------------------------------------------------- */
+
+  else{
+
+    claims.push({
+
+      id:
+        `${p.id}-CLM${Date.now()}`,
+
+      amount:
+        amount,
+
+      claimDate:
+        claimDate,
+
+      visitId:
+        visitId,
+
+      notes:
+        notes
+
+    });
+
+  }
+
+
+
+  /* -------------------------------------------------------
+     SAVE
+  -------------------------------------------------------- */
 
   upsertPatient(
-    patient
+    p
   );
 
 
-  patient =
+  p =
     getPatient(
-      patientId
+      id
     );
 
 
-  refreshAll();
+  closeClaimModal();
+
+
+  refresh();
 
 
   renderNotifications();
@@ -3260,43 +4443,61 @@ function saveClaim(
 
 
 /* =========================================================
-   EDIT PATIENT
+   EDIT PATIENT PANEL
 ========================================================= */
 
 function editPatient(){
 
-  const currentPanel =
-    patient.panelProvider ||
+  const current =
+    p.panelProvider ||
     "SELF_PAY";
 
 
-  const nextPanel =
-    prompt(
-      "Enter payment type:\n\nSELF_PAY\nPANEL_A\nPANEL_B\nPANEL_C\nOther",
-      currentPanel
-    );
-
-
-  if(
-    nextPanel === null
-  ){
-    return;
-  }
-
-
-  const normalized =
-    nextPanel
-      .trim();
-
-
-  if(
-    ![
+  const options =
+    [
       "SELF_PAY",
       "PANEL_A",
       "PANEL_B",
       "PANEL_C",
       "Other"
-    ].includes(
+    ];
+
+
+  const selected =
+    prompt(
+
+      "Enter payment type:\n\n" +
+
+      "SELF_PAY\n" +
+      "PANEL_A\n" +
+      "PANEL_B\n" +
+      "PANEL_C\n" +
+      "Other\n\n" +
+
+      "Current: " +
+      current,
+
+      current
+
+    );
+
+
+  if(
+    selected ===
+    null
+  ){
+
+    return;
+
+  }
+
+
+  const normalized =
+    selected.trim();
+
+
+  if(
+    !options.includes(
       normalized
     )
   ){
@@ -3306,11 +4507,13 @@ function editPatient(){
     );
 
     return;
+
   }
 
 
-  patient.panelProvider =
+  p.panelProvider =
     normalized;
+
 
 
   if(
@@ -3318,16 +4521,20 @@ function editPatient(){
     "Other"
   ){
 
-    const customPanel =
+    const custom =
       prompt(
-        "Enter panel name:",
-        patient.otherPanelName ||
-          ""
+
+        "Enter the panel name:",
+
+        p.otherPanelName ||
+        ""
+
       );
 
 
     if(
-      customPanel === null
+      custom ===
+      null
     ){
 
       return;
@@ -3335,112 +4542,79 @@ function editPatient(){
     }
 
 
-    patient.otherPanelName =
-      customPanel.trim();
+    p.otherPanelName =
+      custom.trim();
 
   }else{
 
-    patient.otherPanelName =
+    p.otherPanelName =
       "";
 
   }
 
 
+
   upsertPatient(
-    patient
+    p
   );
 
 
-  refreshAll();
-
-}
-
-
-
-/* =========================================================
-   REFRESH EVERYTHING
-========================================================= */
-
-function refreshAll(){
-
-  patient =
+  p =
     getPatient(
-      patientId
+      id
     );
 
 
-  document.getElementById(
-    "patientName"
-  ).textContent =
-    patient.name;
-
-
-  document.getElementById(
-    "patientId"
-  ).textContent =
-    patient.id;
-
-
-  document.getElementById(
-    "patientAvatar"
-  ).textContent =
-    patient.initials;
-
-
-  document.getElementById(
-    "patientStatus"
-  ).textContent =
-    patient.status;
-
-
-  document.getElementById(
-    "patientPaymentBadge"
-  ).textContent =
-    getPanelName(
-      patient
-    );
-
-
-  document.getElementById(
-    "programStart"
-  ).textContent =
-    patient.startDate ||
-    "—";
-
-
-  document.getElementById(
-    "lastVisit"
-  ).textContent =
-    latestVisit(
-      patient
-    )?.dateKey ||
-    "—";
-
-
-  renderFinance();
-
-  renderOverviewVisits();
-
-  renderVisits();
-
-  renderFiles();
-
-  renderAppointments();
-
-  renderClaims();
+  refresh();
 
 }
 
 
 
 /* =========================================================
-   INITIAL LOAD
+   AUTO OPEN CLAIM
 ========================================================= */
 
-refreshAll();
+if(
+  params.get(
+    "openClaim"
+  ) ===
+  "1"
+){
+
+  setTimeout(
+    () => {
+
+      const claimTab =
+        document.querySelector(
+          ".patient-tabs button:last-child"
+        );
+
+
+      showSection(
+        "claims",
+        claimTab
+      );
+
+
+      openClaimModal();
+
+    },
+    250
+  );
+
+}
+
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+refresh();
+
 
 renderNotifications();
-
 
 </script>
 
