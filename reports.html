@@ -1,0 +1,994 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reports | Getwell</title>
+<link rel="stylesheet" href="styles.css?v=20260822-final3">
+<script src="app.js?v=20260822-final3"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+
+/* =========================================================
+   REPORTS PAGE
+   Monthly performance report using the existing store.
+========================================================= */
+
+document.getElementById("root").innerHTML = shell(
+  "Reports",
+  "reports",
+  `
+  <div class="page-head">
+    <div>
+      <h1>Reports</h1>
+      <p>View clinic performance for the selected month.</p>
+    </div>
+
+    <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;justify-content:flex-end">
+      <div class="form-group" style="min-width:180px">
+        <label>Report Period</label>
+        <select id="reportMonth" class="claim-input" onchange="renderReports()"></select>
+      </div>
+
+      <button
+        type="button"
+        class="primary"
+        style="height:36px;display:flex;align-items:center;gap:7px"
+        onclick="downloadReportPDF()"
+      >
+        ↓ Download PDF
+      </button>
+    </div>
+  </div>
+
+  <div id="reportContent"></div>
+  `
+);
+
+
+/* =========================================================
+   KEEP REPORTS LINK ON REPORTS PAGE
+========================================================= */
+
+(function setupReportsNavigation(){
+  const links = document.querySelectorAll(".nav a");
+  links.forEach(link => {
+    if ((link.textContent || "").trim().includes("Reports")) {
+      link.href = "reports.html";
+      link.classList.add("active");
+    }
+  });
+})();
+
+
+/* =========================================================
+   MONTH HELPERS
+========================================================= */
+
+function pad2(n){
+  return String(n).padStart(2,"0");
+}
+
+function monthLabel(key){
+  const [y,m] = key.split("-").map(Number);
+  return new Date(y,m-1,1).toLocaleDateString("en-MY",{
+    month:"long",
+    year:"numeric"
+  });
+}
+
+function getCurrentMonthKey(){
+  const d = new Date();
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}`;
+}
+
+function getMonthRange(key){
+  const [year,month] = key.split("-").map(Number);
+  const start = `${year}-${pad2(month)}-01`;
+  const lastDay = new Date(year,month,0).getDate();
+  const end = `${year}-${pad2(month)}-${pad2(lastDay)}`;
+  return {year,month,start,end,lastDay};
+}
+
+function isDateInMonth(dateValue,range){
+  const d = String(dateValue || "").slice(0,10);
+  return !!d && d >= range.start && d <= range.end;
+}
+
+function dateDisplay(dateValue){
+  if(!dateValue) return "—";
+  const [y,m,d] = String(dateValue).slice(0,10).split("-");
+  if(!y || !m || !d) return dateValue;
+  return `${d}/${m}/${y}`;
+}
+
+
+/* =========================================================
+   MONTH SELECTOR
+========================================================= */
+
+function buildMonthSelector(){
+  const select = document.getElementById("reportMonth");
+  if(!select) return;
+
+  const current = getCurrentMonthKey();
+  const [currentYear,currentMonth] = current.split("-").map(Number);
+  const options = [];
+
+  // Show the current year plus the previous year.
+  for(let y=currentYear; y>=currentYear-1; y--){
+    const maxMonth = y === currentYear ? currentMonth : 12;
+    const minMonth = 1;
+    for(let m=maxMonth; m>=minMonth; m--){
+      const key = `${y}-${pad2(m)}`;
+      options.push(`<option value="${key}">${monthLabel(key)}</option>`);
+    }
+  }
+
+  select.innerHTML = options.join("");
+  select.value = current;
+}
+
+
+/* =========================================================
+   REPORT DATA
+========================================================= */
+
+function getReportData(monthKey){
+
+  const range = getMonthRange(monthKey);
+  const patients = store().patients || [];
+
+  const visits = [];
+  const appointments = [];
+  const claims = [];
+
+  patients.forEach(patient => {
+
+    (patient.visits || []).forEach(visit => {
+      const date = visit.dateKey || visit.date || "";
+      if(isDateInMonth(date,range)){
+        visits.push({
+          ...visit,
+          patientId:patient.id,
+          patientName:patient.name,
+          patient
+        });
+      }
+    });
+
+    (patient.appointments || []).forEach(appointment => {
+      if(isDateInMonth(appointment.date,range)){
+        appointments.push({
+          ...appointment,
+          patientId:patient.id,
+          patientName:patient.name,
+          patient
+        });
+      }
+    });
+
+    (patient.claims || []).forEach(claim => {
+      if(isDateInMonth(claim.claimDate,range)){
+        claims.push({
+          ...claim,
+          patientId:patient.id,
+          patientName:patient.name,
+          patient
+        });
+      }
+    });
+  });
+
+
+  /* -------------------------
+     Revenue
+  ------------------------- */
+
+  let revenue = 0;
+  let injection = 0;
+  let medication = 0;
+  let treatment = 0;
+  let other = 0;
+  let panelRevenue = 0;
+  let selfPayRevenue = 0;
+
+  visits.forEach(v => {
+    const b = ensureVisit(v).billing;
+    const total = visitTotal(v);
+
+    revenue += total;
+    injection += +b.injection.price || 0;
+    medication += +b.medication.price || 0;
+    treatment += +b.treatment.price || 0;
+    other += +b.other.price || 0;
+
+    if(patientUsesPanel(v.patient)) panelRevenue += total;
+    else selfPayRevenue += total;
+  });
+
+
+  /* -------------------------
+     Patients
+  ------------------------- */
+
+  const newPatients = patients.filter(p =>
+    isDateInMonth(p.startDate || p.programStartDate,range)
+  );
+
+  const monthPatientIds = new Set(visits.map(v => v.patientId));
+  const returningPatients = Math.max(
+    0,
+    monthPatientIds.size - new Set(newPatients.map(p => p.id)).size
+  );
+
+  const activePatients = patients.filter(p => {
+    const start = String(p.startDate || p.programStartDate || "").slice(0,10);
+    return start && start <= range.end && p.status === "Active";
+  });
+
+  const completedPrograms = patients.filter(p => {
+    const status = String(p.status || "").toLowerCase();
+    return (status === "completed" || status === "goal achieved") &&
+      String(p.startDate || p.programStartDate || "") <= range.end;
+  });
+
+  const inactivePatients = patients.filter(p =>
+    String(p.status || "").toLowerCase() === "inactive"
+  );
+
+
+  /* -------------------------
+     Visit summary
+  ------------------------- */
+
+  const visitPatients = new Set(visits.map(v => v.patientId));
+  const completedVisits = visits.filter(v =>
+    String(v.status || "Completed").toLowerCase() === "completed"
+  ).length;
+
+  const totalVisits = visits.length;
+
+
+  /* -------------------------
+     Panel report
+  ------------------------- */
+
+  const panelMap = {};
+
+  visits.forEach(v => {
+    if(!patientUsesPanel(v.patient)) return;
+
+    const panel = getPanelName(v.patient);
+    if(!panelMap[panel]){
+      panelMap[panel] = {
+        panel,
+        patients:new Set(),
+        invoiced:0,
+        claimed:0
+      };
+    }
+
+    panelMap[panel].patients.add(v.patientId);
+    panelMap[panel].invoiced += visitTotal(v);
+  });
+
+  claims.forEach(c => {
+    if(!patientUsesPanel(c.patient)) return;
+
+    const panel = getPanelName(c.patient);
+    if(!panelMap[panel]){
+      panelMap[panel] = {
+        panel,
+        patients:new Set(),
+        invoiced:0,
+        claimed:0
+      };
+    }
+
+    panelMap[panel].patients.add(c.patientId);
+    panelMap[panel].claimed += +c.amount || 0;
+  });
+
+  const panelRows = Object.values(panelMap)
+    .map(x => ({
+      ...x,
+      patients:x.patients.size,
+      balance:Math.max(0,x.invoiced-x.claimed)
+    }))
+    .sort((a,b)=>b.invoiced-a.invoiced);
+
+
+  /* -------------------------
+     Suspended policies
+  ------------------------- */
+
+  const suspendedPatients = patients.filter(p =>
+    isPanelSuspended(p) && finance(p).balance > 0
+  );
+
+  const suspendedOutstanding = suspendedPatients.reduce(
+    (sum,p)=>sum + finance(p).balance,
+    0
+  );
+
+
+  /* -------------------------
+     Appointment summary
+  ------------------------- */
+
+  const appointmentStatus = {
+    total:appointments.length,
+    completed:appointments.filter(a=>a.status==="Completed").length,
+    upcoming:appointments.filter(a=>a.status==="Upcoming").length,
+    noShow:appointments.filter(a=>a.status==="No Show").length,
+    cancelled:appointments.filter(a=>a.status==="Cancelled").length
+  };
+
+  const attendanceBase =
+    appointmentStatus.completed + appointmentStatus.noShow;
+
+  const attendanceRate = attendanceBase
+    ? Math.round((appointmentStatus.completed / attendanceBase) * 100)
+    : 0;
+
+
+  return {
+    monthKey,
+    monthLabel:monthLabel(monthKey),
+    range,
+    patients,
+    visits,
+    appointments,
+    claims,
+    revenue,
+    injection,
+    medication,
+    treatment,
+    other,
+    panelRevenue,
+    selfPayRevenue,
+    newPatients,
+    returningPatients,
+    activePatients,
+    completedPrograms,
+    inactivePatients,
+    visitPatients,
+    totalVisits,
+    completedVisits,
+    panelRows,
+    suspendedPatients,
+    suspendedOutstanding,
+    appointmentStatus,
+    attendanceRate
+  };
+}
+
+
+/* =========================================================
+   HTML HELPERS
+========================================================= */
+
+function reportMoney(n){
+  return money(n);
+}
+
+function emptyRow(colspan,text){
+  return `
+    <tr>
+      <td colspan="${colspan}" style="text-align:center;padding:28px;color:var(--muted)">
+        ${text}
+      </td>
+    </tr>
+  `;
+}
+
+function statusBadge(status){
+  const s = String(status || "").toLowerCase();
+  let cls = "orange";
+  if(s === "completed") cls = "green";
+  if(s === "cancelled" || s === "no show") cls = "red";
+  return `<span class="badge ${cls}">${status || "—"}</span>`;
+}
+
+
+/* =========================================================
+   REPORT RENDER
+========================================================= */
+
+function renderReports(){
+
+  const monthKey =
+    document.getElementById("reportMonth")?.value ||
+    getCurrentMonthKey();
+
+  const data = getReportData(monthKey);
+
+  reportContent.innerHTML = `
+
+    <!-- ===================================================
+         REPORT PERIOD
+    ==================================================== -->
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-head">
+        <div>
+          <h2>Performance Overview</h2>
+          <p>${data.monthLabel} · ${dateDisplay(data.range.start)} — ${dateDisplay(data.range.end)}</p>
+        </div>
+        <span class="badge blue">${data.monthLabel}</span>
+      </div>
+    </div>
+
+
+    <!-- ===================================================
+         KPI
+    ==================================================== -->
+
+    <div class="kpi-grid">
+
+      <div class="kpi">
+        <div class="kpi-label">TOTAL REVENUE</div>
+        <div class="kpi-value">${reportMoney(data.revenue)}</div>
+        <div class="kpi-sub">Visit billing for selected month</div>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi-label">TOTAL VISITS</div>
+        <div class="kpi-value">${data.totalVisits}</div>
+        <div class="kpi-sub">${data.completedVisits} completed</div>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi-label">NEW PATIENTS</div>
+        <div class="kpi-value">${data.newPatients.length}</div>
+        <div class="kpi-sub">Started in ${data.monthLabel}</div>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi-label">ACTIVE PATIENTS</div>
+        <div class="kpi-value">${data.activePatients.length}</div>
+        <div class="kpi-sub">Active by month end</div>
+      </div>
+
+    </div>
+
+
+    <!-- ===================================================
+         REVENUE + PATIENT ACTIVITY
+    ==================================================== -->
+
+    <div class="grid-2" style="margin-bottom:16px">
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2>Revenue Breakdown</h2>
+            <p>Billing recorded from visits during ${data.monthLabel}.</p>
+          </div>
+        </div>
+
+        <div class="card-body" style="padding-top:6px">
+
+          <div class="row">
+            <div class="row-main"><div class="row-title">Injection</div></div>
+            <strong>${reportMoney(data.injection)}</strong>
+          </div>
+
+          <div class="row">
+            <div class="row-main"><div class="row-title">Medication</div></div>
+            <strong>${reportMoney(data.medication)}</strong>
+          </div>
+
+          <div class="row">
+            <div class="row-main"><div class="row-title">Treatment</div></div>
+            <strong>${reportMoney(data.treatment)}</strong>
+          </div>
+
+          <div class="row">
+            <div class="row-main"><div class="row-title">Other</div></div>
+            <strong>${reportMoney(data.other)}</strong>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 0 4px">
+            <strong>Total Revenue</strong>
+            <strong style="font-size:14px">${reportMoney(data.revenue)}</strong>
+          </div>
+
+        </div>
+      </div>
+
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2>Patient Activity</h2>
+            <p>Patient activity associated with the selected period.</p>
+          </div>
+        </div>
+
+        <div class="card-body" style="padding-top:6px">
+
+          <div class="row">
+            <div class="row-main"><div class="row-title">New Patients</div></div>
+            <strong>${data.newPatients.length}</strong>
+          </div>
+
+          <div class="row">
+            <div class="row-main"><div class="row-title">Returning Patients</div></div>
+            <strong>${data.returningPatients}</strong>
+          </div>
+
+          <div class="row">
+            <div class="row-main"><div class="row-title">Completed Programs</div></div>
+            <strong>${data.completedPrograms.length}</strong>
+          </div>
+
+          <div class="row">
+            <div class="row-main"><div class="row-title">Inactive Patients</div></div>
+            <strong>${data.inactivePatients.length}</strong>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ===================================================
+         VISIT SUMMARY
+    ==================================================== -->
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-head">
+        <div>
+          <h2>Visit Summary</h2>
+          <p>Visits recorded during ${data.monthLabel}.</p>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="finance-grid">
+
+          <div class="finance-card">
+            <div class="label">TOTAL VISITS</div>
+            <div class="value">${data.totalVisits}</div>
+          </div>
+
+          <div class="finance-card">
+            <div class="label">COMPLETED</div>
+            <div class="value">${data.completedVisits}</div>
+          </div>
+
+          <div class="finance-card">
+            <div class="label">PANEL REVENUE</div>
+            <div class="value">${reportMoney(data.panelRevenue)}</div>
+          </div>
+
+          <div class="finance-card balance">
+            <div class="label">SELF-PAY REVENUE</div>
+            <div class="value">${reportMoney(data.selfPayRevenue)}</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ===================================================
+         PANEL PERFORMANCE
+    ==================================================== -->
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-head">
+        <div>
+          <h2>Panel Performance</h2>
+          <p>Panel billing and claims recorded during ${data.monthLabel}.</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Panel</th>
+              <th>Patients</th>
+              <th>INVOICED</th>
+              <th>CLAIMED</th>
+              <th>BALANCE</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.panelRows.length
+              ? data.panelRows.map(row => `
+                <tr>
+                  <td><strong>${row.panel}</strong></td>
+                  <td>${row.patients}</td>
+                  <td>${reportMoney(row.invoiced)}</td>
+                  <td>${reportMoney(row.claimed)}</td>
+                  <td>
+                    <span class="badge ${row.balance > 0 ? "orange" : "green"}">
+                      ${reportMoney(row.balance)}
+                    </span>
+                  </td>
+                </tr>
+              `).join("")
+              : emptyRow(5,"No panel activity recorded for this month.")}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- ===================================================
+         SUSPENDED POLICIES
+    ==================================================== -->
+
+    <div class="card" style="margin-bottom:16px;border-color:#F59E0B">
+      <div class="card-head">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <h2>Suspended Policies</h2>
+            <span class="badge red">${data.suspendedPatients.length}</span>
+          </div>
+          <p>Panel patients who remain suspended with outstanding claimable balance.</p>
+        </div>
+
+        <div class="badge orange">
+          Outstanding: ${reportMoney(data.suspendedOutstanding)}
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Panel</th>
+              <th>OUTSTANDING</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.suspendedPatients.length
+              ? data.suspendedPatients.map(p => `
+                <tr>
+                  <td>
+                    <strong>${p.name}</strong>
+                    <div class="row-sub">${p.id}</div>
+                  </td>
+                  <td><span class="panel-chip">${getPanelName(p)}</span></td>
+                  <td><span class="badge red">${reportMoney(finance(p).balance)}</span></td>
+                  <td><span class="badge red">SUSPENDED</span></td>
+                </tr>
+              `).join("")
+              : emptyRow(4,"No suspended-policy patients with outstanding balance.")}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- ===================================================
+         APPOINTMENT PERFORMANCE
+    ==================================================== -->
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-head">
+        <div>
+          <h2>Appointment Performance</h2>
+          <p>Appointment activity during ${data.monthLabel}.</p>
+        </div>
+        <span class="badge ${data.attendanceRate >= 80 ? "green" : "orange"}">
+          Attendance ${data.attendanceRate}%
+        </span>
+      </div>
+
+      <div class="card-body">
+        <div class="finance-grid">
+
+          <div class="finance-card">
+            <div class="label">TOTAL APPOINTMENTS</div>
+            <div class="value">${data.appointmentStatus.total}</div>
+          </div>
+
+          <div class="finance-card">
+            <div class="label">COMPLETED</div>
+            <div class="value">${data.appointmentStatus.completed}</div>
+          </div>
+
+          <div class="finance-card">
+            <div class="label">UPCOMING</div>
+            <div class="value">${data.appointmentStatus.upcoming}</div>
+          </div>
+
+          <div class="finance-card balance">
+            <div class="label">NO SHOW</div>
+            <div class="value">${data.appointmentStatus.noShow}</div>
+          </div>
+
+        </div>
+
+        <div class="breakdown" style="margin-top:12px">
+          <div>
+            <strong>Cancelled</strong>
+            <span>${data.appointmentStatus.cancelled}</span>
+          </div>
+          <div>
+            <strong>Completed / No Show</strong>
+            <span>${data.appointmentStatus.completed} / ${data.appointmentStatus.noShow}</span>
+          </div>
+          <div>
+            <strong>Attendance Rate</strong>
+            <span>${data.attendanceRate}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ===================================================
+         MONTH NOTE
+    ==================================================== -->
+
+    <div style="font-size:10px;color:var(--muted);text-align:right;margin-top:4px">
+      Report period: ${dateDisplay(data.range.start)} — ${dateDisplay(data.range.end)}
+    </div>
+
+  `;
+}
+
+
+/* =========================================================
+   PDF
+========================================================= */
+
+let pdfLibraryPromise = null;
+
+function loadPDFLibrary(){
+  if(window.jspdf?.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+  if(pdfLibraryPromise) return pdfLibraryPromise;
+
+  pdfLibraryPromise = new Promise((resolve,reject)=>{
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+    script.onload = () => {
+      if(window.jspdf?.jsPDF) resolve(window.jspdf.jsPDF);
+      else reject(new Error("PDF library unavailable."));
+    };
+    script.onerror = () => reject(new Error("Unable to load PDF library."));
+    document.head.appendChild(script);
+  });
+
+  return pdfLibraryPromise;
+}
+
+function pdfMoney(n){
+  return `RM ${Number(n||0).toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+}
+
+function addPDFHeader(doc,data){
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(17);
+  doc.text("GETWELL CLINIC",40,42);
+
+  doc.setFontSize(13);
+  doc.text("Monthly Performance Report",40,61);
+
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(9);
+  doc.text(data.monthLabel,40,76);
+  doc.text(`Report period: ${data.range.start} to ${data.range.end}`,40,90);
+
+  doc.setDrawColor(210,218,230);
+  doc.line(40,101,552,101);
+}
+
+function ensurePDFSpace(doc,y,needed=30){
+  if(y + needed <= 800) return y;
+  doc.addPage();
+  return 42;
+}
+
+function pdfSectionTitle(doc,title,y){
+  y = ensurePDFSpace(doc,y,28);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(11);
+  doc.text(title,40,y);
+  return y+18;
+}
+
+function pdfRow(doc,label,value,y){
+  y = ensurePDFSpace(doc,y,18);
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(9);
+  doc.text(String(label),48,y);
+  doc.text(String(value),552,y,{align:"right"});
+  return y+16;
+}
+
+function pdfTable(doc,headers,rows,y,widths){
+  const x0 = 40;
+  const rowH = 20;
+  const totalW = widths.reduce((a,b)=>a+b,0);
+
+  y = ensurePDFSpace(doc,y,rowH*(Math.min(rows.length,25)+2));
+
+  doc.setFillColor(236,242,250);
+  doc.rect(x0,y-13,totalW,rowH,"F");
+
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(8);
+
+  let x = x0;
+  headers.forEach((h,i)=>{
+    doc.text(String(h),x+6,y);
+    x += widths[i];
+  });
+
+  y += rowH;
+
+  doc.setFont("helvetica","normal");
+
+  rows.forEach(row=>{
+    y = ensurePDFSpace(doc,y,rowH+8);
+    let xx=x0;
+    row.forEach((cell,i)=>{
+      const text=String(cell ?? "—");
+      doc.text(text,xx+6,y);
+      xx += widths[i];
+    });
+    doc.setDrawColor(225,231,239);
+    doc.line(x0,y+6,x0+totalW,y+6);
+    y += rowH;
+  });
+
+  return y+8;
+}
+
+async function downloadReportPDF(){
+
+  const monthKey =
+    document.getElementById("reportMonth")?.value ||
+    getCurrentMonthKey();
+
+  const data = getReportData(monthKey);
+
+  try{
+    const jsPDF = await loadPDFLibrary();
+    const doc = new jsPDF({orientation:"portrait",unit:"pt",format:"a4"});
+
+    addPDFHeader(doc,data);
+
+    let y = 125;
+
+    y = pdfSectionTitle(doc,"Performance Overview",y);
+
+    y = pdfRow(doc,"Total Revenue",pdfMoney(data.revenue),y);
+    y = pdfRow(doc,"Total Visits",data.totalVisits,y);
+    y = pdfRow(doc,"New Patients",data.newPatients.length,y);
+    y = pdfRow(doc,"Active Patients",data.activePatients.length,y);
+
+    y += 8;
+    y = pdfSectionTitle(doc,"Revenue Breakdown",y);
+    y = pdfRow(doc,"Injection",pdfMoney(data.injection),y);
+    y = pdfRow(doc,"Medication",pdfMoney(data.medication),y);
+    y = pdfRow(doc,"Treatment",pdfMoney(data.treatment),y);
+    y = pdfRow(doc,"Other",pdfMoney(data.other),y);
+    y = pdfRow(doc,"Total Revenue",pdfMoney(data.revenue),y);
+
+    y += 8;
+    y = pdfSectionTitle(doc,"Patient Activity",y);
+    y = pdfRow(doc,"New Patients",data.newPatients.length,y);
+    y = pdfRow(doc,"Returning Patients",data.returningPatients,y);
+    y = pdfRow(doc,"Completed Programs",data.completedPrograms.length,y);
+    y = pdfRow(doc,"Inactive Patients",data.inactivePatients.length,y);
+
+    y += 8;
+    y = pdfSectionTitle(doc,"Visit Summary",y);
+    y = pdfRow(doc,"Total Visits",data.totalVisits,y);
+    y = pdfRow(doc,"Completed Visits",data.completedVisits,y);
+    y = pdfRow(doc,"Panel Revenue",pdfMoney(data.panelRevenue),y);
+    y = pdfRow(doc,"Self-Pay Revenue",pdfMoney(data.selfPayRevenue),y);
+
+    y += 8;
+    y = pdfSectionTitle(doc,"Panel Performance",y);
+    y = pdfTable(
+      doc,
+      ["Panel","Patients","Invoiced","Claimed","Balance"],
+      data.panelRows.map(r=>[
+        r.panel,
+        r.patients,
+        pdfMoney(r.invoiced),
+        pdfMoney(r.claimed),
+        pdfMoney(r.balance)
+      ]),
+      y,
+      [105,65,115,115,112]
+    );
+
+    y += 8;
+    y = pdfSectionTitle(doc,"Suspended Policies",y);
+    y = pdfRow(doc,"Suspended Patients",data.suspendedPatients.length,y);
+    y = pdfRow(doc,"Total Outstanding",pdfMoney(data.suspendedOutstanding),y);
+
+    if(data.suspendedPatients.length){
+      y += 5;
+      y = pdfTable(
+        doc,
+        ["Patient","Panel","Outstanding","Status"],
+        data.suspendedPatients.map(p=>[
+          `${p.name} (${p.id})`,
+          getPanelName(p),
+          pdfMoney(finance(p).balance),
+          "SUSPENDED"
+        ]),
+        y,
+        [250,95,105,62]
+      );
+    }
+
+    y += 8;
+    y = pdfSectionTitle(doc,"Appointment Performance",y);
+    y = pdfRow(doc,"Total Appointments",data.appointmentStatus.total,y);
+    y = pdfRow(doc,"Completed",data.appointmentStatus.completed,y);
+    y = pdfRow(doc,"Upcoming",data.appointmentStatus.upcoming,y);
+    y = pdfRow(doc,"No Show",data.appointmentStatus.noShow,y);
+    y = pdfRow(doc,"Cancelled",data.appointmentStatus.cancelled,y);
+    y = pdfRow(doc,"Attendance Rate",`${data.attendanceRate}%`,y);
+
+    const pageCount = doc.getNumberOfPages();
+    for(let page=1;page<=pageCount;page++){
+      doc.setPage(page);
+      doc.setFont("helvetica","normal");
+      doc.setFontSize(7.5);
+      doc.setTextColor(100,116,139);
+      doc.text(
+        `Getwell Clinic · ${data.monthLabel} · Page ${page} of ${pageCount}`,
+        40,
+        820
+      );
+      doc.setTextColor(0,0,0);
+    }
+
+    doc.save(`Getwell-Clinic-Report-${monthKey}.pdf`);
+
+  }catch(error){
+    console.error(error);
+    alert("The PDF generator could not load. The report will open in print mode so you can choose Save as PDF.");
+    window.print();
+  }
+}
+
+
+/* =========================================================
+   PRINT SUPPORT
+========================================================= */
+
+const printStyle = document.createElement("style");
+printStyle.textContent = `
+@media print{
+  .sidebar,.topbar,.page-head button,#reportMonth,.global-notification-wrap,.theme-toggle,.user-avatar,.search-box{display:none !important}
+  .main{margin-left:0 !important}
+  .content{padding:12px !important}
+  .card,.kpi{box-shadow:none !important}
+  .page-head{display:block}
+}
+`;
+document.head.appendChild(printStyle);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+buildMonthSelector();
+renderReports();
+renderNotifications();
+
+</script>
+</body>
+</html>
