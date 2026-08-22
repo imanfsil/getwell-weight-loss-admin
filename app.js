@@ -3,46 +3,111 @@ const STORE_KEY = "getwell_ui_sync_v1";
 /* =========================================================
    GLOBAL DAY / NIGHT MODE
 ========================================================= */
+
 const THEME_KEY = "getwell_theme";
 
+
 function getSavedTheme(){
-  const saved = localStorage.getItem(THEME_KEY);
-  return saved === "dark" ? "dark" : "light";
+
+  const saved =
+    localStorage.getItem(
+      THEME_KEY
+    );
+
+  return saved === "dark"
+    ? "dark"
+    : "light";
+
 }
 
-function applyTheme(theme){
-  const selected = theme === "dark" ? "dark" : "light";
 
-  document.documentElement.dataset.theme = selected;
-  localStorage.setItem(THEME_KEY, selected);
+function applyTheme(
+  theme
+){
 
-  const toggle = document.getElementById("themeToggle");
+  const selected =
+    theme === "dark"
+      ? "dark"
+      : "light";
+
+
+  document.documentElement.dataset.theme =
+    selected;
+
+
+  localStorage.setItem(
+    THEME_KEY,
+    selected
+  );
+
+
+  const toggle =
+    document.getElementById(
+      "themeToggle"
+    );
+
 
   if(toggle){
-    toggle.textContent = selected === "dark" ? "☀" : "☾";
-    toggle.title = selected === "dark"
-      ? "Switch to Day Mode"
-      : "Switch to Night Mode";
-    toggle.setAttribute("aria-label", toggle.title);
+
+    toggle.textContent =
+      selected === "dark"
+        ? "☀"
+        : "☾";
+
+
+    toggle.title =
+      selected === "dark"
+        ? "Switch to Day Mode"
+        : "Switch to Night Mode";
+
+
+    toggle.setAttribute(
+      "aria-label",
+      toggle.title
+    );
+
   }
+
 }
+
 
 function toggleTheme(){
-  const current =
-    document.documentElement.dataset.theme || getSavedTheme();
 
-  applyTheme(current === "dark" ? "light" : "dark");
+  const current =
+    document.documentElement.dataset.theme ||
+    getSavedTheme();
+
+
+  applyTheme(
+    current === "dark"
+      ? "light"
+      : "dark"
+  );
+
 }
+
 
 function initTheme(){
-  applyTheme(getSavedTheme());
+
+  applyTheme(
+    getSavedTheme()
+  );
+
 }
+
 
 initTheme();
 
 
+
+/* =========================================================
+   DEMO / INITIAL DATA
+========================================================= */
+
 const seed = {
+
   patients: [
+
     {
       id:"PAT-0001",
       name:"PATIENT 001",
@@ -53,6 +118,7 @@ const seed = {
       goalWeight:65,
       currentWeight:72,
       startingWeight:78,
+
       visits:[
         {
           id:"PAT-0001-V1",
@@ -65,23 +131,28 @@ const seed = {
           medication:"",
           additionalTreatment:"Gut Detox",
           notes:"",
+
           billing:{
             injection:{
               price:120,
               notes:"Tirzepatide 2.5 mg"
             },
+
             medication:{
               price:0,
               notes:""
             },
+
             treatment:{
               price:50,
               notes:"Gut Detox"
             },
+
             other:{
               price:0,
               notes:""
             },
+
             panel:120,
             selfPay:50,
             panelClaimAmount:0,
@@ -89,8 +160,12 @@ const seed = {
             coverageType:"panel"
           }
         }
-      ]
+      ],
+
+      claims:[]
+
     },
+
 
     {
       id:"PAT-0002",
@@ -102,6 +177,7 @@ const seed = {
       goalWeight:68,
       currentWeight:76,
       startingWeight:82,
+
       visits:[
         {
           id:"PAT-0002-V1",
@@ -114,23 +190,28 @@ const seed = {
           medication:"",
           additionalTreatment:"",
           notes:"",
+
           billing:{
             injection:{
               price:100,
               notes:""
             },
+
             medication:{
               price:20,
               notes:""
             },
+
             treatment:{
               price:0,
               notes:""
             },
+
             other:{
               price:0,
               notes:""
             },
+
             panel:0,
             selfPay:120,
             panelClaimAmount:0,
@@ -138,8 +219,12 @@ const seed = {
             coverageType:"self"
           }
         }
-      ]
+      ],
+
+      claims:[]
+
     },
+
 
     {
       id:"PAT-0003",
@@ -151,6 +236,7 @@ const seed = {
       goalWeight:70,
       currentWeight:80,
       startingWeight:90,
+
       visits:[
         {
           id:"PAT-0003-V1",
@@ -163,32 +249,44 @@ const seed = {
           medication:"",
           additionalTreatment:"Physio",
           notes:"",
+
           billing:{
             injection:{
               price:150,
               notes:"Semaglutide 1 mg"
             },
+
             medication:{
               price:0,
               notes:""
             },
+
             treatment:{
               price:80,
               notes:"Physio"
             },
+
             other:{
               price:0,
               notes:""
             },
+
             panel:200,
             selfPay:30,
+
+            /* Legacy demo claim */
             panelClaimAmount:120,
             panelClaimDate:"2026-08-16",
+
             coverageType:"panel"
           }
         }
-      ]
+      ],
+
+      claims:[]
+
     },
+
 
     {
       id:"PAT-0004",
@@ -200,6 +298,7 @@ const seed = {
       goalWeight:70,
       currentWeight:83,
       startingWeight:86,
+
       visits:[
         {
           id:"PAT-0004-V1",
@@ -212,23 +311,28 @@ const seed = {
           medication:"",
           additionalTreatment:"",
           notes:"",
+
           billing:{
             injection:{
               price:0,
               notes:""
             },
+
             medication:{
               price:0,
               notes:""
             },
+
             treatment:{
               price:0,
               notes:""
             },
+
             other:{
               price:0,
               notes:""
             },
+
             panel:0,
             selfPay:0,
             panelClaimAmount:0,
@@ -236,128 +340,552 @@ const seed = {
             coverageType:"self"
           }
         }
-      ]
+      ],
+
+      claims:[]
+
     }
+
   ]
+
 };
 
+
+
+/* =========================================================
+   LEGACY CLAIM MIGRATION
+=========================================================
+
+Old version stored one claim per visit:
+
+billing.panelClaimAmount
+billing.panelClaimDate
+
+New version stores:
+
+patient.claims[]
+
+This migration converts old records automatically.
+========================================================= */
+
+function migrateLegacyClaims(
+  storeData
+){
+
+  let changed =
+    false;
+
+
+  (
+    storeData.patients ||
+    []
+  ).forEach(
+    patient => {
+
+
+      if(
+        !Array.isArray(
+          patient.claims
+        )
+      ){
+
+        patient.claims =
+          [];
+
+        changed =
+          true;
+
+      }
+
+
+      const existingKeys =
+        new Set(
+
+          patient.claims.map(
+            claim =>
+
+              `${claim.visitId || ""}|` +
+              `${claim.claimDate || ""}|` +
+              `${Number(
+                claim.amount || 0
+              )}`
+
+          )
+
+        );
+
+
+      (
+        patient.visits ||
+        []
+      ).forEach(
+        visit => {
+
+
+          const billing =
+            visit.billing ||
+            {};
+
+
+          const legacyAmount =
+            Number(
+              billing.panelClaimAmount ||
+              0
+            );
+
+
+          const legacyDate =
+            billing.panelClaimDate ||
+            "";
+
+
+          if(
+            legacyAmount > 0 &&
+            legacyDate
+          ){
+
+            const key =
+              `${visit.id}|` +
+              `${legacyDate}|` +
+              `${legacyAmount}`;
+
+
+            if(
+              !existingKeys.has(
+                key
+              )
+            ){
+
+              patient.claims.push({
+
+                id:
+                  `${patient.id}-LEGACY-${visit.id}`,
+
+                amount:
+                  legacyAmount,
+
+                claimDate:
+                  legacyDate,
+
+                visitId:
+                  visit.id,
+
+                notes:
+                  "Migrated from previous visit claim record"
+
+              });
+
+
+              existingKeys.add(
+                key
+              );
+
+
+              changed =
+                true;
+
+            }
+
+
+            /*
+              Clear legacy claim values so the old
+              one-claim-per-visit system cannot
+              double count the same claim.
+            */
+
+            billing.panelClaimAmount =
+              0;
+
+
+            billing.panelClaimDate =
+              "";
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+  return changed;
+
+}
+
+
+
+/* =========================================================
+   LOAD / SAVE STORE
+========================================================= */
 
 function loadStore(){
 
   const raw =
-    localStorage.getItem(STORE_KEY);
+    localStorage.getItem(
+      STORE_KEY
+    );
+
 
   if(!raw){
 
-    localStorage.setItem(
-      STORE_KEY,
-      JSON.stringify(seed)
+    const initialData =
+      structuredClone(
+        seed
+      );
+
+
+    /*
+      Migrate seed legacy claim
+      immediately.
+    */
+
+    migrateLegacyClaims(
+      initialData
     );
 
-    return structuredClone(seed);
+
+    localStorage.setItem(
+      STORE_KEY,
+      JSON.stringify(
+        initialData
+      )
+    );
+
+
+    return initialData;
+
   }
+
 
   try{
 
-    return JSON.parse(raw);
+    const data =
+      JSON.parse(
+        raw
+      );
+
+
+    const changed =
+      migrateLegacyClaims(
+        data
+      );
+
+
+    if(changed){
+
+      localStorage.setItem(
+        STORE_KEY,
+        JSON.stringify(
+          data
+        )
+      );
+
+    }
+
+
+    return data;
+
 
   }catch(error){
 
-    localStorage.setItem(
-      STORE_KEY,
-      JSON.stringify(seed)
+    const resetData =
+      structuredClone(
+        seed
+      );
+
+
+    migrateLegacyClaims(
+      resetData
     );
 
-    return structuredClone(seed);
+
+    localStorage.setItem(
+      STORE_KEY,
+      JSON.stringify(
+        resetData
+      )
+    );
+
+
+    return resetData;
+
   }
+
 }
 
 
-function saveStore(store){
+
+function saveStore(
+  data
+){
 
   localStorage.setItem(
     STORE_KEY,
-    JSON.stringify(store)
+    JSON.stringify(
+      data
+    )
   );
+
 }
+
 
 
 function store(){
 
   return loadStore();
+
 }
 
 
-function getPatient(id){
+
+/* =========================================================
+   PATIENT HELPERS
+========================================================= */
+
+function getPatient(
+  id
+){
 
   return store()
     .patients
     .find(
-      patient => patient.id === id
+      patient =>
+        patient.id === id
     ) || null;
+
 }
 
 
-function upsertPatient(patient){
 
-  const data = store();
+function upsertPatient(
+  patient
+){
+
+  const data =
+    store();
+
 
   const index =
     data.patients.findIndex(
-      item => item.id === patient.id
+      item =>
+        item.id ===
+        patient.id
     );
+
 
   if(index >= 0){
 
-    data.patients[index] = patient;
+    data.patients[
+      index
+    ] = patient;
 
   }else{
 
-    data.patients.push(patient);
+    data.patients.push(
+      patient
+    );
+
   }
 
-  saveStore(data);
+
+  saveStore(
+    data
+  );
+
 }
 
 
-function patientUsesPanel(patient){
+
+/* =========================================================
+   PAYMENT / PANEL
+========================================================= */
+
+function patientUsesPanel(
+  patient
+){
 
   return !!(
+
     patient &&
+
     patient.panelProvider &&
-    patient.panelProvider !== "SELF_PAY"
+
+    patient.panelProvider !==
+      "SELF_PAY"
+
   );
+
 }
 
 
-function getPanelName(patient){
+
+function getPanelName(
+  patient
+){
 
   if(!patient){
+
     return "Self-Pay";
+
   }
 
+
   if(
-    patient.panelProvider === "SELF_PAY"
+    patient.panelProvider ===
+      "SELF_PAY"
   ){
 
     return "Self-Pay";
+
   }
+
 
   if(
-    patient.panelProvider === "Other"
+    patient.panelProvider ===
+      "Other"
   ){
 
-    return patient.otherPanelName ||
-      "Panel";
+    return (
+      patient.otherPanelName ||
+      "Panel"
+    );
+
   }
+
+
+  /*
+    Later we can replace these
+    generic values with actual
+    insurance provider names.
+  */
+
+  if(
+    patient.panelProvider ===
+      "PANEL_A"
+  ){
+
+    return "Panel A";
+
+  }
+
+
+  if(
+    patient.panelProvider ===
+      "PANEL_B"
+  ){
+
+    return "Panel B";
+
+  }
+
+
+  if(
+    patient.panelProvider ===
+      "PANEL_C"
+  ){
+
+    return "Panel C";
+
+  }
+
 
   return "Panel";
+
 }
 
 
-function ensureVisit(visit){
 
-  if(!visit.billing){
+/* =========================================================
+   CLAIM LEDGER
+========================================================= */
+
+function ensureClaims(
+  patient
+){
+
+  if(
+    !Array.isArray(
+      patient.claims
+    )
+  ){
+
+    patient.claims =
+      [];
+
+  }
+
+
+  return patient.claims;
+
+}
+
+
+
+function claimsTotal(
+  patient
+){
+
+  return ensureClaims(
+    patient
+  )
+  .reduce(
+    (
+      total,
+      claim
+    ) =>
+
+      total +
+      (
+        Number(
+          claim.amount
+        ) || 0
+      ),
+
+    0
+  );
+
+}
+
+
+
+function grandTotal(
+  patient
+){
+
+  return (
+    patient.visits ||
+    []
+  )
+  .reduce(
+    (
+      total,
+      visit
+    ) =>
+
+      total +
+      visitTotal(
+        visit
+      ),
+
+    0
+  );
+
+}
+
+
+
+/* =========================================================
+   VISIT HELPERS
+========================================================= */
+
+function ensureVisit(
+  visit
+){
+
+  if(
+    !visit.billing
+  ){
 
     visit.billing = {
 
@@ -382,119 +910,267 @@ function ensureVisit(visit){
       },
 
       panel:0,
+
       selfPay:0,
+
+      /*
+        Legacy fields remain here only
+        for backward compatibility.
+      */
+
       panelClaimAmount:0,
+
       panelClaimDate:"",
+
       coverageType:"self"
 
     };
 
   }
 
+
   return visit;
+
 }
 
 
-function visitTotal(visit){
+
+function visitTotal(
+  visit
+){
 
   const billing =
-    ensureVisit(visit).billing;
+    ensureVisit(
+      visit
+    ).billing;
+
 
   return (
-    (+billing.injection?.price || 0) +
-    (+billing.medication?.price || 0) +
-    (+billing.treatment?.price || 0) +
-    (+billing.other?.price || 0)
+
+    (
+      Number(
+        billing.injection?.price
+      ) || 0
+    )
+
+    +
+
+    (
+      Number(
+        billing.medication?.price
+      ) || 0
+    )
+
+    +
+
+    (
+      Number(
+        billing.treatment?.price
+      ) || 0
+    )
+
+    +
+
+    (
+      Number(
+        billing.other?.price
+      ) || 0
+    )
+
   );
+
 }
 
 
-function panelEligible(visit){
+
+function panelEligible(
+  visit
+){
 
   return Math.max(
+
     0,
-    +ensureVisit(visit).billing.panel || 0
+
+    Number(
+      ensureVisit(
+        visit
+      )
+      .billing
+      .panel
+    ) || 0
+
   );
+
 }
 
 
-function totalClaimed(visit){
+
+/*
+  Legacy helper.
+
+  New finance calculations use patient.claims[].
+*/
+
+function totalClaimed(
+  visit
+){
 
   return Math.max(
+
     0,
-    +ensureVisit(visit).billing.panelClaimAmount || 0
+
+    Number(
+      ensureVisit(
+        visit
+      )
+      .billing
+      .panelClaimAmount
+    ) || 0
+
   );
+
 }
 
 
-function finance(patient){
+
+/* =========================================================
+   FINANCIAL CALCULATION
+=========================================================
+
+Panel patient:
+
+GRAND TOTAL
+= all visit invoices
+
+TOTAL CLAIMED
+= all claim transactions
+
+BALANCE TO CLAIM
+= GRAND TOTAL - TOTAL CLAIMED
+
+There is NO TOTAL CLAIMABLE shown.
+========================================================= */
+
+function finance(
+  patient
+){
 
   const result = {
 
     grand:0,
+
     claimed:0,
-    claimable:0,
+
     injection:0,
+
     medication:0,
+
     treatment:0,
-    selfpay:0
+
+    selfpay:0,
+
+    balance:0
 
   };
 
-  (patient.visits || [])
-    .forEach(visit => {
+
+  (
+    patient.visits ||
+    []
+  )
+  .forEach(
+    visit => {
 
       const billing =
-        ensureVisit(visit).billing;
+        ensureVisit(
+          visit
+        ).billing;
+
 
       result.grand +=
-        visitTotal(visit);
+        visitTotal(
+          visit
+        );
 
-      result.claimable +=
-        panelEligible(visit);
-
-      result.claimed +=
-        totalClaimed(visit);
 
       result.injection +=
-        +billing.injection.price || 0;
+
+        Number(
+          billing.injection?.price
+        ) || 0;
+
 
       result.medication +=
-        +billing.medication.price || 0;
+
+        Number(
+          billing.medication?.price
+        ) || 0;
+
 
       result.treatment +=
-        +billing.treatment.price || 0;
+
+        Number(
+          billing.treatment?.price
+        ) || 0;
+
 
       result.selfpay +=
-        +billing.selfPay || 0;
 
-    });
+        Number(
+          billing.selfPay
+        ) || 0;
+
+    }
+  );
+
+
+  result.claimed =
+    claimsTotal(
+      patient
+    );
 
 
   result.balance =
     Math.max(
       0,
-      result.claimable -
+
+      result.grand -
       result.claimed
+
     );
 
+
   return result;
+
 }
 
 
-function daysSince(dateKey){
+
+/* =========================================================
+   FOLLOW-UP
+========================================================= */
+
+function daysSince(
+  dateKey
+){
 
   if(!dateKey){
+
     return null;
+
   }
+
 
   const visitDate =
     new Date(
-      dateKey + "T00:00:00"
+      dateKey +
+      "T00:00:00"
     );
+
 
   const today =
     new Date();
+
 
   today.setHours(
     0,
@@ -503,90 +1179,160 @@ function daysSince(dateKey){
     0
   );
 
+
   return Math.floor(
+
     (
       today -
       visitDate
     ) /
+
     86400000
+
   );
+
 }
 
 
-function latestVisit(patient){
+
+function latestVisit(
+  patient
+){
 
   return [
+
     ...(patient.visits || [])
+
   ]
+
     .sort(
-      (a,b) =>
-        (a.dateKey || "")
-          .localeCompare(
-            b.dateKey || ""
-          )
+      (
+        a,
+        b
+      ) =>
+
+        (
+          a.dateKey ||
+          ""
+        )
+        .localeCompare(
+          b.dateKey ||
+          ""
+        )
+
     )
+
     .at(-1) || null;
+
 }
 
+
+
+/* =========================================================
+   FOLLOW-UP ALERTS
+========================================================= */
 
 function alerts(){
 
   return store()
+
     .patients
-    .map(patient => {
 
-      const visit =
-        latestVisit(patient);
+    .map(
+      patient => {
 
-      const days =
-        daysSince(
-          visit?.dateKey
-        );
+        const visit =
+          latestVisit(
+            patient
+          );
 
-      if(
-        days === null ||
-        days < 5
-      ){
 
-        return null;
-      }
+        const days =
+          daysSince(
+            visit?.dateKey
+          );
 
-      return {
 
-        id:patient.id,
+        if(
 
-        name:patient.name,
+          days === null ||
 
-        days,
+          days < 5
 
-        level:
-          days >= 7
-            ? "overdue"
-            : "warning",
+        ){
 
-        text:
-          `${days} days since last recorded visit.`
-      };
+          return null;
 
-    })
-
-    .filter(Boolean)
-
-    .sort(
-      (a,b) => {
-
-        if(a.level === b.level){
-
-          return b.days - a.days;
         }
 
-        return a.level === "overdue"
+
+        return {
+
+          id:
+            patient.id,
+
+          name:
+            patient.name,
+
+          days:
+            days,
+
+          level:
+            days >= 7
+              ? "overdue"
+              : "warning",
+
+          text:
+            `${days} days since last recorded visit.`
+
+        };
+
+      }
+    )
+
+    .filter(
+      Boolean
+    )
+
+    .sort(
+      (
+        a,
+        b
+      ) => {
+
+        if(
+          a.level ===
+          b.level
+        ){
+
+          return (
+            b.days -
+            a.days
+          );
+
+        }
+
+
+        return (
+
+          a.level ===
+          "overdue"
+
+        )
+
           ? -1
           : 1;
+
       }
     );
+
 }
 
+
+
+/* =========================================================
+   NOTIFICATION UI
+========================================================= */
 
 function renderNotifications(){
 
@@ -595,28 +1341,43 @@ function renderNotifications(){
       "notifCount"
     );
 
+
   const body =
     document.getElementById(
       "notifBody"
     );
 
-  if(!count || !body){
+
+  if(
+    !count ||
+    !body
+  ){
+
     return;
+
   }
+
 
   const notifications =
     alerts();
 
+
   count.hidden =
     notifications.length === 0;
 
+
   count.textContent =
-    notifications.length > 99
+
+    notifications.length >
+    99
+
       ? "99+"
+
       : notifications.length;
 
 
   body.innerHTML =
+
     notifications.length
 
       ? notifications
@@ -627,34 +1388,49 @@ function renderNotifications(){
                 class="notif-item"
                 onclick="
                   location.href=
-                  'patient-profile.html?patient=${encodeURIComponent(item.id)}'
+                  'patient-profile.html?patient=${encodeURIComponent(
+                    item.id
+                  )}'
                 "
               >
 
                 <span
-                  class="notif-dot ${item.level}"
+                  class="
+                    notif-dot
+                    ${item.level}
+                  "
                 ></span>
 
 
                 <div>
 
-                  <div class="notif-name">
+                  <div
+                    class="notif-name"
+                  >
                     ${item.name}
                   </div>
 
 
-                  <div class="notif-text">
+                  <div
+                    class="notif-text"
+                  >
 
                     ${
-                      item.level === "overdue"
+                      item.level ===
+                      "overdue"
+
                         ? "Overdue"
+
                         : "Due for Follow-Up"
+
                     }
 
                   </div>
 
 
-                  <div class="notif-text">
+                  <div
+                    class="notif-text"
+                  >
                     ${item.text}
                   </div>
 
@@ -666,36 +1442,57 @@ function renderNotifications(){
           )
           .join("")
 
+
       : `
 
-        <div class="notif-empty">
+        <div
+          class="notif-empty"
+        >
           No patients are due for follow-up.
         </div>
 
       `;
+
 }
 
 
-function toggleNotifications(event){
+
+/* =========================================================
+   NOTIFICATION TOGGLE
+========================================================= */
+
+function toggleNotifications(
+  event
+){
 
   event.stopPropagation();
+
 
   const panel =
     document.getElementById(
       "notifPanel"
     );
 
+
   if(!panel){
+
     return;
+
   }
+
 
   panel.hidden =
     !panel.hidden;
 
+
   if(!panel.hidden){
+
     renderNotifications();
+
   }
+
 }
+
 
 
 document.addEventListener(
@@ -707,25 +1504,36 @@ document.addEventListener(
         "notifWrap"
       );
 
+
     const panel =
       document.getElementById(
         "notifPanel"
       );
 
+
     if(
+
       wrapper &&
       panel &&
       !wrapper.contains(
         event.target
       )
+
     ){
 
-      panel.hidden = true;
+      panel.hidden =
+        true;
+
     }
 
   }
 );
 
+
+
+/* =========================================================
+   HEADER
+========================================================= */
 
 function header(
   title,
@@ -735,193 +1543,266 @@ function header(
 
   return `
 
-    <header class="topbar">
-
-      <div class="topbar-left">
-
-        <button
-          class="mobile-menu"
-          onclick="
-            document
-            .querySelector('.sidebar')
-            ?.classList.toggle('open')
-          "
-        >
-          ☰
-        </button>
+<header class="topbar">
 
 
-        <div>
+  <div class="topbar-left">
 
-          <div class="page-title">
-            ${title}
-          </div>
 
-          <div class="page-subtitle">
-            ${subtitle}
-          </div>
+    <button
+      class="mobile-menu"
+      onclick="
+        document
+        .querySelector('.sidebar')
+        ?.classList.toggle(
+          'open'
+        )
+      "
+    >
+      ☰
+    </button>
 
-        </div>
 
+    <div>
+
+      <div class="page-title">
+        ${title}
       </div>
 
 
-      <div class="topbar-right">
+      <div class="page-subtitle">
+        ${subtitle}
+      </div>
 
-        <div class="search-box">
+    </div>
 
-          <span>
-            ⌕
-          </span>
 
-          <input
-            id="globalSearch"
-            placeholder="Search patient, ID or phone..."
+  </div>
+
+
+
+  <div class="topbar-right">
+
+
+    <!-- SEARCH -->
+
+    <div class="search-box">
+
+      <span>
+        ⌕
+      </span>
+
+
+      <input
+        id="globalSearch"
+        placeholder="Search patient, ID or phone..."
+      >
+
+    </div>
+
+
+
+    <!-- NOTIFICATION -->
+
+    <div
+      class="global-notification-wrap"
+      id="notifWrap"
+    >
+
+
+      <button
+        type="button"
+        class="icon-button"
+        onclick="
+          toggleNotifications(
+            event
+          )
+        "
+        aria-label="Notifications"
+        title="Follow-Up Notifications"
+      >
+
+        🔔
+
+
+        <span
+          class="notification-count"
+          id="notifCount"
+          hidden
+        >
+          0
+        </span>
+
+      </button>
+
+
+      <div
+        class="
+          global-notification-panel
+        "
+        id="notifPanel"
+        hidden
+      >
+
+
+        <div
+          class="notif-head"
+        >
+
+
+          <div>
+
+            <strong>
+              Follow-Up Alerts
+            </strong>
+
+
+            <span>
+              5 days = due · 7 days = overdue
+            </span>
+
+          </div>
+
+
+          <button
+            type="button"
+            class="icon-button"
+            style="
+              width:28px;
+              height:28px;
+            "
+            onclick="
+              document
+                .getElementById(
+                  'notifPanel'
+                )
+                .hidden=true
+            "
           >
+            ×
+          </button>
+
 
         </div>
 
 
         <div
-          class="global-notification-wrap"
-          id="notifWrap"
-        >
+          id="notifBody"
+        ></div>
 
-          <button
-            type="button"
-            class="icon-button"
-            onclick="
-              toggleNotifications(event)
-            "
-            aria-label="Notifications"
-            title="Follow-Up Notifications"
-          >
-
-            🔔
-
-
-            <span
-              class="notification-count"
-              id="notifCount"
-              hidden
-            >
-              0
-            </span>
-
-          </button>
-
-
-          <div
-            class="global-notification-panel"
-            id="notifPanel"
-            hidden
-          >
-
-            <div class="notif-head">
-
-              <div>
-
-                <strong>
-                  Follow-Up Alerts
-                </strong>
-
-                <span>
-                  5 days = due · 7 days = overdue
-                </span>
-
-              </div>
-
-
-              <button
-                type="button"
-                class="icon-button"
-                style="
-                  width:28px;
-                  height:28px
-                "
-                onclick="
-                  document
-                    .getElementById('notifPanel')
-                    .hidden=true
-                "
-              >
-                ×
-              </button>
-
-            </div>
-
-
-            <div id="notifBody"></div>
-
-          </div>
-
-        </div>
-
-
-        <button
-          type="button"
-          class="theme-toggle"
-          id="themeToggle"
-          onclick="
-            toggleTheme()
-          "
-          aria-label="Switch to Night Mode"
-          title="Switch to Night Mode"
-        >
-          ☾
-        </button>
-
-
-        <div class="user-avatar">
-          A
-        </div>
 
       </div>
 
-    </header>
 
-  `;
+    </div>
+
+
+
+    <!-- DAY / NIGHT -->
+
+    <button
+      type="button"
+      class="theme-toggle"
+      id="themeToggle"
+      onclick="
+        toggleTheme()
+      "
+      aria-label="Switch to Night Mode"
+      title="Switch to Night Mode"
+    >
+      ☾
+    </button>
+
+
+
+    <!-- USER -->
+
+    <div
+      class="user-avatar"
+    >
+      A
+    </div>
+
+
+  </div>
+
+
+</header>
+
+`;
+
 }
 
 
-function sidebar(active){
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+function sidebar(
+  active
+){
 
   return `
 
-    <aside class="sidebar">
+    <aside
+      class="sidebar"
+    >
 
-      <div class="brand">
 
-        <div class="brand-mark">
+      <div
+        class="brand"
+      >
+
+
+        <div
+          class="brand-mark"
+        >
           G
         </div>
 
 
         <div>
 
-          <div class="brand-name">
+          <div
+            class="brand-name"
+          >
             GETWELL
           </div>
 
-          <div class="brand-sub">
+
+          <div
+            class="brand-sub"
+          >
             Weight Loss Admin
           </div>
 
         </div>
 
+
       </div>
 
 
-      <nav class="nav">
 
-        <div class="nav-label">
+      <nav
+        class="nav"
+      >
+
+
+        <div
+          class="nav-label"
+        >
           MAIN
         </div>
 
 
+
+        <!-- DASHBOARD -->
+
         <a
           class="${
-            active === "dashboard"
+            active ===
+            "dashboard"
               ? "active"
               : ""
           }"
@@ -931,9 +1812,13 @@ function sidebar(active){
         </a>
 
 
+
+        <!-- PATIENTS -->
+
         <a
           class="${
-            active === "patients"
+            active ===
+            "patients"
               ? "active"
               : ""
           }"
@@ -943,49 +1828,51 @@ function sidebar(active){
         </a>
 
 
+
+        <!-- APPOINTMENTS -->
+
         <a
+          class="${
+            active ===
+            "appointments"
+              ? "active"
+              : ""
+          }"
           href="appointments.html"
         >
           ▣ Appointments
         </a>
 
 
-        <div
-          class="nav-label"
-          style="margin-top:18px"
-        >
-          PROGRAM
-        </div>
-
-
-        <a
-          href="appointments.html"
-        >
-          ↗ Treatments
-        </a>
-
-
-        <a
-          href="appointments.html"
-        >
-          ◒ Progress
-        </a>
-
-
-        <a
-          href="appointments.html"
-        >
-          ! Follow-Up
-        </a>
-
 
         <div
           class="nav-label"
-          style="margin-top:18px"
+          style="
+            margin-top:18px;
+          "
         >
           MANAGEMENT
         </div>
 
+
+
+        <!-- PANEL -->
+
+        <a
+          class="${
+            active ===
+            "panel"
+              ? "active"
+              : ""
+          }"
+          href="panel.html"
+        >
+          ▣ Panel
+        </a>
+
+
+
+        <!-- REPORTS -->
 
         <a
           href="appointments.html"
@@ -994,45 +1881,72 @@ function sidebar(active){
         </a>
 
 
+
+        <!-- SETTINGS -->
+
         <a
           href="appointments.html"
         >
           ⚙ Settings
         </a>
 
+
       </nav>
 
 
-      <div class="sidebar-user">
 
-        <div class="user-card">
+      <div
+        class="sidebar-user"
+      >
 
-          <div class="user-dot">
+
+        <div
+          class="user-card"
+        >
+
+
+          <div
+            class="user-dot"
+          >
             A
           </div>
 
 
           <div>
 
-            <div class="user-name">
+            <div
+              class="user-name"
+            >
               Administrator
             </div>
 
-            <div class="user-role">
+
+            <div
+              class="user-role"
+            >
               Weight Loss Program
             </div>
 
           </div>
 
+
         </div>
 
+
       </div>
+
 
     </aside>
 
   `;
+
 }
 
+
+
+/* =========================================================
+   PAGE SHELL
+========================================================= */
 
 function shell(
   title,
@@ -1043,11 +1957,18 @@ function shell(
 
   return `
 
-    <div class="app">
+    <div
+      class="app"
+    >
 
-      ${sidebar(active)}
+      ${sidebar(
+        active
+      )}
 
-      <main class="main">
+
+      <main
+        class="main"
+      >
 
         ${header(
           title,
@@ -1055,23 +1976,90 @@ function shell(
           active
         )}
 
-        <div class="content">
+
+        <div
+          class="content"
+        >
 
           ${body}
 
         </div>
 
+
       </main>
+
 
     </div>
 
   `;
+
 }
 
+
+
+/* =========================================================
+   GLOBAL SEARCH
+========================================================= */
+
+function globalSearch(
+  query
+){
+
+  if(!query){
+
+    return;
+
+  }
+
+
+  const match =
+    store()
+      .patients
+      .find(
+        patient =>
+
+          (
+            patient.name +
+            " " +
+            patient.id
+          )
+          .toLowerCase()
+          .includes(
+            query
+              .toLowerCase()
+          )
+      );
+
+
+  if(
+    match &&
+    query.length >= 3 &&
+    typeof event !==
+      "undefined" &&
+    event.key ===
+      "Enter"
+  ){
+
+    location.href =
+      "patient-profile.html?patient=" +
+      encodeURIComponent(
+        match.id
+      );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   INITIAL RENDER
+========================================================= */
 
 function render(){
 
   renderNotifications();
+
 }
 
 
