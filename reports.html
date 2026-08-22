@@ -16,11 +16,11 @@
 
 <link
   rel="stylesheet"
-  href="styles.css?v=20260822-final3"
+  href="styles.css?v=20260822fix"
 >
 
 <script
-  src="app.js?v=20260822-final3"
+  src="app.js?v=20260822fix"
 ></script>
 
 </head>
@@ -35,7 +35,6 @@
 
 /* =========================================================
    REPORTS PAGE
-   Monthly performance report using the existing store.
 ========================================================= */
 
 document.getElementById("root").innerHTML = shell(
@@ -112,17 +111,14 @@ document.getElementById("root").innerHTML = shell(
 
 
 /* =========================================================
-   KEEP REPORTS LINK ON REPORTS PAGE
+   REPORTS NAVIGATION
 ========================================================= */
 
-(function setupReportsNavigation(){
+(function(){
 
-  const links =
-    document.querySelectorAll(".nav a");
-
-
-  links.forEach(
-    link => {
+  document
+    .querySelectorAll(".nav a")
+    .forEach(link => {
 
       if(
         (
@@ -142,14 +138,13 @@ document.getElementById("root").innerHTML = shell(
 
       }
 
-    }
-  );
+    });
 
 })();
 
 
 /* =========================================================
-   MONTH HELPERS
+   DATE HELPERS
 ========================================================= */
 
 function pad2(n){
@@ -160,11 +155,28 @@ function pad2(n){
 }
 
 
+function getCurrentMonthKey(){
+
+  const d =
+    new Date();
+
+  return (
+    d.getFullYear()
+    + "-"
+    +
+    pad2(
+      d.getMonth()+1
+    )
+  );
+
+}
+
+
 function monthLabel(key){
 
   const [
-    y,
-    m
+    year,
+    month
   ] =
     key
       .split("-")
@@ -172,8 +184,8 @@ function monthLabel(key){
 
 
   return new Date(
-    y,
-    m - 1,
+    year,
+    month - 1,
     1
   )
   .toLocaleDateString(
@@ -183,23 +195,6 @@ function monthLabel(key){
       year:"numeric"
     }
   );
-
-}
-
-
-function getCurrentMonthKey(){
-
-  const d =
-    new Date();
-
-
-  return `${
-    d.getFullYear()
-  }-${
-    pad2(
-      d.getMonth()+1
-    )
-  }`;
 
 }
 
@@ -236,8 +231,7 @@ function getMonthRange(key){
     year,
     month,
     start,
-    end,
-    lastDay
+    end
   };
 
 }
@@ -248,7 +242,7 @@ function isDateInMonth(
   range
 ){
 
-  const d =
+  const date =
     String(
       dateValue || ""
     )
@@ -258,9 +252,11 @@ function isDateInMonth(
     );
 
 
-  return !!d &&
-    d >= range.start &&
-    d <= range.end;
+  return (
+    date &&
+    date >= range.start &&
+    date <= range.end
+  );
 
 }
 
@@ -305,114 +301,6 @@ function dateDisplay(
 
 
 /* =========================================================
-   DATE HELPERS FOR RETURNING PATIENTS
-========================================================= */
-
-function normaliseDate(
-  dateValue
-){
-
-  const value =
-    String(
-      dateValue || ""
-    )
-    .slice(
-      0,
-      10
-    );
-
-
-  if(
-    !/^\d{4}-\d{2}-\d{2}$/.test(
-      value
-    )
-  ){
-
-    return null;
-
-  }
-
-
-  return value;
-
-}
-
-
-function isAtLeastOneMonthApart(
-  previousDate,
-  currentDate
-){
-
-  const previous =
-    normaliseDate(
-      previousDate
-    );
-
-
-  const current =
-    normaliseDate(
-      currentDate
-    );
-
-
-  if(
-    !previous ||
-    !current
-  ){
-
-    return false;
-
-  }
-
-
-  const [
-    py,
-    pm,
-    pd
-  ] =
-    previous
-      .split("-")
-      .map(Number);
-
-
-  const [
-    cy,
-    cm,
-    cd
-  ] =
-    current
-      .split("-")
-      .map(Number);
-
-
-  const previousPlusOneMonth =
-    new Date(
-      py,
-      pm - 1,
-      pd
-    );
-
-
-  previousPlusOneMonth.setMonth(
-    previousPlusOneMonth.getMonth()+1
-  );
-
-
-  const currentDateObject =
-    new Date(
-      cy,
-      cm - 1,
-      cd
-    );
-
-
-  return currentDateObject >=
-    previousPlusOneMonth;
-
-}
-
-
-/* =========================================================
    MONTH SELECTOR
 ========================================================= */
 
@@ -444,43 +332,33 @@ function buildMonthSelector(){
   const options = [];
 
 
-  /*
-    Show current year and previous year.
-  */
-
   for(
-    let y=currentYear;
-    y>=currentYear-1;
-    y--
+    let year=currentYear;
+    year>=currentYear-1;
+    year--
   ){
 
     const maxMonth =
-      y === currentYear
+      year === currentYear
         ? currentMonth
         : 12;
 
 
-    const minMonth =
-      1;
-
-
     for(
-      let m=maxMonth;
-      m>=minMonth;
-      m--
+      let month=maxMonth;
+      month>=1;
+      month--
     ){
 
       const key =
-        `${y}-${pad2(m)}`;
+        `${year}-${pad2(month)}`;
 
 
-      options.push(
-        `
+      options.push(`
         <option value="${key}">
           ${monthLabel(key)}
         </option>
-        `
-      );
+      `);
 
     }
 
@@ -498,31 +376,87 @@ function buildMonthSelector(){
 
 
 /* =========================================================
-   RETURNING PATIENT CALCULATION
+   RETURNING PATIENT LOGIC
+
+   Definition:
+   Patient has a new visit during the selected month,
+   and the previous visit was at least one month earlier.
 ========================================================= */
 
-function getReturningPatients(
+function isAtLeastOneMonthApart(
+  previousDate,
+  currentDate
+){
+
+  if(
+    !previousDate ||
+    !currentDate
+  ){
+
+    return false;
+
+  }
+
+
+  const previous =
+    new Date(
+      previousDate +
+      "T00:00:00"
+    );
+
+
+  const current =
+    new Date(
+      currentDate +
+      "T00:00:00"
+    );
+
+
+  const minimumReturnDate =
+    new Date(
+      previous
+    );
+
+
+  minimumReturnDate.setMonth(
+    minimumReturnDate.getMonth()+1
+  );
+
+
+  return (
+    current >=
+    minimumReturnDate
+  );
+
+}
+
+
+function getReturningPatientIds(
   patients,
-  visits,
   range
 ){
 
-  const returningIds =
+  const returning =
     new Set();
 
 
   patients.forEach(
     patient => {
 
-      const patientVisits =
+      const visits =
         (patient.visits || [])
           .map(
             visit => {
 
               const date =
-                normaliseDate(
+                String(
                   visit.dateKey ||
-                  visit.date
+                  visit.date ||
+                  ""
+                )
+                .slice(
+                  0,
+                  10
                 );
 
 
@@ -531,8 +465,7 @@ function getReturningPatients(
 
 
               return {
-                ...visit,
-                reportDate:date
+                date
               };
 
             }
@@ -540,15 +473,14 @@ function getReturningPatients(
           .filter(Boolean)
           .sort(
             (a,b)=>
-              a.reportDate
-                .localeCompare(
-                  b.reportDate
-                )
+              a.date.localeCompare(
+                b.date
+              )
           );
 
 
       if(
-        patientVisits.length < 2
+        visits.length < 2
       ){
 
         return;
@@ -558,22 +490,26 @@ function getReturningPatients(
 
       for(
         let i=1;
-        i<patientVisits.length;
+        i<visits.length;
         i++
       ){
 
-        const currentVisit =
-          patientVisits[i];
+        const current =
+          visits[i];
+
+
+        const previous =
+          visits[i-1];
 
 
         /*
-          Only consider the new visit if it
-          happened during the selected month.
+          The new visit must be
+          inside the selected month.
         */
 
         if(
           !isDateInMonth(
-            currentVisit.reportDate,
+            current.date,
             range
           )
         ){
@@ -583,31 +519,22 @@ function getReturningPatients(
         }
 
 
-        const previousVisit =
-          patientVisits[i-1];
-
-
         /*
-          Returning Patient:
-          previous visit was at least
-          one month before the new visit.
+          Previous visit must be
+          at least one month earlier.
         */
 
         if(
           isAtLeastOneMonthApart(
-            previousVisit.reportDate,
-            currentVisit.reportDate
+            previous.date,
+            current.date
           )
         ){
 
-          returningIds.add(
+          returning.add(
             patient.id
           );
 
-          /*
-            Once the patient qualifies,
-            no need to check further.
-          */
 
           break;
 
@@ -619,7 +546,7 @@ function getReturningPatients(
   );
 
 
-  return returningIds;
+  return returning;
 
 }
 
@@ -643,7 +570,9 @@ function getReportData(
 
 
   const visits = [];
+
   const appointments = [];
+
   const claims = [];
 
 
@@ -654,111 +583,120 @@ function getReportData(
         VISITS
       */
 
-      (patient.visits || [])
-        .forEach(
-          visit => {
+      (
+        patient.visits ||
+        []
+      )
+      .forEach(
+        visit => {
 
-            const date =
-              visit.dateKey ||
-              visit.date ||
-              "";
+          const date =
+            visit.dateKey ||
+            visit.date ||
+            "";
 
 
-            if(
-              isDateInMonth(
-                date,
-                range
-              )
-            ){
+          if(
+            isDateInMonth(
+              date,
+              range
+            )
+          ){
 
-              visits.push({
+            visits.push({
 
-                ...visit,
+              ...visit,
 
-                patientId:
-                  patient.id,
+              patientId:
+                patient.id,
 
-                patientName:
-                  patient.name,
+              patientName:
+                patient.name,
 
-                patient
+              patient
 
-              });
-
-            }
+            });
 
           }
-        );
+
+        }
+      );
 
 
       /*
         APPOINTMENTS
       */
 
-      (patient.appointments || [])
-        .forEach(
-          appointment => {
+      (
+        patient.appointments ||
+        []
+      )
+      .forEach(
+        appointment => {
 
-            if(
-              isDateInMonth(
-                appointment.date,
-                range
-              )
-            ){
+          if(
+            isDateInMonth(
+              appointment.date,
+              range
+            )
+          ){
 
-              appointments.push({
+            appointments.push({
 
-                ...appointment,
+              ...appointment,
 
-                patientId:
-                  patient.id,
+              patientId:
+                patient.id,
 
-                patientName:
-                  patient.name,
+              patientName:
+                patient.name,
 
-                patient
+              patient
 
-              });
-
-            }
+            });
 
           }
-        );
+
+        }
+      );
 
 
       /*
         CLAIMS
       */
 
-      (patient.claims || [])
-        .forEach(
-          claim => {
+      (
+        patient.claims ||
+        []
+      )
+      .forEach(
+        claim => {
 
-            if(
-              isDateInMonth(
-                claim.claimDate,
-                range
-              )
-            ){
+          if(
+            isDateInMonth(
+              claim.claimDate,
+              range
+            )
+          ){
 
-              claims.push({
+            claims.push({
 
-                ...claim,
+              ...claim,
 
-                patientId:
-                  patient.id,
+              patientId:
+                patient.id,
 
-                patientName:
-                  patient.name,
+              patientName:
+                patient.name,
 
-                patient
+              patient
 
-              });
-
-            }
+            });
 
           }
-        );
+
+        }
+      );
 
     }
   );
@@ -766,7 +704,7 @@ function getReportData(
 
   /* =======================================================
      REVENUE
-  ======================================================= */
+  ======================================================== */
 
   let revenue = 0;
 
@@ -803,27 +741,23 @@ function getReportData(
 
 
       injection +=
-        +billing
-          .injection
-          .price || 0;
+        +billing.injection.price ||
+        0;
 
 
       medication +=
-        +billing
-          .medication
-          .price || 0;
+        +billing.medication.price ||
+        0;
 
 
       treatment +=
-        +billing
-          .treatment
-          .price || 0;
+        +billing.treatment.price ||
+        0;
 
 
       other +=
-        +billing
-          .other
-          .price || 0;
+        +billing.other.price ||
+        0;
 
 
       if(
@@ -848,7 +782,7 @@ function getReportData(
 
   /* =======================================================
      NEW PATIENTS
-  ======================================================= */
+  ======================================================== */
 
   const newPatients =
     patients.filter(
@@ -863,24 +797,18 @@ function getReportData(
 
   /* =======================================================
      RETURNING PATIENTS
-
-     Definition:
-     A patient who has a new visit during
-     the selected month AND the previous
-     visit was at least one month earlier.
-  ======================================================= */
+  ======================================================== */
 
   const returningIds =
-    getReturningPatients(
+    getReturningPatientIds(
       patients,
-      visits,
       range
     );
 
 
   /*
-    Do not count a patient as both
-    New Patient and Returning Patient.
+    A new patient should not also
+    appear as a returning patient.
   */
 
   newPatients.forEach(
@@ -900,7 +828,7 @@ function getReportData(
 
   /* =======================================================
      ACTIVE PATIENTS
-  ======================================================= */
+  ======================================================== */
 
   const activePatients =
     patients.filter(
@@ -921,7 +849,8 @@ function getReportData(
         return (
           start &&
           start <= range.end &&
-          patient.status === "Active"
+          patient.status ===
+            "Active"
         );
 
       }
@@ -930,7 +859,7 @@ function getReportData(
 
   /* =======================================================
      COMPLETED PROGRAMS
-  ======================================================= */
+  ======================================================== */
 
   const completedPrograms =
     patients.filter(
@@ -945,17 +874,10 @@ function getReportData(
 
 
         return (
-          (
-            status ===
-              "completed" ||
-            status ===
-              "goal achieved"
-          ) &&
-          String(
-            patient.startDate ||
-            patient.programStartDate ||
-            ""
-          ) <= range.end
+          status ===
+            "completed" ||
+          status ===
+            "goal achieved"
         );
 
       }
@@ -963,8 +885,8 @@ function getReportData(
 
 
   /* =======================================================
-     INACTIVE PATIENTS
-  ======================================================= */
+     INACTIVE
+  ======================================================== */
 
   const inactivePatients =
     patients.filter(
@@ -979,16 +901,11 @@ function getReportData(
 
 
   /* =======================================================
-     VISIT SUMMARY
-  ======================================================= */
+     VISITS
+  ======================================================== */
 
-  const visitPatients =
-    new Set(
-      visits.map(
-        visit =>
-          visit.patientId
-      )
-    );
+  const totalVisits =
+    visits.length;
 
 
   const completedVisits =
@@ -1003,13 +920,9 @@ function getReportData(
     ).length;
 
 
-  const totalVisits =
-    visits.length;
-
-
   /* =======================================================
-     PANEL REPORT
-  ======================================================= */
+     PANEL PERFORMANCE
+  ======================================================== */
 
   const panelMap = {};
 
@@ -1128,7 +1041,8 @@ function getReportData(
         panel
       ]
       .claimed +=
-        +claim.amount || 0;
+        +claim.amount ||
+        0;
 
     }
   );
@@ -1141,10 +1055,17 @@ function getReportData(
     .map(
       row => ({
 
-        ...row,
+        panel:
+          row.panel,
 
         patients:
           row.patients.size,
+
+        invoiced:
+          row.invoiced,
+
+        claimed:
+          row.claimed,
 
         balance:
           Math.max(
@@ -1164,7 +1085,7 @@ function getReportData(
 
   /* =======================================================
      SUSPENDED POLICIES
-  ======================================================= */
+  ======================================================== */
 
   const suspendedPatients =
     patients.filter(
@@ -1181,10 +1102,10 @@ function getReportData(
   const suspendedOutstanding =
     suspendedPatients.reduce(
       (
-        sum,
+        total,
         patient
       ) =>
-        sum +
+        total +
         finance(
           patient
         ).balance,
@@ -1193,8 +1114,8 @@ function getReportData(
 
 
   /* =======================================================
-     APPOINTMENT SUMMARY
-  ======================================================= */
+     APPOINTMENTS
+  ======================================================== */
 
   const appointmentStatus = {
 
@@ -1233,12 +1154,7 @@ function getReportData(
 
 
   /*
-    Attendance Rate:
-    Completed ÷ (Completed + No Show)
-
-    Cancelled appointments are excluded
-    because the patient did not have an
-    attendance opportunity.
+    Attendance excludes cancelled appointments.
   */
 
   const attendanceBase =
@@ -1268,14 +1184,6 @@ function getReportData(
 
     range,
 
-    patients,
-
-    visits,
-
-    appointments,
-
-    claims,
-
     revenue,
 
     injection,
@@ -1300,8 +1208,6 @@ function getReportData(
 
     inactivePatients,
 
-    visitPatients,
-
     totalVisits,
 
     completedVisits,
@@ -1322,7 +1228,7 @@ function getReportData(
 
 
 /* =========================================================
-   HTML HELPERS
+   REPORT MONEY
 ========================================================= */
 
 function reportMoney(n){
@@ -1331,6 +1237,10 @@ function reportMoney(n){
 
 }
 
+
+/* =========================================================
+   EMPTY TABLE
+========================================================= */
 
 function emptyRow(
   colspan,
@@ -1346,7 +1256,7 @@ function emptyRow(
         style="
           text-align:center;
           padding:28px;
-          color:var(--muted)
+          color:var(--muted);
         "
       >
 
@@ -1361,70 +1271,20 @@ function emptyRow(
 }
 
 
-function statusBadge(
-  status
-){
-
-  const s =
-    String(
-      status || ""
-    )
-    .toLowerCase();
-
-
-  let cls =
-    "orange";
-
-
-  if(
-    s ===
-    "completed"
-  ){
-
-    cls =
-      "green";
-
-  }
-
-
-  if(
-    s ===
-      "cancelled" ||
-    s ===
-      "no show"
-  ){
-
-    cls =
-      "red";
-
-  }
-
-
-  return `
-
-    <span
-      class="badge ${cls}"
-    >
-      ${status || "—"}
-    </span>
-
-  `;
-
-}
-
-
 /* =========================================================
-   REPORT RENDER
+   MAIN REPORT RENDER
 ========================================================= */
 
 function renderReports(){
 
+  const select =
+    document.getElementById(
+      "reportMonth"
+    );
+
+
   const monthKey =
-    document
-      .getElementById(
-        "reportMonth"
-      )
-      ?.value ||
+    select?.value ||
     getCurrentMonthKey();
 
 
@@ -1434,950 +1294,970 @@ function renderReports(){
     );
 
 
-  document
-    .getElementById(
+  const content =
+    document.getElementById(
       "reportContent"
-    )
-    .innerHTML = `
+    );
 
 
-    <!-- ===================================================
-         REPORT PERIOD
-    ==================================================== -->
-
-    <div
-      class="card"
-      style="
-        margin-bottom:16px;
-      "
-    >
-
-      <div class="card-head">
-
-        <div>
-
-          <h2>
-            Performance Overview
-          </h2>
-
-          <p>
-            ${data.monthLabel}
-            ·
-            ${dateDisplay(
-              data.range.start
-            )}
-            —
-            ${dateDisplay(
-              data.range.end
-            )}
-          </p>
-
-        </div>
+  if(!content)
+    return;
 
 
-        <span
-          class="badge blue"
-        >
-          ${data.monthLabel}
-        </span>
+  content.innerHTML = `
+
+
+  <!-- =====================================================
+       PERFORMANCE OVERVIEW
+  ====================================================== -->
+
+  <div
+    class="card"
+    style="
+      margin-bottom:16px;
+    "
+  >
+
+    <div class="card-head">
+
+      <div>
+
+        <h2>
+          Performance Overview
+        </h2>
+
+        <p>
+          Clinic performance for
+          ${data.monthLabel}.
+        </p>
+
+      </div>
+
+
+      <span class="badge blue">
+
+        ${data.monthLabel}
+
+      </span>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       KPI
+  ====================================================== -->
+
+  <div class="kpi-grid">
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        TOTAL REVENUE
+      </div>
+
+      <div class="kpi-value">
+        ${reportMoney(
+          data.revenue
+        )}
+      </div>
+
+      <div class="kpi-sub">
+        Billing recorded from visits
+      </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        TOTAL VISITS
+      </div>
+
+      <div class="kpi-value">
+        ${data.totalVisits}
+      </div>
+
+      <div class="kpi-sub">
+        ${data.completedVisits}
+        completed
+      </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        NEW PATIENTS
+      </div>
+
+      <div class="kpi-value">
+        ${data.newPatients.length}
+      </div>
+
+      <div class="kpi-sub">
+        Started this month
+      </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        ACTIVE PATIENTS
+      </div>
+
+      <div class="kpi-value">
+        ${data.activePatients.length}
+      </div>
+
+      <div class="kpi-sub">
+        Currently active
+      </div>
+
+    </div>
+
+
+  </div>
+
+
+  <!-- =====================================================
+       REVENUE BREAKDOWN
+
+       FULL WIDTH.
+       No grid wrapper.
+  ====================================================== -->
+
+  <div
+    class="card"
+    style="
+      margin-top:16px;
+      margin-bottom:16px;
+    "
+  >
+
+    <div class="card-head">
+
+      <div>
+
+        <h2>
+          Revenue Breakdown
+        </h2>
+
+        <p>
+          Billing recorded from visits
+          during ${data.monthLabel}.
+        </p>
 
       </div>
 
     </div>
 
 
-    <!-- ===================================================
-         KPI
-    ==================================================== -->
+    <div
+      class="card-body"
+      style="
+        padding-top:6px;
+      "
+    >
 
-    <div class="kpi-grid">
 
+      <div class="row">
 
-      <div class="kpi">
+        <div class="row-main">
 
-        <div class="kpi-label">
-          TOTAL REVENUE
+          <div class="row-title">
+            Injection
+          </div>
+
         </div>
 
-        <div class="kpi-value">
+        <strong>
+          ${reportMoney(
+            data.injection
+          )}
+        </strong>
+
+      </div>
+
+
+      <div class="row">
+
+        <div class="row-main">
+
+          <div class="row-title">
+            Medication
+          </div>
+
+        </div>
+
+        <strong>
+          ${reportMoney(
+            data.medication
+          )}
+        </strong>
+
+      </div>
+
+
+      <div class="row">
+
+        <div class="row-main">
+
+          <div class="row-title">
+            Treatment
+          </div>
+
+        </div>
+
+        <strong>
+          ${reportMoney(
+            data.treatment
+          )}
+        </strong>
+
+      </div>
+
+
+      <div class="row">
+
+        <div class="row-main">
+
+          <div class="row-title">
+            Other
+          </div>
+
+        </div>
+
+        <strong>
+          ${reportMoney(
+            data.other
+          )}
+        </strong>
+
+      </div>
+
+
+      <div
+        style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          padding:16px 0 4px;
+          border-top:1px solid var(--border);
+          margin-top:4px;
+        "
+      >
+
+        <strong>
+          Total Revenue
+        </strong>
+
+        <strong
+          style="
+            font-size:14px;
+          "
+        >
+
           ${reportMoney(
             data.revenue
           )}
-        </div>
 
-        <div class="kpi-sub">
-          Visit billing for selected month
-        </div>
+        </strong>
 
       </div>
 
 
-      <div class="kpi">
+    </div>
 
-        <div class="kpi-label">
-          TOTAL VISITS
-        </div>
+  </div>
 
-        <div class="kpi-value">
-          ${data.totalVisits}
-        </div>
 
-        <div class="kpi-sub">
-          ${data.completedVisits}
-          completed
-        </div>
+  <!-- =====================================================
+       PATIENT ACTIVITY
+
+       Separate card.
+       Explicit 16px gap from Revenue Breakdown.
+  ====================================================== -->
+
+  <div
+    class="card"
+    style="
+      margin-top:16px;
+      margin-bottom:16px;
+    "
+  >
+
+    <div class="card-head">
+
+      <div>
+
+        <h2>
+          Patient Activity
+        </h2>
+
+        <p>
+          Patient activity associated
+          with the selected period.
+        </p>
 
       </div>
 
+    </div>
 
-      <div class="kpi">
 
-        <div class="kpi-label">
-          NEW PATIENTS
+    <div
+      class="card-body"
+      style="
+        padding-top:6px;
+      "
+    >
+
+
+      <div class="row">
+
+        <div class="row-main">
+
+          <div class="row-title">
+            New Patients
+          </div>
+
         </div>
 
-        <div class="kpi-value">
+        <strong>
           ${data.newPatients.length}
-        </div>
-
-        <div class="kpi-sub">
-          Started in ${data.monthLabel}
-        </div>
+        </strong>
 
       </div>
 
 
-      <div class="kpi">
+      <div class="row">
 
-        <div class="kpi-label">
-          ACTIVE PATIENTS
+        <div class="row-main">
+
+          <div class="row-title">
+            Returning Patients
+          </div>
+
+          <div class="row-sub">
+            Returned after at least
+            1 month without a visit
+          </div>
+
         </div>
 
-        <div class="kpi-value">
-          ${data.activePatients.length}
-        </div>
-
-        <div class="kpi-sub">
-          Active by month end
-        </div>
+        <strong>
+          ${data.returningPatients}
+        </strong>
 
       </div>
 
 
-    </div>
+      <div class="row">
 
+        <div class="row-main">
 
-    <!-- ===================================================
-         REVENUE + PATIENT ACTIVITY
-
-         IMPORTANT:
-         Explicit 16px gap is added so the
-         cards never touch when stacked.
-    ==================================================== -->
-
-    <div
-      class="grid-2"
-      style="
-        margin-bottom:16px;
-        gap:16px;
-      "
-    >
-
-
-      <!-- REVENUE -->
-
-      <div class="card">
-
-        <div class="card-head">
-
-          <div>
-
-            <h2>
-              Revenue Breakdown
-            </h2>
-
-            <p>
-              Billing recorded from visits
-              during ${data.monthLabel}.
-            </p>
-
+          <div class="row-title">
+            Completed Programs
           </div>
 
         </div>
 
-
-        <div
-          class="card-body"
-          style="
-            padding-top:6px;
-          "
-        >
-
-
-          <div class="row">
-
-            <div class="row-main">
-
-              <div class="row-title">
-                Injection
-              </div>
-
-            </div>
-
-            <strong>
-              ${reportMoney(
-                data.injection
-              )}
-            </strong>
-
-          </div>
-
-
-          <div class="row">
-
-            <div class="row-main">
-
-              <div class="row-title">
-                Medication
-              </div>
-
-            </div>
-
-            <strong>
-              ${reportMoney(
-                data.medication
-              )}
-            </strong>
-
-          </div>
-
-
-          <div class="row">
-
-            <div class="row-main">
-
-              <div class="row-title">
-                Treatment
-              </div>
-
-            </div>
-
-            <strong>
-              ${reportMoney(
-                data.treatment
-              )}
-            </strong>
-
-          </div>
-
-
-          <div class="row">
-
-            <div class="row-main">
-
-              <div class="row-title">
-                Other
-              </div>
-
-            </div>
-
-            <strong>
-              ${reportMoney(
-                data.other
-              )}
-            </strong>
-
-          </div>
-
-
-          <div
-            style="
-              display:flex;
-              justify-content:space-between;
-              align-items:center;
-              padding:16px 0 4px;
-            "
-          >
-
-            <strong>
-              Total Revenue
-            </strong>
-
-            <strong
-              style="
-                font-size:14px;
-              "
-            >
-              ${reportMoney(
-                data.revenue
-              )}
-            </strong>
-
-          </div>
-
-
-        </div>
+        <strong>
+          ${data.completedPrograms.length}
+        </strong>
 
       </div>
 
 
-      <!-- PATIENT ACTIVITY -->
+      <div class="row">
 
-      <div class="card">
+        <div class="row-main">
 
-        <div class="card-head">
-
-          <div>
-
-            <h2>
-              Patient Activity
-            </h2>
-
-            <p>
-              Patient activity associated
-              with the selected period.
-            </p>
-
+          <div class="row-title">
+            Inactive Patients
           </div>
 
         </div>
 
-
-        <div
-          class="card-body"
-          style="
-            padding-top:6px;
-          "
-        >
-
-
-          <div class="row">
-
-            <div class="row-main">
-
-              <div class="row-title">
-                New Patients
-              </div>
-
-            </div>
-
-            <strong>
-              ${data.newPatients.length}
-            </strong>
-
-          </div>
-
-
-          <div class="row">
-
-            <div class="row-main">
-
-              <div class="row-title">
-                Returning Patients
-              </div>
-
-            </div>
-
-            <strong>
-              ${data.returningPatients}
-            </strong>
-
-          </div>
-
-
-          <div class="row">
-
-            <div class="row-main">
-
-              <div class="row-title">
-                Completed Programs
-              </div>
-
-            </div>
-
-            <strong>
-              ${data.completedPrograms.length}
-            </strong>
-
-          </div>
-
-
-          <div class="row">
-
-            <div class="row-main">
-
-              <div class="row-title">
-                Inactive Patients
-              </div>
-
-            </div>
-
-            <strong>
-              ${data.inactivePatients.length}
-            </strong>
-
-          </div>
-
-
-        </div>
+        <strong>
+          ${data.inactivePatients.length}
+        </strong>
 
       </div>
 
 
     </div>
 
-
-    <!-- ===================================================
-         VISIT SUMMARY
-    ==================================================== -->
-
-    <div
-      class="card"
-      style="
-        margin-bottom:16px;
-      "
-    >
-
-      <div class="card-head">
-
-        <div>
-
-          <h2>
-            Visit Summary
-          </h2>
-
-          <p>
-            Visits recorded during
-            ${data.monthLabel}.
-          </p>
-
-        </div>
-
-      </div>
+  </div>
 
 
-      <div class="card-body">
+  <!-- =====================================================
+       VISIT SUMMARY
+  ====================================================== -->
 
-        <div class="finance-grid">
+  <div
+    class="card"
+    style="
+      margin-bottom:16px;
+    "
+  >
 
+    <div class="card-head">
 
-          <div class="finance-card">
+      <div>
 
-            <div class="label">
-              TOTAL VISITS
-            </div>
+        <h2>
+          Visit Summary
+        </h2>
 
-            <div class="value">
-              ${data.totalVisits}
-            </div>
-
-          </div>
-
-
-          <div class="finance-card">
-
-            <div class="label">
-              COMPLETED
-            </div>
-
-            <div class="value">
-              ${data.completedVisits}
-            </div>
-
-          </div>
-
-
-          <div class="finance-card">
-
-            <div class="label">
-              PANEL REVENUE
-            </div>
-
-            <div class="value">
-              ${reportMoney(
-                data.panelRevenue
-              )}
-            </div>
-
-          </div>
-
-
-          <div class="finance-card balance">
-
-            <div class="label">
-              SELF-PAY REVENUE
-            </div>
-
-            <div class="value">
-              ${reportMoney(
-                data.selfPayRevenue
-              )}
-            </div>
-
-          </div>
-
-
-        </div>
+        <p>
+          Visits recorded during
+          ${data.monthLabel}.
+        </p>
 
       </div>
 
     </div>
 
 
-    <!-- ===================================================
-         PANEL PERFORMANCE
-    ==================================================== -->
+    <div class="card-body">
 
-    <div
-      class="card"
-      style="
-        margin-bottom:16px;
-      "
-    >
+      <div class="finance-grid">
 
-      <div class="card-head">
 
-        <div>
+        <div class="finance-card">
 
-          <h2>
-            Panel Performance
-          </h2>
+          <div class="label">
+            TOTAL VISITS
+          </div>
 
-          <p>
-            Panel billing and claims recorded
-            during ${data.monthLabel}.
-          </p>
+          <div class="value">
+            ${data.totalVisits}
+          </div>
 
         </div>
 
+
+        <div class="finance-card">
+
+          <div class="label">
+            COMPLETED
+          </div>
+
+          <div class="value">
+            ${data.completedVisits}
+          </div>
+
+        </div>
+
+
+        <div class="finance-card">
+
+          <div class="label">
+            PANEL REVENUE
+          </div>
+
+          <div class="value">
+            ${reportMoney(
+              data.panelRevenue
+            )}
+          </div>
+
+        </div>
+
+
+        <div class="finance-card balance">
+
+          <div class="label">
+            SELF-PAY REVENUE
+          </div>
+
+          <div class="value">
+            ${reportMoney(
+              data.selfPayRevenue
+            )}
+          </div>
+
+        </div>
+
+
       </div>
 
+    </div>
 
-      <div class="table-wrap">
-
-        <table class="table">
-
-          <thead>
-
-            <tr>
-
-              <th>
-                Panel
-              </th>
-
-              <th>
-                Patients
-              </th>
-
-              <th>
-                INVOICED
-              </th>
-
-              <th>
-                CLAIMED
-              </th>
-
-              <th>
-                BALANCE
-              </th>
-
-            </tr>
-
-          </thead>
+  </div>
 
 
-          <tbody>
+  <!-- =====================================================
+       PANEL PERFORMANCE
+  ====================================================== -->
 
-            ${
-              data.panelRows.length
+  <div
+    class="card"
+    style="
+      margin-bottom:16px;
+    "
+  >
 
-                ? data.panelRows
-                    .map(
-                      row => `
+    <div class="card-head">
 
-                        <tr>
+      <div>
 
-                          <td>
-                            <strong>
-                              ${row.panel}
-                            </strong>
-                          </td>
+        <h2>
+          Panel Performance
+        </h2>
 
-                          <td>
-                            ${row.patients}
-                          </td>
+        <p>
+          Panel billing and claims
+          during ${data.monthLabel}.
+        </p>
 
-                          <td>
+      </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table class="table">
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Panel
+            </th>
+
+            <th>
+              Patients
+            </th>
+
+            <th>
+              INVOICED
+            </th>
+
+            <th>
+              CLAIMED
+            </th>
+
+            <th>
+              BALANCE
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          ${
+            data.panelRows.length
+
+              ? data.panelRows
+                  .map(
+                    row => `
+
+                      <tr>
+
+                        <td>
+
+                          <strong>
+                            ${row.panel}
+                          </strong>
+
+                        </td>
+
+
+                        <td>
+                          ${row.patients}
+                        </td>
+
+
+                        <td>
+                          ${reportMoney(
+                            row.invoiced
+                          )}
+                        </td>
+
+
+                        <td>
+                          ${reportMoney(
+                            row.claimed
+                          )}
+                        </td>
+
+
+                        <td>
+
+                          <span
+                            class="
+                              badge
+                              ${
+                                row.balance > 0
+                                  ? "orange"
+                                  : "green"
+                              }
+                            "
+                          >
+
                             ${reportMoney(
-                              row.invoiced
+                              row.balance
                             )}
-                          </td>
 
-                          <td>
-                            ${reportMoney(
-                              row.claimed
-                            )}
-                          </td>
+                          </span>
 
-                          <td>
+                        </td>
 
-                            <span
-                              class="
-                                badge
-                                ${
-                                  row.balance > 0
-                                    ? "orange"
-                                    : "green"
-                                }
-                              "
-                            >
-                              ${reportMoney(
-                                row.balance
-                              )}
-                            </span>
+                      </tr>
 
-                          </td>
-
-                        </tr>
-
-                      `
-                    )
-                    .join("")
-
-                : emptyRow(
-                    5,
-                    "No panel activity recorded for this month."
+                    `
                   )
-            }
+                  .join("")
 
-          </tbody>
+              : emptyRow(
+                  5,
+                  "No panel activity recorded for this month."
+                )
+          }
 
-        </table>
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       SUSPENDED POLICIES
+  ====================================================== -->
+
+  <div
+    class="card"
+    style="
+      margin-bottom:16px;
+      border-color:#F59E0B;
+    "
+  >
+
+    <div class="card-head">
+
+      <div>
+
+        <div
+          style="
+            display:flex;
+            align-items:center;
+            gap:8px;
+          "
+        >
+
+          <h2>
+            Suspended Policies
+          </h2>
+
+          <span class="badge red">
+            ${data.suspendedPatients.length}
+          </span>
+
+        </div>
+
+
+        <p>
+          Panel patients who still have
+          outstanding claimable balance.
+        </p>
+
+      </div>
+
+
+      <div class="badge orange">
+
+        Outstanding:
+        ${reportMoney(
+          data.suspendedOutstanding
+        )}
 
       </div>
 
     </div>
 
 
-    <!-- ===================================================
-         SUSPENDED POLICIES
-    ==================================================== -->
+    <div class="table-wrap">
 
-    <div
-      class="card"
-      style="
-        margin-bottom:16px;
-        border-color:#F59E0B;
-      "
-    >
+      <table class="table">
 
-      <div class="card-head">
+        <thead>
 
-        <div>
+          <tr>
 
-          <div
-            style="
-              display:flex;
-              align-items:center;
-              gap:8px;
-            "
-          >
+            <th>
+              Patient
+            </th>
 
-            <h2>
-              Suspended Policies
-            </h2>
+            <th>
+              Panel
+            </th>
 
-            <span class="badge red">
-              ${data.suspendedPatients.length}
-            </span>
+            <th>
+              OUTSTANDING
+            </th>
 
-          </div>
+            <th>
+              Status
+            </th>
+
+          </tr>
+
+        </thead>
 
 
-          <p>
-            Panel patients who remain suspended
-            with outstanding claimable balance.
-          </p>
+        <tbody>
 
-        </div>
+          ${
+            data.suspendedPatients.length
 
+              ? data.suspendedPatients
+                  .map(
+                    patient => `
 
-        <div class="badge orange">
+                      <tr>
 
-          Outstanding:
-          ${reportMoney(
-            data.suspendedOutstanding
-          )}
+                        <td>
 
-        </div>
+                          <strong>
+                            ${patient.name}
+                          </strong>
 
-      </div>
+                          <div
+                            class="row-sub"
+                          >
+                            ${patient.id}
+                          </div>
 
-
-      <div class="table-wrap">
-
-        <table class="table">
-
-          <thead>
-
-            <tr>
-
-              <th>
-                Patient
-              </th>
-
-              <th>
-                Panel
-              </th>
-
-              <th>
-                OUTSTANDING
-              </th>
-
-              <th>
-                Status
-              </th>
-
-            </tr>
-
-          </thead>
+                        </td>
 
 
-          <tbody>
+                        <td>
 
-            ${
-              data.suspendedPatients.length
+                          <span
+                            class="panel-chip"
+                          >
+                            ${getPanelName(
+                              patient
+                            )}
+                          </span>
 
-                ? data.suspendedPatients
-                    .map(
-                      patient => `
-
-                        <tr>
-
-                          <td>
-
-                            <strong>
-                              ${patient.name}
-                            </strong>
-
-                            <div
-                              class="row-sub"
-                            >
-                              ${patient.id}
-                            </div>
-
-                          </td>
+                        </td>
 
 
-                          <td>
+                        <td>
 
-                            <span
-                              class="panel-chip"
-                            >
-                              ${getPanelName(
+                          <span
+                            class="badge red"
+                          >
+
+                            ${reportMoney(
+                              finance(
                                 patient
-                              )}
-                            </span>
+                              ).balance
+                            )}
 
-                          </td>
+                          </span>
 
-
-                          <td>
-
-                            <span
-                              class="badge red"
-                            >
-                              ${reportMoney(
-                                finance(
-                                  patient
-                                ).balance
-                              )}
-                            </span>
-
-                          </td>
+                        </td>
 
 
-                          <td>
+                        <td>
 
-                            <span
-                              class="badge red"
-                            >
-                              SUSPENDED
-                            </span>
+                          <span
+                            class="badge red"
+                          >
+                            SUSPENDED
+                          </span>
 
-                          </td>
+                        </td>
 
-                        </tr>
+                      </tr>
 
-                      `
-                    )
-                    .join("")
-
-                : emptyRow(
-                    4,
-                    "No suspended-policy patients with outstanding balance."
+                    `
                   )
-            }
+                  .join("")
 
-          </tbody>
+              : emptyRow(
+                  4,
+                  "No suspended-policy patients with outstanding balance."
+                )
+          }
 
-        </table>
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       APPOINTMENT PERFORMANCE
+  ====================================================== -->
+
+  <div
+    class="card"
+    style="
+      margin-bottom:16px;
+    "
+  >
+
+    <div class="card-head">
+
+      <div>
+
+        <h2>
+          Appointment Performance
+        </h2>
+
+        <p>
+          Appointment activity during
+          ${data.monthLabel}.
+        </p>
 
       </div>
+
+
+      <span
+        class="
+          badge
+          ${
+            data.attendanceRate >= 80
+              ? "green"
+              : "orange"
+          }
+        "
+      >
+
+        Attendance
+        ${data.attendanceRate}%
+
+      </span>
 
     </div>
 
 
-    <!-- ===================================================
-         APPOINTMENT PERFORMANCE
-    ==================================================== -->
+    <div class="card-body">
 
-    <div
-      class="card"
-      style="
-        margin-bottom:16px;
-      "
-    >
+      <div class="finance-grid">
 
-      <div class="card-head">
+
+        <div class="finance-card">
+
+          <div class="label">
+            TOTAL APPOINTMENTS
+          </div>
+
+          <div class="value">
+            ${data.appointmentStatus.total}
+          </div>
+
+        </div>
+
+
+        <div class="finance-card">
+
+          <div class="label">
+            COMPLETED
+          </div>
+
+          <div class="value">
+            ${data.appointmentStatus.completed}
+          </div>
+
+        </div>
+
+
+        <div class="finance-card">
+
+          <div class="label">
+            UPCOMING
+          </div>
+
+          <div class="value">
+            ${data.appointmentStatus.upcoming}
+          </div>
+
+        </div>
+
+
+        <div class="finance-card balance">
+
+          <div class="label">
+            NO SHOW
+          </div>
+
+          <div class="value">
+            ${data.appointmentStatus.noShow}
+          </div>
+
+        </div>
+
+
+      </div>
+
+
+      <div
+        class="breakdown"
+        style="
+          margin-top:12px;
+        "
+      >
 
         <div>
 
-          <h2>
-            Appointment Performance
-          </h2>
+          <strong>
+            Cancelled
+          </strong>
 
-          <p>
-            Appointment activity during
-            ${data.monthLabel}.
-          </p>
-
-        </div>
-
-
-        <span
-          class="
-            badge
-            ${
-              data.attendanceRate >= 80
-                ? "green"
-                : "orange"
-            }
-          "
-        >
-          Attendance
-          ${data.attendanceRate}%
-        </span>
-
-      </div>
-
-
-      <div class="card-body">
-
-        <div class="finance-grid">
-
-
-          <div class="finance-card">
-
-            <div class="label">
-              TOTAL APPOINTMENTS
-            </div>
-
-            <div class="value">
-              ${data.appointmentStatus.total}
-            </div>
-
-          </div>
-
-
-          <div class="finance-card">
-
-            <div class="label">
-              COMPLETED
-            </div>
-
-            <div class="value">
-              ${data.appointmentStatus.completed}
-            </div>
-
-          </div>
-
-
-          <div class="finance-card">
-
-            <div class="label">
-              UPCOMING
-            </div>
-
-            <div class="value">
-              ${data.appointmentStatus.upcoming}
-            </div>
-
-          </div>
-
-
-          <div class="finance-card balance">
-
-            <div class="label">
-              NO SHOW
-            </div>
-
-            <div class="value">
-              ${data.appointmentStatus.noShow}
-            </div>
-
-          </div>
-
+          <span>
+            ${data.appointmentStatus.cancelled}
+          </span>
 
         </div>
 
 
-        <div
-          class="breakdown"
-          style="
-            margin-top:12px;
-          "
-        >
+        <div>
 
-          <div>
+          <strong>
+            Completed / No Show
+          </strong>
 
-            <strong>
-              Cancelled
-            </strong>
+          <span>
+            ${data.appointmentStatus.completed}
+            /
+            ${data.appointmentStatus.noShow}
+          </span>
 
-            <span>
-              ${data.appointmentStatus.cancelled}
-            </span>
-
-          </div>
+        </div>
 
 
-          <div>
+        <div>
 
-            <strong>
-              Completed / No Show
-            </strong>
+          <strong>
+            Attendance Rate
+          </strong>
 
-            <span>
-              ${data.appointmentStatus.completed}
-              /
-              ${data.appointmentStatus.noShow}
-            </span>
-
-          </div>
-
-
-          <div>
-
-            <strong>
-              Attendance Rate
-            </strong>
-
-            <span>
-              ${data.attendanceRate}%
-            </span>
-
-          </div>
+          <span>
+            ${data.attendanceRate}%
+          </span>
 
         </div>
 
@@ -2385,30 +2265,28 @@ function renderReports(){
 
     </div>
 
+  </div>
 
-    <!-- ===================================================
-         MONTH NOTE
-    ==================================================== -->
 
-    <div
-      style="
-        font-size:10px;
-        color:var(--muted);
-        text-align:right;
-        margin-top:4px;
-      "
-    >
+  <div
+    style="
+      font-size:10px;
+      color:var(--muted);
+      text-align:right;
+      margin-top:4px;
+    "
+  >
 
-      Report period:
-      ${dateDisplay(
-        data.range.start
-      )}
-      —
-      ${dateDisplay(
-        data.range.end
-      )}
+    Report period:
+    ${dateDisplay(
+      data.range.start
+    )}
+    —
+    ${dateDisplay(
+      data.range.end
+    )}
 
-    </div>
+  </div>
 
 
   `;
@@ -2427,7 +2305,8 @@ let pdfLibraryPromise =
 function loadPDFLibrary(){
 
   if(
-    window.jspdf?.jsPDF
+    window.jspdf &&
+    window.jspdf.jsPDF
   ){
 
     return Promise.resolve(
@@ -2467,7 +2346,8 @@ function loadPDFLibrary(){
           () => {
 
             if(
-              window.jspdf?.jsPDF
+              window.jspdf &&
+              window.jspdf.jsPDF
             ){
 
               resolve(
@@ -2488,12 +2368,15 @@ function loadPDFLibrary(){
 
 
         script.onerror =
-          () =>
+          () => {
+
             reject(
               new Error(
                 "Unable to load PDF library."
               )
             );
+
+          };
 
 
         document.head.appendChild(
@@ -2512,7 +2395,7 @@ function loadPDFLibrary(){
 function pdfMoney(n){
 
   return `RM ${
-    Number(n||0)
+    Number(n || 0)
       .toLocaleString(
         "en-MY",
         {
@@ -2723,7 +2606,7 @@ function pdfTable(
 
   const totalW =
     widths.reduce(
-      (a,b)=>
+      (a,b) =>
         a+b,
       0
     );
@@ -2733,13 +2616,7 @@ function pdfTable(
     ensurePDFSpace(
       doc,
       y,
-      rowH *
-      (
-        Math.min(
-          rows.length,
-          25
-        ) + 2
-      )
+      80
     );
 
 
@@ -2825,15 +2702,11 @@ function pdfTable(
           index
         ) => {
 
-          const text =
+          doc.text(
             String(
               cell ??
               "—"
-            );
-
-
-          doc.text(
-            text,
+            ),
             xx+6,
             y
           );
@@ -2897,16 +2770,18 @@ async function downloadReportPDF(){
 
 
     const doc =
-      new jsPDF(
-        {
-          orientation:
-            "portrait",
-          unit:
-            "pt",
-          format:
-            "a4"
-        }
-      );
+      new jsPDF({
+
+        orientation:
+          "portrait",
+
+        unit:
+          "pt",
+
+        format:
+          "a4"
+
+      });
 
 
     addPDFHeader(
@@ -3156,17 +3031,23 @@ async function downloadReportPDF(){
         ],
         data.panelRows.map(
           row => [
+
             row.panel,
+
             row.patients,
+
             pdfMoney(
               row.invoiced
             ),
+
             pdfMoney(
               row.claimed
             ),
+
             pdfMoney(
               row.balance
             )
+
           ]
         ),
         y,
@@ -3210,49 +3091,6 @@ async function downloadReportPDF(){
         ),
         y
       );
-
-
-    if(
-      data.suspendedPatients.length
-    ){
-
-      y +=
-        5;
-
-
-      y =
-        pdfTable(
-          doc,
-          [
-            "Patient",
-            "Panel",
-            "Outstanding",
-            "Status"
-          ],
-          data.suspendedPatients.map(
-            patient => [
-              `${patient.name} (${patient.id})`,
-              getPanelName(
-                patient
-              ),
-              pdfMoney(
-                finance(
-                  patient
-                ).balance
-              ),
-              "SUSPENDED"
-            ]
-          ),
-          y,
-          [
-            250,
-            95,
-            105,
-            62
-          ]
-        );
-
-    }
 
 
     y +=
@@ -3321,13 +3159,13 @@ async function downloadReportPDF(){
       );
 
 
-    const pageCount =
+    const pages =
       doc.getNumberOfPages();
 
 
     for(
       let page=1;
-      page<=pageCount;
+      page<=pages;
       page++
     ){
 
@@ -3355,7 +3193,7 @@ async function downloadReportPDF(){
 
 
       doc.text(
-        `Getwell Clinic · ${data.monthLabel} · Page ${page} of ${pageCount}`,
+        `Getwell Clinic · ${data.monthLabel} · Page ${page} of ${pages}`,
         40,
         820
       );
@@ -3383,7 +3221,7 @@ async function downloadReportPDF(){
 
 
     alert(
-      "The PDF generator could not load. The report will open in print mode so you can choose Save as PDF."
+      "The PDF generator could not load. The browser print dialog will open so you can save the report as PDF."
     );
 
 
@@ -3395,7 +3233,7 @@ async function downloadReportPDF(){
 
 
 /* =========================================================
-   PRINT SUPPORT
+   PRINT STYLE
 ========================================================= */
 
 const printStyle =
@@ -3430,10 +3268,6 @@ printStyle.textContent = `
   .card,
   .kpi{
     box-shadow:none !important;
-  }
-
-  .page-head{
-    display:block;
   }
 
 }
