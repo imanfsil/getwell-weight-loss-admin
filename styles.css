@@ -3,29 +3,21 @@
 :root{
 
   --navy:#08142A;
-
   --blue:#2563EB;
-
   --blue-soft:#E8F2FF;
 
   --page:#EEF5FF;
-
   --card:#FFFFFF;
-
   --surface:#F8FBFF;
 
   --border:#D9E4F2;
-
   --border-light:#E8EEF7;
 
   --muted:#64748B;
-
   --muted-2:#94A3B8;
 
   --green:#16A34A;
-
   --orange:#F59E0B;
-
   --red:#DC2626;
 
   --shadow:
@@ -41,17 +33,14 @@
 
 }
 
-
 *{
   box-sizing:border-box;
 }
-
 
 html,
 body{
 
   margin:0;
-
   padding:0;
 
   min-height:100%;
@@ -61,21 +50,17 @@ body{
     Arial,
     sans-serif;
 
-  background:
-    var(--page);
+  background:var(--page);
 
-  color:
-    var(--navy);
+  color:var(--navy);
 
   font-size:11px;
 
 }
 
-
 body{
   overflow-x:hidden;
 }
-
 
 button,
 input,
@@ -84,11 +69,9 @@ textarea{
   font-family:inherit;
 }
 
-
 button{
   cursor:pointer;
 }
-
 
 a{
   text-decoration:none;
@@ -104,7 +87,6 @@ a{
 .app{
   min-height:100vh;
 }
-
 
 .main{
 
@@ -125,9 +107,7 @@ a{
   position:fixed;
 
   left:0;
-
   top:0;
-
   bottom:0;
 
   width:225px;
@@ -145,7 +125,6 @@ a{
   z-index:20;
 
 }
-
 
 .brand{
 
@@ -167,11 +146,9 @@ a{
 
 }
 
-
 .brand-mark{
 
   width:36px;
-
   height:36px;
 
   border-radius:10px;
@@ -195,7 +172,6 @@ a{
 
 }
 
-
 .brand-name{
 
   font-size:14px;
@@ -203,7 +179,6 @@ a{
   font-weight:700;
 
 }
-
 
 .brand-sub{
 
@@ -213,7 +188,6 @@ a{
 
 }
 
-
 .nav{
 
   padding:
@@ -221,7 +195,6 @@ a{
     12px;
 
 }
-
 
 .nav-label{
 
@@ -239,7 +212,6 @@ a{
     10px;
 
 }
-
 
 .nav a{
 
@@ -265,7 +237,6 @@ a{
 
 }
 
-
 .nav a:hover{
 
   background:#EAF2FF;
@@ -273,7 +244,6 @@ a{
   color:#1759D6;
 
 }
-
 
 .nav a.active{
 
@@ -284,7 +254,6 @@ a{
   font-weight:600;
 
 }
-
 
 .sidebar-user{
 
@@ -297,7 +266,6 @@ a{
     var(--border);
 
 }
-
 
 .user-card{
 
@@ -319,11 +287,9 @@ a{
 
 }
 
-
 .user-dot{
 
   width:30px;
-
   height:30px;
 
   border-radius:50%;
@@ -342,7 +308,6 @@ a{
 
 }
 
-
 .user-name{
 
   font-size:10px;
@@ -350,7 +315,6 @@ a{
   font-weight:600;
 
 }
-
 
 .user-role{
 
@@ -396,7 +360,6 @@ a{
 
 }
 
-
 .topbar-left{
 
   display:flex;
@@ -407,13 +370,9 @@ a{
 
 }
 
-
 .mobile-menu{
-
   display:none;
-
 }
-
 
 .page-title{
 
@@ -423,7 +382,6 @@ a{
 
 }
 
-
 .page-subtitle{
 
   font-size:11px;
@@ -431,7 +389,6 @@ a{
   color:var(--muted);
 
 }
-
 
 .topbar-right{
 
@@ -443,11 +400,9 @@ a{
 
 }
 
-
 .search-box{
 
   width:245px;
-
   height:36px;
 
   border:
@@ -470,18 +425,13 @@ a{
 
 }
 
-
 .search-box span{
-
   color:#94A3B8;
-
 }
-
 
 .search-box input{
 
   border:0;
-
   outline:0;
 
   width:100%;
@@ -494,18 +444,13 @@ a{
 
 }
 
-
 .search-box input::placeholder{
-
   color:#94A3B8;
-
 }
-
 
 .icon-button{
 
   width:36px;
-
   height:36px;
 
   border:
@@ -526,18 +471,13 @@ a{
 
 }
 
-
 .icon-button:hover{
-
   background:#F8FBFF;
-
 }
-
 
 .user-avatar{
 
   width:36px;
-
   height:36px;
 
   border-radius:50%;
@@ -571,7 +511,6 @@ a{
 
 }
 
-
 .back{
 
   font-size:10px;
@@ -602,7 +541,6 @@ a{
 
 }
 
-
 .page-head h1{
 
   font-size:21px;
@@ -613,7 +551,6 @@ a{
     4px;
 
 }
-
 
 .page-head p{
 
@@ -652,7 +589,6 @@ a{
 
 }
 
-
 .primary{
 
   background:var(--blue);
@@ -660,7 +596,6 @@ a{
   color:#fff;
 
 }
-
 
 .primary:hover{
 
@@ -680,7 +615,6 @@ a{
 
 }
 
-
 .secondary{
 
   background:#fff;
@@ -691,7 +625,6 @@ a{
   color:#1D4ED8;
 
 }
-
 
 .secondary:hover{
 
@@ -719,7 +652,6 @@ a{
 
 }
 
-
 .card-head{
 
   padding:18px;
@@ -738,7 +670,6 @@ a{
 
 }
 
-
 .card-head h2{
 
   margin:0;
@@ -746,7 +677,6 @@ a{
   font-size:13px;
 
 }
-
 
 .card-head p{
 
@@ -760,7 +690,6 @@ a{
   color:var(--muted);
 
 }
-
 
 .card-body{
 
@@ -790,7 +719,6 @@ a{
 
 }
 
-
 .kpi{
 
   padding:16px;
@@ -807,7 +735,6 @@ a{
 
 }
 
-
 .kpi-label{
 
   font-size:10px;
@@ -818,7 +745,6 @@ a{
 
 }
 
-
 .kpi-value{
 
   font-size:25px;
@@ -828,7 +754,6 @@ a{
   margin-top:8px;
 
 }
-
 
 .kpi-sub{
 
@@ -858,11 +783,8 @@ a{
 
 }
 
-
 .list{
-
   padding:0;
-
 }
 
 
@@ -889,20 +811,13 @@ a{
 
 }
 
-
 .row:last-child{
-
   border-bottom:0;
-
 }
-
 
 .row-main{
-
   flex:1;
-
 }
-
 
 .row-title{
 
@@ -911,7 +826,6 @@ a{
   font-weight:600;
 
 }
-
 
 .row-sub{
 
@@ -925,11 +839,9 @@ a{
 
 }
 
-
 .avatar-small{
 
   width:34px;
-
   height:34px;
 
   border-radius:9px;
@@ -955,11 +867,8 @@ a{
 ========================================================= */
 
 .table-wrap{
-
   overflow:auto;
-
 }
-
 
 .table{
 
@@ -970,7 +879,6 @@ a{
   min-width:760px;
 
 }
-
 
 .table th{
 
@@ -992,7 +900,6 @@ a{
 
 }
 
-
 .table td{
 
   font-size:11px;
@@ -1006,7 +913,6 @@ a{
     var(--border);
 
 }
-
 
 .table tr:hover td{
 
@@ -1040,7 +946,6 @@ a{
 
 }
 
-
 .badge.green{
 
   background:#ECFDF5;
@@ -1048,7 +953,6 @@ a{
   color:#15803D;
 
 }
-
 
 .badge.gray{
 
@@ -1058,7 +962,6 @@ a{
 
 }
 
-
 .badge.blue{
 
   background:#E8F2FF;
@@ -1067,7 +970,6 @@ a{
 
 }
 
-
 .badge.orange{
 
   background:#FFF7ED;
@@ -1075,7 +977,6 @@ a{
   color:#C2410C;
 
 }
-
 
 .badge.red{
 
@@ -1151,7 +1052,6 @@ a{
 
 }
 
-
 .patient-main{
 
   display:flex;
@@ -1162,11 +1062,9 @@ a{
 
 }
 
-
 .patient-avatar{
 
   width:60px;
-
   height:60px;
 
   border-radius:14px;
@@ -1185,7 +1083,6 @@ a{
 
 }
 
-
 .patient-heading h1{
 
   font-size:19px;
@@ -1196,7 +1093,6 @@ a{
     5px;
 
 }
-
 
 .meta{
 
@@ -1214,7 +1110,6 @@ a{
 
 }
 
-
 .hero-details{
 
   display:flex;
@@ -1222,7 +1117,6 @@ a{
   gap:25px;
 
 }
-
 
 .hero-detail{
 
@@ -1234,7 +1128,6 @@ a{
 
 }
 
-
 .hero-label{
 
   font-size:10px;
@@ -1242,7 +1135,6 @@ a{
   color:#94A3B8;
 
 }
-
 
 .hero-value{
 
@@ -1255,7 +1147,7 @@ a{
 
 
 /* =========================================================
-   TABS
+   PATIENT TABS
 ========================================================= */
 
 .patient-tabs{
@@ -1282,7 +1174,6 @@ a{
 
 }
 
-
 .patient-tabs button{
 
   border:0;
@@ -1303,7 +1194,6 @@ a{
     transparent;
 
 }
-
 
 .patient-tabs button.active{
 
@@ -1336,7 +1226,6 @@ a{
 
 }
 
-
 .finance-card{
 
   padding:16px;
@@ -1351,7 +1240,6 @@ a{
 
 }
 
-
 .finance-card .label{
 
   font-size:10px;
@@ -1359,7 +1247,6 @@ a{
   color:#64748B;
 
 }
-
 
 .finance-card .value{
 
@@ -1371,7 +1258,6 @@ a{
 
 }
 
-
 .balance{
 
   background:#FFF7ED;
@@ -1380,13 +1266,11 @@ a{
 
 }
 
-
 .balance .value{
 
   color:#92400E;
 
 }
-
 
 .breakdown{
 
@@ -1404,7 +1288,6 @@ a{
 
 }
 
-
 .break{
 
   padding:12px;
@@ -1417,7 +1300,6 @@ a{
 
 }
 
-
 .break span{
 
   font-size:10px;
@@ -1425,7 +1307,6 @@ a{
   color:var(--muted);
 
 }
-
 
 .break strong{
 
@@ -1449,7 +1330,6 @@ a{
 
 }
 
-
 .visit-section-title{
 
   font-size:12px;
@@ -1471,7 +1351,6 @@ a{
 
 }
 
-
 .visit-grid{
 
   display:grid;
@@ -1483,7 +1362,6 @@ a{
   gap:10px;
 
 }
-
 
 .visit-item{
 
@@ -1499,7 +1377,6 @@ a{
 
 }
 
-
 .visit-item label{
 
   display:block;
@@ -1509,7 +1386,6 @@ a{
   color:var(--muted);
 
 }
-
 
 .visit-item strong{
 
@@ -1535,7 +1411,6 @@ a{
 
 }
 
-
 .form-group label{
 
   display:block;
@@ -1547,7 +1422,6 @@ a{
   margin-bottom:5px;
 
 }
-
 
 .form-group input,
 .form-group select,
@@ -1577,14 +1451,12 @@ a{
 
 }
 
-
 .form-group input::placeholder,
 .form-group textarea::placeholder{
 
   color:#94A3B8;
 
 }
-
 
 .form-group textarea{
 
@@ -1596,13 +1468,9 @@ a{
 
 }
 
-
 .full{
-
   grid-column:1/-1;
-
 }
-
 
 .claim-grid{
 
@@ -1617,7 +1485,6 @@ a{
   gap:10px;
 
 }
-
 
 .claim-input{
 
@@ -1677,13 +1544,9 @@ a{
 
 }
 
-
 .modal-wrap.show{
-
   display:flex;
-
 }
-
 
 .modal{
 
@@ -1714,7 +1577,6 @@ a{
 
 }
 
-
 .modal-head{
 
   padding:
@@ -1733,7 +1595,6 @@ a{
 
 }
 
-
 .modal-head h2{
 
   margin:0;
@@ -1741,7 +1602,6 @@ a{
   font-size:14px;
 
 }
-
 
 .modal-head p{
 
@@ -1756,7 +1616,6 @@ a{
 
 }
 
-
 .modal-close{
 
   border:
@@ -1766,7 +1625,6 @@ a{
   background:#fff;
 
   width:31px;
-
   height:31px;
 
   border-radius:8px;
@@ -1777,13 +1635,11 @@ a{
 
 }
 
-
 .modal-body{
 
   padding:18px;
 
 }
-
 
 .modal-foot{
 
@@ -1814,7 +1670,6 @@ a{
   position:relative;
 
 }
-
 
 .notification-count{
 
@@ -1853,7 +1708,6 @@ a{
   justify-content:center;
 
 }
-
 
 .global-notification-panel{
 
@@ -1895,11 +1749,9 @@ a{
 
 }
 
-
 .notif-head{
 
-  padding:
-    14px;
+  padding:14px;
 
   background:#F8FBFF;
 
@@ -1913,13 +1765,11 @@ a{
 
 }
 
-
 .notif-head strong{
 
   font-size:11px;
 
 }
-
 
 .notif-head span{
 
@@ -1932,7 +1782,6 @@ a{
   margin-top:3px;
 
 }
-
 
 .notif-item{
 
@@ -1952,13 +1801,11 @@ a{
 
 }
 
-
 .notif-item:hover{
 
   background:#F8FBFF;
 
 }
-
 
 .notif-dot{
 
@@ -1974,20 +1821,13 @@ a{
 
 }
 
-
 .notif-dot.warning{
-
   background:#F59E0B;
-
 }
-
 
 .notif-dot.overdue{
-
   background:#DC2626;
-
 }
-
 
 .notif-name{
 
@@ -1996,7 +1836,6 @@ a{
   font-weight:600;
 
 }
-
 
 .notif-text{
 
@@ -2009,7 +1848,6 @@ a{
   margin-top:2px;
 
 }
-
 
 .notif-empty{
 
@@ -2055,7 +1893,6 @@ a{
 
 }
 
-
 .theme-toggle:hover{
 
   transform:
@@ -2066,13 +1903,12 @@ a{
 
 
 /* =========================================================
-   DAY / NIGHT MODE
+   DARK MODE
 ========================================================= */
 
 html[data-theme="dark"]{
 
   color-scheme:dark;
-
 
   --page:#080D19;
 
@@ -2130,7 +1966,6 @@ html[data-theme="dark"] .sidebar{
 
 }
 
-
 html[data-theme="dark"] .brand{
 
   border-bottom:
@@ -2139,52 +1974,31 @@ html[data-theme="dark"] .brand{
 
 }
 
-
 html[data-theme="dark"] .brand-name{
-
   color:#F8FAFC;
-
 }
-
 
 html[data-theme="dark"] .brand-sub{
-
   color:#A8B3C2;
-
 }
-
 
 html[data-theme="dark"] .nav-label{
-
   color:#8FA1B6;
-
 }
-
 
 html[data-theme="dark"] .nav a{
-
   color:#D4DCE7;
-
 }
-
 
 html[data-theme="dark"] .nav a:hover{
-
   background:#132B4A;
-
   color:#60A5FA;
-
 }
-
 
 html[data-theme="dark"] .nav a.active{
-
   background:#16345A;
-
   color:#60A5FA;
-
 }
-
 
 html[data-theme="dark"] .user-card{
 
@@ -2196,20 +2010,13 @@ html[data-theme="dark"] .user-card{
 
 }
 
-
 html[data-theme="dark"] .user-name{
-
   color:#F8FAFC;
-
 }
-
 
 html[data-theme="dark"] .user-role{
-
   color:#A8B3C2;
-
 }
-
 
 html[data-theme="dark"] .user-dot{
 
@@ -2235,20 +2042,13 @@ html[data-theme="dark"] .topbar{
 
 }
 
-
 html[data-theme="dark"] .page-title{
-
   color:#F8FAFC;
-
 }
-
 
 html[data-theme="dark"] .page-subtitle{
-
   color:#A8B3C2;
-
 }
-
 
 html[data-theme="dark"] .search-box{
 
@@ -2260,20 +2060,13 @@ html[data-theme="dark"] .search-box{
 
 }
 
-
 html[data-theme="dark"] .search-box input{
-
   color:#F8FAFC;
-
 }
-
 
 html[data-theme="dark"] .search-box input::placeholder{
-
   color:#718198;
-
 }
-
 
 html[data-theme="dark"] .icon-button{
 
@@ -2287,13 +2080,9 @@ html[data-theme="dark"] .icon-button{
 
 }
 
-
 html[data-theme="dark"] .icon-button:hover{
-
   background:#1B263A;
-
 }
-
 
 html[data-theme="dark"] .user-avatar{
 
@@ -2335,7 +2124,6 @@ html[data-theme="dark"] .visit-item{
 
 }
 
-
 html[data-theme="dark"] .card-head{
 
   border-bottom:
@@ -2344,18 +2132,12 @@ html[data-theme="dark"] .card-head{
 
 }
 
-
 html[data-theme="dark"] .card-head h2{
-
   color:#F8FAFC;
-
 }
 
-
 html[data-theme="dark"] .card-head p{
-
   color:#B8C4D4;
-
 }
 
 
@@ -2365,23 +2147,15 @@ html[data-theme="dark"] .card-head p{
 ========================================================= */
 
 html[data-theme="dark"] .kpi-label{
-
   color:#CBD5E1;
-
 }
-
 
 html[data-theme="dark"] .kpi-value{
-
   color:#F8FAFC;
-
 }
 
-
 html[data-theme="dark"] .kpi-sub{
-
   color:#A8B3C2;
-
 }
 
 
@@ -2398,27 +2172,17 @@ html[data-theme="dark"] .row{
 
 }
 
-
 html[data-theme="dark"] .row:hover{
-
   background:#1B263A;
-
 }
-
 
 html[data-theme="dark"] .row-title{
-
   color:#F8FAFC;
-
 }
-
 
 html[data-theme="dark"] .row-sub{
-
   color:#B8C4D4;
-
 }
-
 
 html[data-theme="dark"] .avatar-small{
 
@@ -2431,7 +2195,7 @@ html[data-theme="dark"] .avatar-small{
 
 
 /* =========================================================
-   DARK TABLES
+   DARK TABLE
 ========================================================= */
 
 html[data-theme="dark"] .table th{
@@ -2446,7 +2210,6 @@ html[data-theme="dark"] .table th{
 
 }
 
-
 html[data-theme="dark"] .table td{
 
   color:#E2E8F0;
@@ -2457,7 +2220,6 @@ html[data-theme="dark"] .table td{
 
 }
 
-
 html[data-theme="dark"] .table tr:hover td{
 
   background:#202C42;
@@ -2467,48 +2229,31 @@ html[data-theme="dark"] .table tr:hover td{
 
 
 /* =========================================================
-   DARK PATIENT TEXT
+   DARK PATIENT
 ========================================================= */
 
 html[data-theme="dark"] .patient-heading h1{
-
   color:#F8FAFC;
-
 }
-
 
 html[data-theme="dark"] .meta{
-
   color:#B8C4D4;
-
 }
-
 
 html[data-theme="dark"] .hero-label{
-
   color:#A8B3C2;
-
 }
-
 
 html[data-theme="dark"] .hero-value{
-
   color:#F8FAFC;
-
 }
-
 
 html[data-theme="dark"] .break span{
-
   color:#B8C4D4;
-
 }
 
-
 html[data-theme="dark"] .break strong{
-
   color:#F8FAFC;
-
 }
 
 
@@ -2527,20 +2272,15 @@ html[data-theme="dark"] .patient-tabs{
 
 }
 
-
 html[data-theme="dark"] .patient-tabs button{
-
   color:#CBD5E1;
-
 }
-
 
 html[data-theme="dark"] .patient-tabs button.active{
 
   color:#60A5FA;
 
-  border-bottom-color:
-    #60A5FA;
+  border-bottom-color:#60A5FA;
 
 }
 
@@ -2560,20 +2300,13 @@ html[data-theme="dark"] .finance-card{
 
 }
 
-
 html[data-theme="dark"] .finance-card .label{
-
   color:#CBD5E1;
-
 }
-
 
 html[data-theme="dark"] .finance-card .value{
-
   color:#F8FAFC;
-
 }
-
 
 html[data-theme="dark"] .balance{
 
@@ -2583,18 +2316,12 @@ html[data-theme="dark"] .balance{
 
 }
 
-
 html[data-theme="dark"] .balance .label{
-
   color:#FCD34D;
-
 }
 
-
 html[data-theme="dark"] .balance .value{
-
   color:#FDBA74;
-
 }
 
 
@@ -2629,7 +2356,6 @@ html[data-theme="dark"] .badge.green{
 
 }
 
-
 html[data-theme="dark"] .badge.gray{
 
   background:#26344A;
@@ -2637,7 +2363,6 @@ html[data-theme="dark"] .badge.gray{
   color:#D1D9E4;
 
 }
-
 
 html[data-theme="dark"] .badge.blue{
 
@@ -2647,7 +2372,6 @@ html[data-theme="dark"] .badge.blue{
 
 }
 
-
 html[data-theme="dark"] .badge.orange{
 
   background:#3A2915;
@@ -2655,7 +2379,6 @@ html[data-theme="dark"] .badge.orange{
   color:#FDBA74;
 
 }
-
 
 html[data-theme="dark"] .badge.red{
 
@@ -2677,7 +2400,6 @@ html[data-theme="dark"] .form-group label{
 
 }
 
-
 html[data-theme="dark"] .form-group input,
 html[data-theme="dark"] .form-group select,
 html[data-theme="dark"] .form-group textarea,
@@ -2692,7 +2414,6 @@ html[data-theme="dark"] .claim-input{
   color:#F8FAFC;
 
 }
-
 
 html[data-theme="dark"] .form-group input::placeholder,
 html[data-theme="dark"] .form-group textarea::placeholder,
@@ -2736,7 +2457,6 @@ html[data-theme="dark"] .modal-wrap{
 
 }
 
-
 html[data-theme="dark"] .modal{
 
   background:#151E30;
@@ -2747,7 +2467,6 @@ html[data-theme="dark"] .modal{
 
 }
 
-
 html[data-theme="dark"] .modal-head{
 
   border-bottom:
@@ -2756,20 +2475,13 @@ html[data-theme="dark"] .modal-head{
 
 }
 
-
 html[data-theme="dark"] .modal-head h2{
-
   color:#F8FAFC;
-
 }
-
 
 html[data-theme="dark"] .modal-head p{
-
   color:#B8C4D4;
-
 }
-
 
 html[data-theme="dark"] .modal-foot{
 
@@ -2778,7 +2490,6 @@ html[data-theme="dark"] .modal-foot{
     #334155;
 
 }
-
 
 html[data-theme="dark"] .modal-close{
 
@@ -2819,7 +2530,6 @@ html[data-theme="dark"] .global-notification-panel{
 
 }
 
-
 html[data-theme="dark"] .notif-head{
 
   background:#1B263A;
@@ -2830,20 +2540,13 @@ html[data-theme="dark"] .notif-head{
 
 }
 
-
 html[data-theme="dark"] .notif-head strong{
-
   color:#F8FAFC;
-
 }
-
 
 html[data-theme="dark"] .notif-head span{
-
   color:#B8C4D4;
-
 }
-
 
 html[data-theme="dark"] .notif-item{
 
@@ -2853,38 +2556,26 @@ html[data-theme="dark"] .notif-item{
 
 }
 
-
 html[data-theme="dark"] .notif-item:hover{
-
   background:#202C42;
-
 }
-
 
 html[data-theme="dark"] .notif-name{
-
   color:#F8FAFC;
-
 }
-
 
 html[data-theme="dark"] .notif-text{
-
   color:#B8C4D4;
-
 }
 
-
 html[data-theme="dark"] .notif-empty{
-
   color:#B8C4D4;
-
 }
 
 
 
 /* =========================================================
-   DARK THEME BUTTON
+   DARK THEME TOGGLE
 ========================================================= */
 
 html[data-theme="dark"] .theme-toggle{
@@ -2899,10 +2590,74 @@ html[data-theme="dark"] .theme-toggle{
 
 }
 
-
 html[data-theme="dark"] .theme-toggle:hover{
 
   background:#1B263A;
+
+}
+
+
+
+/* =========================================================
+   IMPORTANT FIX:
+   READONLY PATIENT ID IN EDIT PATIENT MODAL
+=========================================================
+
+The old patient profile used an inline light background:
+
+background:#F8FAFC;
+
+That caused white text on a white field
+when Night Mode was active.
+
+This override intentionally wins over the inline style.
+========================================================= */
+
+html[data-theme="dark"] #editPatientId{
+
+  background:#101827 !important;
+
+  color:#F8FAFC !important;
+
+  border:
+    1px solid
+    #3B4A61 !important;
+
+  -webkit-text-fill-color:#F8FAFC !important;
+
+  opacity:1 !important;
+
+  cursor:not-allowed;
+
+}
+
+html[data-theme="dark"] #editPatientId:disabled{
+
+  background:#101827 !important;
+
+  color:#F8FAFC !important;
+
+  -webkit-text-fill-color:#F8FAFC !important;
+
+  opacity:1 !important;
+
+}
+
+
+
+/* =========================================================
+   READONLY / DISABLED FIELDS GENERAL
+========================================================= */
+
+html[data-theme="dark"] input[readonly],
+html[data-theme="dark"] input:disabled,
+html[data-theme="dark"] select:disabled{
+
+  color:#F8FAFC !important;
+
+  -webkit-text-fill-color:#F8FAFC !important;
+
+  opacity:1;
 
 }
 
@@ -2917,18 +2672,12 @@ html[data-theme="dark"] .theme-toggle:hover{
 ){
 
   .sidebar{
-
     width:210px;
-
   }
-
 
   .main{
-
     margin-left:210px;
-
   }
-
 
   .kpi-grid{
 
@@ -2940,14 +2689,9 @@ html[data-theme="dark"] .theme-toggle:hover{
 
   }
 
-
   .grid-2{
-
-    grid-template-columns:
-      1fr;
-
+    grid-template-columns:1fr;
   }
-
 
   .breakdown,
   .claim-grid{
@@ -2966,18 +2710,12 @@ html[data-theme="dark"] .theme-toggle:hover{
 ){
 
   .sidebar{
-
     display:none;
-
   }
-
 
   .main{
-
     margin-left:0;
-
   }
-
 
   .mobile-menu{
 
@@ -2991,20 +2729,13 @@ html[data-theme="dark"] .theme-toggle:hover{
 
   }
 
-
   .search-box{
-
     width:145px;
-
   }
-
 
   .hero-details{
-
     display:none;
-
   }
-
 
   .content{
 
@@ -3014,31 +2745,22 @@ html[data-theme="dark"] .theme-toggle:hover{
 
   }
 
-
   .patient-hero{
-
     align-items:flex-start;
-
   }
-
 
   .finance-grid,
   .breakdown,
   .visit-grid,
   .form-grid{
 
-    grid-template-columns:
-      1fr;
+    grid-template-columns:1fr;
 
   }
-
 
   .patient-tabs{
-
     overflow:auto;
-
   }
-
 
   .topbar{
 
@@ -3048,13 +2770,9 @@ html[data-theme="dark"] .theme-toggle:hover{
 
   }
 
-
   .topbar-right{
-
     gap:5px;
-
   }
-
 
   .theme-toggle{
 
