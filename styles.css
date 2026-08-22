@@ -1,40 +1,81 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 :root{
+
   --navy:#08142A;
+
   --blue:#2563EB;
+
   --blue-soft:#E8F2FF;
+
   --page:#EEF5FF;
+
   --card:#FFFFFF;
+
   --surface:#F8FBFF;
+
   --border:#D9E4F2;
+
   --border-light:#E8EEF7;
+
   --muted:#64748B;
+
   --muted-2:#94A3B8;
+
   --green:#16A34A;
+
   --orange:#F59E0B;
+
   --red:#DC2626;
-  --shadow:0 8px 28px rgba(15,23,42,.06);
+
+  --shadow:
+    0
+    8px
+    28px
+    rgba(
+      15,
+      23,
+      42,
+      .06
+    );
+
 }
+
 
 *{
   box-sizing:border-box;
 }
 
+
 html,
 body{
+
   margin:0;
+
   padding:0;
+
   min-height:100%;
-  font-family:Poppins,Arial,sans-serif;
-  background:var(--page);
-  color:var(--navy);
+
+  font-family:
+    Poppins,
+    Arial,
+    sans-serif;
+
+  background:
+    var(--page);
+
+  color:
+    var(--navy);
+
   font-size:11px;
+
 }
+
 
 body{
   overflow-x:hidden;
 }
+
 
 button,
 input,
@@ -43,14 +84,18 @@ textarea{
   font-family:inherit;
 }
 
+
 button{
   cursor:pointer;
 }
+
 
 a{
   text-decoration:none;
   color:inherit;
 }
+
+
 
 /* =========================================================
    APP
@@ -60,46 +105,73 @@ a{
   min-height:100vh;
 }
 
+
 .main{
+
   margin-left:225px;
+
   min-height:100vh;
+
 }
+
+
 
 /* =========================================================
    SIDEBAR
 ========================================================= */
 
 .sidebar{
+
   position:fixed;
+
   left:0;
+
   top:0;
+
   bottom:0;
+
   width:225px;
 
   background:#F7FAFF;
 
-  border-right:1px solid var(--border);
+  border-right:
+    1px solid
+    var(--border);
 
   display:flex;
+
   flex-direction:column;
 
   z-index:20;
+
 }
+
 
 .brand{
+
   height:75px;
 
-  padding:18px 16px;
+  padding:
+    18px
+    16px;
 
-  border-bottom:1px solid var(--border);
+  border-bottom:
+    1px solid
+    var(--border);
 
   display:flex;
+
   align-items:center;
+
   gap:10px;
+
 }
 
+
 .brand-mark{
+
   width:36px;
+
   height:36px;
 
   border-radius:10px;
@@ -114,28 +186,47 @@ a{
   color:#fff;
 
   display:grid;
+
   place-items:center;
 
   font-weight:700;
+
   font-size:14px;
+
 }
+
 
 .brand-name{
+
   font-size:14px;
+
   font-weight:700;
+
 }
+
 
 .brand-sub{
+
   font-size:9px;
+
   color:var(--muted);
+
 }
+
 
 .nav{
-  padding:20px 12px;
+
+  padding:
+    20px
+    12px;
+
 }
 
+
 .nav-label{
+
   font-size:10px;
+
   color:#94A3B8;
 
   letter-spacing:.12em;
@@ -146,9 +237,12 @@ a{
     0
     10px
     10px;
+
 }
 
+
 .nav a{
+
   display:flex;
 
   gap:10px;
@@ -166,16 +260,34 @@ a{
   color:#17345F;
 
   margin:4px 0;
+
+  transition:.18s ease;
+
 }
 
-.nav a:hover,
-.nav a.active{
-  background:#DDEBFF;
+
+.nav a:hover{
+
+  background:#EAF2FF;
+
   color:#1759D6;
-  font-weight:600;
+
 }
+
+
+.nav a.active{
+
+  background:#DDEBFF;
+
+  color:#1759D6;
+
+  font-weight:600;
+
+}
+
 
 .sidebar-user{
+
   margin-top:auto;
 
   padding:12px;
@@ -183,9 +295,12 @@ a{
   border-top:
     1px solid
     var(--border);
+
 }
 
+
 .user-card{
+
   padding:11px;
 
   border:
@@ -201,10 +316,14 @@ a{
   gap:9px;
 
   align-items:center;
+
 }
 
+
 .user-dot{
+
   width:30px;
+
   height:30px;
 
   border-radius:50%;
@@ -214,28 +333,41 @@ a{
   color:#2563EB;
 
   display:grid;
+
   place-items:center;
 
   font-size:10px;
 
   font-weight:700;
+
 }
+
 
 .user-name{
+
   font-size:10px;
+
   font-weight:600;
+
 }
 
+
 .user-role{
+
   font-size:9px;
+
   color:var(--muted);
+
 }
+
+
 
 /* =========================================================
    TOPBAR
 ========================================================= */
 
 .topbar{
+
   height:66px;
 
   background:#fff;
@@ -257,39 +389,65 @@ a{
     25px;
 
   position:sticky;
+
   top:0;
 
   z-index:15;
+
 }
+
 
 .topbar-left{
+
   display:flex;
+
   align-items:center;
+
   gap:14px;
+
 }
+
 
 .mobile-menu{
+
   display:none;
+
 }
+
 
 .page-title{
+
   font-size:17px;
+
   font-weight:700;
+
 }
+
 
 .page-subtitle{
+
   font-size:11px;
+
   color:var(--muted);
+
 }
+
 
 .topbar-right{
+
   display:flex;
+
   align-items:center;
+
   gap:9px;
+
 }
 
+
 .search-box{
+
   width:245px;
+
   height:36px;
 
   border:
@@ -301,6 +459,7 @@ a{
   background:#fff;
 
   display:flex;
+
   align-items:center;
 
   gap:7px;
@@ -308,14 +467,21 @@ a{
   padding:
     0
     11px;
+
 }
+
 
 .search-box span{
+
   color:#94A3B8;
+
 }
 
+
 .search-box input{
+
   border:0;
+
   outline:0;
 
   width:100%;
@@ -325,14 +491,21 @@ a{
   font-size:11px;
 
   color:var(--navy);
+
 }
+
 
 .search-box input::placeholder{
+
   color:#94A3B8;
+
 }
 
+
 .icon-button{
+
   width:36px;
+
   height:36px;
 
   border:
@@ -344,19 +517,27 @@ a{
   background:#fff;
 
   display:grid;
+
   place-items:center;
 
   color:#334155;
 
   transition:.18s ease;
+
 }
+
 
 .icon-button:hover{
+
   background:#F8FBFF;
+
 }
 
+
 .user-avatar{
+
   width:36px;
+
   height:36px;
 
   border-radius:50%;
@@ -366,38 +547,51 @@ a{
   color:#fff;
 
   display:grid;
+
   place-items:center;
 
   font-size:10px;
 
   font-weight:600;
+
 }
+
+
 
 /* =========================================================
    CONTENT
 ========================================================= */
 
 .content{
+
   padding:
     25px
     26px
     35px;
+
 }
 
+
 .back{
+
   font-size:10px;
+
   color:#476384;
 
   display:inline-block;
 
   margin-bottom:14px;
+
 }
+
+
 
 /* =========================================================
    PAGE HEADER
 ========================================================= */
 
 .page-head{
+
   display:flex;
 
   justify-content:space-between;
@@ -405,24 +599,33 @@ a{
   align-items:flex-start;
 
   margin-bottom:16px;
+
 }
 
+
 .page-head h1{
+
   font-size:21px;
 
   margin:
     0
     0
     4px;
+
 }
 
+
 .page-head p{
+
   font-size:11px;
 
   color:var(--muted);
 
   margin:0;
+
 }
+
+
 
 /* =========================================================
    BUTTONS
@@ -430,6 +633,7 @@ a{
 
 .primary,
 .secondary{
+
   border-radius:9px;
 
   padding:
@@ -445,40 +649,64 @@ a{
     transparent;
 
   transition:.18s ease;
+
 }
+
 
 .primary{
+
   background:var(--blue);
+
   color:#fff;
+
 }
 
+
 .primary:hover{
-  transform:translateY(-1px);
+
+  transform:
+    translateY(-1px);
+
   box-shadow:
     0
     5px
     14px
-    rgba(37,99,235,.20);
+    rgba(
+      37,
+      99,
+      235,
+      .20
+    );
+
 }
 
+
 .secondary{
+
   background:#fff;
 
   border-color:
     var(--border);
 
   color:#1D4ED8;
+
 }
 
+
 .secondary:hover{
+
   background:#F8FBFF;
+
 }
+
+
 
 /* =========================================================
    CARDS
 ========================================================= */
 
 .card{
+
   background:var(--card);
 
   border:
@@ -488,11 +716,13 @@ a{
   border-radius:12px;
 
   box-shadow:var(--shadow);
+
 }
 
+
 .card-head{
-  padding:
-    18px;
+
+  padding:18px;
 
   border-bottom:
     1px solid
@@ -505,15 +735,21 @@ a{
   gap:12px;
 
   align-items:flex-start;
+
 }
 
+
 .card-head h2{
+
   margin:0;
 
   font-size:13px;
+
 }
 
+
 .card-head p{
+
   margin:
     4px
     0
@@ -522,28 +758,41 @@ a{
   font-size:11px;
 
   color:var(--muted);
+
 }
 
+
 .card-body{
+
   padding:18px;
+
 }
+
+
 
 /* =========================================================
    KPI
 ========================================================= */
 
 .kpi-grid{
+
   display:grid;
 
   grid-template-columns:
-    repeat(4,1fr);
+    repeat(
+      4,
+      1fr
+    );
 
   gap:12px;
 
   margin-bottom:16px;
+
 }
 
+
 .kpi{
+
   padding:16px;
 
   border:
@@ -555,37 +804,50 @@ a{
   border-radius:12px;
 
   box-shadow:var(--shadow);
+
 }
 
+
 .kpi-label{
+
   font-size:10px;
 
   color:#64748B;
 
   font-weight:500;
+
 }
 
+
 .kpi-value{
+
   font-size:25px;
 
   font-weight:700;
 
   margin-top:8px;
+
 }
 
+
 .kpi-sub{
+
   font-size:10px;
 
   color:#94A3B8;
 
   margin-top:3px;
+
 }
+
+
 
 /* =========================================================
    GRID
 ========================================================= */
 
 .grid-2{
+
   display:grid;
 
   grid-template-columns:
@@ -593,17 +855,24 @@ a{
     1fr;
 
   gap:16px;
+
 }
 
+
 .list{
+
   padding:0;
+
 }
+
+
 
 /* =========================================================
    ROW
 ========================================================= */
 
 .row{
+
   display:flex;
 
   align-items:center;
@@ -617,23 +886,35 @@ a{
   border-bottom:
     1px solid
     var(--border-light);
+
 }
+
 
 .row:last-child{
+
   border-bottom:0;
+
 }
+
 
 .row-main{
+
   flex:1;
+
 }
 
+
 .row-title{
+
   font-size:11px;
 
   font-weight:600;
+
 }
 
+
 .row-sub{
+
   font-size:10.5px;
 
   line-height:16px;
@@ -641,10 +922,14 @@ a{
   color:var(--muted);
 
   margin-top:3px;
+
 }
 
+
 .avatar-small{
+
   width:34px;
+
   height:34px;
 
   border-radius:9px;
@@ -654,30 +939,41 @@ a{
   color:#2563EB;
 
   display:grid;
+
   place-items:center;
 
   font-size:10px;
 
   font-weight:600;
+
 }
+
+
 
 /* =========================================================
    TABLE
 ========================================================= */
 
 .table-wrap{
+
   overflow:auto;
+
 }
 
+
 .table{
+
   width:100%;
 
   border-collapse:collapse;
 
   min-width:760px;
+
 }
 
+
 .table th{
+
   background:#F8FBFF;
 
   color:#64748B;
@@ -693,9 +989,12 @@ a{
   border-bottom:
     1px solid
     var(--border);
+
 }
 
+
 .table td{
+
   font-size:11px;
 
   padding:
@@ -705,17 +1004,24 @@ a{
   border-bottom:
     1px solid
     var(--border);
+
 }
 
+
 .table tr:hover td{
+
   background:#FAFCFF;
+
 }
+
+
 
 /* =========================================================
    BADGES
 ========================================================= */
 
 .badge{
+
   display:inline-flex;
 
   align-items:center;
@@ -731,38 +1037,62 @@ a{
   font-size:10px;
 
   font-weight:600;
+
 }
+
 
 .badge.green{
+
   background:#ECFDF5;
+
   color:#15803D;
+
 }
+
 
 .badge.gray{
+
   background:#F1F5F9;
+
   color:#475569;
+
 }
+
 
 .badge.blue{
+
   background:#E8F2FF;
+
   color:#1D4ED8;
+
 }
+
 
 .badge.orange{
+
   background:#FFF7ED;
+
   color:#C2410C;
+
 }
 
+
 .badge.red{
+
   background:#FEF2F2;
+
   color:#B91C1C;
+
 }
+
+
 
 /* =========================================================
    PANEL CHIP
 ========================================================= */
 
 .panel-chip{
+
   display:inline-flex;
 
   align-items:center;
@@ -784,13 +1114,17 @@ a{
   font-size:10px;
 
   font-weight:600;
+
 }
+
+
 
 /* =========================================================
    PATIENT HERO
 ========================================================= */
 
 .patient-hero{
+
   display:flex;
 
   justify-content:space-between;
@@ -814,18 +1148,25 @@ a{
   box-shadow:var(--shadow);
 
   margin-bottom:14px;
+
 }
 
+
 .patient-main{
+
   display:flex;
 
   align-items:center;
 
   gap:14px;
+
 }
 
+
 .patient-avatar{
+
   width:60px;
+
   height:60px;
 
   border-radius:14px;
@@ -835,23 +1176,30 @@ a{
   color:#2563EB;
 
   display:grid;
+
   place-items:center;
 
   font-weight:700;
 
   font-size:16px;
+
 }
 
+
 .patient-heading h1{
+
   font-size:19px;
 
   margin:
     0
     0
     5px;
+
 }
 
+
 .meta{
+
   display:flex;
 
   align-items:center;
@@ -863,39 +1211,55 @@ a{
   font-size:10px;
 
   color:var(--muted);
+
 }
 
+
 .hero-details{
+
   display:flex;
 
   gap:25px;
+
 }
 
+
 .hero-detail{
+
   display:flex;
 
   flex-direction:column;
 
   align-items:flex-end;
+
 }
 
+
 .hero-label{
+
   font-size:10px;
 
   color:#94A3B8;
+
 }
 
+
 .hero-value{
+
   font-size:10px;
 
   font-weight:600;
+
 }
+
+
 
 /* =========================================================
    TABS
 ========================================================= */
 
 .patient-tabs{
+
   display:flex;
 
   gap:20px;
@@ -915,9 +1279,12 @@ a{
   margin:
     15px
     0;
+
 }
 
+
 .patient-tabs button{
+
   border:0;
 
   background:transparent;
@@ -934,31 +1301,44 @@ a{
   border-bottom:
     2px solid
     transparent;
+
 }
 
+
 .patient-tabs button.active{
+
   color:#1D4ED8;
 
   border-bottom-color:
     #2563EB;
 
   font-weight:600;
+
 }
+
+
 
 /* =========================================================
    FINANCE
 ========================================================= */
 
 .finance-grid{
+
   display:grid;
 
   grid-template-columns:
-    repeat(3,1fr);
+    repeat(
+      3,
+      1fr
+    );
 
   gap:10px;
+
 }
 
+
 .finance-card{
+
   padding:16px;
 
   border:
@@ -968,44 +1348,65 @@ a{
   border-radius:10px;
 
   background:#F8FBFF;
+
 }
 
+
 .finance-card .label{
+
   font-size:10px;
 
   color:#64748B;
+
 }
 
+
 .finance-card .value{
+
   font-size:21px;
 
   font-weight:700;
 
   margin-top:6px;
+
 }
 
+
 .balance{
+
   background:#FFF7ED;
 
   border-color:#F2B24A;
+
 }
+
 
 .balance .value{
+
   color:#92400E;
+
 }
 
+
 .breakdown{
+
   display:grid;
 
   grid-template-columns:
-    repeat(4,1fr);
+    repeat(
+      4,
+      1fr
+    );
 
   gap:9px;
 
   margin-top:10px;
+
 }
 
+
 .break{
+
   padding:12px;
 
   border:
@@ -1013,31 +1414,44 @@ a{
     var(--border);
 
   border-radius:9px;
+
 }
 
+
 .break span{
+
   font-size:10px;
 
   color:var(--muted);
+
 }
 
+
 .break strong{
+
   display:block;
 
   font-size:11px;
 
   margin-top:4px;
+
 }
+
+
 
 /* =========================================================
    VISITS
 ========================================================= */
 
 .visit-card{
+
   padding:16px;
+
 }
 
+
 .visit-section-title{
+
   font-size:12px;
 
   font-weight:600;
@@ -1054,9 +1468,12 @@ a{
   border-bottom:
     1px solid
     var(--border);
+
 }
 
+
 .visit-grid{
+
   display:grid;
 
   grid-template-columns:
@@ -1064,9 +1481,12 @@ a{
     1fr;
 
   gap:10px;
+
 }
 
+
 .visit-item{
+
   padding:12px;
 
   border:
@@ -1076,25 +1496,35 @@ a{
   border-radius:9px;
 
   background:#FAFCFF;
+
 }
 
+
 .visit-item label{
+
   display:block;
 
   font-size:10px;
 
   color:var(--muted);
+
 }
 
+
 .visit-item strong{
+
   font-size:11px;
+
 }
+
+
 
 /* =========================================================
    FORMS
 ========================================================= */
 
 .form-grid{
+
   display:grid;
 
   grid-template-columns:
@@ -1102,9 +1532,12 @@ a{
     1fr;
 
   gap:10px;
+
 }
 
+
 .form-group label{
+
   display:block;
 
   font-size:10px;
@@ -1112,11 +1545,14 @@ a{
   color:#475569;
 
   margin-bottom:5px;
+
 }
+
 
 .form-group input,
 .form-group select,
 .form-group textarea{
+
   width:100%;
 
   border:
@@ -1138,35 +1574,53 @@ a{
   outline:0;
 
   color:var(--navy);
+
 }
+
 
 .form-group input::placeholder,
 .form-group textarea::placeholder{
+
   color:#94A3B8;
+
 }
 
+
 .form-group textarea{
+
   height:88px;
 
   padding:8px;
 
   resize:vertical;
+
 }
+
 
 .full{
+
   grid-column:1/-1;
+
 }
 
+
 .claim-grid{
+
   display:grid;
 
   grid-template-columns:
-    repeat(3,1fr);
+    repeat(
+      3,
+      1fr
+    );
 
   gap:10px;
+
 }
 
+
 .claim-input{
+
   width:100%;
 
   height:35px;
@@ -1188,13 +1642,17 @@ a{
   color:var(--navy);
 
   outline:0;
+
 }
+
+
 
 /* =========================================================
    MODALS
 ========================================================= */
 
 .modal-wrap{
+
   position:fixed;
 
   inset:0;
@@ -1216,13 +1674,19 @@ a{
   z-index:60;
 
   padding:20px;
+
 }
+
 
 .modal-wrap.show{
+
   display:flex;
+
 }
 
+
 .modal{
+
   width:
     min(
       760px,
@@ -1247,9 +1711,12 @@ a{
       42,
       .20
     );
+
 }
 
+
 .modal-head{
+
   padding:
     16px
     18px;
@@ -1263,15 +1730,21 @@ a{
   justify-content:space-between;
 
   align-items:center;
+
 }
 
+
 .modal-head h2{
+
   margin:0;
 
   font-size:14px;
+
 }
 
+
 .modal-head p{
+
   margin:
     4px
     0
@@ -1280,9 +1753,12 @@ a{
   font-size:10px;
 
   color:var(--muted);
+
 }
 
+
 .modal-close{
+
   border:
     1px solid
     var(--border);
@@ -1290,6 +1766,7 @@ a{
   background:#fff;
 
   width:31px;
+
   height:31px;
 
   border-radius:8px;
@@ -1297,13 +1774,19 @@ a{
   font-size:18px;
 
   color:#475569;
+
 }
+
 
 .modal-body{
+
   padding:18px;
+
 }
 
+
 .modal-foot{
+
   padding:
     13px
     18px;
@@ -1317,17 +1800,24 @@ a{
   justify-content:flex-end;
 
   gap:8px;
+
 }
+
+
 
 /* =========================================================
    NOTIFICATIONS
 ========================================================= */
 
 .global-notification-wrap{
+
   position:relative;
+
 }
 
+
 .notification-count{
+
   position:absolute;
 
   top:-4px;
@@ -1361,9 +1851,12 @@ a{
   align-items:center;
 
   justify-content:center;
+
 }
 
+
 .global-notification-panel{
+
   position:absolute;
 
   top:44px;
@@ -1399,9 +1892,12 @@ a{
   overflow:hidden;
 
   z-index:99;
+
 }
 
+
 .notif-head{
+
   padding:
     14px;
 
@@ -1414,13 +1910,19 @@ a{
   display:flex;
 
   justify-content:space-between;
+
 }
+
 
 .notif-head strong{
+
   font-size:11px;
+
 }
 
+
 .notif-head span{
+
   font-size:10px;
 
   color:var(--muted);
@@ -1428,9 +1930,12 @@ a{
   display:block;
 
   margin-top:3px;
+
 }
 
+
 .notif-item{
+
   display:flex;
 
   gap:9px;
@@ -1444,14 +1949,21 @@ a{
     var(--border-light);
 
   cursor:pointer;
+
 }
+
 
 .notif-item:hover{
+
   background:#F8FBFF;
+
 }
 
+
 .notif-dot{
+
   width:8px;
+
   height:8px;
 
   border-radius:50%;
@@ -1459,23 +1971,35 @@ a{
   margin-top:5px;
 
   flex:0 0 auto;
+
 }
+
 
 .notif-dot.warning{
+
   background:#F59E0B;
+
 }
+
 
 .notif-dot.overdue{
+
   background:#DC2626;
+
 }
 
+
 .notif-name{
+
   font-size:11px;
 
   font-weight:600;
+
 }
 
+
 .notif-text{
+
   font-size:10px;
 
   line-height:16px;
@@ -1483,9 +2007,12 @@ a{
   color:var(--muted);
 
   margin-top:2px;
+
 }
 
+
 .notif-empty{
+
   padding:22px;
 
   text-align:center;
@@ -1493,14 +2020,19 @@ a{
   font-size:10px;
 
   color:var(--muted);
+
 }
+
+
 
 /* =========================================================
    THEME TOGGLE
 ========================================================= */
 
 .theme-toggle{
+
   width:36px;
+
   height:36px;
 
   border:
@@ -1514,36 +2046,48 @@ a{
   color:#334155;
 
   display:grid;
+
   place-items:center;
 
   font-size:16px;
 
   transition:.18s ease;
+
 }
 
+
 .theme-toggle:hover{
-  transform:translateY(-1px);
+
+  transform:
+    translateY(-1px);
+
 }
+
+
 
 /* =========================================================
    DAY / NIGHT MODE
 ========================================================= */
 
-/* ---------- NIGHT BASE ---------- */
-
 html[data-theme="dark"]{
+
   color-scheme:dark;
 
+
   --page:#080D19;
+
   --card:#151E30;
+
   --surface:#1B263A;
 
   --navy:#F8FAFC;
 
   --border:#334155;
+
   --border-light:#26344A;
 
   --muted:#B8C4D4;
+
   --muted-2:#94A3B8;
 
   --blue-soft:#102A4A;
@@ -1558,110 +2102,181 @@ html[data-theme="dark"]{
       0,
       .20
     );
+
 }
 
+
 html[data-theme="dark"] body{
+
   background:#080D19;
 
   color:#F8FAFC;
+
 }
 
-/* ---------- SIDEBAR ---------- */
+
+
+/* =========================================================
+   DARK SIDEBAR
+========================================================= */
 
 html[data-theme="dark"] .sidebar{
+
   background:#0D1424;
 
   border-right:
     1px solid
     #334155;
+
 }
 
+
 html[data-theme="dark"] .brand{
+
   border-bottom:
     1px solid
     #334155;
+
 }
+
 
 html[data-theme="dark"] .brand-name{
+
   color:#F8FAFC;
+
 }
+
 
 html[data-theme="dark"] .brand-sub{
+
   color:#A8B3C2;
+
 }
+
 
 html[data-theme="dark"] .nav-label{
+
   color:#8FA1B6;
+
 }
+
 
 html[data-theme="dark"] .nav a{
+
   color:#D4DCE7;
+
 }
 
-html[data-theme="dark"] .nav a:hover,
+
+html[data-theme="dark"] .nav a:hover{
+
+  background:#132B4A;
+
+  color:#60A5FA;
+
+}
+
+
 html[data-theme="dark"] .nav a.active{
+
   background:#16345A;
 
   color:#60A5FA;
+
 }
 
+
 html[data-theme="dark"] .user-card{
+
   background:#151E30;
 
   border:
     1px solid
     #334155;
+
 }
+
 
 html[data-theme="dark"] .user-name{
+
   color:#F8FAFC;
+
 }
+
 
 html[data-theme="dark"] .user-role{
+
   color:#A8B3C2;
+
 }
 
+
 html[data-theme="dark"] .user-dot{
+
   background:#16345A;
 
   color:#60A5FA;
+
 }
 
-/* ---------- TOPBAR ---------- */
+
+
+/* =========================================================
+   DARK TOPBAR
+========================================================= */
 
 html[data-theme="dark"] .topbar{
+
   background:#0D1424;
 
   border-bottom:
     1px solid
     #334155;
+
 }
+
 
 html[data-theme="dark"] .page-title{
+
   color:#F8FAFC;
+
 }
+
 
 html[data-theme="dark"] .page-subtitle{
+
   color:#A8B3C2;
+
 }
 
+
 html[data-theme="dark"] .search-box{
+
   background:#101827;
 
   border:
     1px solid
     #3B4A61;
+
 }
+
 
 html[data-theme="dark"] .search-box input{
+
   color:#F8FAFC;
+
 }
+
 
 html[data-theme="dark"] .search-box input::placeholder{
+
   color:#718198;
+
 }
 
+
 html[data-theme="dark"] .icon-button{
+
   background:#101827;
 
   border:
@@ -1669,25 +2284,30 @@ html[data-theme="dark"] .icon-button{
     #3B4A61;
 
   color:#E2E8F0;
+
 }
+
 
 html[data-theme="dark"] .icon-button:hover{
+
   background:#1B263A;
+
 }
 
+
 html[data-theme="dark"] .user-avatar{
+
   background:#F8FAFC;
 
   color:#0D1424;
+
 }
 
-/* ---------- CONTENT ---------- */
 
-html[data-theme="dark"] .back{
-  color:#93C5FD;
-}
 
-/* ---------- CARDS ---------- */
+/* =========================================================
+   DARK CARDS
+========================================================= */
 
 html[data-theme="dark"] .card,
 html[data-theme="dark"] .kpi,
@@ -1695,6 +2315,7 @@ html[data-theme="dark"] .patient-hero,
 html[data-theme="dark"] .finance-card,
 html[data-theme="dark"] .break,
 html[data-theme="dark"] .visit-item{
+
   background:#151E30;
 
   border:
@@ -1711,65 +2332,110 @@ html[data-theme="dark"] .visit-item{
       0,
       .16
     );
+
 }
 
+
 html[data-theme="dark"] .card-head{
+
   border-bottom:
     1px solid
     #334155;
+
 }
+
 
 html[data-theme="dark"] .card-head h2{
+
   color:#F8FAFC;
+
 }
+
 
 html[data-theme="dark"] .card-head p{
+
   color:#B8C4D4;
+
 }
 
-/* ---------- KPI ---------- */
+
+
+/* =========================================================
+   DARK KPI
+========================================================= */
 
 html[data-theme="dark"] .kpi-label{
+
   color:#CBD5E1;
+
 }
+
 
 html[data-theme="dark"] .kpi-value{
+
   color:#F8FAFC;
+
 }
+
 
 html[data-theme="dark"] .kpi-sub{
+
   color:#A8B3C2;
+
 }
 
-/* ---------- ROWS ---------- */
+
+
+/* =========================================================
+   DARK ROWS
+========================================================= */
 
 html[data-theme="dark"] .row{
+
   border-bottom:
     1px solid
     #26344A;
+
 }
+
 
 html[data-theme="dark"] .row:hover{
+
   background:#1B263A;
+
 }
+
 
 html[data-theme="dark"] .row-title{
+
   color:#F8FAFC;
+
 }
+
 
 html[data-theme="dark"] .row-sub{
+
   color:#B8C4D4;
+
 }
 
+
 html[data-theme="dark"] .avatar-small{
+
   background:#16345A;
 
   color:#60A5FA;
+
 }
 
-/* ---------- TABLE ---------- */
+
+
+/* =========================================================
+   DARK TABLES
+========================================================= */
 
 html[data-theme="dark"] .table th{
+
   background:#1B263A;
 
   color:#CBD5E1;
@@ -1777,102 +2443,168 @@ html[data-theme="dark"] .table th{
   border-bottom:
     1px solid
     #334155;
+
 }
 
+
 html[data-theme="dark"] .table td{
+
   color:#E2E8F0;
 
   border-bottom:
     1px solid
     #26344A;
+
 }
+
 
 html[data-theme="dark"] .table tr:hover td{
+
   background:#202C42;
+
 }
 
-/* ---------- TEXT ---------- */
+
+
+/* =========================================================
+   DARK PATIENT TEXT
+========================================================= */
 
 html[data-theme="dark"] .patient-heading h1{
+
   color:#F8FAFC;
+
 }
+
 
 html[data-theme="dark"] .meta{
+
   color:#B8C4D4;
+
 }
+
 
 html[data-theme="dark"] .hero-label{
+
   color:#A8B3C2;
+
 }
+
 
 html[data-theme="dark"] .hero-value{
+
   color:#F8FAFC;
+
 }
+
 
 html[data-theme="dark"] .break span{
+
   color:#B8C4D4;
+
 }
+
 
 html[data-theme="dark"] .break strong{
+
   color:#F8FAFC;
+
 }
 
-/* ---------- TABS ---------- */
+
+
+/* =========================================================
+   DARK TABS
+========================================================= */
 
 html[data-theme="dark"] .patient-tabs{
+
   background:#151E30;
 
   border:
     1px solid
     #334155;
+
 }
+
 
 html[data-theme="dark"] .patient-tabs button{
+
   color:#CBD5E1;
+
 }
 
+
 html[data-theme="dark"] .patient-tabs button.active{
+
   color:#60A5FA;
 
   border-bottom-color:
     #60A5FA;
+
 }
 
-/* ---------- FINANCE ---------- */
+
+
+/* =========================================================
+   DARK FINANCE
+========================================================= */
 
 html[data-theme="dark"] .finance-card{
+
   background:#1B263A;
 
   border:
     1px solid
     #3B4A61;
+
 }
+
 
 html[data-theme="dark"] .finance-card .label{
+
   color:#CBD5E1;
+
 }
+
 
 html[data-theme="dark"] .finance-card .value{
+
   color:#F8FAFC;
+
 }
 
+
 html[data-theme="dark"] .balance{
+
   background:#302013;
 
   border-color:#9A6A22;
+
 }
+
 
 html[data-theme="dark"] .balance .label{
+
   color:#FCD34D;
+
 }
+
 
 html[data-theme="dark"] .balance .value{
+
   color:#FDBA74;
+
 }
 
-/* ---------- PANEL ---------- */
+
+
+/* =========================================================
+   DARK PANEL CHIP
+========================================================= */
 
 html[data-theme="dark"] .panel-chip{
+
   background:#15365C;
 
   border:
@@ -1880,45 +2612,77 @@ html[data-theme="dark"] .panel-chip{
     #2F65A0;
 
   color:#93C5FD;
+
 }
 
-/* ---------- BADGES ---------- */
+
+
+/* =========================================================
+   DARK BADGES
+========================================================= */
 
 html[data-theme="dark"] .badge.green{
+
   background:#102A1A;
+
   color:#86EFAC;
+
 }
+
 
 html[data-theme="dark"] .badge.gray{
+
   background:#26344A;
+
   color:#D1D9E4;
+
 }
+
 
 html[data-theme="dark"] .badge.blue{
+
   background:#15365C;
+
   color:#93C5FD;
+
 }
+
 
 html[data-theme="dark"] .badge.orange{
+
   background:#3A2915;
+
   color:#FDBA74;
+
 }
+
 
 html[data-theme="dark"] .badge.red{
+
   background:#3A1515;
+
   color:#FCA5A5;
+
 }
 
-/* ---------- FORMS ---------- */
+
+
+/* =========================================================
+   DARK FORMS
+========================================================= */
 
 html[data-theme="dark"] .form-group label{
+
   color:#CBD5E1;
+
 }
+
 
 html[data-theme="dark"] .form-group input,
 html[data-theme="dark"] .form-group select,
 html[data-theme="dark"] .form-group textarea,
 html[data-theme="dark"] .claim-input{
+
   background:#101827;
 
   border:
@@ -1926,27 +2690,42 @@ html[data-theme="dark"] .claim-input{
     #3B4A61;
 
   color:#F8FAFC;
+
 }
+
 
 html[data-theme="dark"] .form-group input::placeholder,
 html[data-theme="dark"] .form-group textarea::placeholder,
 html[data-theme="dark"] .claim-input::placeholder{
+
   color:#718198;
+
 }
 
-/* ---------- VISITS ---------- */
+
+
+/* =========================================================
+   DARK VISIT
+========================================================= */
 
 html[data-theme="dark"] .visit-section-title{
+
   color:#F8FAFC;
 
   border-bottom:
     1px solid
     #334155;
+
 }
 
-/* ---------- MODALS ---------- */
+
+
+/* =========================================================
+   DARK MODALS
+========================================================= */
 
 html[data-theme="dark"] .modal-wrap{
+
   background:
     rgba(
       2,
@@ -1954,37 +2733,55 @@ html[data-theme="dark"] .modal-wrap{
       23,
       .78
     );
+
 }
 
+
 html[data-theme="dark"] .modal{
+
   background:#151E30;
 
   border:
     1px solid
     #334155;
+
 }
 
+
 html[data-theme="dark"] .modal-head{
+
   border-bottom:
     1px solid
     #334155;
+
 }
+
 
 html[data-theme="dark"] .modal-head h2{
+
   color:#F8FAFC;
+
 }
+
 
 html[data-theme="dark"] .modal-head p{
+
   color:#B8C4D4;
+
 }
 
+
 html[data-theme="dark"] .modal-foot{
+
   border-top:
     1px solid
     #334155;
+
 }
 
+
 html[data-theme="dark"] .modal-close{
+
   background:#101827;
 
   border:
@@ -1992,11 +2789,17 @@ html[data-theme="dark"] .modal-close{
     #3B4A61;
 
   color:#CBD5E1;
+
 }
 
-/* ---------- NOTIFICATIONS ---------- */
+
+
+/* =========================================================
+   DARK NOTIFICATIONS
+========================================================= */
 
 html[data-theme="dark"] .global-notification-panel{
+
   background:#151E30;
 
   border:
@@ -2013,49 +2816,79 @@ html[data-theme="dark"] .global-notification-panel{
       0,
       .40
     );
+
 }
 
+
 html[data-theme="dark"] .notif-head{
+
   background:#1B263A;
 
   border-bottom:
     1px solid
     #334155;
+
 }
+
 
 html[data-theme="dark"] .notif-head strong{
+
   color:#F8FAFC;
+
 }
+
 
 html[data-theme="dark"] .notif-head span{
+
   color:#B8C4D4;
+
 }
 
+
 html[data-theme="dark"] .notif-item{
+
   border-bottom:
     1px solid
     #26344A;
+
 }
+
 
 html[data-theme="dark"] .notif-item:hover{
+
   background:#202C42;
+
 }
+
 
 html[data-theme="dark"] .notif-name{
+
   color:#F8FAFC;
+
 }
+
 
 html[data-theme="dark"] .notif-text{
+
   color:#B8C4D4;
+
 }
+
 
 html[data-theme="dark"] .notif-empty{
+
   color:#B8C4D4;
+
 }
 
-/* ---------- THEME TOGGLE ---------- */
+
+
+/* =========================================================
+   DARK THEME BUTTON
+========================================================= */
 
 html[data-theme="dark"] .theme-toggle{
+
   background:#101827;
 
   border:
@@ -2063,55 +2896,91 @@ html[data-theme="dark"] .theme-toggle{
     #3B4A61;
 
   color:#FBBF24;
+
 }
 
+
 html[data-theme="dark"] .theme-toggle:hover{
+
   background:#1B263A;
+
 }
+
+
 
 /* =========================================================
    RESPONSIVE
 ========================================================= */
 
-@media(max-width:900px){
+@media(
+  max-width:900px
+){
 
   .sidebar{
+
     width:210px;
+
   }
+
 
   .main{
+
     margin-left:210px;
+
   }
+
 
   .kpi-grid{
+
     grid-template-columns:
-      repeat(2,1fr);
+      repeat(
+        2,
+        1fr
+      );
+
   }
 
+
   .grid-2{
-    grid-template-columns:1fr;
+
+    grid-template-columns:
+      1fr;
+
   }
+
 
   .breakdown,
   .claim-grid{
+
     grid-template-columns:
       1fr
       1fr;
+
   }
 
 }
 
-@media(max-width:700px){
+
+@media(
+  max-width:700px
+){
 
   .sidebar{
+
     display:none;
+
   }
+
 
   .main{
+
     margin-left:0;
+
   }
 
+
   .mobile-menu{
+
     display:block;
 
     background:transparent;
@@ -2119,50 +2988,80 @@ html[data-theme="dark"] .theme-toggle:hover{
     border:0;
 
     font-size:18px;
+
   }
+
 
   .search-box{
+
     width:145px;
+
   }
+
 
   .hero-details{
+
     display:none;
+
   }
 
+
   .content{
+
     padding:
       18px
       12px;
+
   }
 
+
   .patient-hero{
+
     align-items:flex-start;
+
   }
+
 
   .finance-grid,
   .breakdown,
   .visit-grid,
   .form-grid{
-    grid-template-columns:1fr;
+
+    grid-template-columns:
+      1fr;
+
   }
+
 
   .patient-tabs{
+
     overflow:auto;
+
   }
 
+
   .topbar{
+
     padding:
       0
       12px;
+
   }
+
 
   .topbar-right{
+
     gap:5px;
+
   }
 
+
   .theme-toggle{
+
     width:34px;
+
     height:34px;
+
   }
 
 }
