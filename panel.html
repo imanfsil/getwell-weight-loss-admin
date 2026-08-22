@@ -317,36 +317,9 @@ document.getElementById("root").innerHTML = shell(
 
 function buildPanelFilter(){
 
-  const names = new Set([
-    "MiCare",
-    "PMCare",
-    "Other Panel"
-  ]);
-
-
-  getPanelPatientsRaw().forEach(
-    patient => {
-
-      const name =
-        getPanelName(
-          patient
-        );
-
-      if(name){
-        names.add(name);
-      }
-
-    }
-  );
-
-
-  const sorted =
-    [...names]
-      .sort(
-        (a,b) =>
-          a.localeCompare(b)
-      );
-
+  const current =
+    panelFilter.value ||
+    "ALL";
 
   panelFilter.innerHTML = `
 
@@ -355,11 +328,11 @@ function buildPanelFilter(){
     </option>
 
     ${
-      sorted
+      PANEL_TYPES
         .map(
           name => `
             <option
-              value="${name.replace(/"/g,"&quot;")}"
+              value="${name}"
             >
               ${name}
             </option>
@@ -369,6 +342,17 @@ function buildPanelFilter(){
     }
 
   `;
+
+  if(
+    current === "ALL" ||
+    PANEL_TYPES.includes(current)
+  ){
+    panelFilter.value =
+      current;
+  }else{
+    panelFilter.value =
+      "ALL";
+  }
 
 }
 
