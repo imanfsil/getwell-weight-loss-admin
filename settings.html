@@ -14,11 +14,11 @@
 
   <link
     rel="stylesheet"
-    href="styles.css?v=20260823-settings2"
+    href="styles.css?v=20260823-settings3"
   >
 
   <script
-    src="app.js?v=20260823-settings2"
+    src="app.js?v=20260823-settings3"
   ></script>
 
 </head>
@@ -43,7 +43,15 @@ const SETTINGS_UPDATED_KEY =
   "GETWELL_SETTINGS_UPDATED";
 
 
+/* =========================================================
+   DEFAULT SETTINGS
+========================================================= */
+
 const DEFAULT_SETTINGS = {
+
+  /* -------------------------------------------------------
+     GENERAL
+  ------------------------------------------------------- */
 
   general: {
 
@@ -65,6 +73,10 @@ const DEFAULT_SETTINGS = {
   },
 
 
+  /* -------------------------------------------------------
+     PATIENT
+  ------------------------------------------------------- */
+
   patient: {
 
     idPrefix:
@@ -78,6 +90,7 @@ const DEFAULT_SETTINGS = {
 
     autoGenerateId:
       true,
+
 
     statuses: [
 
@@ -107,11 +120,20 @@ const DEFAULT_SETTINGS = {
 
     ],
 
+
     defaultStatus:
       "Active"
 
   },
 
+
+  /* -------------------------------------------------------
+     PANEL & INSURANCE
+     
+     SELF-PAY IS NOT INCLUDED HERE.
+     It is displayed separately as the
+     permanent built-in option.
+  ------------------------------------------------------- */
 
   panels: [
 
@@ -120,18 +142,7 @@ const DEFAULT_SETTINGS = {
         "PMCARE",
 
       name:
-        "PMCare",
-
-      enabled:
-        true
-    },
-
-    {
-      id:
-        "MICARE",
-
-      name:
-        "MiCare",
+        "PMCARE",
 
       enabled:
         true
@@ -153,7 +164,18 @@ const DEFAULT_SETTINGS = {
         "COMPUMED",
 
       name:
-        "CompuMed",
+        "COMPUMED",
+
+      enabled:
+        true
+    },
+
+    {
+      id:
+        "MICARE",
+
+      name:
+        "MICARE",
 
       enabled:
         true
@@ -164,7 +186,62 @@ const DEFAULT_SETTINGS = {
         "SELCARE",
 
       name:
-        "Selcare",
+        "SELCARE",
+
+      enabled:
+        true
+    },
+
+    {
+      id:
+        "IHP",
+
+      name:
+        "IHP",
+
+      enabled:
+        true
+    },
+
+    {
+      id:
+        "ASP",
+
+      name:
+        "ASP",
+
+      enabled:
+        true
+    },
+
+    {
+      id:
+        "HEALTHCONNECT",
+
+      name:
+        "HEALTHCONNECT",
+
+      enabled:
+        true
+    },
+
+    {
+      id:
+        "EMAS",
+
+      name:
+        "EMAS",
+
+      enabled:
+        true
+    },
+
+    {
+      id:
+        "SPONSORED",
+
+      name:
+        "SPONSORED",
 
       enabled:
         true
@@ -172,6 +249,10 @@ const DEFAULT_SETTINGS = {
 
   ],
 
+
+  /* -------------------------------------------------------
+     APPOINTMENTS
+  ------------------------------------------------------- */
 
   appointments: {
 
@@ -211,14 +292,20 @@ const DEFAULT_SETTINGS = {
 
     ],
 
+
     defaultStatus:
       "Upcoming",
+
 
     defaultDuration:
       30
 
   },
 
+
+  /* -------------------------------------------------------
+     FOLLOW UP
+  ------------------------------------------------------- */
 
   followUp: {
 
@@ -230,6 +317,10 @@ const DEFAULT_SETTINGS = {
 
   },
 
+
+  /* -------------------------------------------------------
+     DASHBOARD
+  ------------------------------------------------------- */
 
   dashboard: {
 
@@ -253,6 +344,10 @@ const DEFAULT_SETTINGS = {
 
   },
 
+
+  /* -------------------------------------------------------
+     REPORTS
+  ------------------------------------------------------- */
 
   reports: {
 
@@ -283,6 +378,10 @@ const DEFAULT_SETTINGS = {
   },
 
 
+  /* -------------------------------------------------------
+     SYSTEM FEATURES
+  ------------------------------------------------------- */
+
   features: {
 
     patients:
@@ -309,7 +408,7 @@ const DEFAULT_SETTINGS = {
 
 
 /* =========================================================
-   HELPERS
+   DEEP CLONE
 ========================================================= */
 
 function deepClone(
@@ -324,6 +423,10 @@ function deepClone(
 
 }
 
+
+/* =========================================================
+   MERGE SETTINGS
+========================================================= */
 
 function mergeSettings(
   defaults,
@@ -365,13 +468,17 @@ function mergeSettings(
 
         result[key] =
           mergeSettings(
+
             defaults[key],
 
             saved &&
             saved[key] !==
               undefined
+
               ? saved[key]
+
               : defaults[key]
+
           );
 
       }
@@ -385,7 +492,9 @@ function mergeSettings(
 
   return saved !==
     undefined
+
       ? saved
+
       : defaults;
 
 }
@@ -393,6 +502,12 @@ function mergeSettings(
 
 /* =========================================================
    GET SETTINGS
+
+   IMPORTANT:
+   Existing saved settings may only contain
+   the original 5 panels.
+
+   We automatically add the missing panels.
 ========================================================= */
 
 function getSettings(){
@@ -403,6 +518,10 @@ function getSettings(){
     );
 
 
+  /* -------------------------------------------------------
+     NO SAVED SETTINGS
+  ------------------------------------------------------- */
+
   if(!raw){
 
     const initial =
@@ -412,11 +531,13 @@ function getSettings(){
 
 
     localStorage.setItem(
+
       SETTINGS_KEY,
 
       JSON.stringify(
         initial
       )
+
     );
 
 
@@ -424,6 +545,10 @@ function getSettings(){
 
   }
 
+
+  /* -------------------------------------------------------
+     READ SAVED SETTINGS
+  ------------------------------------------------------- */
 
   try{
 
@@ -433,12 +558,95 @@ function getSettings(){
       );
 
 
-    return mergeSettings(
-      DEFAULT_SETTINGS,
-      saved
-    );
+    const result =
+      mergeSettings(
 
-  }catch(error){
+        DEFAULT_SETTINGS,
+
+        saved
+
+      );
+
+
+    /* -----------------------------------------------------
+       ADD ANY NEW PANEL THAT DOES NOT EXIST YET
+
+       This prevents the old saved 5-panel configuration
+       from blocking the new panels.
+    ----------------------------------------------------- */
+
+    const existingPanels =
+
+      Array.isArray(
+        result.panels
+      )
+
+        ? result.panels
+
+        : [];
+
+
+    const existingIds =
+      new Set(
+
+        existingPanels.map(
+
+          panel =>
+
+            String(
+              panel.id
+            )
+            .toUpperCase()
+
+        )
+
+      );
+
+
+    DEFAULT_SETTINGS.panels
+      .forEach(
+
+        defaultPanel => {
+
+          const id =
+
+            String(
+              defaultPanel.id
+            )
+            .toUpperCase();
+
+
+          if(
+            !existingIds.has(
+              id
+            )
+          ){
+
+            existingPanels.push(
+
+              deepClone(
+                defaultPanel
+              )
+
+            );
+
+          }
+
+        }
+
+      );
+
+
+    result.panels =
+      existingPanels;
+
+
+    return result;
+
+  }
+
+
+  catch(error){
 
     console.error(
       "Unable to read Getwell system settings:",
@@ -472,6 +680,11 @@ function saveSettings(){
   );
 
 
+  /*
+    Send update signal so other pages can
+    refresh their settings.
+  */
+
   localStorage.setItem(
 
     SETTINGS_UPDATED_KEY,
@@ -485,12 +698,16 @@ function saveSettings(){
 }
 
 
+/* =========================================================
+   CURRENT SETTINGS
+========================================================= */
+
 let settings =
   getSettings();
 
 
 /* =========================================================
-   ROOT
+   RENDER PAGE
 ========================================================= */
 
 document.getElementById(
@@ -541,7 +758,7 @@ document.getElementById(
 
 
     <!-- =================================================
-         SETTINGS NAVIGATION
+         LEFT SETTINGS MENU
     ================================================== -->
 
     <div
@@ -556,7 +773,11 @@ document.getElementById(
       <button
         class="settings-tab active"
         data-section="general"
-        onclick="showSettingsSection('general')"
+        onclick="
+          showSettingsSection(
+            'general'
+          )
+        "
       >
         General
       </button>
@@ -565,7 +786,11 @@ document.getElementById(
       <button
         class="settings-tab"
         data-section="patient"
-        onclick="showSettingsSection('patient')"
+        onclick="
+          showSettingsSection(
+            'patient'
+          )
+        "
       >
         Patient Management
       </button>
@@ -574,7 +799,11 @@ document.getElementById(
       <button
         class="settings-tab"
         data-section="panels"
-        onclick="showSettingsSection('panels')"
+        onclick="
+          showSettingsSection(
+            'panels'
+          )
+        "
       >
         Panel & Insurance
       </button>
@@ -583,7 +812,11 @@ document.getElementById(
       <button
         class="settings-tab"
         data-section="appointments"
-        onclick="showSettingsSection('appointments')"
+        onclick="
+          showSettingsSection(
+            'appointments'
+          )
+        "
       >
         Appointments
       </button>
@@ -592,7 +825,11 @@ document.getElementById(
       <button
         class="settings-tab"
         data-section="followUp"
-        onclick="showSettingsSection('followUp')"
+        onclick="
+          showSettingsSection(
+            'followUp'
+          )
+        "
       >
         Follow-Up
       </button>
@@ -601,7 +838,11 @@ document.getElementById(
       <button
         class="settings-tab"
         data-section="dashboard"
-        onclick="showSettingsSection('dashboard')"
+        onclick="
+          showSettingsSection(
+            'dashboard'
+          )
+        "
       >
         Dashboard
       </button>
@@ -610,7 +851,11 @@ document.getElementById(
       <button
         class="settings-tab"
         data-section="reports"
-        onclick="showSettingsSection('reports')"
+        onclick="
+          showSettingsSection(
+            'reports'
+          )
+        "
       >
         Reports
       </button>
@@ -619,7 +864,11 @@ document.getElementById(
       <button
         class="settings-tab"
         data-section="features"
-        onclick="showSettingsSection('features')"
+        onclick="
+          showSettingsSection(
+            'features'
+          )
+        "
       >
         System Features
       </button>
@@ -628,7 +877,7 @@ document.getElementById(
 
 
     <!-- =================================================
-         SETTINGS CONTENT
+         RIGHT CONTENT
     ================================================== -->
 
     <div>
@@ -752,8 +1001,6 @@ document.getElementById(
         hidden
       >
 
-
-        <!-- PATIENT ID -->
 
         <div
           class="card"
@@ -918,7 +1165,7 @@ document.getElementById(
 
               <p>
                 Control the status options available
-                throughout the patient system.
+                throughout patient management.
               </p>
 
             </div>
@@ -926,7 +1173,9 @@ document.getElementById(
 
             <button
               class="secondary"
-              onclick="addPatientStatus()"
+              onclick="
+                addPatientStatus()
+              "
             >
               + Add Status
             </button>
@@ -968,7 +1217,7 @@ document.getElementById(
 
 
       <!-- =================================================
-           PANELS
+           PANEL & INSURANCE
       ================================================== -->
 
       <section
@@ -996,7 +1245,9 @@ document.getElementById(
 
             <button
               class="secondary"
-              onclick="addPanel()"
+              onclick="
+                addPanel()
+              "
             >
               + Add Panel
             </button>
@@ -1043,7 +1294,9 @@ document.getElementById(
 
             <button
               class="secondary"
-              onclick="addAppointmentStatus()"
+              onclick="
+                addAppointmentStatus()
+              "
             >
               + Add Status
             </button>
@@ -1263,7 +1516,7 @@ document.getElementById(
 
 
       <!-- =================================================
-           FEATURES
+           SYSTEM FEATURES
       ================================================== -->
 
       <section
@@ -1303,7 +1556,7 @@ document.getElementById(
 
 
       <!-- =================================================
-           SAVE
+           BOTTOM ACTIONS
       ================================================== -->
 
       <div
@@ -1317,7 +1570,9 @@ document.getElementById(
 
         <button
           class="secondary"
-          onclick="reloadSettings()"
+          onclick="
+            reloadSettings()
+          "
         >
           Cancel
         </button>
@@ -1325,7 +1580,9 @@ document.getElementById(
 
         <button
           class="primary"
-          onclick="saveAllSettings()"
+          onclick="
+            saveAllSettings()
+          "
         >
           Save Changes
         </button>
@@ -1355,7 +1612,7 @@ document.getElementById(
 
 
 /* =========================================================
-   SETTINGS TAB STYLE
+   SETTINGS-SPECIFIC CSS
 ========================================================= */
 
 const settingsStyle =
@@ -1742,18 +1999,16 @@ function loadPatientSettings(){
     "patientNextNumber"
   ]
   .forEach(
+
     id => {
 
-      const element =
-        document.getElementById(
-          id
-        );
-
-
-      element.oninput =
+      document.getElementById(
+        id
+      ).oninput =
         patientIdPreview;
 
     }
+
   );
 
 
@@ -1777,7 +2032,9 @@ function renderPatientStatuses(){
   container.innerHTML =
 
     settings.patient.statuses
+
       .map(
+
         (
           status,
           index
@@ -1838,12 +2095,12 @@ function renderPatientStatuses(){
                     ${index}
                   )
                 "
-                aria-label="Toggle status"
               ></button>
 
 
               ${
                 settings.patient.statuses.length > 1
+
                   ? `
 
                     <button
@@ -1861,7 +2118,9 @@ function renderPatientStatuses(){
                     </button>
 
                   `
+
                   : ""
+
               }
 
             </div>
@@ -1869,6 +2128,7 @@ function renderPatientStatuses(){
           </div>
 
         `
+
       )
       .join("");
 
@@ -1932,13 +2192,13 @@ function togglePatientStatus(
   index
 ){
 
-  const status =
-    settings.patient
-      .statuses[index];
+  settings.patient
+    .statuses[index]
+    .enabled =
 
-
-  status.enabled =
-    !status.enabled;
+    !settings.patient
+      .statuses[index]
+      .enabled;
 
 
   if(
@@ -1949,7 +2209,9 @@ function togglePatientStatus(
       )
   ){
 
-    status.enabled =
+    settings.patient
+      .statuses[index]
+      .enabled =
       true;
 
   }
@@ -2108,8 +2370,10 @@ function renderDefaultPatientStatus(){
 
 
   select.innerHTML =
+
     enabled
       .map(
+
         status => `
 
           <option
@@ -2123,6 +2387,7 @@ function renderDefaultPatientStatus(){
           </option>
 
         `
+
       )
       .join("");
 
@@ -2138,7 +2403,9 @@ function renderDefaultPatientStatus(){
     select.value =
       settings.patient.defaultStatus;
 
-  }else if(
+  }
+
+  else if(
     enabled.length
   ){
 
@@ -2164,6 +2431,8 @@ function renderPanels(){
 
   container.innerHTML = `
 
+    <!-- SELF PAY -->
+
     <div
       class="settings-item"
       style="padding-top:0;"
@@ -2178,6 +2447,7 @@ function renderPanels(){
         >
           Self-Pay
         </div>
+
 
         <div
           class="settings-item-sub"
@@ -2197,9 +2467,12 @@ function renderPanels(){
     </div>
 
 
+    <!-- CONFIGURED PANELS -->
+
     ${
       settings.panels
         .map(
+
           (
             panel,
             index
@@ -2218,6 +2491,7 @@ function renderPanels(){
                     display:flex;
                     gap:8px;
                     align-items:center;
+                    flex-wrap:wrap;
                   "
                 >
 
@@ -2237,6 +2511,7 @@ function renderPanels(){
 
                   ${
                     panel.enabled
+
                       ? `
 
                         <span
@@ -2246,6 +2521,7 @@ function renderPanels(){
                         </span>
 
                       `
+
                       : `
 
                         <span
@@ -2312,6 +2588,7 @@ function renderPanels(){
             </div>
 
           `
+
         )
         .join("")
     }
@@ -2336,6 +2613,8 @@ function updatePanelName(
 
   if(!clean){
 
+    renderPanels();
+
     return;
 
   }
@@ -2344,6 +2623,9 @@ function updatePanelName(
   settings.panels[index]
     .name =
     clean;
+
+
+  renderPanels();
 
 }
 
@@ -2413,6 +2695,13 @@ function addPanel(){
     name.trim();
 
 
+  if(!clean){
+
+    return;
+
+  }
+
+
   if(
     settings.panels
       .some(
@@ -2433,13 +2722,50 @@ function addPanel(){
   }
 
 
-  const id =
+  let id =
     clean
       .toUpperCase()
       .replace(
         /[^A-Z0-9]+/g,
         "_"
       );
+
+
+  /*
+    Make sure the generated ID
+    is unique.
+  */
+
+  const existingIds =
+    settings.panels.map(
+      panel =>
+        String(
+          panel.id
+        )
+        .toUpperCase()
+    );
+
+
+  let originalId =
+    id;
+
+
+  let counter =
+    2;
+
+
+  while(
+    existingIds.includes(
+      id
+    )
+  ){
+
+    id =
+      `${originalId}_${counter}`;
+
+    counter++;
+
+  }
 
 
   settings.panels.push({
@@ -2461,7 +2787,7 @@ function addPanel(){
 
 
 /* =========================================================
-   APPOINTMENT STATUS
+   APPOINTMENTS
 ========================================================= */
 
 function renderAppointmentStatuses(){
@@ -2474,8 +2800,10 @@ function renderAppointmentStatuses(){
 
   container.innerHTML =
 
-    settings.appointments.statuses
+    settings.appointments
+      .statuses
       .map(
+
         (
           status,
           index
@@ -2545,6 +2873,7 @@ function renderAppointmentStatuses(){
           </div>
 
         `
+
       )
       .join("");
 
@@ -2599,7 +2928,7 @@ function updateAppointmentStatusName(
   }
 
 
-  renderDefaultAppointmentStatus();
+  renderAppointmentStatuses();
 
 }
 
@@ -2707,7 +3036,8 @@ function addAppointmentStatus(){
 
 
   if(
-    settings.appointments.statuses
+    settings.appointments
+      .statuses
       .some(
         status =>
           status.name
@@ -2726,7 +3056,8 @@ function addAppointmentStatus(){
   }
 
 
-  settings.appointments.statuses
+  settings.appointments
+    .statuses
     .push({
 
       name:
@@ -2752,7 +3083,8 @@ function renderDefaultAppointmentStatus(){
 
 
   const enabled =
-    settings.appointments.statuses
+    settings.appointments
+      .statuses
       .filter(
         status =>
           status.enabled
@@ -2760,8 +3092,10 @@ function renderDefaultAppointmentStatus(){
 
 
   select.innerHTML =
+
     enabled
       .map(
+
         status => `
 
           <option
@@ -2775,6 +3109,7 @@ function renderDefaultAppointmentStatus(){
           </option>
 
         `
+
       )
       .join("");
 
@@ -2792,7 +3127,9 @@ function renderDefaultAppointmentStatus(){
       settings.appointments
         .defaultStatus;
 
-  }else if(
+  }
+
+  else if(
     enabled.length
   ){
 
@@ -2805,7 +3142,7 @@ function renderDefaultAppointmentStatus(){
 
 
 /* =========================================================
-   FOLLOW-UP
+   FOLLOW UP
 ========================================================= */
 
 function loadFollowUp(){
@@ -2827,7 +3164,7 @@ function loadFollowUp(){
 
 
 /* =========================================================
-   DASHBOARD SETTINGS
+   DASHBOARD
 ========================================================= */
 
 const DASHBOARD_LABELS = {
@@ -2867,6 +3204,7 @@ function renderDashboardOptions(){
       DASHBOARD_LABELS
     )
     .map(
+
       key => `
 
         <div
@@ -2913,6 +3251,7 @@ function renderDashboardOptions(){
         </div>
 
       `
+
     )
     .join("");
 
@@ -2920,7 +3259,7 @@ function renderDashboardOptions(){
 
 
 /* =========================================================
-   REPORT SETTINGS
+   REPORTS
 ========================================================= */
 
 const REPORT_LABELS = {
@@ -2966,6 +3305,7 @@ function renderReportOptions(){
       REPORT_LABELS
     )
     .map(
+
       key => `
 
         <div
@@ -3012,6 +3352,7 @@ function renderReportOptions(){
         </div>
 
       `
+
     )
     .join("");
 
@@ -3059,6 +3400,7 @@ function renderFeatureOptions(){
       FEATURE_LABELS
     )
     .map(
+
       key => `
 
         <div
@@ -3105,6 +3447,7 @@ function renderFeatureOptions(){
         </div>
 
       `
+
     )
     .join("");
 
@@ -3124,13 +3467,16 @@ function showSettingsSection(
       ".settings-section"
     )
     .forEach(
+
       element => {
 
         element.hidden =
+
           element.id !==
           `section-${section}`;
 
       }
+
     );
 
 
@@ -3139,6 +3485,7 @@ function showSettingsSection(
       ".settings-tab"
     )
     .forEach(
+
       button => {
 
         button.classList.toggle(
@@ -3151,60 +3498,72 @@ function showSettingsSection(
         );
 
       }
+
     );
 
 }
 
 
 /* =========================================================
-   SAVE ALL SETTINGS
+   SAVE ALL
 ========================================================= */
 
 function saveAllSettings(){
 
 
-  /* GENERAL */
+  /* -------------------------------------------------------
+     GENERAL
+  ------------------------------------------------------- */
 
   settings.general.clinicName =
+
     document.getElementById(
       "clinicName"
     ).value.trim();
 
 
   settings.general.clinicLocation =
+
     document.getElementById(
       "clinicLocation"
     ).value.trim();
 
 
   settings.general.contactNumber =
+
     document.getElementById(
       "contactNumber"
     ).value.trim();
 
 
   settings.general.email =
+
     document.getElementById(
       "clinicEmail"
     ).value.trim();
 
 
   settings.general.operatingHours =
+
     document.getElementById(
       "operatingHours"
     ).value.trim();
 
 
 
-  /* PATIENT */
+  /* -------------------------------------------------------
+     PATIENT
+  ------------------------------------------------------- */
 
   settings.patient.idPrefix =
+
     document.getElementById(
       "patientIdPrefix"
     ).value;
 
 
   settings.patient.idDigits =
+
     Math.max(
 
       1,
@@ -3219,6 +3578,7 @@ function saveAllSettings(){
 
 
   settings.patient.nextNumber =
+
     Math.max(
 
       1,
@@ -3233,27 +3593,33 @@ function saveAllSettings(){
 
 
   settings.patient.autoGenerateId =
+
     document.getElementById(
       "autoGeneratePatientId"
     ).checked;
 
 
   settings.patient.defaultStatus =
+
     document.getElementById(
       "defaultPatientStatus"
     ).value;
 
 
 
-  /* APPOINTMENTS */
+  /* -------------------------------------------------------
+     APPOINTMENTS
+  ------------------------------------------------------- */
 
   settings.appointments.defaultStatus =
+
     document.getElementById(
       "defaultAppointmentStatus"
     ).value;
 
 
   settings.appointments.defaultDuration =
+
     Math.max(
 
       5,
@@ -3268,9 +3634,12 @@ function saveAllSettings(){
 
 
 
-  /* FOLLOW-UP */
+  /* -------------------------------------------------------
+     FOLLOW UP
+  ------------------------------------------------------- */
 
   settings.followUp.dueAfterDays =
+
     Math.max(
 
       1,
@@ -3285,6 +3654,7 @@ function saveAllSettings(){
 
 
   settings.followUp.overdueAfterDays =
+
     Math.max(
 
       1,
@@ -3299,7 +3669,9 @@ function saveAllSettings(){
 
 
 
-  /* SAVE */
+  /* -------------------------------------------------------
+     SAVE
+  ------------------------------------------------------- */
 
   saveSettings();
 
@@ -3315,6 +3687,7 @@ function saveAllSettings(){
 
 
   setTimeout(
+
     () => {
 
       message.textContent =
@@ -3330,7 +3703,7 @@ function saveAllSettings(){
 
 
 /* =========================================================
-   CANCEL / RELOAD
+   CANCEL
 ========================================================= */
 
 function reloadSettings(){
