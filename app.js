@@ -1,12 +1,11 @@
 /* =========================================================
    GETWELL WEIGHT LOSS ADMIN
    CENTRAL APP.JS
-   Compatible with existing settings.html
 ========================================================= */
 
 
 /* =========================================================
-   STORAGE KEYS
+   STORAGE
 ========================================================= */
 
 const STORE_KEY =
@@ -18,16 +17,9 @@ const THEME_KEY =
 const MIGRATION_KEY =
   "getwell_pat_to_gw_v1";
 
-const SETTINGS_KEY =
-  "GETWELL_SYSTEM_CONFIG_V1";
-
-const SETTINGS_UPDATED_KEY =
+const GW_SETTINGS_UPDATED_KEY =
   "GETWELL_SETTINGS_UPDATED";
 
-
-/* =========================================================
-   DEFAULT DATA
-========================================================= */
 
 const seed = {
   patients: []
@@ -35,476 +27,203 @@ const seed = {
 
 
 /* =========================================================
-   DEFAULT SETTINGS
-   Used only when settings.html has not
-   created the configuration yet.
-========================================================= */
-
-const DEFAULT_SYSTEM_SETTINGS = {
-
-  general: {
-
-    clinicName:
-      "Getwell Clinic",
-
-    clinicLocation:
-      "Puncak Alam",
-
-    contactNumber:
-      "",
-
-    email:
-      "",
-
-    operatingHours:
-      "8:00 AM - 12:00 AM"
-
-  },
-
-
-  patient: {
-
-    idPrefix:
-      "GW-",
-
-    idDigits:
-      4,
-
-    nextNumber:
-      1,
-
-    autoGenerateId:
-      true,
-
-    statuses: [
-
-      {
-        name:
-          "Active",
-
-        enabled:
-          true
-      },
-
-      {
-        name:
-          "Inactive",
-
-        enabled:
-          true
-      },
-
-      {
-        name:
-          "Completed",
-
-        enabled:
-          true
-      }
-
-    ],
-
-    defaultStatus:
-      "Active"
-
-  },
-
-
-  panels: [
-
-    {
-      id:
-        "PMCARE",
-
-      name:
-        "PMCare",
-
-      enabled:
-        true
-    },
-
-    {
-      id:
-        "MICARE",
-
-      name:
-        "MiCare",
-
-      enabled:
-        true
-    },
-
-    {
-      id:
-        "UITM",
-
-      name:
-        "UITM",
-
-      enabled:
-        true
-    },
-
-    {
-      id:
-        "COMPUMED",
-
-      name:
-        "CompuMed",
-
-      enabled:
-        true
-    },
-
-    {
-      id:
-        "SELCARE",
-
-      name:
-        "Selcare",
-
-      enabled:
-        true
-    }
-
-  ],
-
-
-  appointments: {
-
-    statuses: [
-
-      {
-        name:
-          "Upcoming",
-
-        enabled:
-          true
-      },
-
-      {
-        name:
-          "Completed",
-
-        enabled:
-          true
-      },
-
-      {
-        name:
-          "No Show",
-
-        enabled:
-          true
-      },
-
-      {
-        name:
-          "Cancelled",
-
-        enabled:
-          true
-      }
-
-    ],
-
-    defaultStatus:
-      "Upcoming",
-
-    defaultDuration:
-      30
-
-  },
-
-
-  followUp: {
-
-    dueAfterDays:
-      5,
-
-    overdueAfterDays:
-      7
-
-  },
-
-
-  dashboard: {
-
-    showTotalPatients:
-      true,
-
-    showActivePatients:
-      true,
-
-    showDueFollowUp:
-      true,
-
-    showPanelPatients:
-      true,
-
-    showAttention:
-      true,
-
-    showPanelClaimOverview:
-      true
-
-  },
-
-
-  reports: {
-
-    showPerformance:
-      true,
-
-    showRevenue:
-      true,
-
-    showPatientActivity:
-      true,
-
-    showVisitSummary:
-      true,
-
-    showPanelPerformance:
-      true,
-
-    showSuspendedPolicies:
-      true,
-
-    showAppointmentPerformance:
-      true,
-
-    showDownloadPDF:
-      true
-
-  },
-
-
-  features: {
-
-    patients:
-      true,
-
-    appointments:
-      true,
-
-    panel:
-      true,
-
-    reports:
-      true,
-
-    followUpAlerts:
-      true,
-
-    panelClaims:
-      true
-
-  }
-
-};
-
-
-/* =========================================================
-   DEEP CLONE
-========================================================= */
-
-function cloneObject(
-  object
-){
-
-  return JSON.parse(
-    JSON.stringify(
-      object
-    )
-  );
-
-}
-
-
-/* =========================================================
-   MERGE SETTINGS
-========================================================= */
-
-function mergeSystemSettings(
-  defaults,
-  saved
-){
-
-  if(
-    Array.isArray(
-      defaults
-    )
-  ){
-
-    return Array.isArray(
-      saved
-    )
-      ? saved
-      : cloneObject(
-          defaults
-        );
-
-  }
-
-
-  if(
-    defaults &&
-    typeof defaults ===
-      "object"
-  ){
-
-    const result = {};
-
-
-    Object.keys(
-      defaults
-    )
-    .forEach(
-      key => {
-
-        result[key] =
-          mergeSystemSettings(
-            defaults[key],
-            saved &&
-            saved[key] !==
-              undefined
-              ? saved[key]
-              : defaults[key]
-          );
-
-      }
-    );
-
-
-    return result;
-
-  }
-
-
-  return saved !==
-    undefined
-      ? saved
-      : defaults;
-
-}
-
-
-/* =========================================================
    SYSTEM SETTINGS
+   IMPORTANT:
+   settings.html already owns:
+   SETTINGS_KEY
+   DEFAULT_SETTINGS
+   getSettings()
+   saveSettings()
+   settings
+
+   Therefore app.js MUST NOT declare
+   those names.
 ========================================================= */
 
-function getSystemSettings(){
+function getwellSystemSettings(){
 
   const raw =
     localStorage.getItem(
-      SETTINGS_KEY
+      "GETWELL_SYSTEM_CONFIG_V1"
     );
 
 
-  /*
-    IMPORTANT:
-    If settings.html has already created
-    the configuration, use that exact
-    configuration.
-  */
+  if(!raw){
 
-  if(raw){
+    return {
 
-    try{
+      general: {},
 
-      const saved =
-        JSON.parse(
-          raw
-        );
+      patient: {
+
+        idPrefix:
+          "GW-",
+
+        idDigits:
+          4,
+
+        nextNumber:
+          1,
+
+        autoGenerateId:
+          true,
+
+        statuses: [
+
+          {
+            name:
+              "Active",
+
+            enabled:
+              true
+          },
+
+          {
+            name:
+              "Inactive",
+
+            enabled:
+              true
+          },
+
+          {
+            name:
+              "Completed",
+
+            enabled:
+              true
+          }
+
+        ],
+
+        defaultStatus:
+          "Active"
+
+      },
 
 
-      return mergeSystemSettings(
-        DEFAULT_SYSTEM_SETTINGS,
-        saved
-      );
+      panels: [],
 
-    }catch(error){
 
-      console.error(
-        "Getwell settings error:",
-        error
-      );
+      appointments: {
 
-    }
+        statuses: [
+
+          {
+            name:
+              "Upcoming",
+
+            enabled:
+              true
+          },
+
+          {
+            name:
+              "Completed",
+
+            enabled:
+              true
+          },
+
+          {
+            name:
+              "No Show",
+
+            enabled:
+              true
+          },
+
+          {
+            name:
+              "Cancelled",
+
+            enabled:
+              true
+          }
+
+        ],
+
+        defaultStatus:
+          "Upcoming",
+
+        defaultDuration:
+          30
+
+      },
+
+
+      followUp: {
+
+        dueAfterDays:
+          5,
+
+        overdueAfterDays:
+          7
+
+      },
+
+
+      dashboard: {},
+
+      reports: {},
+
+
+      features: {
+
+        patients:
+          true,
+
+        appointments:
+          true,
+
+        panel:
+          true,
+
+        reports:
+          true,
+
+        followUpAlerts:
+          true,
+
+        panelClaims:
+          true
+
+      }
+
+    };
 
   }
 
 
-  /*
-    Only create defaults when the
-    configuration doesn't exist yet.
-  */
+  try{
 
-  const defaults =
-    cloneObject(
-      DEFAULT_SYSTEM_SETTINGS
+    return JSON.parse(
+      raw
+    );
+
+  }catch(error){
+
+    console.error(
+      "Unable to read Getwell system settings:",
+      error
     );
 
 
-  localStorage.setItem(
-    SETTINGS_KEY,
-    JSON.stringify(
-      defaults
-    )
-  );
+    return {};
 
-
-  return defaults;
+  }
 
 }
 
 
 /* =========================================================
-   SAVE SYSTEM SETTINGS
+   PATIENT SETTINGS
 ========================================================= */
 
-function saveSystemSettings(
-  settings
-){
-
-  localStorage.setItem(
-    SETTINGS_KEY,
-    JSON.stringify(
-      settings
-    )
-  );
-
-
-  localStorage.setItem(
-    SETTINGS_UPDATED_KEY,
-    String(
-      Date.now()
-    )
-  );
-
-}
-
-
-/* =========================================================
-   SETTINGS ALIAS
-========================================================= */
-
-function systemSettings(){
-
-  return getSystemSettings();
-
-}
-
-
-/* =========================================================
-   PATIENT STATUS
-========================================================= */
-
-function getPatientStatuses(){
+function getwellPatientStatuses(){
 
   const settings =
-    getSystemSettings();
+    getwellSystemSettings();
 
 
   return Array.isArray(
@@ -516,9 +235,9 @@ function getPatientStatuses(){
 }
 
 
-function getActivePatientStatuses(){
+function getwellActivePatientStatuses(){
 
-  return getPatientStatuses()
+  return getwellPatientStatuses()
     .filter(
       status =>
         status &&
@@ -528,19 +247,18 @@ function getActivePatientStatuses(){
 }
 
 
-function getDefaultPatientStatus(){
+function getwellDefaultPatientStatus(){
 
   const settings =
-    getSystemSettings();
+    getwellSystemSettings();
 
 
   const active =
-    getActivePatientStatuses();
+    getwellActivePatientStatuses();
 
 
   const wanted =
-    settings.patient
-      ?.defaultStatus;
+    settings.patient?.defaultStatus;
 
 
   const match =
@@ -558,9 +276,10 @@ function getDefaultPatientStatus(){
   }
 
 
-  return active[0]
-    ?.name ||
-    "Active";
+  return (
+    active[0]?.name ||
+    "Active"
+  );
 
 }
 
@@ -569,18 +288,22 @@ function getDefaultPatientStatus(){
    PATIENT ID SETTINGS
 ========================================================= */
 
-function getPatientIdSettings(){
+function getwellPatientIdSettings(){
 
   const settings =
-    getSystemSettings();
+    getwellSystemSettings();
+
+
+  const patient =
+    settings.patient ||
+    {};
 
 
   return {
 
     prefix:
       String(
-        settings.patient
-          ?.idPrefix ||
+        patient.idPrefix ||
         "GW-"
       ),
 
@@ -588,8 +311,7 @@ function getPatientIdSettings(){
       Math.max(
         1,
         Number(
-          settings.patient
-            ?.idDigits
+          patient.idDigits
         ) ||
         4
       ),
@@ -598,40 +320,33 @@ function getPatientIdSettings(){
       Math.max(
         1,
         Number(
-          settings.patient
-            ?.nextNumber
+          patient.nextNumber
         ) ||
         1
       ),
 
     autoGenerate:
-      settings.patient
-        ?.autoGenerateId !==
-        false
+      patient.autoGenerateId !==
+      false
 
   };
 
 }
 
 
-/* =========================================================
-   FORMAT PATIENT ID
-========================================================= */
-
-function formatPatientId(
+function getwellFormatPatientId(
   number
 ){
 
   const config =
-    getPatientIdSettings();
+    getwellPatientIdSettings();
 
 
   return (
     config.prefix +
     String(
       number
-    )
-    .padStart(
+    ).padStart(
       config.digits,
       "0"
     )
@@ -640,61 +355,15 @@ function formatPatientId(
 }
 
 
-/* =========================================================
-   NEXT PATIENT ID
-========================================================= */
-
-function getNextPatientId(){
+function getwellNextPatientId(){
 
   const config =
-    getPatientIdSettings();
+    getwellPatientIdSettings();
 
 
-  return formatPatientId(
+  return getwellFormatPatientId(
     config.nextNumber
   );
-
-}
-
-
-/* =========================================================
-   RESERVE PATIENT ID
-========================================================= */
-
-function reserveNextPatientId(){
-
-  const settings =
-    getSystemSettings();
-
-
-  const current =
-    Math.max(
-      1,
-      Number(
-        settings.patient
-          ?.nextNumber
-      ) ||
-      1
-    );
-
-
-  const id =
-    formatPatientId(
-      current
-    );
-
-
-  settings.patient
-    .nextNumber =
-    current + 1;
-
-
-  saveSystemSettings(
-    settings
-  );
-
-
-  return id;
 
 }
 
@@ -703,10 +372,10 @@ function reserveNextPatientId(){
    PANELS
 ========================================================= */
 
-function getAllPanels(){
+function getwellAllPanels(){
 
   const settings =
-    getSystemSettings();
+    getwellSystemSettings();
 
 
   return Array.isArray(
@@ -718,9 +387,9 @@ function getAllPanels(){
 }
 
 
-function getActivePanels(){
+function getwellActivePanels(){
 
-  return getAllPanels()
+  return getwellAllPanels()
     .filter(
       panel =>
         panel &&
@@ -730,7 +399,7 @@ function getActivePanels(){
 }
 
 
-function getPanelById(
+function getwellPanelById(
   id
 ){
 
@@ -741,7 +410,7 @@ function getPanelById(
   }
 
 
-  return getAllPanels()
+  return getwellAllPanels()
     .find(
       panel =>
         String(
@@ -758,7 +427,7 @@ function getPanelById(
 }
 
 
-function getPanelByName(
+function getwellPanelByName(
   name
 ){
 
@@ -769,7 +438,7 @@ function getPanelByName(
   }
 
 
-  return getAllPanels()
+  return getwellAllPanels()
     .find(
       panel =>
         String(
@@ -786,11 +455,7 @@ function getPanelByName(
 }
 
 
-/* =========================================================
-   PANEL OPTIONS
-========================================================= */
-
-function getPanelOptions(){
+function getwellPanelOptions(){
 
   return [
 
@@ -806,7 +471,7 @@ function getPanelOptions(){
 
     },
 
-    ...getActivePanels()
+    ...getwellActivePanels()
 
   ];
 
@@ -833,7 +498,7 @@ function getPanelName(
 
 
   const configured =
-    getPanelById(
+    getwellPanelById(
       p.panelProvider
     );
 
@@ -845,9 +510,7 @@ function getPanelName(
   }
 
 
-  /*
-    Legacy support.
-  */
+  /* Legacy values */
 
   if(
     p.panelProvider ===
@@ -902,75 +565,19 @@ function getPanelName(
 
 
 /* =========================================================
-   PANEL CHECK
-========================================================= */
-
-function patientUsesPanel(
-  p
-){
-
-  return !!(
-    p?.panelProvider &&
-    p.panelProvider !==
-      "SELF_PAY"
-  );
-
-}
-
-
-/* =========================================================
-   PANEL SUSPENSION
-========================================================= */
-
-function isPanelSuspended(
-  p
-){
-
-  return (
-    patientUsesPanel(
-      p
-    ) &&
-    (
-      p.panelStatus ===
-        "Suspended" ||
-
-      p.insuranceStatus ===
-        "Suspended"
-    )
-  );
-
-}
-
-
-function panelSuspensionNote(
-  p
-){
-
-  return (
-    p.panelSuspensionNote ||
-    p.insuranceSuspensionNote ||
-    ""
-  );
-
-}
-
-
-/* =========================================================
    APPOINTMENT SETTINGS
 ========================================================= */
 
-function getAppointmentStatuses(){
+function getwellAppointmentStatuses(){
 
   const settings =
-    getSystemSettings();
+    getwellSystemSettings();
 
 
   return Array.isArray(
-    settings.appointments
-      ?.statuses
+    settings.appointments?.statuses
   )
-    ? settings.appointments
-        .statuses
+    ? settings.appointments.statuses
         .filter(
           status =>
             status &&
@@ -981,14 +588,14 @@ function getAppointmentStatuses(){
 }
 
 
-function getDefaultAppointmentStatus(){
+function getwellDefaultAppointmentStatus(){
 
   const settings =
-    getSystemSettings();
+    getwellSystemSettings();
 
 
-  const active =
-    getAppointmentStatuses();
+  const statuses =
+    getwellAppointmentStatuses();
 
 
   const wanted =
@@ -997,31 +604,27 @@ function getDefaultAppointmentStatus(){
 
 
   const match =
-    active.find(
+    statuses.find(
       status =>
         status.name ===
         wanted
     );
 
 
-  if(match){
-
-    return match.name;
-
-  }
-
-
-  return active[0]
-    ?.name ||
-    "Upcoming";
+  return match
+    ? match.name
+    : (
+        statuses[0]?.name ||
+        "Upcoming"
+      );
 
 }
 
 
-function getAppointmentDuration(){
+function getwellAppointmentDuration(){
 
   const settings =
-    getSystemSettings();
+    getwellSystemSettings();
 
 
   return Math.max(
@@ -1037,13 +640,13 @@ function getAppointmentDuration(){
 
 
 /* =========================================================
-   FOLLOW-UP SETTINGS
+   FOLLOW-UP
 ========================================================= */
 
-function getFollowUpSettings(){
+function getwellFollowUpSettings(){
 
   const settings =
-    getSystemSettings();
+    getwellSystemSettings();
 
 
   return {
@@ -1074,15 +677,15 @@ function getFollowUpSettings(){
 
 
 /* =========================================================
-   FEATURE SETTINGS
+   FEATURES
 ========================================================= */
 
-function isFeatureEnabled(
+function getwellFeatureEnabled(
   feature
 ){
 
   const settings =
-    getSystemSettings();
+    getwellSystemSettings();
 
 
   if(
@@ -1107,10 +710,10 @@ function isFeatureEnabled(
    DASHBOARD SETTINGS
 ========================================================= */
 
-function getDashboardSettings(){
+function getwellDashboardSettings(){
 
   const settings =
-    getSystemSettings();
+    getwellSystemSettings();
 
 
   return (
@@ -1125,10 +728,10 @@ function getDashboardSettings(){
    REPORT SETTINGS
 ========================================================= */
 
-function getReportSettings(){
+function getwellReportSettings(){
 
   const settings =
-    getSystemSettings();
+    getwellSystemSettings();
 
 
   return (
@@ -1161,7 +764,7 @@ function rawStore(){
     );
 
 
-    return cloneObject(
+    return structuredClone(
       seed
     );
 
@@ -1174,13 +777,7 @@ function rawStore(){
       raw
     );
 
-  }catch(error){
-
-    console.error(
-      "Getwell data error:",
-      error
-    );
-
+  }catch(e){
 
     localStorage.setItem(
       STORE_KEY,
@@ -1190,7 +787,7 @@ function rawStore(){
     );
 
 
-    return cloneObject(
+    return structuredClone(
       seed
     );
 
@@ -1354,18 +951,18 @@ function migrateLegacyIds(
         []
       )
       .forEach(
-        appointment => {
+        a => {
 
           if(
-            appointment.patientId &&
+            a.patientId &&
             map[
-              appointment.patientId
+              a.patientId
             ]
           ){
 
-            appointment.patientId =
+            a.patientId =
               map[
-                appointment.patientId
+                a.patientId
               ];
 
           }
@@ -1409,10 +1006,6 @@ function store(){
 }
 
 
-/* =========================================================
-   SAVE STORE
-========================================================= */
-
 function saveStore(
   data
 ){
@@ -1428,7 +1021,7 @@ function saveStore(
 
 
 /* =========================================================
-   MAP LEGACY PATIENT ID
+   PATIENT
 ========================================================= */
 
 function mapLegacyId(
@@ -1448,32 +1041,12 @@ function mapLegacyId(
     );
 
 
-  if(match){
-
-    return (
-      "GW-" +
-      String(
-        Number(
-          match[1]
-        )
-      )
-      .padStart(
-        4,
-        "0"
-      )
-    );
-
-  }
-
-
-  return value;
+  return match
+    ? `GW-${String(Number(match[1])).padStart(4,"0")}`
+    : value;
 
 }
 
-
-/* =========================================================
-   GET PATIENT
-========================================================= */
 
 function getPatient(
   id
@@ -1498,10 +1071,6 @@ function getPatient(
 
 }
 
-
-/* =========================================================
-   UPSERT PATIENT
-========================================================= */
 
 function upsertPatient(
   patient
@@ -1567,7 +1136,7 @@ function ensureClaims(
 
 
 /* =========================================================
-   VISIT
+   VISITS
 ========================================================= */
 
 function ensureVisit(
@@ -1631,10 +1200,6 @@ function ensureVisit(
 }
 
 
-/* =========================================================
-   VISIT TOTAL
-========================================================= */
-
 function visitTotal(
   visit
 ){
@@ -1642,8 +1207,7 @@ function visitTotal(
   const billing =
     ensureVisit(
       visit
-    )
-    .billing;
+    ).billing;
 
 
   return (
@@ -1657,36 +1221,57 @@ function visitTotal(
 
 
 /* =========================================================
-   CLAIM TOTAL
+   PANEL
 ========================================================= */
 
-function claimsTotal(
+function patientUsesPanel(
   patient
 ){
 
-  return ensureClaims(
-    patient
-  )
-  .reduce(
+  return !!(
+    patient?.panelProvider &&
+    patient.panelProvider !==
+      "SELF_PAY"
+  );
+
+}
+
+
+function isPanelSuspended(
+  patient
+){
+
+  return (
+    patientUsesPanel(
+      patient
+    ) &&
     (
-      total,
-      claim
-    ) =>
-      total +
-      (
-        Number(
-          claim.amount
-        ) ||
-        0
-      ),
-    0
+      patient.panelStatus ===
+        "Suspended" ||
+
+      patient.insuranceStatus ===
+        "Suspended"
+    )
+  );
+
+}
+
+
+function panelSuspensionNote(
+  patient
+){
+
+  return (
+    patient.panelSuspensionNote ||
+    patient.insuranceSuspensionNote ||
+    ""
   );
 
 }
 
 
 /* =========================================================
-   GRAND TOTAL
+   FINANCE
 ========================================================= */
 
 function grandTotal(
@@ -1712,9 +1297,28 @@ function grandTotal(
 }
 
 
-/* =========================================================
-   FINANCE
-========================================================= */
+function claimsTotal(
+  patient
+){
+
+  return ensureClaims(
+    patient
+  )
+  .reduce(
+    (
+      total,
+      claim
+    ) =>
+      total +
+      (
+        +claim.amount ||
+        0
+      ),
+    0
+  );
+
+}
+
 
 function finance(
   patient
@@ -1743,35 +1347,26 @@ function finance(
       const billing =
         ensureVisit(
           visit
-        )
-        .billing;
+        ).billing;
 
 
       injection +=
-        Number(
-          billing.injection.price
-        ) ||
+        +billing.injection.price ||
         0;
 
 
       medication +=
-        Number(
-          billing.medication.price
-        ) ||
+        +billing.medication.price ||
         0;
 
 
       treatment +=
-        Number(
-          billing.treatment.price
-        ) ||
+        +billing.treatment.price ||
         0;
 
 
       selfpay +=
-        Number(
-          billing.selfPay
-        ) ||
+        +billing.selfPay ||
         0;
 
     }
@@ -1817,7 +1412,7 @@ function finance(
 
 
 /* =========================================================
-   LATEST VISIT
+   FOLLOW-UP
 ========================================================= */
 
 function latestVisit(
@@ -1833,15 +1428,13 @@ function latestVisit(
       a,
       b
     ) =>
-      String(
+      (
         a.dateKey ||
         ""
       )
       .localeCompare(
-        String(
-          b.dateKey ||
-          ""
-        )
+        b.dateKey ||
+        ""
       )
   )
   .at(
@@ -1851,10 +1444,6 @@ function latestVisit(
 
 }
 
-
-/* =========================================================
-   DAYS SINCE
-========================================================= */
 
 function daysSince(
   date
@@ -1897,14 +1486,10 @@ function daysSince(
 }
 
 
-/* =========================================================
-   FOLLOW-UP ALERTS
-========================================================= */
-
 function alerts(){
 
   const config =
-    getFollowUpSettings();
+    getwellFollowUpSettings();
 
 
   return (
@@ -1914,15 +1499,12 @@ function alerts(){
   .map(
     patient => {
 
-      const last =
-        latestVisit(
-          patient
-        );
-
-
       const days =
         daysSince(
-          last?.dateKey
+          latestVisit(
+            patient
+          )
+          ?.dateKey
         );
 
 
@@ -2089,6 +1671,10 @@ function toggleTheme(){
 
 function header(){
 
+  const followUp =
+    getwellFollowUpSettings();
+
+
   return `
 
 <header class="topbar">
@@ -2113,7 +1699,6 @@ function header(){
 
 
   <div class="topbar-right">
-
 
     <div class="search-box">
 
@@ -2167,9 +1752,9 @@ function header(){
             </strong>
 
             <span>
-              ${getFollowUpSettings().dueAfterDays}
+              ${followUp.dueAfterDays}
               days due ·
-              ${getFollowUpSettings().overdueAfterDays}
+              ${followUp.overdueAfterDays}
               days overdue
             </span>
 
@@ -2217,25 +1802,25 @@ function sidebar(
 ){
 
   const showPatients =
-    isFeatureEnabled(
+    getwellFeatureEnabled(
       "patients"
     );
 
 
   const showAppointments =
-    isFeatureEnabled(
+    getwellFeatureEnabled(
       "appointments"
     );
 
 
   const showPanel =
-    isFeatureEnabled(
+    getwellFeatureEnabled(
       "panel"
     );
 
 
   const showReports =
-    isFeatureEnabled(
+    getwellFeatureEnabled(
       "reports"
     );
 
@@ -2253,11 +1838,11 @@ function sidebar(
     onclick="goHome()"
     onkeydown="
       if(
-        event.key === 'Enter' ||
-        event.key === ' '
+        event.key==='Enter' ||
+        event.key===' '
       ){
         event.preventDefault();
-        goHome();
+        goHome()
       }
     "
   >
@@ -2283,7 +1868,6 @@ function sidebar(
 
 
   <nav class="nav">
-
 
     <div class="nav-label">
       MAIN
@@ -2456,7 +2040,7 @@ function goHome(){
 
 
 /* =========================================================
-   APP SHELL
+   SHELL
 ========================================================= */
 
 function shell(
@@ -2699,7 +2283,7 @@ document.addEventListener(
 
 
 /* =========================================================
-   SETTINGS CROSS-TAB UPDATE
+   SETTINGS UPDATE
 ========================================================= */
 
 window.addEventListener(
@@ -2708,15 +2292,14 @@ window.addEventListener(
 
     if(
       event.key ===
-      SETTINGS_UPDATED_KEY
+      GW_SETTINGS_UPDATED_KEY
     ){
 
       /*
-        Do NOT reload settings.html
-        here unnecessarily.
+        Settings page stays open.
 
-        Other pages reload so they
-        immediately use the new config.
+        Every other page reloads so
+        the new configuration applies.
       */
 
       if(
@@ -2746,12 +2329,17 @@ document.addEventListener(
   () => {
 
     /*
-      Ensure settings exist.
-      This does not overwrite
-      existing Settings data.
+      Only READ settings here.
+
+      Do not call:
+      getSettings()
+      saveSettings()
+      mergeSettings()
+      because those belong to
+      settings.html.
     */
 
-    getSystemSettings();
+    getwellSystemSettings();
 
 
     initTheme();
