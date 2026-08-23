@@ -1,126 +1,441 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  >
+
+  <title>Settings | Getwell</title>
+
+  <link
+    rel="stylesheet"
+    href="styles.css?v=20260823-settings2"
+  >
+
+  <script
+    src="app.js?v=20260823-settings2"
+  ></script>
+
+</head>
+
+
+<body>
+
+<div id="root"></div>
+
+
+<script>
+
 /* =========================================================
-   GETWELL WEIGHT LOSS ADMIN
-   CENTRAL APP.JS
+   GETWELL SYSTEM CONFIGURATION
 ========================================================= */
 
+const SETTINGS_KEY =
+  "GETWELL_SYSTEM_CONFIG_V1";
 
-/* =========================================================
-   STORAGE
-========================================================= */
 
-const STORE_KEY =
-  "getwell_final_v4";
-
-const THEME_KEY =
-  "getwell_theme_v4";
-
-const MIGRATION_KEY =
-  "getwell_pat_to_gw_v1";
-
-const GW_SETTINGS_UPDATED_KEY =
+const SETTINGS_UPDATED_KEY =
   "GETWELL_SETTINGS_UPDATED";
 
 
-const seed = {
-  patients: []
+const DEFAULT_SETTINGS = {
+
+  general: {
+
+    clinicName:
+      "Getwell Clinic",
+
+    clinicLocation:
+      "Puncak Alam",
+
+    contactNumber:
+      "",
+
+    email:
+      "",
+
+    operatingHours:
+      "8:00 AM - 12:00 AM"
+
+  },
+
+
+  patient: {
+
+    idPrefix:
+      "GW-",
+
+    idDigits:
+      4,
+
+    nextNumber:
+      1,
+
+    autoGenerateId:
+      true,
+
+    statuses: [
+
+      {
+        name:
+          "Active",
+
+        enabled:
+          true
+      },
+
+      {
+        name:
+          "Inactive",
+
+        enabled:
+          true
+      },
+
+      {
+        name:
+          "Completed",
+
+        enabled:
+          true
+      }
+
+    ],
+
+    defaultStatus:
+      "Active"
+
+  },
+
+
+  panels: [
+
+    {
+      id:
+        "PMCARE",
+
+      name:
+        "PMCare",
+
+      enabled:
+        true
+    },
+
+    {
+      id:
+        "MICARE",
+
+      name:
+        "MiCare",
+
+      enabled:
+        true
+    },
+
+    {
+      id:
+        "UITM",
+
+      name:
+        "UITM",
+
+      enabled:
+        true
+    },
+
+    {
+      id:
+        "COMPUMED",
+
+      name:
+        "CompuMed",
+
+      enabled:
+        true
+    },
+
+    {
+      id:
+        "SELCARE",
+
+      name:
+        "Selcare",
+
+      enabled:
+        true
+    }
+
+  ],
+
+
+  appointments: {
+
+    statuses: [
+
+      {
+        name:
+          "Upcoming",
+
+        enabled:
+          true
+      },
+
+      {
+        name:
+          "Completed",
+
+        enabled:
+          true
+      },
+
+      {
+        name:
+          "No Show",
+
+        enabled:
+          true
+      },
+
+      {
+        name:
+          "Cancelled",
+
+        enabled:
+          true
+      }
+
+    ],
+
+    defaultStatus:
+      "Upcoming",
+
+    defaultDuration:
+      30
+
+  },
+
+
+  followUp: {
+
+    dueAfterDays:
+      5,
+
+    overdueAfterDays:
+      7
+
+  },
+
+
+  dashboard: {
+
+    showTotalPatients:
+      true,
+
+    showActivePatients:
+      true,
+
+    showDueFollowUp:
+      true,
+
+    showPanelPatients:
+      true,
+
+    showAttention:
+      true,
+
+    showPanelClaimOverview:
+      true
+
+  },
+
+
+  reports: {
+
+    showPerformance:
+      true,
+
+    showRevenue:
+      true,
+
+    showPatientActivity:
+      true,
+
+    showVisitSummary:
+      true,
+
+    showPanelPerformance:
+      true,
+
+    showSuspendedPolicies:
+      true,
+
+    showAppointmentPerformance:
+      true,
+
+    showDownloadPDF:
+      true
+
+  },
+
+
+  features: {
+
+    patients:
+      true,
+
+    appointments:
+      true,
+
+    panel:
+      true,
+
+    reports:
+      true,
+
+    followUpAlerts:
+      true,
+
+    panelClaims:
+      true
+
+  }
+
 };
 
 
 /* =========================================================
-   SYSTEM SETTINGS
-   IMPORTANT:
-   Do NOT create SETTINGS_KEY here.
-   settings.html already owns that variable.
+   HELPERS
 ========================================================= */
 
-function getwellSystemSettings(){
+function deepClone(
+  object
+){
+
+  return JSON.parse(
+    JSON.stringify(
+      object
+    )
+  );
+
+}
+
+
+function mergeSettings(
+  defaults,
+  saved
+){
+
+  if(
+    Array.isArray(
+      defaults
+    )
+  ){
+
+    return Array.isArray(
+      saved
+    )
+      ? saved
+      : deepClone(
+          defaults
+        );
+
+  }
+
+
+  if(
+    defaults &&
+    typeof defaults ===
+      "object"
+  ){
+
+    const result =
+      {};
+
+
+    Object.keys(
+      defaults
+    )
+    .forEach(
+      key => {
+
+        result[key] =
+          mergeSettings(
+            defaults[key],
+
+            saved &&
+            saved[key] !==
+              undefined
+              ? saved[key]
+              : defaults[key]
+          );
+
+      }
+    );
+
+
+    return result;
+
+  }
+
+
+  return saved !==
+    undefined
+      ? saved
+      : defaults;
+
+}
+
+
+/* =========================================================
+   GET SETTINGS
+========================================================= */
+
+function getSettings(){
 
   const raw =
     localStorage.getItem(
-      "GETWELL_SYSTEM_CONFIG_V1"
+      SETTINGS_KEY
     );
 
 
   if(!raw){
 
-    return {
+    const initial =
+      deepClone(
+        DEFAULT_SETTINGS
+      );
 
-      general: {},
 
-      patient: {
-        idPrefix: "GW-",
-        idDigits: 4,
-        nextNumber: 1,
-        autoGenerateId: true,
-        statuses: [
-          {
-            name: "Active",
-            enabled: true
-          },
-          {
-            name: "Inactive",
-            enabled: true
-          },
-          {
-            name: "Completed",
-            enabled: true
-          }
-        ],
-        defaultStatus: "Active"
-      },
+    localStorage.setItem(
+      SETTINGS_KEY,
 
-      panels: [],
+      JSON.stringify(
+        initial
+      )
+    );
 
-      appointments: {
-        statuses: [
-          {
-            name: "Upcoming",
-            enabled: true
-          },
-          {
-            name: "Completed",
-            enabled: true
-          },
-          {
-            name: "No Show",
-            enabled: true
-          },
-          {
-            name: "Cancelled",
-            enabled: true
-          }
-        ],
-        defaultStatus: "Upcoming",
-        defaultDuration: 30
-      },
 
-      followUp: {
-        dueAfterDays: 5,
-        overdueAfterDays: 7
-      },
-
-      dashboard: {},
-
-      reports: {},
-
-      features: {
-        patients: true,
-        appointments: true,
-        panel: true,
-        reports: true,
-        followUpAlerts: true,
-        panelClaims: true
-      }
-
-    };
+    return initial;
 
   }
 
 
   try{
 
-    return JSON.parse(
-      raw
+    const saved =
+      JSON.parse(
+        raw
+      );
+
+
+    return mergeSettings(
+      DEFAULT_SETTINGS,
+      saved
     );
 
   }catch(error){
@@ -131,7 +446,9 @@ function getwellSystemSettings(){
     );
 
 
-    return {};
+    return deepClone(
+      DEFAULT_SETTINGS
+    );
 
   }
 
@@ -139,151 +456,1696 @@ function getwellSystemSettings(){
 
 
 /* =========================================================
-   PATIENT SETTINGS
+   SAVE SETTINGS
 ========================================================= */
 
-function getwellPatientStatuses(){
+function saveSettings(){
 
-  const settings =
-    getwellSystemSettings();
+  localStorage.setItem(
+
+    SETTINGS_KEY,
+
+    JSON.stringify(
+      settings
+    )
+
+  );
 
 
-  return Array.isArray(
-    settings.patient?.statuses
-  )
-    ? settings.patient.statuses
-    : [];
+  localStorage.setItem(
+
+    SETTINGS_UPDATED_KEY,
+
+    String(
+      Date.now()
+    )
+
+  );
 
 }
 
 
-function getwellActivePatientStatuses(){
+let settings =
+  getSettings();
 
-  return getwellPatientStatuses()
-    .filter(
-      status =>
-        status &&
-        status.enabled
-    );
+
+/* =========================================================
+   ROOT
+========================================================= */
+
+document.getElementById(
+  "root"
+).innerHTML = shell(
+
+  "Settings",
+
+  "settings",
+
+  `
+
+  <div class="page-head">
+
+    <div>
+
+      <h1>
+        Settings
+      </h1>
+
+      <p>
+        Manage how the Getwell Weight Loss Admin
+        system works.
+      </p>
+
+    </div>
+
+
+    <button
+      class="primary"
+      onclick="saveAllSettings()"
+    >
+      Save Changes
+    </button>
+
+  </div>
+
+
+  <div
+    class="settings-layout"
+    style="
+      display:grid;
+      grid-template-columns:210px minmax(0,1fr);
+      gap:16px;
+      align-items:start;
+    "
+  >
+
+
+    <!-- =================================================
+         SETTINGS NAVIGATION
+    ================================================== -->
+
+    <div
+      class="card"
+      style="
+        padding:8px;
+        position:sticky;
+        top:16px;
+      "
+    >
+
+      <button
+        class="settings-tab active"
+        data-section="general"
+        onclick="showSettingsSection('general')"
+      >
+        General
+      </button>
+
+
+      <button
+        class="settings-tab"
+        data-section="patient"
+        onclick="showSettingsSection('patient')"
+      >
+        Patient Management
+      </button>
+
+
+      <button
+        class="settings-tab"
+        data-section="panels"
+        onclick="showSettingsSection('panels')"
+      >
+        Panel & Insurance
+      </button>
+
+
+      <button
+        class="settings-tab"
+        data-section="appointments"
+        onclick="showSettingsSection('appointments')"
+      >
+        Appointments
+      </button>
+
+
+      <button
+        class="settings-tab"
+        data-section="followUp"
+        onclick="showSettingsSection('followUp')"
+      >
+        Follow-Up
+      </button>
+
+
+      <button
+        class="settings-tab"
+        data-section="dashboard"
+        onclick="showSettingsSection('dashboard')"
+      >
+        Dashboard
+      </button>
+
+
+      <button
+        class="settings-tab"
+        data-section="reports"
+        onclick="showSettingsSection('reports')"
+      >
+        Reports
+      </button>
+
+
+      <button
+        class="settings-tab"
+        data-section="features"
+        onclick="showSettingsSection('features')"
+      >
+        System Features
+      </button>
+
+    </div>
+
+
+    <!-- =================================================
+         SETTINGS CONTENT
+    ================================================== -->
+
+    <div>
+
+
+      <!-- =================================================
+           GENERAL
+      ================================================== -->
+
+      <section
+        id="section-general"
+        class="settings-section"
+      >
+
+        <div class="card">
+
+          <div class="card-head">
+
+            <div>
+
+              <h2>
+                General
+              </h2>
+
+              <p>
+                Basic clinic information used
+                throughout the system.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="card-body">
+
+            <div class="form-grid">
+
+
+              <div class="form-group">
+
+                <label>
+                  Clinic Name
+                </label>
+
+                <input
+                  id="clinicName"
+                >
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label>
+                  Clinic Location
+                </label>
+
+                <input
+                  id="clinicLocation"
+                >
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label>
+                  Contact Number
+                </label>
+
+                <input
+                  id="contactNumber"
+                >
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label>
+                  Email
+                </label>
+
+                <input
+                  id="clinicEmail"
+                >
+
+              </div>
+
+
+              <div class="form-group full">
+
+                <label>
+                  Operating Hours
+                </label>
+
+                <input
+                  id="operatingHours"
+                >
+
+              </div>
+
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           PATIENT MANAGEMENT
+      ================================================== -->
+
+      <section
+        id="section-patient"
+        class="settings-section"
+        hidden
+      >
+
+
+        <!-- PATIENT ID -->
+
+        <div
+          class="card"
+          style="margin-bottom:16px;"
+        >
+
+          <div class="card-head">
+
+            <div>
+
+              <h2>
+                Patient ID
+              </h2>
+
+              <p>
+                Control how new Patient IDs are generated.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="card-body">
+
+            <div class="form-grid">
+
+
+              <div class="form-group">
+
+                <label>
+                  ID Prefix
+                </label>
+
+                <input
+                  id="patientIdPrefix"
+                >
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label>
+                  Number of Digits
+                </label>
+
+                <input
+                  id="patientIdDigits"
+                  type="number"
+                  min="1"
+                  max="8"
+                >
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label>
+                  Next Patient Number
+                </label>
+
+                <input
+                  id="patientNextNumber"
+                  type="number"
+                  min="1"
+                >
+
+              </div>
+
+
+              <div
+                class="form-group"
+                style="
+                  display:flex;
+                  align-items:flex-end;
+                "
+              >
+
+                <label
+                  style="
+                    display:flex;
+                    align-items:center;
+                    gap:8px;
+                    height:36px;
+                  "
+                >
+
+                  <input
+                    id="autoGeneratePatientId"
+                    type="checkbox"
+                    style="
+                      width:15px;
+                      height:15px;
+                    "
+                  >
+
+                  Automatically generate Patient ID
+
+                </label>
+
+              </div>
+
+
+            </div>
+
+
+            <div
+              class="card"
+              style="
+                margin-top:16px;
+                background:var(--surface);
+              "
+            >
+
+              <div
+                style="
+                  padding:14px;
+                "
+              >
+
+                <div
+                  style="
+                    font-size:10px;
+                    color:var(--muted);
+                  "
+                >
+                  PREVIEW
+                </div>
+
+
+                <div
+                  id="patientIdPreview"
+                  style="
+                    font-size:20px;
+                    font-weight:700;
+                    margin-top:5px;
+                  "
+                ></div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- PATIENT STATUS -->
+
+        <div class="card">
+
+          <div class="card-head">
+
+            <div>
+
+              <h2>
+                Patient Status
+              </h2>
+
+              <p>
+                Control the status options available
+                throughout the patient system.
+              </p>
+
+            </div>
+
+
+            <button
+              class="secondary"
+              onclick="addPatientStatus()"
+            >
+              + Add Status
+            </button>
+
+          </div>
+
+
+          <div
+            id="patientStatusList"
+            class="card-body"
+          ></div>
+
+
+          <div
+            class="card-body"
+            style="
+              border-top:1px solid var(--border);
+            "
+          >
+
+            <div class="form-group">
+
+              <label>
+                Default Status For New Patients
+              </label>
+
+              <select
+                id="defaultPatientStatus"
+              ></select>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+      </section>
+
+
+      <!-- =================================================
+           PANELS
+      ================================================== -->
+
+      <section
+        id="section-panels"
+        class="settings-section"
+        hidden
+      >
+
+        <div class="card">
+
+          <div class="card-head">
+
+            <div>
+
+              <h2>
+                Panel & Insurance
+              </h2>
+
+              <p>
+                Add, disable or rename panel providers.
+              </p>
+
+            </div>
+
+
+            <button
+              class="secondary"
+              onclick="addPanel()"
+            >
+              + Add Panel
+            </button>
+
+          </div>
+
+
+          <div
+            id="panelList"
+            class="card-body"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           APPOINTMENTS
+      ================================================== -->
+
+      <section
+        id="section-appointments"
+        class="settings-section"
+        hidden
+      >
+
+        <div class="card">
+
+          <div class="card-head">
+
+            <div>
+
+              <h2>
+                Appointment Settings
+              </h2>
+
+              <p>
+                Control appointment statuses and defaults.
+              </p>
+
+            </div>
+
+
+            <button
+              class="secondary"
+              onclick="addAppointmentStatus()"
+            >
+              + Add Status
+            </button>
+
+          </div>
+
+
+          <div class="card-body">
+
+            <div
+              id="appointmentStatusList"
+            ></div>
+
+
+            <div
+              style="
+                margin-top:16px;
+                padding-top:16px;
+                border-top:1px solid var(--border);
+              "
+            >
+
+              <div class="form-grid">
+
+
+                <div class="form-group">
+
+                  <label>
+                    Default Appointment Status
+                  </label>
+
+                  <select
+                    id="defaultAppointmentStatus"
+                  ></select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                  <label>
+                    Default Duration (minutes)
+                  </label>
+
+                  <input
+                    id="appointmentDuration"
+                    type="number"
+                    min="5"
+                    step="5"
+                  >
+
+                </div>
+
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           FOLLOW UP
+      ================================================== -->
+
+      <section
+        id="section-followUp"
+        class="settings-section"
+        hidden
+      >
+
+        <div class="card">
+
+          <div class="card-head">
+
+            <div>
+
+              <h2>
+                Follow-Up Rules
+              </h2>
+
+              <p>
+                Control when patients appear in
+                follow-up alerts.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="card-body">
+
+            <div class="form-grid">
+
+
+              <div class="form-group">
+
+                <label>
+                  Due After (days)
+                </label>
+
+                <input
+                  id="followUpDue"
+                  type="number"
+                  min="1"
+                >
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label>
+                  Overdue After (days)
+                </label>
+
+                <input
+                  id="followUpOverdue"
+                  type="number"
+                  min="1"
+                >
+
+              </div>
+
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           DASHBOARD
+      ================================================== -->
+
+      <section
+        id="section-dashboard"
+        class="settings-section"
+        hidden
+      >
+
+        <div class="card">
+
+          <div class="card-head">
+
+            <div>
+
+              <h2>
+                Dashboard
+              </h2>
+
+              <p>
+                Choose which dashboard sections are displayed.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div
+            id="dashboardOptions"
+            class="card-body"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           REPORTS
+      ================================================== -->
+
+      <section
+        id="section-reports"
+        class="settings-section"
+        hidden
+      >
+
+        <div class="card">
+
+          <div class="card-head">
+
+            <div>
+
+              <h2>
+                Reports
+              </h2>
+
+              <p>
+                Control which sections appear on the
+                monthly performance report.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div
+            id="reportOptions"
+            class="card-body"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           FEATURES
+      ================================================== -->
+
+      <section
+        id="section-features"
+        class="settings-section"
+        hidden
+      >
+
+        <div class="card">
+
+          <div class="card-head">
+
+            <div>
+
+              <h2>
+                System Features
+              </h2>
+
+              <p>
+                Enable or disable major features
+                across the application.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div
+            id="featureOptions"
+            class="card-body"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           SAVE
+      ================================================== -->
+
+      <div
+        style="
+          display:flex;
+          justify-content:flex-end;
+          gap:8px;
+          margin-top:16px;
+        "
+      >
+
+        <button
+          class="secondary"
+          onclick="reloadSettings()"
+        >
+          Cancel
+        </button>
+
+
+        <button
+          class="primary"
+          onclick="saveAllSettings()"
+        >
+          Save Changes
+        </button>
+
+      </div>
+
+
+      <div
+        id="saveMessage"
+        style="
+          text-align:right;
+          font-size:10px;
+          color:#16A34A;
+          margin-top:7px;
+          min-height:14px;
+        "
+      ></div>
+
+
+    </div>
+
+  </div>
+
+  `
+
+);
+
+
+/* =========================================================
+   SETTINGS TAB STYLE
+========================================================= */
+
+const settingsStyle =
+  document.createElement(
+    "style"
+  );
+
+
+settingsStyle.textContent = `
+
+.settings-tab{
+
+  display:block;
+
+  width:100%;
+
+  border:0;
+
+  background:transparent;
+
+  text-align:left;
+
+  padding:10px 11px;
+
+  border-radius:8px;
+
+  font-family:inherit;
+
+  font-size:11px;
+
+  font-weight:600;
+
+  color:var(--muted);
+
+  cursor:pointer;
+
+  margin-bottom:3px;
 
 }
 
 
-function getwellDefaultPatientStatus(){
+.settings-tab:hover{
 
-  const settings =
-    getwellSystemSettings();
+  background:var(--surface);
 
+  color:var(--navy);
 
-  const active =
-    getwellActivePatientStatuses();
-
-
-  const wanted =
-    settings.patient?.defaultStatus;
+}
 
 
-  const match =
-    active.find(
-      status =>
-        status.name ===
-        wanted
-    );
+.settings-tab.active{
+
+  background:#16345A;
+
+  color:#60A5FA;
+
+}
 
 
-  if(match){
+.settings-section[hidden]{
 
-    return match.name;
+  display:none !important;
 
-  }
+}
 
 
-  return active[0]?.name ||
-    "Active";
+.settings-item{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:15px;
+
+  padding:13px 0;
+
+  border-bottom:
+    1px solid var(--border-light);
+
+}
+
+
+.settings-item:last-child{
+
+  border-bottom:0;
+
+}
+
+
+.settings-item-main{
+
+  min-width:0;
+
+}
+
+
+.settings-item-title{
+
+  font-size:11px;
+
+  font-weight:600;
+
+}
+
+
+.settings-item-sub{
+
+  font-size:9px;
+
+  color:var(--muted);
+
+  margin-top:3px;
+
+}
+
+
+.settings-actions{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:7px;
+
+}
+
+
+.settings-toggle{
+
+  width:38px;
+
+  height:21px;
+
+  border-radius:999px;
+
+  border:0;
+
+  background:#CBD5E1;
+
+  position:relative;
+
+  cursor:pointer;
+
+  flex:0 0 auto;
+
+}
+
+
+.settings-toggle::after{
+
+  content:"";
+
+  position:absolute;
+
+  top:3px;
+
+  left:3px;
+
+  width:15px;
+
+  height:15px;
+
+  border-radius:50%;
+
+  background:#fff;
+
+  transition:.15s;
+
+}
+
+
+.settings-toggle.on{
+
+  background:#2563EB;
+
+}
+
+
+.settings-toggle.on::after{
+
+  left:20px;
+
+}
+
+
+.settings-input{
+
+  width:180px;
+
+  height:34px;
+
+  border:1px solid var(--border);
+
+  border-radius:8px;
+
+  background:var(--card);
+
+  color:var(--navy);
+
+  padding:0 9px;
+
+  font:inherit;
+
+  font-size:10px;
+
+}
+
+
+.settings-small-button{
+
+  height:30px;
+
+  padding:0 9px;
+
+  border-radius:7px;
+
+  border:1px solid var(--border);
+
+  background:var(--card);
+
+  color:var(--navy);
+
+  font:inherit;
+
+  font-size:9px;
+
+  cursor:pointer;
+
+}
+
+
+.settings-small-button:hover{
+
+  background:var(--surface);
+
+}
+
+
+.settings-danger{
+
+  color:#DC2626;
+
+  border-color:#FCA5A5;
+
+}
+
+`;
+
+
+document.head.appendChild(
+  settingsStyle
+);
+
+
+/* =========================================================
+   GENERAL
+========================================================= */
+
+function loadGeneral(){
+
+  document.getElementById(
+    "clinicName"
+  ).value =
+    settings.general.clinicName;
+
+
+  document.getElementById(
+    "clinicLocation"
+  ).value =
+    settings.general.clinicLocation;
+
+
+  document.getElementById(
+    "contactNumber"
+  ).value =
+    settings.general.contactNumber;
+
+
+  document.getElementById(
+    "clinicEmail"
+  ).value =
+    settings.general.email;
+
+
+  document.getElementById(
+    "operatingHours"
+  ).value =
+    settings.general.operatingHours;
 
 }
 
 
 /* =========================================================
-   PATIENT ID SETTINGS
+   PATIENT ID
 ========================================================= */
 
-function getwellPatientIdSettings(){
+function patientIdPreview(){
 
-  const settings =
-    getwellSystemSettings();
-
-
-  const patient =
-    settings.patient ||
-    {};
+  const prefix =
+    document.getElementById(
+      "patientIdPrefix"
+    ).value;
 
 
-  return {
+  const digits =
+    Math.max(
 
-    prefix:
-      String(
-        patient.idPrefix ||
-        "GW-"
-      ),
+      1,
 
-    digits:
-      Math.max(
-        1,
-        Number(
-          patient.idDigits
-        ) ||
-        4
-      ),
+      Number(
+        document.getElementById(
+          "patientIdDigits"
+        ).value
+      ) || 4
 
-    nextNumber:
-      Math.max(
-        1,
-        Number(
-          patient.nextNumber
-        ) ||
-        1
-      ),
-
-    autoGenerate:
-      patient.autoGenerateId !==
-      false
-
-  };
-
-}
+    );
 
 
-function getwellFormatPatientId(
-  number
-){
+  const number =
+    Math.max(
 
-  const config =
-    getwellPatientIdSettings();
+      1,
+
+      Number(
+        document.getElementById(
+          "patientNextNumber"
+        ).value
+      ) || 1
+
+    );
 
 
-  return (
-    config.prefix +
+  document.getElementById(
+    "patientIdPreview"
+  ).textContent =
+
+    prefix +
+
     String(
       number
-    ).padStart(
-      config.digits,
-      "0"
     )
-  );
+    .padStart(
+      digits,
+      "0"
+    );
 
 }
 
 
-function getwellNextPatientId(){
+function loadPatientSettings(){
 
-  const config =
-    getwellPatientIdSettings();
+  document.getElementById(
+    "patientIdPrefix"
+  ).value =
+    settings.patient.idPrefix;
 
 
-  return getwellFormatPatientId(
-    config.nextNumber
+  document.getElementById(
+    "patientIdDigits"
+  ).value =
+    settings.patient.idDigits;
+
+
+  document.getElementById(
+    "patientNextNumber"
+  ).value =
+    settings.patient.nextNumber;
+
+
+  document.getElementById(
+    "autoGeneratePatientId"
+  ).checked =
+    settings.patient.autoGenerateId;
+
+
+  patientIdPreview();
+
+
+  [
+    "patientIdPrefix",
+    "patientIdDigits",
+    "patientNextNumber"
+  ]
+  .forEach(
+    id => {
+
+      const element =
+        document.getElementById(
+          id
+        );
+
+
+      element.oninput =
+        patientIdPreview;
+
+    }
   );
+
+
+  renderPatientStatuses();
+
+}
+
+
+/* =========================================================
+   PATIENT STATUS
+========================================================= */
+
+function renderPatientStatuses(){
+
+  const container =
+    document.getElementById(
+      "patientStatusList"
+    );
+
+
+  container.innerHTML =
+
+    settings.patient.statuses
+      .map(
+        (
+          status,
+          index
+        ) => `
+
+          <div
+            class="settings-item"
+          >
+
+            <div
+              class="settings-item-main"
+            >
+
+              <div
+                class="settings-item-title"
+              >
+
+                <input
+                  class="settings-input"
+                  value="${escapeHtml(
+                    status.name
+                  )}"
+                  onchange="
+                    updatePatientStatusName(
+                      ${index},
+                      this.value
+                    )
+                  "
+                >
+
+              </div>
+
+
+              <div
+                class="settings-item-sub"
+              >
+                Used throughout patient management.
+              </div>
+
+            </div>
+
+
+            <div
+              class="settings-actions"
+            >
+
+              <button
+                class="
+                  settings-toggle
+                  ${
+                    status.enabled
+                      ? "on"
+                      : ""
+                  }
+                "
+                onclick="
+                  togglePatientStatus(
+                    ${index}
+                  )
+                "
+                aria-label="Toggle status"
+              ></button>
+
+
+              ${
+                settings.patient.statuses.length > 1
+                  ? `
+
+                    <button
+                      class="
+                        settings-small-button
+                        settings-danger
+                      "
+                      onclick="
+                        removePatientStatus(
+                          ${index}
+                        )
+                      "
+                    >
+                      Remove
+                    </button>
+
+                  `
+                  : ""
+              }
+
+            </div>
+
+          </div>
+
+        `
+      )
+      .join("");
+
+
+  renderDefaultPatientStatus();
+
+}
+
+
+function updatePatientStatusName(
+  index,
+  value
+){
+
+  const clean =
+    String(
+      value ||
+      ""
+    )
+    .trim();
+
+
+  if(!clean){
+
+    return;
+
+  }
+
+
+  const oldName =
+    settings.patient
+      .statuses[index]
+      .name;
+
+
+  settings.patient
+    .statuses[index]
+    .name =
+      clean;
+
+
+  if(
+    settings.patient
+      .defaultStatus ===
+    oldName
+  ){
+
+    settings.patient
+      .defaultStatus =
+      clean;
+
+  }
+
+
+  renderDefaultPatientStatus();
+
+}
+
+
+function togglePatientStatus(
+  index
+){
+
+  const status =
+    settings.patient
+      .statuses[index];
+
+
+  status.enabled =
+    !status.enabled;
+
+
+  if(
+    !settings.patient.statuses
+      .some(
+        status =>
+          status.enabled
+      )
+  ){
+
+    status.enabled =
+      true;
+
+  }
+
+
+  renderPatientStatuses();
+
+}
+
+
+function removePatientStatus(
+  index
+){
+
+  const status =
+    settings.patient
+      .statuses[index];
+
+
+  if(
+    !confirm(
+      `Remove patient status "${status.name}"?`
+    )
+  ){
+
+    return;
+
+  }
+
+
+  settings.patient.statuses
+    .splice(
+      index,
+      1
+    );
+
+
+  if(
+    !settings.patient.statuses
+      .some(
+        status =>
+          status.enabled
+      )
+  ){
+
+    settings.patient.statuses[0]
+      .enabled =
+      true;
+
+  }
+
+
+  if(
+    !settings.patient.statuses
+      .some(
+        status =>
+          status.name ===
+            settings.patient.defaultStatus &&
+          status.enabled
+      )
+  ){
+
+    const first =
+      settings.patient.statuses
+        .find(
+          status =>
+            status.enabled
+        );
+
+
+    if(first){
+
+      settings.patient.defaultStatus =
+        first.name;
+
+    }
+
+  }
+
+
+  renderPatientStatuses();
+
+}
+
+
+function addPatientStatus(){
+
+  const name =
+    prompt(
+      "Enter the new patient status:"
+    );
+
+
+  if(!name){
+
+    return;
+
+  }
+
+
+  const clean =
+    name.trim();
+
+
+  if(
+    settings.patient.statuses
+      .some(
+        status =>
+          status.name
+            .toLowerCase() ===
+          clean.toLowerCase()
+      )
+  ){
+
+    alert(
+      "That patient status already exists."
+    );
+
+
+    return;
+
+  }
+
+
+  settings.patient.statuses
+    .push({
+
+      name:
+        clean,
+
+      enabled:
+        true
+
+    });
+
+
+  renderPatientStatuses();
+
+}
+
+
+function renderDefaultPatientStatus(){
+
+  const select =
+    document.getElementById(
+      "defaultPatientStatus"
+    );
+
+
+  const enabled =
+    settings.patient.statuses
+      .filter(
+        status =>
+          status.enabled
+      );
+
+
+  select.innerHTML =
+    enabled
+      .map(
+        status => `
+
+          <option
+            value="${escapeHtml(
+              status.name
+            )}"
+          >
+            ${escapeHtml(
+              status.name
+            )}
+          </option>
+
+        `
+      )
+      .join("");
+
+
+  if(
+    enabled.some(
+      status =>
+        status.name ===
+        settings.patient.defaultStatus
+    )
+  ){
+
+    select.value =
+      settings.patient.defaultStatus;
+
+  }else if(
+    enabled.length
+  ){
+
+    select.value =
+      enabled[0].name;
+
+  }
 
 }
 
@@ -292,418 +2154,674 @@ function getwellNextPatientId(){
    PANELS
 ========================================================= */
 
-function getwellAllPanels(){
+function renderPanels(){
 
-  const settings =
-    getwellSystemSettings();
-
-
-  return Array.isArray(
-    settings.panels
-  )
-    ? settings.panels
-    : [];
-
-}
-
-
-function getwellActivePanels(){
-
-  return getwellAllPanels()
-    .filter(
-      panel =>
-        panel &&
-        panel.enabled
+  const container =
+    document.getElementById(
+      "panelList"
     );
 
+
+  container.innerHTML = `
+
+    <div
+      class="settings-item"
+      style="padding-top:0;"
+    >
+
+      <div
+        class="settings-item-main"
+      >
+
+        <div
+          class="settings-item-title"
+        >
+          Self-Pay
+        </div>
+
+        <div
+          class="settings-item-sub"
+        >
+          Built-in payment option. Cannot be removed.
+        </div>
+
+      </div>
+
+
+      <span
+        class="badge green"
+      >
+        Always Available
+      </span>
+
+    </div>
+
+
+    ${
+      settings.panels
+        .map(
+          (
+            panel,
+            index
+          ) => `
+
+            <div
+              class="settings-item"
+            >
+
+              <div
+                class="settings-item-main"
+              >
+
+                <div
+                  style="
+                    display:flex;
+                    gap:8px;
+                    align-items:center;
+                  "
+                >
+
+                  <input
+                    class="settings-input"
+                    value="${escapeHtml(
+                      panel.name
+                    )}"
+                    onchange="
+                      updatePanelName(
+                        ${index},
+                        this.value
+                      )
+                    "
+                  >
+
+
+                  ${
+                    panel.enabled
+                      ? `
+
+                        <span
+                          class="badge green"
+                        >
+                          Active
+                        </span>
+
+                      `
+                      : `
+
+                        <span
+                          class="badge gray"
+                        >
+                          Disabled
+                        </span>
+
+                      `
+                  }
+
+                </div>
+
+
+                <div
+                  class="settings-item-sub"
+                >
+                  ID:
+                  ${escapeHtml(
+                    panel.id
+                  )}
+                </div>
+
+              </div>
+
+
+              <div
+                class="settings-actions"
+              >
+
+                <button
+                  class="
+                    settings-toggle
+                    ${
+                      panel.enabled
+                        ? "on"
+                        : ""
+                    }
+                  "
+                  onclick="
+                    togglePanel(
+                      ${index}
+                    )
+                  "
+                ></button>
+
+
+                <button
+                  class="
+                    settings-small-button
+                    settings-danger
+                  "
+                  onclick="
+                    removePanel(
+                      ${index}
+                    )
+                  "
+                >
+                  Remove
+                </button>
+
+              </div>
+
+            </div>
+
+          `
+        )
+        .join("")
+    }
+
+  `;
+
 }
 
 
-function getwellPanelById(
-  id
+function updatePanelName(
+  index,
+  value
 ){
 
-  if(!id){
+  const clean =
+    String(
+      value ||
+      ""
+    )
+    .trim();
 
-    return null;
+
+  if(!clean){
+
+    return;
 
   }
 
 
-  return getwellAllPanels()
-    .find(
-      panel =>
-        String(
-          panel.id
-        )
-        .toUpperCase() ===
-        String(
-          id
-        )
-        .toUpperCase()
-    ) ||
-    null;
+  settings.panels[index]
+    .name =
+    clean;
 
 }
 
 
-function getwellPanelByName(
-  name
+function togglePanel(
+  index
 ){
+
+  settings.panels[index]
+    .enabled =
+
+    !settings.panels[index]
+      .enabled;
+
+
+  renderPanels();
+
+}
+
+
+function removePanel(
+  index
+){
+
+  const panel =
+    settings.panels[index];
+
+
+  if(
+    !confirm(
+      `Remove panel "${panel.name}"?`
+    )
+  ){
+
+    return;
+
+  }
+
+
+  settings.panels.splice(
+    index,
+    1
+  );
+
+
+  renderPanels();
+
+}
+
+
+function addPanel(){
+
+  const name =
+    prompt(
+      "Enter the new panel provider name:"
+    );
+
 
   if(!name){
 
-    return null;
+    return;
 
   }
 
 
-  return getwellAllPanels()
-    .find(
-      panel =>
-        String(
+  const clean =
+    name.trim();
+
+
+  if(
+    settings.panels
+      .some(
+        panel =>
           panel.name
-        )
-        .toLowerCase() ===
-        String(
-          name
-        )
-        .toLowerCase()
-    ) ||
-    null;
+            .toLowerCase() ===
+          clean.toLowerCase()
+      )
+  ){
+
+    alert(
+      "That panel already exists."
+    );
+
+
+    return;
+
+  }
+
+
+  const id =
+    clean
+      .toUpperCase()
+      .replace(
+        /[^A-Z0-9]+/g,
+        "_"
+      );
+
+
+  settings.panels.push({
+
+    id,
+
+    name:
+      clean,
+
+    enabled:
+      true
+
+  });
+
+
+  renderPanels();
 
 }
 
 
 /* =========================================================
-   PANEL OPTIONS
+   APPOINTMENT STATUS
 ========================================================= */
 
-function getwellPanelOptions(){
+function renderAppointmentStatuses(){
 
-  return [
+  const container =
+    document.getElementById(
+      "appointmentStatusList"
+    );
 
-    {
-      id:
-        "SELF_PAY",
+
+  container.innerHTML =
+
+    settings.appointments.statuses
+      .map(
+        (
+          status,
+          index
+        ) => `
+
+          <div
+            class="settings-item"
+          >
+
+            <div
+              class="settings-item-main"
+            >
+
+              <input
+                class="settings-input"
+                value="${escapeHtml(
+                  status.name
+                )}"
+                onchange="
+                  updateAppointmentStatusName(
+                    ${index},
+                    this.value
+                  )
+                "
+              >
+
+            </div>
+
+
+            <div
+              class="settings-actions"
+            >
+
+              <button
+                class="
+                  settings-toggle
+                  ${
+                    status.enabled
+                      ? "on"
+                      : ""
+                  }
+                "
+                onclick="
+                  toggleAppointmentStatus(
+                    ${index}
+                  )
+                "
+              ></button>
+
+
+              <button
+                class="
+                  settings-small-button
+                  settings-danger
+                "
+                onclick="
+                  removeAppointmentStatus(
+                    ${index}
+                  )
+                "
+              >
+                Remove
+              </button>
+
+            </div>
+
+          </div>
+
+        `
+      )
+      .join("");
+
+
+  renderDefaultAppointmentStatus();
+
+}
+
+
+function updateAppointmentStatusName(
+  index,
+  value
+){
+
+  const clean =
+    String(
+      value ||
+      ""
+    )
+    .trim();
+
+
+  if(!clean){
+
+    return;
+
+  }
+
+
+  const old =
+    settings.appointments
+      .statuses[index]
+      .name;
+
+
+  settings.appointments
+    .statuses[index]
+    .name =
+    clean;
+
+
+  if(
+    settings.appointments
+      .defaultStatus ===
+    old
+  ){
+
+    settings.appointments
+      .defaultStatus =
+      clean;
+
+  }
+
+
+  renderDefaultAppointmentStatus();
+
+}
+
+
+function toggleAppointmentStatus(
+  index
+){
+
+  settings.appointments
+    .statuses[index]
+    .enabled =
+
+    !settings.appointments
+      .statuses[index]
+      .enabled;
+
+
+  if(
+    !settings.appointments.statuses
+      .some(
+        status =>
+          status.enabled
+      )
+  ){
+
+    settings.appointments
+      .statuses[index]
+      .enabled =
+      true;
+
+  }
+
+
+  renderAppointmentStatuses();
+
+}
+
+
+function removeAppointmentStatus(
+  index
+){
+
+  const status =
+    settings.appointments
+      .statuses[index];
+
+
+  if(
+    !confirm(
+      `Remove appointment status "${status.name}"?`
+    )
+  ){
+
+    return;
+
+  }
+
+
+  settings.appointments
+    .statuses
+    .splice(
+      index,
+      1
+    );
+
+
+  if(
+    !settings.appointments.statuses
+      .some(
+        status =>
+          status.enabled
+      )
+  ){
+
+    settings.appointments
+      .statuses[0]
+      .enabled =
+      true;
+
+  }
+
+
+  renderAppointmentStatuses();
+
+}
+
+
+function addAppointmentStatus(){
+
+  const name =
+    prompt(
+      "Enter the new appointment status:"
+    );
+
+
+  if(!name){
+
+    return;
+
+  }
+
+
+  const clean =
+    name.trim();
+
+
+  if(
+    settings.appointments.statuses
+      .some(
+        status =>
+          status.name
+            .toLowerCase() ===
+          clean.toLowerCase()
+      )
+  ){
+
+    alert(
+      "That appointment status already exists."
+    );
+
+
+    return;
+
+  }
+
+
+  settings.appointments.statuses
+    .push({
 
       name:
-        "Self-Pay",
+        clean,
 
       enabled:
         true
 
-    },
-
-    ...getwellActivePanels()
-
-  ];
-
-}
+    });
 
 
-/* =========================================================
-   PANEL TYPE NORMALIZATION
-========================================================= */
-
-function normalizePanelType(
-  value
-){
-
-  if(
-    !value ||
-    value ===
-      "SELF_PAY"
-  ){
-
-    return "SELF_PAY";
-
-  }
-
-
-  /*
-    Current Settings panel ID.
-  */
-
-  const configured =
-    getwellPanelById(
-      value
-    );
-
-
-  if(configured){
-
-    return configured.id;
-
-  }
-
-
-  /*
-    Legacy panel values.
-  */
-
-  if(
-    value ===
-      "MiCare"
-  ){
-
-    return "MICARE";
-
-  }
-
-
-  if(
-    value ===
-      "PMCare"
-  ){
-
-    return "PMCARE";
-
-  }
-
-
-  if(
-    value ===
-      "Other Panel"
-  ){
-
-    return "PANEL_C";
-
-  }
-
-
-  return value;
+  renderAppointmentStatuses();
 
 }
 
 
-/* =========================================================
-   PANEL NAME
-========================================================= */
+function renderDefaultAppointmentStatus(){
 
-function getPanelName(
-  p
-){
-
-  if(
-    !p ||
-    p.panelProvider ===
-      "SELF_PAY"
-  ){
-
-    return "Self-Pay";
-
-  }
-
-
-  const configured =
-    getwellPanelById(
-      p.panelProvider
+  const select =
+    document.getElementById(
+      "defaultAppointmentStatus"
     );
 
 
-  if(configured){
-
-    return configured.name;
-
-  }
-
-
-  /*
-    Legacy support.
-  */
-
-  if(
-    p.panelProvider ===
-      "Other"
-  ){
-
-    return (
-      p.otherPanelName ||
-      "Panel"
-    );
-
-  }
-
-
-  if(
-    p.panelProvider ===
-      "PANEL_A"
-  ){
-
-    return "MiCare";
-
-  }
-
-
-  if(
-    p.panelProvider ===
-      "PANEL_B"
-  ){
-
-    return "PMCare";
-
-  }
-
-
-  if(
-    p.panelProvider ===
-      "PANEL_C"
-  ){
-
-    return "Other Panel";
-
-  }
-
-
-  return (
-    p.otherPanelName ||
-    p.panelProvider ||
-    "Panel"
-  );
-
-}
-
-
-/* =========================================================
-   APPOINTMENT SETTINGS
-========================================================= */
-
-function getwellAppointmentStatuses(){
-
-  const settings =
-    getwellSystemSettings();
-
-
-  return Array.isArray(
-    settings.appointments?.statuses
-  )
-    ? settings.appointments
-        .statuses
-        .filter(
-          status =>
-            status &&
-            status.enabled
-        )
-    : [];
-
-}
-
-
-function getwellDefaultAppointmentStatus(){
-
-  const settings =
-    getwellSystemSettings();
-
-
-  const statuses =
-    getwellAppointmentStatuses();
-
-
-  const wanted =
-    settings.appointments
-      ?.defaultStatus;
-
-
-  const match =
-    statuses.find(
-      status =>
-        status.name ===
-        wanted
-    );
-
-
-  return match
-    ? match.name
-    : (
-        statuses[0]?.name ||
-        "Upcoming"
+  const enabled =
+    settings.appointments.statuses
+      .filter(
+        status =>
+          status.enabled
       );
 
-}
 
+  select.innerHTML =
+    enabled
+      .map(
+        status => `
 
-function getwellAppointmentDuration(){
+          <option
+            value="${escapeHtml(
+              status.name
+            )}"
+          >
+            ${escapeHtml(
+              status.name
+            )}
+          </option>
 
-  const settings =
-    getwellSystemSettings();
-
-
-  return Math.max(
-    5,
-    Number(
-      settings.appointments
-        ?.defaultDuration
-    ) ||
-    30
-  );
-
-}
-
-
-/* =========================================================
-   FOLLOW-UP SETTINGS
-========================================================= */
-
-function getwellFollowUpSettings(){
-
-  const settings =
-    getwellSystemSettings();
-
-
-  return {
-
-    dueAfterDays:
-      Math.max(
-        1,
-        Number(
-          settings.followUp
-            ?.dueAfterDays
-        ) ||
-        5
-      ),
-
-    overdueAfterDays:
-      Math.max(
-        1,
-        Number(
-          settings.followUp
-            ?.overdueAfterDays
-        ) ||
-        7
+        `
       )
-
-  };
-
-}
-
-
-/* =========================================================
-   FEATURE SETTINGS
-========================================================= */
-
-function getwellFeatureEnabled(
-  feature
-){
-
-  const settings =
-    getwellSystemSettings();
+      .join("");
 
 
   if(
-    !settings.features ||
-    settings.features[feature] ===
-      undefined
+    enabled.some(
+      status =>
+        status.name ===
+        settings.appointments
+          .defaultStatus
+    )
   ){
 
-    return true;
+    select.value =
+      settings.appointments
+        .defaultStatus;
+
+  }else if(
+    enabled.length
+  ){
+
+    select.value =
+      enabled[0].name;
 
   }
 
+}
 
-  return !!settings.features[
-    feature
-  ];
+
+/* =========================================================
+   FOLLOW-UP
+========================================================= */
+
+function loadFollowUp(){
+
+  document.getElementById(
+    "followUpDue"
+  ).value =
+    settings.followUp
+      .dueAfterDays;
+
+
+  document.getElementById(
+    "followUpOverdue"
+  ).value =
+    settings.followUp
+      .overdueAfterDays;
 
 }
 
@@ -712,16 +2830,91 @@ function getwellFeatureEnabled(
    DASHBOARD SETTINGS
 ========================================================= */
 
-function getwellDashboardSettings(){
+const DASHBOARD_LABELS = {
 
-  const settings =
-    getwellSystemSettings();
+  showTotalPatients:
+    "Total Patients",
+
+  showActivePatients:
+    "Active Patients",
+
+  showDueFollowUp:
+    "Due Follow-Up",
+
+  showPanelPatients:
+    "Panel Patients",
+
+  showAttention:
+    "Patients Needing Attention",
+
+  showPanelClaimOverview:
+    "Panel Claim Overview"
+
+};
 
 
-  return (
-    settings.dashboard ||
-    {}
-  );
+function renderDashboardOptions(){
+
+  const container =
+    document.getElementById(
+      "dashboardOptions"
+    );
+
+
+  container.innerHTML =
+
+    Object.keys(
+      DASHBOARD_LABELS
+    )
+    .map(
+      key => `
+
+        <div
+          class="settings-item"
+        >
+
+          <div
+            class="settings-item-main"
+          >
+
+            <div
+              class="settings-item-title"
+            >
+              ${DASHBOARD_LABELS[key]}
+            </div>
+
+
+            <div
+              class="settings-item-sub"
+            >
+              Show this section on the Dashboard.
+            </div>
+
+          </div>
+
+
+          <button
+            class="
+              settings-toggle
+              ${
+                settings.dashboard[key]
+                  ? "on"
+                  : ""
+              }
+            "
+            onclick="
+              settings.dashboard['${key}'] =
+                !settings.dashboard['${key}'];
+
+              renderDashboardOptions();
+            "
+          ></button>
+
+        </div>
+
+      `
+    )
+    .join("");
 
 }
 
@@ -730,1648 +2923,515 @@ function getwellDashboardSettings(){
    REPORT SETTINGS
 ========================================================= */
 
-function getwellReportSettings(){
+const REPORT_LABELS = {
 
-  const settings =
-    getwellSystemSettings();
+  showPerformance:
+    "Performance Overview",
 
+  showRevenue:
+    "Revenue Breakdown",
 
-  return (
-    settings.reports ||
-    {}
-  );
+  showPatientActivity:
+    "Patient Activity",
 
-}
+  showVisitSummary:
+    "Visit Summary",
 
+  showPanelPerformance:
+    "Panel Performance",
 
-/* =========================================================
-   RAW STORE
-========================================================= */
+  showSuspendedPolicies:
+    "Suspended Policies",
 
-function rawStore(){
+  showAppointmentPerformance:
+    "Appointment Performance",
 
-  const raw =
-    localStorage.getItem(
-      STORE_KEY
-    );
+  showDownloadPDF:
+    "Download PDF Button"
 
+};
 
-  if(!raw){
 
-    localStorage.setItem(
-      STORE_KEY,
-      JSON.stringify(
-        seed
-      )
-    );
+function renderReportOptions(){
 
-
-    return structuredClone(
-      seed
-    );
-
-  }
-
-
-  try{
-
-    return JSON.parse(
-      raw
-    );
-
-  }catch(e){
-
-    localStorage.setItem(
-      STORE_KEY,
-      JSON.stringify(
-        seed
-      )
-    );
-
-
-    return structuredClone(
-      seed
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   LEGACY ID MIGRATION
-========================================================= */
-
-function migrateLegacyIds(
-  data
-){
-
-  if(
-    localStorage.getItem(
-      MIGRATION_KEY
-    ) ===
-    "done"
-  ){
-
-    return data;
-
-  }
-
-
-  const used =
-    new Set();
-
-
-  const map =
-    {};
-
-
-  (
-    data.patients ||
-    []
-  )
-  .forEach(
-    p => {
-
-      const old =
-        String(
-          p.id ||
-          ""
-        );
-
-
-      const m =
-        old.match(
-          /^PAT-(\d+)$/i
-        );
-
-
-      if(m){
-
-        const n =
-          String(
-            Number(
-              m[1]
-            )
-          )
-          .padStart(
-            4,
-            "0"
-          );
-
-
-        const neu =
-          `GW-${n}`;
-
-
-        map[old] =
-          neu;
-
-
-        p.id =
-          neu;
-
-
-        used.add(
-          neu
-        );
-
-      }
-
-    }
-  );
-
-
-  let next =
-    1;
-
-
-  (
-    data.patients ||
-    []
-  )
-  .forEach(
-    p => {
-
-      if(
-        !/^GW-\d+$/i.test(
-          p.id ||
-          ""
-        )
-      ){
-
-        while(
-          used.has(
-            `GW-${String(next).padStart(4,"0")}`
-          )
-        ){
-
-          next++;
-
-        }
-
-
-        p.id =
-          `GW-${String(next).padStart(4,"0")}`;
-
-
-        used.add(
-          p.id
-        );
-
-
-        next++;
-
-      }
-
-
-      if(
-        !p.panelStatus &&
-        patientUsesPanel(
-          p
-        )
-      ){
-
-        p.panelStatus =
-          "Active";
-
-      }
-
-
-      if(
-        !p.panelSuspensionNote
-      ){
-
-        p.panelSuspensionNote =
-          "";
-
-      }
-
-
-      (
-        p.appointments ||
-        []
-      )
-      .forEach(
-        a => {
-
-          if(
-            a.patientId &&
-            map[a.patientId]
-          ){
-
-            a.patientId =
-              map[
-                a.patientId
-              ];
-
-          }
-
-        }
-      );
-
-    }
-  );
-
-
-  localStorage.setItem(
-    STORE_KEY,
-    JSON.stringify(
-      data
-    )
-  );
-
-
-  localStorage.setItem(
-    MIGRATION_KEY,
-    "done"
-  );
-
-
-  return data;
-
-}
-
-
-/* =========================================================
-   STORE
-========================================================= */
-
-function store(){
-
-  return migrateLegacyIds(
-    rawStore()
-  );
-
-}
-
-
-/* =========================================================
-   SAVE STORE
-========================================================= */
-
-function saveStore(
-  d
-){
-
-  localStorage.setItem(
-    STORE_KEY,
-    JSON.stringify(
-      d
-    )
-  );
-
-}
-
-
-/* =========================================================
-   PATIENT
-========================================================= */
-
-function getPatient(
-  id
-){
-
-  const wanted =
-    mapLegacyId(
-      id
-    );
-
-
-  return (
-    store().patients ||
-    []
-  )
-  .find(
-    p =>
-      p.id ===
-      wanted
-  ) ||
-  null;
-
-}
-
-
-function mapLegacyId(
-  id
-){
-
-  const s =
-    String(
-      id ||
-      ""
-    );
-
-
-  const m =
-    s.match(
-      /^PAT-(\d+)$/i
-    );
-
-
-  return m
-    ? `GW-${String(Number(m[1])).padStart(4,"0")}`
-    : s;
-
-}
-
-
-/* =========================================================
-   UPSERT PATIENT
-========================================================= */
-
-function upsertPatient(
-  p
-){
-
-  const d =
-    store();
-
-
-  const i =
-    d.patients
-      .findIndex(
-        x =>
-          x.id ===
-          p.id
-      );
-
-
-  if(i >= 0){
-
-    d.patients[i] =
-      p;
-
-  }else{
-
-    d.patients.push(
-      p
-    );
-
-  }
-
-
-  saveStore(
-    d
-  );
-
-}
-
-
-/* =========================================================
-   CLAIMS
-========================================================= */
-
-function ensureClaims(
-  p
-){
-
-  if(
-    !Array.isArray(
-      p.claims
-    )
-  ){
-
-    p.claims =
-      [];
-
-  }
-
-
-  return p.claims;
-
-}
-
-
-/* =========================================================
-   VISIT
-========================================================= */
-
-function ensureVisit(
-  v
-){
-
-  if(
-    !v.billing
-  ){
-
-    v.billing =
-      {};
-
-  }
-
-
-  v.billing.injection ||=
-    {
-      price:0,
-      notes:""
-    };
-
-
-  v.billing.medication ||=
-    {
-      price:0,
-      notes:""
-    };
-
-
-  v.billing.treatment ||=
-    {
-      price:0,
-      notes:""
-    };
-
-
-  v.billing.other ||=
-    {
-      price:0,
-      notes:""
-    };
-
-
-  v.billing.panel =
-    Number(
-      v.billing.panel ||
-      0
-    );
-
-
-  v.billing.selfPay =
-    Number(
-      v.billing.selfPay ||
-      0
-    );
-
-
-  return v;
-
-}
-
-
-/* =========================================================
-   VISIT TOTAL
-========================================================= */
-
-function visitTotal(
-  v
-){
-
-  const b =
-    ensureVisit(
-      v
-    )
-    .billing;
-
-
-  return (
-    (+b.injection.price || 0) +
-    (+b.medication.price || 0) +
-    (+b.treatment.price || 0) +
-    (+b.other.price || 0)
-  );
-
-}
-
-
-/* =========================================================
-   PANEL CHECK
-========================================================= */
-
-function patientUsesPanel(
-  p
-){
-
-  return !!(
-    p?.panelProvider &&
-    p.panelProvider !==
-      "SELF_PAY"
-  );
-
-}
-
-
-/* =========================================================
-   PANEL SUSPENSION
-========================================================= */
-
-function isPanelSuspended(
-  p
-){
-
-  return (
-    patientUsesPanel(
-      p
-    ) &&
-    (
-      p.panelStatus ===
-        "Suspended" ||
-
-      p.insuranceStatus ===
-        "Suspended"
-    )
-  );
-
-}
-
-
-function panelSuspensionNote(
-  p
-){
-
-  return (
-    p.panelSuspensionNote ||
-    p.insuranceSuspensionNote ||
-    ""
-  );
-
-}
-
-
-/* =========================================================
-   TOTALS
-========================================================= */
-
-function grandTotal(
-  p
-){
-
-  return (
-    p.visits ||
-    []
-  )
-  .reduce(
-    (
-      s,
-      v
-    ) =>
-      s +
-      visitTotal(
-        v
-      ),
-    0
-  );
-
-}
-
-
-function claimsTotal(
-  p
-){
-
-  return ensureClaims(
-    p
-  )
-  .reduce(
-    (
-      s,
-      c
-    ) =>
-      s +
-      (
-        +c.amount ||
-        0
-      ),
-    0
-  );
-
-}
-
-
-/* =========================================================
-   FINANCE
-========================================================= */
-
-function finance(
-  p
-){
-
-  let injection =
-    0;
-
-  let medication =
-    0;
-
-  let treatment =
-    0;
-
-  let selfpay =
-    0;
-
-
-  (
-    p.visits ||
-    []
-  )
-  .forEach(
-    v => {
-
-      const b =
-        ensureVisit(
-          v
-        )
-        .billing;
-
-
-      injection +=
-        +b.injection.price ||
-        0;
-
-
-      medication +=
-        +b.medication.price ||
-        0;
-
-
-      treatment +=
-        +b.treatment.price ||
-        0;
-
-
-      selfpay +=
-        +b.selfPay ||
-        0;
-
-    }
-  );
-
-
-  const grand =
-    grandTotal(
-      p
-    );
-
-
-  const claimed =
-    claimsTotal(
-      p
-    );
-
-
-  return {
-
-    grand,
-
-    claimed,
-
-    balance:
-      Math.max(
-        0,
-        grand -
-        claimed
-      ),
-
-    injection,
-
-    medication,
-
-    treatment,
-
-    selfpay
-
-  };
-
-}
-
-
-/* =========================================================
-   LATEST VISIT
-========================================================= */
-
-function latestVisit(
-  p
-){
-
-  return [
-    ...(p.visits ||
-      [])
-  ]
-  .sort(
-    (
-      a,
-      b
-    ) =>
-      (
-        a.dateKey ||
-        ""
-      )
-      .localeCompare(
-        b.dateKey ||
-        ""
-      )
-  )
-  .at(
-    -1
-  ) ||
-  null;
-
-}
-
-
-/* =========================================================
-   DAYS SINCE
-========================================================= */
-
-function daysSince(
-  d
-){
-
-  if(!d)
-    return null;
-
-
-  const a =
-    new Date(
-      d +
-      "T00:00:00"
-    );
-
-
-  const b =
-    new Date();
-
-
-  b.setHours(
-    0,
-    0,
-    0,
-    0
-  );
-
-
-  return Math.floor(
-    (
-      b -
-      a
-    ) /
-    86400000
-  );
-
-}
-
-
-/* =========================================================
-   FOLLOW-UP ALERTS
-========================================================= */
-
-function alerts(){
-
-  const config =
-    getwellFollowUpSettings();
-
-
-  return (
-    store().patients ||
-    []
-  )
-  .map(
-    p => {
-
-      const d =
-        daysSince(
-          latestVisit(
-            p
-          )
-          ?.dateKey
-        );
-
-
-      if(
-        d === null ||
-        d <
-          config.dueAfterDays
-      ){
-
-        return null;
-
-      }
-
-
-      return {
-
-        id:
-          p.id,
-
-        name:
-          p.name,
-
-        days:
-          d,
-
-        level:
-          d >=
-            config.overdueAfterDays
-            ? "overdue"
-            : "warning"
-
-      };
-
-    }
-  )
-  .filter(
-    Boolean
-  )
-  .sort(
-    (
-      a,
-      b
-    ) =>
-      b.days -
-      a.days
-  );
-
-}
-
-
-/* =========================================================
-   MONEY
-========================================================= */
-
-function money(
-  n
-){
-
-  return (
-    "RM " +
-    Number(
-      n ||
-      0
-    )
-    .toLocaleString(
-      "en-MY",
-      {
-        minimumFractionDigits:
-          2,
-
-        maximumFractionDigits:
-          2
-      }
-    )
-  );
-
-}
-
-
-/* =========================================================
-   THEME
-========================================================= */
-
-function applyTheme(
-  t
-){
-
-  t =
-    t ===
-      "dark"
-      ? "dark"
-      : "light";
-
-
-  document.documentElement
-    .dataset.theme =
-    t;
-
-
-  localStorage.setItem(
-    THEME_KEY,
-    t
-  );
-
-
-  const b =
+  const container =
     document.getElementById(
-      "themeToggle"
+      "reportOptions"
     );
 
 
-  if(b){
+  container.innerHTML =
 
-    b.textContent =
-      t ===
-        "dark"
-        ? "☀"
-        : "☾";
+    Object.keys(
+      REPORT_LABELS
+    )
+    .map(
+      key => `
 
-
-    b.title =
-      t ===
-        "dark"
-        ? "Switch to Day Mode"
-        : "Switch to Night Mode";
-
-  }
-
-}
-
-
-function initTheme(){
-
-  applyTheme(
-    localStorage.getItem(
-      THEME_KEY
-    ) ||
-    "light"
-  );
-
-}
-
-
-function toggleTheme(){
-
-  applyTheme(
-
-    (
-      document.documentElement
-        .dataset.theme ||
-      "light"
-    ) ===
-      "dark"
-
-      ? "light"
-
-      : "dark"
-
-  );
-
-}
-
-
-/* =========================================================
-   HEADER
-========================================================= */
-
-function header(){
-
-  const followUp =
-    getwellFollowUpSettings();
-
-
-  return `
-
-<header class="topbar">
-
-  <div class="topbar-left">
-
-    <div>
-
-      <div class="page-title">
-        ${document.title
-          .split("|")[0]
-          .trim()}
-      </div>
-
-      <div class="page-subtitle">
-        Getwell Weight Loss Admin
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <div class="topbar-right">
-
-
-    <div class="search-box">
-
-      <span>
-        ⌕
-      </span>
-
-      <input
-        id="globalSearch"
-        placeholder="Search patient or ID"
-      >
-
-    </div>
-
-
-    <div
-      id="notifWrap"
-      class="global-notification-wrap"
-    >
-
-      <button
-        class="icon-button"
-        onclick="toggleNotifications(event)"
-      >
-
-        🔔
-
-        <span
-          class="notification-count"
-          id="notifCount"
-          hidden
+        <div
+          class="settings-item"
         >
-          0
-        </span>
 
-      </button>
+          <div
+            class="settings-item-main"
+          >
+
+            <div
+              class="settings-item-title"
+            >
+              ${REPORT_LABELS[key]}
+            </div>
 
 
-      <div
-        id="notifPanel"
-        class="global-notification-panel"
-        hidden
-      >
-
-        <div class="notif-head">
-
-          <div>
-
-            <strong>
-              Follow-Up Alerts
-            </strong>
-
-            <span>
-              ${followUp.dueAfterDays}
-              days due ·
-              ${followUp.overdueAfterDays}
-              days overdue
-            </span>
+            <div
+              class="settings-item-sub"
+            >
+              Show this section in Reports.
+            </div>
 
           </div>
 
+
+          <button
+            class="
+              settings-toggle
+              ${
+                settings.reports[key]
+                  ? "on"
+                  : ""
+              }
+            "
+            onclick="
+              settings.reports['${key}'] =
+                !settings.reports['${key}'];
+
+              renderReportOptions();
+            "
+          ></button>
+
         </div>
 
-
-        <div id="notifBody"></div>
-
-      </div>
-
-    </div>
-
-
-    <button
-      class="theme-toggle"
-      id="themeToggle"
-      onclick="toggleTheme()"
-    >
-      ☾
-    </button>
-
-
-    <div class="user-avatar">
-      A
-    </div>
-
-
-  </div>
-
-</header>
-
-`;
+      `
+    )
+    .join("");
 
 }
 
 
 /* =========================================================
-   SIDEBAR
+   SYSTEM FEATURES
 ========================================================= */
 
-function sidebar(
-  active
-){
+const FEATURE_LABELS = {
 
-  const showPatients =
-    getwellFeatureEnabled(
-      "patients"
-    );
+  patients:
+    "Patient Management",
 
+  appointments:
+    "Appointments",
 
-  const showAppointments =
-    getwellFeatureEnabled(
-      "appointments"
-    );
+  panel:
+    "Panel Management",
 
+  reports:
+    "Reports",
 
-  const showPanel =
-    getwellFeatureEnabled(
-      "panel"
-    );
+  followUpAlerts:
+    "Follow-Up Alerts",
 
+  panelClaims:
+    "Panel Claims"
 
-  const showReports =
-    getwellFeatureEnabled(
-      "reports"
-    );
+};
 
 
-  return `
+function renderFeatureOptions(){
 
-<aside class="sidebar">
-
-
-  <div
-    class="brand"
-    role="button"
-    tabindex="0"
-    aria-label="Go to Dashboard"
-    onclick="goHome()"
-    onkeydown="
-      if(
-        event.key==='Enter' ||
-        event.key===' '
-      ){
-        event.preventDefault();
-        goHome()
-      }
-    "
-  >
-
-    <div class="brand-mark">
-      G
-    </div>
-
-
-    <div>
-
-      <div class="brand-name">
-        GETWELL
-      </div>
-
-      <div class="brand-sub">
-        Weight Loss Admin
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <nav class="nav">
-
-
-    <div class="nav-label">
-      MAIN
-    </div>
-
-
-    <a
-      class="${
-        active ===
-          "dashboard"
-          ? "active"
-          : ""
-      }"
-      href="index.html"
-    >
-      ⌂ Dashboard
-    </a>
-
-
-    ${
-      showPatients
-        ? `
-
-          <a
-            class="${
-              active ===
-                "patients"
-                ? "active"
-                : ""
-            }"
-            href="patients.html"
-          >
-            ♙ Patients
-          </a>
-
-        `
-        : ""
-    }
-
-
-    ${
-      showAppointments
-        ? `
-
-          <a
-            class="${
-              active ===
-                "appointments"
-                ? "active"
-                : ""
-            }"
-            href="appointments.html"
-          >
-            ▣ Appointments
-          </a>
-
-        `
-        : ""
-    }
-
-
-    <div
-      class="nav-label"
-      style="
-        margin-top:18px
-      "
-    >
-      MANAGEMENT
-    </div>
-
-
-    ${
-      showPanel
-        ? `
-
-          <a
-            class="${
-              active ===
-                "panel"
-                ? "active"
-                : ""
-            }"
-            href="panel.html"
-          >
-            ▣ Panel
-          </a>
-
-        `
-        : ""
-    }
-
-
-    ${
-      showReports
-        ? `
-
-          <a
-            class="${
-              active ===
-                "reports"
-                ? "active"
-                : ""
-            }"
-            href="reports.html"
-          >
-            ▤ Reports
-          </a>
-
-        `
-        : ""
-    }
-
-
-    <a
-      class="${
-        active ===
-          "settings"
-          ? "active"
-          : ""
-      }"
-      href="settings.html"
-    >
-      ⚙ Settings
-    </a>
-
-
-  </nav>
-
-
-  <div class="sidebar-user">
-
-    <div class="user-card">
-
-      <div class="user-dot">
-        A
-      </div>
-
-      <div>
-
-        <div class="user-name">
-          Administrator
-        </div>
-
-        <div class="user-role">
-          Weight Loss Program
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-</aside>
-
-`;
-
-}
-
-
-/* =========================================================
-   HOME
-========================================================= */
-
-function goHome(){
-
-  window.location.href =
-    "index.html";
-
-}
-
-
-/* =========================================================
-   APP SHELL
-========================================================= */
-
-function shell(
-  title,
-  active,
-  body
-){
-
-  document.title =
-    title +
-    " | Getwell";
-
-
-  return `
-
-<div class="app">
-
-  ${sidebar(
-    active
-  )}
-
-  <main class="main">
-
-    ${header()}
-
-    <div class="content">
-
-      ${body}
-
-    </div>
-
-  </main>
-
-</div>
-
-`;
-
-}
-
-
-/* =========================================================
-   NOTIFICATIONS
-========================================================= */
-
-function toggleNotifications(
-  e
-){
-
-  if(e){
-
-    e.stopPropagation();
-
-  }
-
-
-  const p =
+  const container =
     document.getElementById(
-      "notifPanel"
+      "featureOptions"
     );
 
 
-  if(p){
+  container.innerHTML =
 
-    p.hidden =
-      !p.hidden;
+    Object.keys(
+      FEATURE_LABELS
+    )
+    .map(
+      key => `
 
+        <div
+          class="settings-item"
+        >
 
-    if(!p.hidden){
+          <div
+            class="settings-item-main"
+          >
 
-      renderNotifications();
-
-    }
-
-  }
-
-}
-
-
-function renderNotifications(){
-
-  const a =
-    alerts();
-
-
-  const c =
-    document.getElementById(
-      "notifCount"
-    );
+            <div
+              class="settings-item-title"
+            >
+              ${FEATURE_LABELS[key]}
+            </div>
 
 
-  const b =
-    document.getElementById(
-      "notifBody"
-    );
+            <div
+              class="settings-item-sub"
+            >
+              Enable or disable this system feature.
+            </div>
 
-
-  if(
-    !c ||
-    !b
-  ){
-
-    return;
-
-  }
-
-
-  c.hidden =
-    !a.length;
-
-
-  c.textContent =
-    a.length >
-      99
-      ? "99+"
-      : a.length;
-
-
-  b.innerHTML =
-    a.length
-
-      ? a
-          .map(
-            x => `
-
-              <div
-                class="notif-item"
-                onclick="
-                  location.href=
-                    'patient-profile.html?patient='+
-                    encodeURIComponent(
-                      '${String(
-                        x.id
-                      )
-                      .replace(
-                        /'/g,
-                        "\\'"
-                      )}'
-                    )
-                "
-              >
-
-                <span
-                  class="
-                    notif-dot
-                    ${x.level}
-                  "
-                ></span>
-
-
-                <div>
-
-                  <div
-                    class="notif-name"
-                  >
-                    ${x.name}
-                  </div>
-
-
-                  <div
-                    class="notif-text"
-                  >
-
-                    ${
-                      x.level ===
-                        "overdue"
-                        ? "Overdue"
-                        : "Due for Follow-Up"
-                    }
-
-                    ·
-
-                    ${x.days}
-
-                    days since last visit.
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            `
-          )
-          .join("")
-
-      : `
-
-          <div class="notif-empty">
-            No patients are due.
           </div>
 
-        `;
+
+          <button
+            class="
+              settings-toggle
+              ${
+                settings.features[key]
+                  ? "on"
+                  : ""
+              }
+            "
+            onclick="
+              settings.features['${key}'] =
+                !settings.features['${key}'];
+
+              renderFeatureOptions();
+            "
+          ></button>
+
+        </div>
+
+      `
+    )
+    .join("");
 
 }
 
 
 /* =========================================================
-   CLOSE NOTIFICATIONS
+   SECTION NAVIGATION
 ========================================================= */
 
-document.addEventListener(
-  "click",
-  e => {
+function showSettingsSection(
+  section
+){
 
-    const w =
-      document.getElementById(
-        "notifWrap"
-      );
+  document
+    .querySelectorAll(
+      ".settings-section"
+    )
+    .forEach(
+      element => {
 
-
-    const p =
-      document.getElementById(
-        "notifPanel"
-      );
-
-
-    if(
-      w &&
-      p &&
-      !w.contains(
-        e.target
-      )
-    ){
-
-      p.hidden =
-        true;
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   SETTINGS UPDATE
-========================================================= */
-
-window.addEventListener(
-  "storage",
-  event => {
-
-    if(
-      event.key ===
-      GW_SETTINGS_UPDATED_KEY
-    ){
-
-      /*
-        Settings page itself should
-        remain open.
-
-        Other pages reload so they
-        immediately use the new
-        configuration.
-      */
-
-      if(
-        !location.pathname
-          .toLowerCase()
-          .endsWith(
-            "settings.html"
-          )
-      ){
-
-        location.reload();
+        element.hidden =
+          element.id !==
+          `section-${section}`;
 
       }
+    );
 
-    }
 
-  }
-);
+  document
+    .querySelectorAll(
+      ".settings-tab"
+    )
+    .forEach(
+      button => {
+
+        button.classList.toggle(
+
+          "active",
+
+          button.dataset.section ===
+          section
+
+        );
+
+      }
+    );
+
+}
 
 
 /* =========================================================
-   INITIALIZATION
+   SAVE ALL SETTINGS
 ========================================================= */
 
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
-
-    /*
-      We intentionally do NOT call
-      getSettings(), mergeSettings(),
-      saveSettings(), etc.
-
-      Those functions belong to
-      settings.html.
-    */
-
-    getwellSystemSettings();
+function saveAllSettings(){
 
 
-    initTheme();
+  /* GENERAL */
+
+  settings.general.clinicName =
+    document.getElementById(
+      "clinicName"
+    ).value.trim();
 
 
-    renderNotifications();
+  settings.general.clinicLocation =
+    document.getElementById(
+      "clinicLocation"
+    ).value.trim();
 
-  }
+
+  settings.general.contactNumber =
+    document.getElementById(
+      "contactNumber"
+    ).value.trim();
+
+
+  settings.general.email =
+    document.getElementById(
+      "clinicEmail"
+    ).value.trim();
+
+
+  settings.general.operatingHours =
+    document.getElementById(
+      "operatingHours"
+    ).value.trim();
+
+
+
+  /* PATIENT */
+
+  settings.patient.idPrefix =
+    document.getElementById(
+      "patientIdPrefix"
+    ).value;
+
+
+  settings.patient.idDigits =
+    Math.max(
+
+      1,
+
+      Number(
+        document.getElementById(
+          "patientIdDigits"
+        ).value
+      ) || 4
+
+    );
+
+
+  settings.patient.nextNumber =
+    Math.max(
+
+      1,
+
+      Number(
+        document.getElementById(
+          "patientNextNumber"
+        ).value
+      ) || 1
+
+    );
+
+
+  settings.patient.autoGenerateId =
+    document.getElementById(
+      "autoGeneratePatientId"
+    ).checked;
+
+
+  settings.patient.defaultStatus =
+    document.getElementById(
+      "defaultPatientStatus"
+    ).value;
+
+
+
+  /* APPOINTMENTS */
+
+  settings.appointments.defaultStatus =
+    document.getElementById(
+      "defaultAppointmentStatus"
+    ).value;
+
+
+  settings.appointments.defaultDuration =
+    Math.max(
+
+      5,
+
+      Number(
+        document.getElementById(
+          "appointmentDuration"
+        ).value
+      ) || 30
+
+    );
+
+
+
+  /* FOLLOW-UP */
+
+  settings.followUp.dueAfterDays =
+    Math.max(
+
+      1,
+
+      Number(
+        document.getElementById(
+          "followUpDue"
+        ).value
+      ) || 5
+
+    );
+
+
+  settings.followUp.overdueAfterDays =
+    Math.max(
+
+      1,
+
+      Number(
+        document.getElementById(
+          "followUpOverdue"
+        ).value
+      ) || 7
+
+    );
+
+
+
+  /* SAVE */
+
+  saveSettings();
+
+
+  const message =
+    document.getElementById(
+      "saveMessage"
+    );
+
+
+  message.textContent =
+    "✓ Settings saved successfully.";
+
+
+  setTimeout(
+    () => {
+
+      message.textContent =
+        "";
+
+    },
+
+    3000
+
+  );
+
+}
+
+
+/* =========================================================
+   CANCEL / RELOAD
+========================================================= */
+
+function reloadSettings(){
+
+  settings =
+    getSettings();
+
+
+  loadEverything();
+
+}
+
+
+/* =========================================================
+   LOAD EVERYTHING
+========================================================= */
+
+function loadEverything(){
+
+  loadGeneral();
+
+  loadPatientSettings();
+
+  renderPanels();
+
+  renderAppointmentStatuses();
+
+
+  document.getElementById(
+    "appointmentDuration"
+  ).value =
+    settings.appointments
+      .defaultDuration;
+
+
+  loadFollowUp();
+
+  renderDashboardOptions();
+
+  renderReportOptions();
+
+  renderFeatureOptions();
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHtml(
+  value
+){
+
+  return String(
+    value ??
+    ""
+  )
+
+  .replace(
+    /&/g,
+    "&amp;"
+  )
+
+  .replace(
+    /</g,
+    "&lt;"
+  )
+
+  .replace(
+    />/g,
+    "&gt;"
+  )
+
+  .replace(
+    /"/g,
+    "&quot;"
+  )
+
+  .replace(
+    /'/g,
+    "&#039;"
+  );
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+loadEverything();
+
+
+showSettingsSection(
+  "general"
 );
+
+</script>
+
+
+</body>
+
+</html>
