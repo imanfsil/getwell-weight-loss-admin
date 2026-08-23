@@ -311,14 +311,11 @@ function buildMonthSelector(){
       "reportMonth"
     );
 
-
   if(!select)
     return;
 
-
   const current =
     getCurrentMonthKey();
-
 
   const [
     currentYear,
@@ -328,13 +325,23 @@ function buildMonthSelector(){
       .split("-")
       .map(Number);
 
+  /*
+    REPORT MONTH RANGE
+
+    Reports are available from September 2025
+    through the current month.
+
+    Do not show months before September 2025.
+  */
+
+  const MIN_REPORT_YEAR = 2025;
+  const MIN_REPORT_MONTH = 9; // September
 
   const options = [];
 
-
   for(
     let year=currentYear;
-    year>=currentYear-1;
+    year>=MIN_REPORT_YEAR;
     year--
   ){
 
@@ -343,16 +350,19 @@ function buildMonthSelector(){
         ? currentMonth
         : 12;
 
+    const minMonth =
+      year === MIN_REPORT_YEAR
+        ? MIN_REPORT_MONTH
+        : 1;
 
     for(
       let month=maxMonth;
-      month>=1;
+      month>=minMonth;
       month--
     ){
 
       const key =
         `${year}-${pad2(month)}`;
-
 
       options.push(`
         <option value="${key}">
@@ -364,13 +374,28 @@ function buildMonthSelector(){
 
   }
 
-
   select.innerHTML =
     options.join("");
 
+  /*
+    Keep the current month selected.
+  */
 
-  select.value =
-    current;
+  if(
+    [...select.options]
+      .some(option => option.value === current)
+  ){
+
+    select.value =
+      current;
+
+  }else if(
+    select.options.length
+  ){
+
+    select.selectedIndex = 0;
+
+  }
 
 }
 
