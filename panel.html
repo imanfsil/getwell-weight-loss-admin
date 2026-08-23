@@ -1,3255 +1,1513 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Panel | Getwell</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  >
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    :root {
-      --blue: #2f6fed;
-      --blue-dark: #2457c5;
-      --blue-soft: #eef5ff;
-
-      --navy: #172033;
-      --text: #202939;
-      --muted: #7b8495;
-
-      --bg: #f5f7fb;
-      --white: #ffffff;
-      --border: #e6eaf0;
-
-      --green: #20a36a;
-      --green-soft: #e9f8f1;
-
-      --orange: #e69a2e;
-      --orange-soft: #fff5e4;
-
-      --red: #df4d5b;
-      --red-soft: #fff0f1;
-
-      --shadow:
-        0 8px 24px rgba(35, 54, 85, 0.06);
-    }
-
-    * {
-      scrollbar-width: thin;
-      scrollbar-color: #d5dbe5 transparent;
-    }
-
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      min-height: 100%;
-      font-family: "Poppins", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    body {
-      min-height: 100vh;
-    }
-
-    button,
-    input,
-    select {
-      font-family: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    .app {
-      display: flex;
-      min-height: 100vh;
-    }
-
-    /* =====================================================
-       SIDEBAR
-    ===================================================== */
-
-    .sidebar {
-      width: 245px;
-      min-width: 245px;
-      min-height: 100vh;
-
-      background: #ffffff;
-      border-right: 1px solid var(--border);
-
-      display: flex;
-      flex-direction: column;
-
-      position: fixed;
-      left: 0;
-      top: 0;
-      bottom: 0;
-
-      z-index: 20;
-    }
-
-    .brand {
-      height: 82px;
-
-      display: flex;
-      align-items: center;
-
-      gap: 12px;
-
-      padding: 0 22px;
-
-      border-bottom: 1px solid var(--border);
-
-      cursor: pointer;
-    }
-
-    .brand-mark {
-      width: 40px;
-      height: 40px;
-
-      border-radius: 12px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      background: linear-gradient(
-        135deg,
-        #2f6fed,
-        #6da0ff
-      );
-
-      color: #fff;
-
-      font-size: 21px;
-      font-weight: 700;
-    }
-
-    .brand-name {
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      color: var(--navy);
-    }
-
-    .brand-sub {
-      margin-top: 1px;
-      font-size: 10px;
-      color: var(--muted);
-    }
-
-    .nav {
-      padding: 22px 14px;
-    }
-
-    .nav-label {
-      padding: 0 12px 9px;
-
-      font-size: 10px;
-      font-weight: 700;
-
-      letter-spacing: 1px;
-
-      color: #a1a9b7;
-    }
-
-    .nav a {
-      display: flex;
-      align-items: center;
-
-      height: 44px;
-
-      margin-bottom: 4px;
-
-      padding: 0 13px;
-
-      border-radius: 10px;
-
-      text-decoration: none;
-
-      color: #687286;
-
-      font-size: 13px;
-      font-weight: 500;
-
-      transition: 0.18s ease;
-    }
-
-    .nav a:hover {
-      background: #f4f7fc;
-      color: var(--blue);
-    }
-
-    .nav a.active {
-      background: var(--blue-soft);
-      color: var(--blue);
-      font-weight: 600;
-    }
-
-    .sidebar-user {
-      margin-top: auto;
-      padding: 15px;
-      border-top: 1px solid var(--border);
-    }
-
-    .user-card {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-
-      padding: 10px;
-
-      border-radius: 12px;
-      background: #f8f9fc;
-    }
-
-    .user-dot {
-      width: 34px;
-      height: 34px;
-
-      border-radius: 50%;
-
-      background: #dce9ff;
-      color: var(--blue);
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .user-name {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--navy);
-    }
-
-    .user-role {
-      font-size: 9px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    /* =====================================================
-       MAIN
-    ===================================================== */
-
-    .main {
-      margin-left: 245px;
-      width: calc(100% - 245px);
-      min-height: 100vh;
-    }
-
-    .topbar {
-      height: 82px;
-
-      background: #fff;
-      border-bottom: 1px solid var(--border);
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      padding: 0 30px;
-
-      position: sticky;
-      top: 0;
-
-      z-index: 15;
-    }
-
-    .page-title {
-      font-size: 21px;
-      font-weight: 700;
-      color: var(--navy);
-    }
-
-    .page-subtitle {
-      margin-top: 3px;
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .search-box {
-      width: 270px;
-      height: 40px;
-
-      border: 1px solid var(--border);
-      border-radius: 10px;
-
-      background: #fafbfc;
-
-      display: flex;
-      align-items: center;
-
-      padding: 0 12px;
-
-      gap: 8px;
-    }
-
-    .search-box span {
-      color: #9ca5b4;
-      font-size: 18px;
-    }
-
-    .search-box input {
-      border: 0;
-      outline: none;
-
-      background: transparent;
-
-      width: 100%;
-
-      font-size: 12px;
-      color: var(--text);
-    }
-
-    .theme-toggle,
-    .icon-button {
-      width: 38px;
-      height: 38px;
-
-      border: 1px solid var(--border);
-      background: #fff;
-
-      border-radius: 10px;
-
-      color: #6f7889;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .theme-toggle:hover,
-    .icon-button:hover {
-      background: #f5f7fb;
-    }
-
-    .user-avatar {
-      width: 36px;
-      height: 36px;
-
-      border-radius: 50%;
-
-      background: #e8f0ff;
-      color: var(--blue);
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    /* =====================================================
-       CONTENT
-    ===================================================== */
-
-    .content {
-      padding: 28px 30px 45px;
-    }
-
-    .page-header {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-
-      margin-bottom: 24px;
-    }
-
-    .page-header h1 {
-      margin: 0;
-      font-size: 22px;
-      color: var(--navy);
-    }
-
-    .page-header p {
-      margin: 6px 0 0;
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    /* =====================================================
-       SUMMARY CARDS
-    ===================================================== */
-
-    .summary-grid {
-      display: grid;
-
-      grid-template-columns:
-        repeat(4, minmax(0, 1fr));
-
-      gap: 16px;
-
-      margin-bottom: 22px;
-    }
-
-    .summary-card {
-      background: #fff;
-
-      border: 1px solid var(--border);
-
-      border-radius: 15px;
-
-      padding: 19px;
-
-      box-shadow: var(--shadow);
-    }
-
-    .summary-label {
-      font-size: 10px;
-      font-weight: 600;
-
-      color: var(--muted);
-
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .summary-value {
-      margin-top: 8px;
-
-      font-size: 25px;
-      font-weight: 700;
-
-      color: var(--navy);
-    }
-
-    .summary-note {
-      margin-top: 4px;
-
-      font-size: 9px;
-      color: #a0a8b6;
-    }
-
-    .summary-card.blue {
-      border-top: 3px solid var(--blue);
-    }
-
-    .summary-card.green {
-      border-top: 3px solid var(--green);
-    }
-
-    .summary-card.orange {
-      border-top: 3px solid var(--orange);
-    }
-
-    .summary-card.red {
-      border-top: 3px solid var(--red);
-    }
-
-    /* =====================================================
-       PANEL BREAKDOWN
-    ===================================================== */
-
-    .panel-grid {
-      display: grid;
-
-      grid-template-columns:
-        minmax(0, 1.3fr)
-        minmax(300px, 0.7fr);
-
-      gap: 18px;
-
-      margin-bottom: 20px;
-    }
-
-    .card {
-      background: #fff;
-
-      border: 1px solid var(--border);
-
-      border-radius: 15px;
-
-      box-shadow: var(--shadow);
-    }
-
-    .card-header {
-      padding: 17px 19px;
-
-      border-bottom: 1px solid var(--border);
-
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .card-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--navy);
-    }
-
-    .card-subtitle {
-      margin-top: 3px;
-      font-size: 9px;
-      color: var(--muted);
-    }
-
-    .card-body {
-      padding: 19px;
-    }
-
-    .provider-row {
-      display: flex;
-      align-items: center;
-
-      justify-content: space-between;
-
-      padding: 13px 0;
-
-      border-bottom: 1px solid #f0f2f5;
-    }
-
-    .provider-row:last-child {
-      border-bottom: 0;
-    }
-
-    .provider-name {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .provider-count {
-      margin-top: 3px;
-      font-size: 9px;
-      color: var(--muted);
-    }
-
-    .provider-amount {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--navy);
-    }
-
-    /* =====================================================
-       FILTERS
-    ===================================================== */
-
-    .filter-bar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-
-      padding: 15px 18px;
-
-      background: #fff;
-
-      border: 1px solid var(--border);
-
-      border-radius: 14px;
-
-      margin-bottom: 16px;
-
-      box-shadow: var(--shadow);
-    }
-
-    .filter-bar select,
-    .filter-bar input {
-      height: 38px;
-
-      border: 1px solid var(--border);
-
-      border-radius: 9px;
-
-      background: #fff;
-
-      padding: 0 11px;
-
-      outline: none;
-
-      font-size: 11px;
-
-      color: var(--text);
-    }
-
-    .filter-bar input {
-      min-width: 220px;
-    }
-
-    .filter-bar select:focus,
-    .filter-bar input:focus {
-      border-color: #9abaff;
-      box-shadow: 0 0 0 3px #eef4ff;
-    }
-
-    .filter-spacer {
-      flex: 1;
-    }
-
-    .btn {
-      height: 38px;
-
-      border: 0;
-
-      border-radius: 9px;
-
-      padding: 0 15px;
-
-      font-size: 11px;
-      font-weight: 600;
-    }
-
-    .btn-primary {
-      background: var(--blue);
-      color: #fff;
-    }
-
-    .btn-primary:hover {
-      background: var(--blue-dark);
-    }
-
-    .btn-light {
-      background: #f3f5f8;
-      color: #606a7c;
-    }
-
-    .btn-light:hover {
-      background: #e9edf3;
-    }
-
-    /* =====================================================
-       TABLE
-    ===================================================== */
-
-    .table-card {
-      overflow: hidden;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-
-      min-width: 1080px;
-    }
-
-    thead th {
-      background: #fafbfc;
-
-      color: #8b94a4;
-
-      font-size: 9px;
-
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-
-      font-weight: 700;
-
-      padding: 13px 15px;
-
-      text-align: left;
-
-      border-bottom: 1px solid var(--border);
-
-      white-space: nowrap;
-    }
-
-    tbody td {
-      padding: 14px 15px;
-
-      font-size: 10px;
-
-      border-bottom: 1px solid #f0f2f5;
-
-      color: #4c5668;
-
-      white-space: nowrap;
-    }
-
-    tbody tr:hover {
-      background: #fbfcfe;
-    }
-
-    .patient-id {
-      font-weight: 700;
-      color: var(--blue);
-    }
-
-    .patient-name {
-      font-weight: 600;
-      color: var(--navy);
-    }
-
-    .money {
-      font-weight: 600;
-      color: var(--navy);
-    }
-
-    .money-green {
-      color: var(--green);
-      font-weight: 700;
-    }
-
-    .money-red {
-      color: var(--red);
-      font-weight: 700;
-    }
-
-    /* =====================================================
-       BADGES
-    ===================================================== */
-
-    .badge {
-      display: inline-flex;
-
-      align-items: center;
-      justify-content: center;
-
-      min-height: 25px;
-
-      padding: 0 9px;
-
-      border-radius: 20px;
-
-      font-size: 8px;
-
-      font-weight: 700;
-    }
-
-    .badge-active {
-      background: var(--green-soft);
-      color: var(--green);
-    }
-
-    .badge-suspended {
-      background: var(--red-soft);
-      color: var(--red);
-    }
-
-    .badge-self {
-      background: #f0f2f5;
-      color: #747e8e;
-    }
-
-    .badge-panel {
-      background: var(--blue-soft);
-      color: var(--blue);
-    }
-
-    /* =====================================================
-       ACTION BUTTONS
-    ===================================================== */
-
-    .action-btn {
-      border: 0;
-
-      height: 30px;
-
-      padding: 0 9px;
-
-      border-radius: 7px;
-
-      font-size: 9px;
-
-      font-weight: 600;
-
-      background: #eef4ff;
-
-      color: var(--blue);
-    }
-
-    .action-btn:hover {
-      background: #dfeaff;
-    }
-
-    /* =====================================================
-       EMPTY
-    ===================================================== */
-
-    .empty {
-      padding: 45px 20px;
-
-      text-align: center;
-
-      color: var(--muted);
-
-      font-size: 11px;
-    }
-
-    .empty-icon {
-      font-size: 28px;
-      margin-bottom: 8px;
-      opacity: 0.55;
-    }
-
-    /* =====================================================
-       MODAL
-    ===================================================== */
-
-    .modal-overlay {
-      position: fixed;
-
-      inset: 0;
-
-      background: rgba(16, 25, 43, 0.45);
-
-      display: none;
-
-      align-items: center;
-      justify-content: center;
-
-      z-index: 100;
-    }
-
-    .modal-overlay.show {
-      display: flex;
-    }
-
-    .modal {
-      width: min(850px, calc(100vw - 40px));
-      max-height: 85vh;
-
-      overflow-y: auto;
-
-      background: #fff;
-
-      border-radius: 17px;
-
-      box-shadow:
-        0 25px 70px rgba(0, 0, 0, 0.18);
-    }
-
-    .modal-header {
-      padding: 19px 22px;
-
-      border-bottom: 1px solid var(--border);
-
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--navy);
-    }
-
-    .modal-close {
-      width: 32px;
-      height: 32px;
-
-      border: 0;
-
-      background: #f3f5f8;
-
-      border-radius: 8px;
-
-      color: #6d7685;
-
-      font-size: 16px;
-    }
-
-    .modal-body {
-      padding: 22px;
-    }
-
-    .detail-grid {
-      display: grid;
-
-      grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-
-      gap: 13px;
-    }
-
-    .detail-item {
-      padding: 13px;
-
-      border-radius: 10px;
-
-      background: #f8f9fc;
-    }
-
-    .detail-label {
-      font-size: 8px;
-
-      text-transform: uppercase;
-
-      letter-spacing: 0.5px;
-
-      color: #9aa2b1;
-
-      font-weight: 700;
-    }
-
-    .detail-value {
-      margin-top: 5px;
-
-      font-size: 11px;
-
-      font-weight: 600;
-
-      color: var(--navy);
-    }
-
-    .claims-title {
-      margin-top: 22px;
-      margin-bottom: 10px;
-
-      font-size: 12px;
-      font-weight: 700;
-
-      color: var(--navy);
-    }
-
-    /* =====================================================
-       RESPONSIVE
-    ===================================================== */
-
-    @media (max-width: 1100px) {
-
-      .summary-grid {
-        grid-template-columns:
-          repeat(2, minmax(0, 1fr));
-      }
-
-      .panel-grid {
-        grid-template-columns: 1fr;
-      }
-
-    }
-
-    @media (max-width: 800px) {
-
-      .sidebar {
-        width: 210px;
-        min-width: 210px;
-      }
-
-      .main {
-        margin-left: 210px;
-        width: calc(100% - 210px);
-      }
-
-      .search-box {
-        width: 190px;
-      }
-
-      .content {
-        padding: 20px;
-      }
-
-    }
-
-    @media (max-width: 650px) {
-
-      .sidebar {
-        display: none;
-      }
-
-      .main {
-        margin-left: 0;
-        width: 100%;
-      }
-
-      .summary-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .topbar {
-        padding: 0 16px;
-      }
-
-      .search-box {
-        display: none;
-      }
-
-      .detail-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .filter-bar {
-        flex-wrap: wrap;
-      }
-
-      .filter-spacer {
-        display: none;
-      }
-
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel | Getwell</title>
+<link rel="stylesheet" href="styles.css?v=20260822-final3">
+<script src="app.js?v=20260822-final3"></script>
 </head>
 
 <body>
 
-  <div class="app">
+<div id="root"></div>
 
-    <!-- ===================================================
-         SIDEBAR
-    ==================================================== -->
 
-    <aside class="sidebar">
+<!-- =========================================================
+     PANEL PATIENT DETAIL
+========================================================= -->
 
-      <div
-        class="brand"
-        onclick="location.href='index.html'"
+<div class="modal-wrap" id="panelDetailModal">
+
+  <div class="modal" style="width:min(1050px,96vw)">
+
+    <div class="modal-head">
+
+      <div>
+        <h2 id="panelDetailTitle">Panel Patient</h2>
+        <p id="panelDetailSub"></p>
+      </div>
+
+      <button
+        type="button"
+        class="modal-close"
+        onclick="closePanelDetail()"
       >
-
-        <div class="brand-mark">
-          G
-        </div>
-
-        <div>
-          <div class="brand-name">
-            GETWELL
-          </div>
-
-          <div class="brand-sub">
-            Weight Loss Admin
-          </div>
-        </div>
-
-      </div>
-
-
-      <nav class="nav">
-
-        <div class="nav-label">
-          MAIN
-        </div>
-
-        <a href="index.html">
-          ⌂ Dashboard
-        </a>
-
-        <a href="patients.html">
-          ♙ Patients
-        </a>
-
-        <a href="appointments.html">
-          ▣ Appointments
-        </a>
-
-
-        <div
-          class="nav-label"
-          style="margin-top:18px"
-        >
-          MANAGEMENT
-        </div>
-
-        <a
-          href="panel.html"
-          class="active"
-        >
-          ▣ Panel
-        </a>
-
-        <a href="reports.html">
-          ▤ Reports
-        </a>
-
-        <a href="settings.html">
-          ⚙ Settings
-        </a>
-
-      </nav>
-
-
-      <div class="sidebar-user">
-
-        <div class="user-card">
-
-          <div class="user-dot">
-            A
-          </div>
-
-          <div>
-
-            <div class="user-name">
-              Administrator
-            </div>
-
-            <div class="user-role">
-              Weight Loss Program
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </aside>
-
-
-    <!-- ===================================================
-         MAIN
-    ==================================================== -->
-
-    <main class="main">
-
-      <header class="topbar">
-
-        <div>
-
-          <div class="page-title">
-            Panel
-          </div>
-
-          <div class="page-subtitle">
-            Panel & Insurance Management
-          </div>
-
-        </div>
-
-
-        <div class="topbar-right">
-
-          <div class="search-box">
-
-            <span>⌕</span>
-
-            <input
-              id="globalSearch"
-              type="text"
-              placeholder="Search patient or ID"
-            >
-
-          </div>
-
-
-          <button
-            class="theme-toggle"
-            id="themeToggle"
-            type="button"
-            onclick="togglePanelTheme()"
-          >
-            ☾
-          </button>
-
-
-          <div class="user-avatar">
-            A
-          </div>
-
-        </div>
-
-      </header>
-
-
-      <div class="content">
-
-        <!-- =================================================
-             PAGE HEADER
-        ================================================== -->
-
-        <div class="page-header">
-
-          <div>
-
-            <h1>
-              Panel & Insurance
-            </h1>
-
-            <p>
-              Manage panel patients, claims and remaining balances.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <!-- =================================================
-             SUMMARY
-        ================================================== -->
-
-        <div class="summary-grid">
-
-          <div class="summary-card blue">
-
-            <div class="summary-label">
-              Panel Patients
-            </div>
-
-            <div
-              class="summary-value"
-              id="totalPanelPatients"
-            >
-              0
-            </div>
-
-            <div class="summary-note">
-              Patients using panel / insurance
-            </div>
-
-          </div>
-
-
-          <div class="summary-card green">
-
-            <div class="summary-label">
-              Active Panels
-            </div>
-
-            <div
-              class="summary-value"
-              id="activePanelPatients"
-            >
-              0
-            </div>
-
-            <div class="summary-note">
-              Currently active
-            </div>
-
-          </div>
-
-
-          <div class="summary-card orange">
-
-            <div class="summary-label">
-              Total Claimed
-            </div>
-
-            <div
-              class="summary-value"
-              id="totalClaimed"
-            >
-              RM 0.00
-            </div>
-
-            <div class="summary-note">
-              Claims recorded
-            </div>
-
-          </div>
-
-
-          <div class="summary-card red">
-
-            <div class="summary-label">
-              Remaining
-            </div>
-
-            <div
-              class="summary-value"
-              id="totalRemaining"
-            >
-              RM 0.00
-            </div>
-
-            <div class="summary-note">
-              Unclaimed visit balance
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- =================================================
-             PROVIDER + CLAIM SUMMARY
-        ================================================== -->
-
-        <div class="panel-grid">
-
-          <div class="card">
-
-            <div class="card-header">
-
-              <div>
-
-                <div class="card-title">
-                  Panel Providers
-                </div>
-
-                <div class="card-subtitle">
-                  Patients and financial activity by provider
-                </div>
-
-              </div>
-
-            </div>
-
-            <div
-              class="card-body"
-              id="providerBreakdown"
-            ></div>
-
-          </div>
-
-
-          <div class="card">
-
-            <div class="card-header">
-
-              <div>
-
-                <div class="card-title">
-                  Claim Summary
-                </div>
-
-                <div class="card-subtitle">
-                  Overall panel billing
-                </div>
-
-              </div>
-
-            </div>
-
-            <div class="card-body">
-
-              <div class="provider-row">
-
-                <div>
-
-                  <div class="provider-name">
-                    Total Visit Value
-                  </div>
-
-                  <div class="provider-count">
-                    All panel patient visits
-                  </div>
-
-                </div>
-
-                <div
-                  class="provider-amount"
-                  id="summaryVisitValue"
-                >
-                  RM 0.00
-                </div>
-
-              </div>
-
-
-              <div class="provider-row">
-
-                <div>
-
-                  <div class="provider-name">
-                    Claimed
-                  </div>
-
-                  <div class="provider-count">
-                    Amount submitted / recorded
-                  </div>
-
-                </div>
-
-                <div
-                  class="provider-amount"
-                  id="summaryClaimed"
-                >
-                  RM 0.00
-                </div>
-
-              </div>
-
-
-              <div class="provider-row">
-
-                <div>
-
-                  <div class="provider-name">
-                    Remaining
-                  </div>
-
-                  <div class="provider-count">
-                    Available balance
-                  </div>
-
-                </div>
-
-                <div
-                  class="provider-amount"
-                  id="summaryRemaining"
-                >
-                  RM 0.00
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- =================================================
-             FILTER
-        ================================================== -->
-
-        <div class="filter-bar">
-
-          <input
-            id="panelSearch"
-            type="text"
-            placeholder="Search patient name or ID..."
-          >
-
-
-          <select id="providerFilter">
-
-            <option value="">
-              All Panel Providers
-            </option>
-
-          </select>
-
-
-          <select id="statusFilter">
-
-            <option value="">
-              All Status
-            </option>
-
-            <option value="Active">
-              Active
-            </option>
-
-            <option value="Suspended">
-              Suspended
-            </option>
-
-          </select>
-
-
-          <div class="filter-spacer"></div>
-
-
-          <button
-            class="btn btn-light"
-            type="button"
-            onclick="resetPanelFilters()"
-          >
-            Reset
-          </button>
-
-
-          <button
-            class="btn btn-primary"
-            type="button"
-            onclick="refreshPanel()"
-          >
-            ↻ Refresh
-          </button>
-
-        </div>
-
-
-        <!-- =================================================
-             PATIENT TABLE
-        ================================================== -->
-
-        <div class="card table-card">
-
-          <div class="card-header">
-
-            <div>
-
-              <div class="card-title">
-                Panel Patients
-              </div>
-
-              <div class="card-subtitle">
-                Patients with panel / insurance billing
-              </div>
-
-            </div>
-
-          </div>
-
-
-          <div class="table-wrap">
-
-            <table>
-
-              <thead>
-
-                <tr>
-
-                  <th>
-                    Patient ID
-                  </th>
-
-                  <th>
-                    Patient
-                  </th>
-
-                  <th>
-                    Panel Provider
-                  </th>
-
-                  <th>
-                    Status
-                  </th>
-
-                  <th>
-                    Visit Value
-                  </th>
-
-                  <th>
-                    Claimed
-                  </th>
-
-                  <th>
-                    Remaining
-                  </th>
-
-                  <th>
-                    Claims
-                  </th>
-
-                  <th>
-                    Action
-                  </th>
-
-                </tr>
-
-              </thead>
-
-
-              <tbody
-                id="panelTableBody"
-              ></tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </main>
+        ×
+      </button>
+
+    </div>
+
+    <div
+      class="modal-body"
+      id="panelDetailContent"
+    ></div>
 
   </div>
 
+</div>
 
-  <!-- =====================================================
-       PATIENT DETAIL MODAL
-  ====================================================== -->
 
-  <div
-    class="modal-overlay"
-    id="patientModal"
-    onclick="closeModalOutside(event)"
-  >
+<script>
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+document.getElementById("root").innerHTML = shell(
+  "Panel",
+  "panel",
+  `
+
+  <div class="page-head">
+
+    <div>
+
+      <h1>
+        Panel Claims
+      </h1>
+
+      <p>
+        Track panel patients, claim progress and outstanding balances.
+      </p>
+
+    </div>
+
 
     <div
-      class="modal"
-      onclick="event.stopPropagation()"
+      style="
+        display:flex;
+        gap:8px;
+        align-items:flex-end;
+        flex-wrap:wrap;
+        justify-content:flex-end;
+      "
     >
 
-      <div class="modal-header">
+      <div class="form-group" style="min-width:170px">
 
-        <div>
+        <label>
+          Panel Filter
+        </label>
 
-          <div
-            class="modal-title"
-            id="modalPatientName"
-          >
-            Patient
-          </div>
-
-        </div>
-
-        <button
-          class="modal-close"
-          type="button"
-          onclick="closePatientModal()"
+        <select
+          id="panelFilter"
+          class="claim-input"
+          onchange="
+            renderPanelKpis();
+            renderPanelPatients();
+          "
         >
-          ×
-        </button>
+          <option value="ALL">All Panels</option>
+          <option value="PMCARE">PMCARE</option>
+          <option value="UITM">UITM</option>
+          <option value="COMPUMED">COMPUMED</option>
+          <option value="MICARE">MICARE</option>
+          <option value="SELCARE">SELCARE</option>
+          <option value="IHP">IHP</option>
+          <option value="ASP">ASP</option>
+          <option value="HEALTHCONNECT">HEALTHCONNECT</option>
+          <option value="EMAS">EMAS</option>
+          <option value="SELFPAY">SELFPAY</option>
+          <option value="SPONSORED">SPONSORED</option>
+        </select>
 
       </div>
 
 
-      <div
-        class="modal-body"
-        id="modalBody"
-      ></div>
+      <div class="form-group" style="min-width:220px">
+
+        <label>
+          Search
+        </label>
+
+        <input
+          id="panelSearch"
+          class="claim-input"
+          placeholder="Search patient, ID or panel"
+          oninput="
+            renderPanelPatients()
+          "
+        >
+
+      </div>
 
     </div>
 
   </div>
 
 
-  <!-- =====================================================
-       IMPORTANT
-       Load app.js LAST.
-  ====================================================== -->
+  <!-- =======================================================
+       PANEL KPI
+  ======================================================== -->
 
-  <script src="app.js"></script>
-
-
-  <script>
-
-    /* =====================================================
-       PANEL PAGE
-    ====================================================== */
-
-    let panelPatients = [];
+  <div
+    class="kpi-grid"
+    id="panelKpis"
+  ></div>
 
 
-    function panelMoney(value) {
+  <!-- =======================================================
+       PANEL PATIENTS
+  ======================================================== -->
 
-      const number =
-        Number(value || 0);
+  <div class="card">
 
-      return (
-        "RM " +
-        number.toLocaleString(
-          "en-MY",
-          {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-          }
+    <div class="card-head">
+
+      <div>
+
+        <h2>
+          Panel Patients
+        </h2>
+
+        <p>
+          The figures below follow the selected panel filter.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table class="table">
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Patient
+            </th>
+
+            <th>
+              Panel
+            </th>
+
+            <th>
+              GRAND TOTAL
+            </th>
+
+            <th>
+              TOTAL CLAIMED
+            </th>
+
+            <th>
+              BALANCE TO CLAIM
+            </th>
+
+            <th>
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody
+          id="panelRows"
+        ></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- =======================================================
+       DANGER / SUSPENDED POLICY
+  ======================================================== -->
+
+  <div
+    class="card"
+    style="
+      margin-top:16px;
+      border-color:#F59E0B;
+    "
+  >
+
+    <div class="card-head">
+
+      <div>
+
+        <div
+          style="
+            display:flex;
+            align-items:center;
+            gap:8px;
+          "
+        >
+
+          <h2>
+            Policy Suspended — Action Required
+          </h2>
+
+
+          <span
+            id="suspendedCount"
+            class="badge red"
+          >
+            0
+          </span>
+
+        </div>
+
+
+        <p>
+          Panel patients who still have a balance to claim but their insurance policy is suspended.
+        </p>
+
+      </div>
+
+
+      <div
+        style="
+          display:flex;
+          align-items:flex-end;
+          gap:8px;
+          flex-wrap:wrap;
+          justify-content:flex-end;
+        "
+      >
+
+        <div
+          class="form-group"
+          style="min-width:160px"
+        >
+
+          <label>
+            Panel Filter
+          </label>
+
+          <select
+            id="suspendedPanelFilter"
+            class="claim-input"
+            onchange="renderSuspendedPatients()"
+          >
+            <option value="ALL">All Panels</option>
+            <option value="PMCARE">PMCARE</option>
+            <option value="UITM">UITM</option>
+            <option value="COMPUMED">COMPUMED</option>
+            <option value="MICARE">MICARE</option>
+            <option value="SELCARE">SELCARE</option>
+            <option value="IHP">IHP</option>
+            <option value="ASP">ASP</option>
+            <option value="HEALTHCONNECT">HEALTHCONNECT</option>
+            <option value="EMAS">EMAS</option>
+            <option value="SELFPAY">SELFPAY</option>
+            <option value="SPONSORED">SPONSORED</option>
+          </select>
+
+        </div>
+
+        <div
+          id="suspendedTotal"
+          class="badge orange"
+        >
+          Outstanding: RM 0.00
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="suspendedPanelSummary"
+      class="card-body"
+      style="
+        padding-top:12px;
+        padding-bottom:12px;
+      "
+    ></div>
+
+    <div class="table-wrap">
+
+      <table class="table">
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Patient
+            </th>
+
+            <th>
+              Panel
+            </th>
+
+            <th>
+              BALANCE / OUTSTANDING
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Notes
+            </th>
+
+            <th>
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody
+          id="suspendedRows"
+        ></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  `
+);
+
+
+/* =========================================================
+   PANEL FILTER OPTIONS
+========================================================= */
+
+function buildPanelFilter(){
+
+  const current =
+    panelFilter.value ||
+    "ALL";
+
+  panelFilter.innerHTML = `
+    <option value="ALL">All Panels</option>
+    ${
+      [
+        "PMCARE",
+        "UITM",
+        "COMPUMED",
+        "MICARE",
+        "SELCARE",
+        "IHP",
+        "ASP",
+        "HEALTHCONNECT",
+        "EMAS",
+        "SELFPAY",
+        "SPONSORED"
+      ]
+      .map(
+        name =>
+          `<option value="${name}">${name}</option>`
+      )
+      .join("")
+    }
+  `;
+
+  panelFilter.value =
+    [
+      "ALL",
+      "PMCARE",
+      "UITM",
+      "COMPUMED",
+      "MICARE",
+      "SELCARE",
+      "IHP",
+      "ASP",
+      "HEALTHCONNECT",
+      "EMAS",
+      "SELFPAY",
+      "SPONSORED"
+    ].includes(current)
+      ? current
+      : "ALL";
+
+}
+
+
+/* =========================================================
+   RAW PANEL PATIENTS
+========================================================= */
+
+function getPanelPatientsRaw(){
+
+  return store()
+    .patients
+    .filter(
+      patient =>
+        patientUsesPanel(
+          patient
         )
-      );
+    );
 
-    }
-
-
-    function getPanelPatientsFromStore() {
-
-      try {
-
-        const data =
-          typeof store === "function"
-            ? store()
-            : null;
+}
 
 
-        if (
-          !data ||
-          !Array.isArray(data.patients)
-        ) {
+/* =========================================================
+   SELECTED PANEL PATIENTS
+========================================================= */
 
-          return [];
+function getFilteredPanelPatients(){
 
-        }
-
-
-        return data.patients.filter(
-          patient =>
-            patient &&
-            patient.panelProvider &&
-            patient.panelProvider !==
-              "SELF_PAY"
-        );
-
-      } catch (error) {
-
-        console.error(
-          "Unable to load panel patients:",
-          error
-        );
-
-        return [];
-
-      }
-
-    }
+  const selected =
+    panelFilter.value || "ALL";
 
 
-    function getPatientFinance(patient) {
-
-      try {
-
-        if (
-          typeof finance === "function"
-        ) {
-
-          return finance(patient);
-
-        }
-
-      } catch (error) {
-
-        console.error(
-          "Finance calculation error:",
-          error
-        );
-
-      }
+  const search =
+    (
+      panelSearch.value ||
+      ""
+    )
+    .trim()
+    .toLowerCase();
 
 
-      return {
-        grand: 0,
-        claimed: 0,
-        balance: 0
-      };
+  return getPanelPatientsRaw()
+    .filter(
+      patient => {
 
-    }
-
-
-    function getPatientPanelName(patient) {
-
-      try {
-
-        if (
-          typeof getPanelName ===
-          "function"
-        ) {
-
-          return getPanelName(
+        const panel =
+          getPanelName(
             patient
           );
 
-        }
 
-      } catch (error) {}
-
-      return (
-        patient.otherPanelName ||
-        patient.panelProvider ||
-        "Panel"
-      );
-
-    }
+        const matchesPanel =
+          selected === "ALL" ||
+          panel === selected;
 
 
-    function getPatientClaims(patient) {
-
-      if (
-        !Array.isArray(
-          patient.claims
-        )
-      ) {
-
-        return [];
-
-      }
-
-      return patient.claims;
-
-    }
-
-
-    function getPanelStatus(patient) {
-
-      return (
-        patient.panelStatus ||
-        patient.insuranceStatus ||
-        "Active"
-      );
-
-    }
-
-
-    function refreshPanel() {
-
-      panelPatients =
-        getPanelPatientsFromStore();
-
-      populateProviderFilter();
-
-      renderPanelSummary();
-
-      renderProviderBreakdown();
-
-      renderPanelTable();
-
-    }
-
-
-    /* =====================================================
-       PROVIDER FILTER
-    ====================================================== */
-
-    function populateProviderFilter() {
-
-      const select =
-        document.getElementById(
-          "providerFilter"
-        );
-
-
-      if (!select) return;
-
-
-      const current =
-        select.value;
-
-
-      const providers =
-        [
-          ...new Set(
-            panelPatients.map(
-              patient =>
-                getPatientPanelName(
-                  patient
-                )
-            )
+        const searchable =
+          (
+            patient.name ||
+            ""
           )
-        ]
-        .filter(Boolean)
-        .sort();
+          + " " +
+          (
+            patient.id ||
+            ""
+          )
+          + " " +
+          panel;
 
 
-      select.innerHTML = `
-        <option value="">
-          All Panel Providers
-        </option>
-
-        ${
-          providers
-            .map(
-              provider => `
-                <option
-                  value="${escapeHtml(provider)}"
-                >
-                  ${escapeHtml(provider)}
-                </option>
-              `
-            )
-            .join("")
-        }
-      `;
+        const matchesSearch =
+          !search ||
+          searchable
+            .toLowerCase()
+            .includes(search);
 
 
-      if (
-        providers.includes(
-          current
-        )
-      ) {
-
-        select.value =
-          current;
-
-      }
-
-    }
-
-
-    /* =====================================================
-       SUMMARY
-    ====================================================== */
-
-    function renderPanelSummary() {
-
-      let totalClaimed = 0;
-      let totalRemaining = 0;
-      let totalVisitValue = 0;
-
-      let active = 0;
-
-
-      panelPatients.forEach(
-        patient => {
-
-          const f =
-            getPatientFinance(
-              patient
-            );
-
-
-          totalClaimed +=
-            Number(
-              f.claimed || 0
-            );
-
-
-          totalRemaining +=
-            Number(
-              f.balance || 0
-            );
-
-
-          totalVisitValue +=
-            Number(
-              f.grand || 0
-            );
-
-
-          if (
-            getPanelStatus(
-              patient
-            ) === "Active"
-          ) {
-
-            active++;
-
-          }
-
-        }
-      );
-
-
-      setText(
-        "totalPanelPatients",
-        panelPatients.length
-      );
-
-
-      setText(
-        "activePanelPatients",
-        active
-      );
-
-
-      setText(
-        "totalClaimed",
-        panelMoney(
-          totalClaimed
-        )
-      );
-
-
-      setText(
-        "totalRemaining",
-        panelMoney(
-          totalRemaining
-        )
-      );
-
-
-      setText(
-        "summaryVisitValue",
-        panelMoney(
-          totalVisitValue
-        )
-      );
-
-
-      setText(
-        "summaryClaimed",
-        panelMoney(
-          totalClaimed
-        )
-      );
-
-
-      setText(
-        "summaryRemaining",
-        panelMoney(
-          totalRemaining
-        )
-      );
-
-    }
-
-
-    /* =====================================================
-       PROVIDER BREAKDOWN
-    ====================================================== */
-
-    function renderProviderBreakdown() {
-
-      const container =
-        document.getElementById(
-          "providerBreakdown"
+        return (
+          matchesPanel &&
+          matchesSearch
         );
 
-
-      if (!container) return;
-
-
-      if (
-        panelPatients.length === 0
-      ) {
-
-        container.innerHTML = `
-          <div class="empty">
-            <div class="empty-icon">
-              ▣
-            </div>
-
-            No panel patients yet.
-          </div>
-        `;
-
-        return;
-
       }
+    );
+
+}
 
 
-      const groups = {};
+/* =========================================================
+   KPI
+========================================================= */
 
+function renderPanelKpis(){
 
-      panelPatients.forEach(
+  const selectedPanel =
+    panelFilter?.value ||
+    "ALL";
+
+  const patients =
+    getPanelPatientsRaw()
+      .filter(
         patient => {
 
-          const provider =
-            getPatientPanelName(
+          const panel =
+            getPanelName(
               patient
             );
-
-
-          if (
-            !groups[provider]
-          ) {
-
-            groups[provider] = {
-              count: 0,
-              grand: 0,
-              claimed: 0,
-              remaining: 0
-            };
-
-          }
-
-
-          const f =
-            getPatientFinance(
-              patient
-            );
-
-
-          groups[provider].count++;
-
-          groups[provider].grand +=
-            Number(
-              f.grand || 0
-            );
-
-          groups[provider].claimed +=
-            Number(
-              f.claimed || 0
-            );
-
-          groups[provider].remaining +=
-            Number(
-              f.balance || 0
-            );
-
-        }
-      );
-
-
-      container.innerHTML =
-        Object.entries(
-          groups
-        )
-        .sort(
-          (
-            a,
-            b
-          ) =>
-            b[1].grand -
-            a[1].grand
-        )
-        .map(
-          (
-            [
-              provider,
-              data
-            ]
-          ) => `
-
-            <div class="provider-row">
-
-              <div>
-
-                <div class="provider-name">
-                  ${escapeHtml(provider)}
-                </div>
-
-                <div class="provider-count">
-                  ${data.count}
-                  patient${data.count === 1 ? "" : "s"}
-                  ·
-                  Claimed ${panelMoney(data.claimed)}
-                </div>
-
-              </div>
-
-
-              <div class="provider-amount">
-                ${panelMoney(data.remaining)}
-              </div>
-
-            </div>
-
-          `
-        )
-        .join("");
-
-    }
-
-
-    /* =====================================================
-       FILTERED PATIENTS
-    ====================================================== */
-
-    function getFilteredPatients() {
-
-      const search =
-        (
-          document.getElementById(
-            "panelSearch"
-          )?.value ||
-          ""
-        )
-        .trim()
-        .toLowerCase();
-
-
-      const provider =
-        document.getElementById(
-          "providerFilter"
-        )?.value ||
-        "";
-
-
-      const status =
-        document.getElementById(
-          "statusFilter"
-        )?.value ||
-        "";
-
-
-      return panelPatients.filter(
-        patient => {
-
-          const name =
-            String(
-              patient.name ||
-              ""
-            )
-            .toLowerCase();
-
-
-          const id =
-            String(
-              patient.id ||
-              ""
-            )
-            .toLowerCase();
-
-
-          const patientProvider =
-            getPatientPanelName(
-              patient
-            );
-
-
-          const patientStatus =
-            getPanelStatus(
-              patient
-            );
-
-
-          const matchesSearch =
-            !search ||
-            name.includes(
-              search
-            ) ||
-            id.includes(
-              search
-            );
-
-
-          const matchesProvider =
-            !provider ||
-            patientProvider ===
-              provider;
-
-
-          const matchesStatus =
-            !status ||
-            patientStatus ===
-              status;
-
 
           return (
-            matchesSearch &&
-            matchesProvider &&
-            matchesStatus
+            selectedPanel === "ALL" ||
+            panel === selectedPanel
           );
 
         }
       );
 
-    }
-
-
-    /* =====================================================
-       TABLE
-    ====================================================== */
-
-    function renderPanelTable() {
-
-      const body =
-        document.getElementById(
-          "panelTableBody"
-        );
-
-
-      if (!body) return;
-
-
-      const filtered =
-        getFilteredPatients();
-
-
-      if (
-        filtered.length === 0
-      ) {
-
-        body.innerHTML = `
-          <tr>
-
-            <td
-              colspan="9"
-              class="empty"
-            >
-
-              <div class="empty-icon">
-                ▣
-              </div>
-
-              No panel patients found.
-
-            </td>
-
-          </tr>
-        `;
-
-        return;
-
-      }
-
-
-      body.innerHTML =
-        filtered
-        .map(
-          patient => {
-
-            const f =
-              getPatientFinance(
-                patient
-              );
-
-
-            const claims =
-              getPatientClaims(
-                patient
-              );
-
-
-            const status =
-              getPanelStatus(
-                patient
-              );
-
-
-            const statusClass =
-              status ===
-                "Suspended"
-                ? "badge-suspended"
-                : "badge-active";
-
-
-            return `
-
-              <tr>
-
-                <td>
-                  <span class="patient-id">
-                    ${escapeHtml(
-                      patient.id ||
-                      "-"
-                    )}
-                  </span>
-                </td>
-
-
-                <td>
-
-                  <div class="patient-name">
-                    ${escapeHtml(
-                      patient.name ||
-                      "Unnamed Patient"
-                    )}
-                  </div>
-
-                </td>
-
-
-                <td>
-
-                  <span class="badge badge-panel">
-                    ${escapeHtml(
-                      getPatientPanelName(
-                        patient
-                      )
-                    )}
-                  </span>
-
-                </td>
-
-
-                <td>
-
-                  <span
-                    class="badge ${statusClass}"
-                  >
-                    ${escapeHtml(
-                      status
-                    )}
-                  </span>
-
-                </td>
-
-
-                <td>
-                  <span class="money">
-                    ${panelMoney(
-                      f.grand
-                    )}
-                  </span>
-                </td>
-
-
-                <td>
-                  <span class="money-green">
-                    ${panelMoney(
-                      f.claimed
-                    )}
-                  </span>
-                </td>
-
-
-                <td>
-                  <span
-                    class="${
-                      Number(f.balance || 0) > 0
-                        ? "money-red"
-                        : "money"
-                    }"
-                  >
-                    ${panelMoney(
-                      f.balance
-                    )}
-                  </span>
-                </td>
-
-
-                <td>
-                  ${claims.length}
-                </td>
-
-
-                <td>
-
-                  <button
-                    class="action-btn"
-                    type="button"
-                    onclick="
-                      openPatientModal(
-                        '${escapeJs(
-                          patient.id
-                        )}'
-                      )
-                    "
-                  >
-                    View
-                  </button>
-
-                </td>
-
-              </tr>
-
-            `;
-
-          }
-        )
-        .join("");
-
-    }
-
-
-    /* =====================================================
-       PATIENT MODAL
-    ====================================================== */
-
-    function openPatientModal(
-      patientId
-    ) {
-
-      let patient =
-        null;
-
-
-      try {
-
-        if (
-          typeof getPatient ===
-          "function"
-        ) {
-
-          patient =
-            getPatient(
-              patientId
-            );
-
-        }
-
-      } catch (error) {
-
-        console.error(
-          error
-        );
-
-      }
-
-
-      if (!patient) {
-
-        patient =
-          panelPatients.find(
-            p =>
-              String(
-                p.id
-              ) ===
-              String(
-                patientId
-              )
-          );
-
-      }
-
-
-      if (!patient) {
-
-        return;
-
-      }
-
+  let g = 0;
+  let c = 0;
+
+  patients.forEach(
+    patient => {
 
       const f =
-        getPatientFinance(
+        finance(
           patient
         );
 
+      g += f.grand;
+      c += f.claimed;
 
-      const claims =
-        getPatientClaims(
-          patient
-        );
+    }
+  );
 
-
-      const status =
-        getPanelStatus(
-          patient
-        );
-
-
-      setText(
-        "modalPatientName",
-        patient.name ||
-        "Patient"
-      );
-
-
-      const modalBody =
-        document.getElementById(
-          "modalBody"
-        );
-
-
-      if (!modalBody) return;
+  panelKpis.innerHTML = `
+    <div class="kpi">
+      <div class="kpi-label">PANEL PATIENTS</div>
+      <div class="kpi-value">${patients.length}</div>
+      <div class="kpi-sub">${selectedPanel === "ALL" ? "All panel types" : selectedPanel}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">GRAND TOTAL</div>
+      <div class="kpi-value">${money(g)}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">TOTAL CLAIMED</div>
+      <div class="kpi-value">${money(c)}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">BALANCE TO CLAIM</div>
+      <div class="kpi-value">${money(Math.max(0, g - c))}</div>
+    </div>`;
+}
 
 
-      const visits =
-        Array.isArray(
-          patient.visits
-        )
-          ? patient.visits
-          : [];
+/* =========================================================
+   PANEL TABLE
+========================================================= */
+
+function renderPanelPatients(){
+
+  const patients =
+    getFilteredPanelPatients();
 
 
-      modalBody.innerHTML = `
+  panelRows.innerHTML =
 
-        <div class="detail-grid">
+    patients.length
 
-          <div class="detail-item">
+      ? patients
+          .map(
+            patient => {
 
-            <div class="detail-label">
-              Patient ID
-            </div>
-
-            <div class="detail-value">
-              ${escapeHtml(
-                patient.id ||
-                "-"
-              )}
-            </div>
-
-          </div>
-
-
-          <div class="detail-item">
-
-            <div class="detail-label">
-              Panel Provider
-            </div>
-
-            <div class="detail-value">
-              ${escapeHtml(
-                getPatientPanelName(
+              const f =
+                finance(
                   patient
-                )
-              )}
-            </div>
+                );
 
-          </div>
 
+              return `
 
-          <div class="detail-item">
+                <tr>
 
-            <div class="detail-label">
-              Panel Status
-            </div>
+                  <td>
 
-            <div class="detail-value">
-              ${escapeHtml(
-                status
-              )}
-            </div>
+                    <strong>
+                      ${patient.name}
+                    </strong>
 
-          </div>
 
+                    <div
+                      class="row-sub"
+                    >
+                      ${patient.id}
+                    </div>
 
-          <div class="detail-item">
+                  </td>
 
-            <div class="detail-label">
-              Total Visit Value
-            </div>
 
-            <div class="detail-value">
-              ${panelMoney(
-                f.grand
-              )}
-            </div>
+                  <td>
 
-          </div>
+                    <span
+                      class="panel-chip"
+                    >
+                      ${getPanelName(
+                        patient
+                      )}
+                    </span>
 
+                  </td>
 
-          <div class="detail-item">
 
-            <div class="detail-label">
-              Total Claimed
-            </div>
+                  <td>
+                    ${money(
+                      f.grand
+                    )}
+                  </td>
 
-            <div class="detail-value">
-              ${panelMoney(
-                f.claimed
-              )}
-            </div>
 
-          </div>
+                  <td>
+                    ${money(
+                      f.claimed
+                    )}
+                  </td>
 
 
-          <div class="detail-item">
+                  <td>
 
-            <div class="detail-label">
-              Remaining
-            </div>
-
-            <div class="detail-value">
-              ${panelMoney(
-                f.balance
-              )}
-            </div>
-
-          </div>
-
-        </div>
-
-
-        ${
-          patient.panelSuspensionNote
-            ? `
-              <div
-                style="
-                  margin-top:16px;
-                  padding:12px;
-                  border-radius:10px;
-                  background:#fff4f4;
-                  color:#b53d49;
-                  font-size:10px;
-                "
-              >
-                <strong>
-                  Suspension Note:
-                </strong>
-
-                ${escapeHtml(
-                  patient.panelSuspensionNote
-                )}
-              </div>
-            `
-            : ""
-        }
-
-
-        <div class="claims-title">
-          Claims
-        </div>
-
-
-        ${
-          claims.length
-            ? `
-
-              <div class="table-wrap">
-
-                <table
-                  style="
-                    min-width:600px;
-                  "
-                >
-
-                  <thead>
-
-                    <tr>
-
-                      <th>
-                        Date
-                      </th>
-
-                      <th>
-                        Claim
-                      </th>
-
-                      <th>
-                        Amount
-                      </th>
-
-                      <th>
-                        Status
-                      </th>
-
-                    </tr>
-
-                  </thead>
-
-
-                  <tbody>
-
-                    ${
-                      claims
-                      .map(
-                        claim => `
-
-                          <tr>
-
-                            <td>
-                              ${escapeHtml(
-                                claim.date ||
-                                claim.dateKey ||
-                                "-"
-                              )}
-                            </td>
-
-                            <td>
-                              ${escapeHtml(
-                                claim.id ||
-                                claim.claimNo ||
-                                "-"
-                              )}
-                            </td>
-
-                            <td>
-                              ${panelMoney(
-                                claim.amount
-                              )}
-                            </td>
-
-                            <td>
-                              ${escapeHtml(
-                                claim.status ||
-                                "Submitted"
-                              )}
-                            </td>
-
-                          </tr>
-
-                        `
-                      )
-                      .join("")
-                    }
-
-                  </tbody>
-
-                </table>
-
-              </div>
-
-            `
-            : `
-
-              <div
-                style="
-                  padding:18px;
-                  background:#f8f9fc;
-                  border-radius:10px;
-                  font-size:10px;
-                  color:#8a93a2;
-                "
-              >
-                No claims recorded for this patient.
-              </div>
-
-            `
-        }
-
-
-        <div class="claims-title">
-          Visit History
-        </div>
-
-
-        ${
-          visits.length
-            ? `
-
-              <div class="table-wrap">
-
-                <table
-                  style="
-                    min-width:700px;
-                  "
-                >
-
-                  <thead>
-
-                    <tr>
-
-                      <th>
-                        Date
-                      </th>
-
-                      <th>
-                        Visit Value
-                      </th>
-
-                      <th>
-                        Panel
-                      </th>
-
-                      <th>
-                        Self Pay
-                      </th>
-
-                    </tr>
-
-                  </thead>
-
-
-                  <tbody>
-
-                    ${
-                      visits
-                      .slice()
-                      .reverse()
-                      .map(
-                        visit => {
-
-                          let total =
-                            0;
-
-                          let panel =
-                            0;
-
-                          let selfPay =
-                            0;
-
-
-                          try {
-
-                            if (
-                              typeof ensureVisit ===
-                              "function"
-                            ) {
-
-                              ensureVisit(
-                                visit
-                              );
-
-                            }
-
-
-                            if (
-                              typeof visitTotal ===
-                              "function"
-                            ) {
-
-                              total =
-                                visitTotal(
-                                  visit
-                                );
-
-                            }
-
-
-                            panel =
-                              Number(
-                                visit.billing?.panel ||
-                                0
-                              );
-
-
-                            selfPay =
-                              Number(
-                                visit.billing?.selfPay ||
-                                0
-                              );
-
-                          } catch (e) {}
-
-
-                          return `
-
-                            <tr>
-
-                              <td>
-                                ${escapeHtml(
-                                  visit.dateKey ||
-                                  visit.date ||
-                                  "-"
-                                )}
-                              </td>
-
-                              <td>
-                                ${panelMoney(
-                                  total
-                                )}
-                              </td>
-
-                              <td>
-                                ${panelMoney(
-                                  panel
-                                )}
-                              </td>
-
-                              <td>
-                                ${panelMoney(
-                                  selfPay
-                                )}
-                              </td>
-
-                            </tr>
-
-                          `;
-
+                    <span
+                      class="
+                        badge
+                        ${
+                          f.balance > 0
+                            ? "orange"
+                            : "green"
                         }
-                      )
-                      .join("")
-                    }
+                      "
+                    >
+                      ${money(
+                        f.balance
+                      )}
+                    </span>
 
-                  </tbody>
+                  </td>
 
-                </table>
 
-              </div>
+                  <td>
 
-            `
-            : `
+                    <button
+                      type="button"
+                      class="secondary"
+                      style="
+                        padding:
+                          7px
+                          9px;
+                      "
+                      onclick="
+                        openPanelDetail(
+                          '${patient.id}'
+                        )
+                      "
+                    >
+                      View Claims →
+                    </button>
 
-              <div
-                style="
-                  padding:18px;
-                  background:#f8f9fc;
-                  border-radius:10px;
-                  font-size:10px;
-                  color:#8a93a2;
-                "
-              >
-                No visits recorded.
-              </div>
+                  </td>
 
-            `
-        }
+                </tr>
+
+              `;
+
+            }
+          )
+          .join("")
+
+
+      : `
+
+        <tr>
+
+          <td
+            colspan="6"
+            style="
+              text-align:center;
+              padding:30px;
+              color:var(--muted);
+            "
+          >
+            No panel patients found.
+          </td>
+
+        </tr>
 
       `;
 
+}
 
-      document
-        .getElementById(
-          "patientModal"
-        )
-        .classList
-        .add(
-          "show"
-        );
 
+/* =========================================================
+   SUSPENDED / DANGER ZONE
+========================================================= */
+
+function buildSuspendedPanelFilter(){
+
+  const current =
+    suspendedPanelFilter.value ||
+    "ALL";
+
+  suspendedPanelFilter.innerHTML = `
+    <option value="ALL">All Panels</option>
+    ${
+      [
+        "PMCARE",
+        "UITM",
+        "COMPUMED",
+        "MICARE",
+        "SELCARE",
+        "IHP",
+        "ASP",
+        "HEALTHCONNECT",
+        "EMAS",
+        "SELFPAY",
+        "SPONSORED"
+      ]
+      .map(
+        name =>
+          `<option value="${name}">${name}</option>`
+      )
+      .join("")
     }
-
-
-    function closePatientModal() {
-
-      document
-        .getElementById(
-          "patientModal"
-        )
-        ?.classList
-        .remove(
-          "show"
-        );
-
-    }
-
-
-    function closeModalOutside(
-      event
-    ) {
-
-      if (
-        event.target.id ===
-        "patientModal"
-      ) {
-
-        closePatientModal();
-
-      }
-
-    }
-
-
-    /* =====================================================
-       FILTER EVENTS
-    ====================================================== */
-
-    function resetPanelFilters() {
-
-      const search =
-        document.getElementById(
-          "panelSearch"
-        );
-
-      const provider =
-        document.getElementById(
-          "providerFilter"
-        );
-
-      const status =
-        document.getElementById(
-          "statusFilter"
-        );
-
-
-      if (search) {
-        search.value = "";
-      }
-
-
-      if (provider) {
-        provider.value = "";
-      }
-
-
-      if (status) {
-        status.value = "";
-      }
-
-
-      renderPanelTable();
-
-    }
-
-
-    document.addEventListener(
-      "input",
-      event => {
-
-        if (
-          event.target.id ===
-          "panelSearch"
-        ) {
-
-          renderPanelTable();
-
-        }
-
-
-        if (
-          event.target.id ===
-          "globalSearch"
-        ) {
-
-          const panelSearch =
-            document.getElementById(
-              "panelSearch"
-            );
-
-
-          if (panelSearch) {
-
-            panelSearch.value =
-              event.target.value;
-
-            renderPanelTable();
-
-          }
-
-        }
-
-      }
-    );
-
-
-    document.addEventListener(
-      "change",
-      event => {
-
-        if (
-          event.target.id ===
-            "providerFilter" ||
-          event.target.id ===
-            "statusFilter"
-        ) {
-
-          renderPanelTable();
-
-        }
-
-      }
-    );
-
-
-    /* =====================================================
-       THEME
-    ====================================================== */
-
-    function togglePanelTheme() {
-
-      const current =
-        localStorage.getItem(
-          "getwell_theme_v4"
-        ) ||
-        "light";
-
-
-      /*
-        Keep this simple so it does not
-        conflict with app.js.
-      */
-
-      if (
-        typeof applyTheme ===
-        "function"
-      ) {
-
-        applyTheme(
-          current ===
-            "dark"
-            ? "light"
-            : "dark"
-        );
-
-      } else {
-
-        localStorage.setItem(
-          "getwell_theme_v4",
-          current ===
-            "dark"
-            ? "light"
-            : "dark"
-        );
-
-        location.reload();
-
-      }
-
-    }
-
-
-    /* =====================================================
-       HELPERS
-    ====================================================== */
-
-    function setText(
-      id,
-      value
-    ) {
-
-      const element =
-        document.getElementById(
-          id
-        );
-
-
-      if (element) {
-
-        element.textContent =
-          value;
-
-      }
-
-    }
-
-
-    function escapeHtml(
-      value
-    ) {
-
-      return String(
-        value ??
-        ""
-      )
-      .replace(
-        /&/g,
-        "&amp;"
-      )
-      .replace(
-        /</g,
-        "&lt;"
-      )
-      .replace(
-        />/g,
-        "&gt;"
-      )
-      .replace(
-        /"/g,
-        "&quot;"
-      )
-      .replace(
-        /'/g,
-        "&#039;"
-      );
-
-    }
-
-
-    function escapeJs(
-      value
-    ) {
-
-      return String(
-        value ??
-        ""
-      )
-      .replace(
-        /\\/g,
-        "\\\\"
-      )
-      .replace(
-        /'/g,
-        "\\'"
-      )
-      .replace(
-        /\n/g,
-        "\\n"
-      )
-      .replace(
-        /\r/g,
-        "\\r"
-      );
-
-    }
-
-
-    /* =====================================================
-       INITIAL LOAD
-    ====================================================== */
-
-    document.addEventListener(
-      "DOMContentLoaded",
-      () => {
-
-        /*
-          app.js is loaded first.
-
-          Its Google Sheets sync may still be
-          loading the remote data, so render now
-          and render again shortly afterwards.
-        */
-
-        refreshPanel();
-
-
-        setTimeout(
-          refreshPanel,
-          800
-        );
-
-
-        setTimeout(
-          refreshPanel,
-          2500
-        );
-
-
-        setTimeout(
-          refreshPanel,
-          5000
-        );
-
-      }
-    );
-
-
-    /*
-      When another page saves to localStorage,
-      refresh Panel automatically.
-    */
-
-    window.addEventListener(
-      "storage",
-      event => {
-
-        if (
-          event.key ===
-            "getwell_final_v4" ||
-          event.key ===
-            "GETWELL_SETTINGS_UPDATED"
-        ) {
-
-          setTimeout(
-            refreshPanel,
-            300
+  `;
+
+  suspendedPanelFilter.value =
+    [
+      "ALL",
+      "PMCARE",
+      "UITM",
+      "COMPUMED",
+      "MICARE",
+      "SELCARE",
+      "IHP",
+      "ASP",
+      "HEALTHCONNECT",
+      "EMAS",
+      "SELFPAY",
+      "SPONSORED"
+    ].includes(current)
+      ? current
+      : "ALL";
+
+}
+
+
+function getSuspendedPatients(){
+
+  const selected =
+    suspendedPanelFilter.value ||
+    "ALL";
+
+  return getPanelPatientsRaw()
+    .filter(
+      patient => {
+
+        const panel =
+          getPanelName(
+            patient
           );
 
-        }
+        const f =
+          finance(
+            patient
+          );
 
+        return (
+          isPanelSuspended(
+            patient
+          ) &&
+          f.balance > 0 &&
+          (
+            selected === "ALL" ||
+            panel === selected
+          )
+        );
       }
     );
+}
 
 
-    /*
-      If the browser tab stays open while
-      app.js polls Google Sheets, refresh
-      the Panel table periodically.
-    */
+function renderSuspendedPatients(){
 
-    setInterval(
-      () => {
+  const patients =
+    getSuspendedPatients();
 
-        refreshPanel();
+  let totalOutstanding =
+    0;
 
-      },
-      10000
+  patients.forEach(
+    patient => {
+
+      totalOutstanding +=
+        finance(
+          patient
+        ).balance;
+
+    }
+  );
+
+  const selected =
+    suspendedPanelFilter.value ||
+    "ALL";
+
+  suspendedCount.textContent =
+    patients.length;
+
+  suspendedTotal.textContent =
+    `Outstanding: ${money(
+      totalOutstanding
+    )}`;
+
+  suspendedPanelSummary.innerHTML = `
+
+    <div class="finance-grid">
+
+      <div class="finance-card">
+
+        <div class="label">
+          SUSPENDED PATIENTS
+        </div>
+
+        <div class="value">
+          ${patients.length}
+        </div>
+
+        <div
+          style="
+            font-size:10px;
+            color:var(--muted);
+            margin-top:3px;
+          "
+        >
+          ${
+            selected === "ALL"
+              ? "All panel types"
+              : selected
+          }
+        </div>
+
+      </div>
+
+      <div class="finance-card balance">
+
+        <div class="label">
+          TOTAL OUTSTANDING
+        </div>
+
+        <div class="value">
+          ${money(
+            totalOutstanding
+          )}
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+  suspendedRows.innerHTML =
+
+    patients.length
+
+      ? patients
+          .map(
+            patient => {
+
+              const balance =
+                finance(
+                  patient
+                ).balance;
+
+              const note =
+                panelSuspensionNote(
+                  patient
+                );
+
+              return `
+
+                <tr>
+
+                  <td>
+
+                    <strong>
+                      ${patient.name}
+                    </strong>
+
+                    <div
+                      class="row-sub"
+                    >
+                      ${patient.id}
+                    </div>
+
+                  </td>
+
+                  <td>
+
+                    <span
+                      class="panel-chip"
+                    >
+                      ${getPanelName(
+                        patient
+                      )}
+                    </span>
+
+                  </td>
+
+                  <td>
+
+                    <span
+                      class="badge red"
+                    >
+                      ${money(
+                        balance
+                      )}
+                    </span>
+
+                  </td>
+
+                  <td>
+
+                    <span
+                      class="badge red"
+                    >
+                      SUSPENDED
+                    </span>
+
+                  </td>
+
+                  <td>
+
+                    <div
+                      style="
+                        max-width:390px;
+                        line-height:16px;
+                      "
+                    >
+                      ${
+                        note ||
+                        "No suspension note entered."
+                      }
+                    </div>
+
+                  </td>
+
+                  <td>
+
+                    <a
+                      class="secondary"
+                      style="
+                        padding:
+                          7px
+                          9px;
+                      "
+                      href="
+                        patient-profile.html?patient=${encodeURIComponent(
+                          patient.id
+                        )}
+                      "
+                    >
+                      Open Patient
+                    </a>
+
+                  </td>
+
+                </tr>
+
+              `;
+
+            }
+          )
+          .join("")
+
+      : `
+
+        <tr>
+
+          <td
+            colspan="6"
+            style="
+              text-align:center;
+              padding:30px;
+              color:var(--muted);
+            "
+          >
+            No suspended-policy patients
+            with outstanding balance
+            ${
+              selected === "ALL"
+                ? "."
+                : ` for ${selected}.`
+            }
+          </td>
+
+        </tr>
+
+      `;
+
+}
+
+
+/* =========================================================
+   COMPLETE PANEL PAGE RENDER
+========================================================= */
+
+function renderPanelPage(){
+
+  renderPanelKpis();
+
+  renderPanelPatients();
+
+  renderSuspendedPatients();
+
+}
+
+
+/* =========================================================
+   PANEL DETAIL
+========================================================= */
+
+function openPanelDetail(
+  patientId
+){
+
+  const patient =
+    getPatient(
+      patientId
     );
 
-  </script>
+
+  if(!patient){
+    return;
+  }
+
+
+  const f =
+    finance(
+      patient
+    );
+
+
+  const claims =
+    ensureClaims(
+      patient
+    );
+
+
+  panelDetailTitle.textContent =
+    patient.name;
+
+
+  panelDetailSub.textContent =
+    `${patient.id} · ${getPanelName(
+      patient
+    )}`;
+
+
+  panelDetailContent.innerHTML = `
+
+    <div
+      class="finance-grid"
+      style="
+        margin-bottom:18px;
+      "
+    >
+
+      <div class="finance-card">
+
+        <div class="label">
+          GRAND TOTAL
+        </div>
+
+        <div class="value">
+          ${money(
+            f.grand
+          )}
+        </div>
+
+      </div>
+
+
+      <div class="finance-card">
+
+        <div class="label">
+          TOTAL CLAIMED
+        </div>
+
+        <div class="value">
+          ${money(
+            f.claimed
+          )}
+        </div>
+
+      </div>
+
+
+      <div
+        class="
+          finance-card
+          balance
+        "
+      >
+
+        <div class="label">
+          BALANCE TO CLAIM
+        </div>
+
+        <div class="value">
+          ${money(
+            f.balance
+          )}
+        </div>
+
+      </div>
+
+    </div>
+
+
+    ${
+      isPanelSuspended(
+        patient
+      )
+        ? `
+
+          <div
+            style="
+              padding:14px;
+              border:
+                1px solid
+                #F59E0B;
+              background:#FFF7ED;
+              border-radius:10px;
+              margin-bottom:18px;
+            "
+          >
+
+            <div
+              style="
+                font-weight:700;
+                color:#B45309;
+              "
+            >
+              ⚠ Policy Suspended
+            </div>
+
+
+            <div
+              style="
+                font-size:10px;
+                color:#92400E;
+                margin-top:4px;
+              "
+            >
+              ${
+                panelSuspensionNote(
+                  patient
+                ) ||
+                "No suspension note entered."
+              }
+            </div>
+
+          </div>
+
+        `
+        : ""
+    }
+
+
+    <div
+      style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:15px;
+        margin-bottom:10px;
+      "
+    >
+
+      <div>
+
+        <strong>
+          Claim History
+        </strong>
+
+        <div
+          class="row-sub"
+        >
+          Claims may be submitted on the visit date,
+          a later date, or a non-visit day.
+        </div>
+
+      </div>
+
+
+      <a
+        class="primary"
+        style="
+          padding:
+            8px
+            11px;
+        "
+        href="
+          patient-profile.html?patient=${encodeURIComponent(
+            patient.id
+          )}&openClaim=1
+        "
+      >
+        ＋ Add Claim
+      </a>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table class="table">
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Claim Date
+            </th>
+
+            <th>
+              Related Visit
+            </th>
+
+            <th>
+              Claim Amount
+            </th>
+
+            <th>
+              Notes
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          ${
+            claims.length
+
+              ? claims
+                  .slice()
+                  .sort(
+                    (a,b) =>
+                      (
+                        b.claimDate ||
+                        ""
+                      )
+                      .localeCompare(
+                        a.claimDate ||
+                        ""
+                      )
+                  )
+                  .map(
+                    claim => {
+
+                      const visit =
+                        (
+                          patient.visits ||
+                          []
+                        )
+                        .find(
+                          v =>
+                            v.id ===
+                            claim.visitId
+                        );
+
+
+                      return `
+
+                        <tr>
+
+                          <td>
+                            ${
+                              claim.claimDate ||
+                              "—"
+                            }
+                          </td>
+
+                          <td>
+                            ${
+                              visit?.visit ||
+                              "No specific visit"
+                            }
+                          </td>
+
+                          <td>
+                            ${money(
+                              claim.amount
+                            )}
+                          </td>
+
+                          <td>
+                            ${
+                              claim.notes ||
+                              "—"
+                            }
+                          </td>
+
+                        </tr>
+
+                      `;
+
+                    }
+                  )
+                  .join("")
+
+              : `
+
+                <tr>
+
+                  <td
+                    colspan="4"
+                    style="
+                      text-align:center;
+                      padding:28px;
+                      color:var(--muted);
+                    "
+                  >
+                    No claims recorded.
+                  </td>
+
+                </tr>
+
+              `
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <div
+      style="
+        margin-top:22px;
+      "
+    >
+
+      <strong>
+        Visit History
+      </strong>
+
+      <div
+        class="table-wrap"
+        style="
+          margin-top:8px;
+        "
+      >
+
+        <table class="table">
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Visit
+              </th>
+
+              <th>
+                Date
+              </th>
+
+              <th>
+                Invoice
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            ${
+              (
+                patient.visits ||
+                []
+              )
+              .map(
+                visit => `
+
+                  <tr>
+
+                    <td>
+                      ${visit.visit}
+                    </td>
+
+                    <td>
+                      ${visit.dateKey}
+                    </td>
+
+                    <td>
+                      ${money(
+                        visitTotal(
+                          visit
+                        )
+                      )}
+                    </td>
+
+                  </tr>
+
+                `
+              )
+              .join("")
+
+              ||
+
+              `
+
+                <tr>
+
+                  <td
+                    colspan="3"
+                    style="
+                      text-align:center;
+                      padding:28px;
+                      color:var(--muted);
+                    "
+                  >
+                    No visits recorded.
+                  </td>
+
+                </tr>
+
+              `
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  panelDetailModal
+    .classList
+    .add("show");
+
+}
+
+
+function closePanelDetail(){
+
+  panelDetailModal
+    .classList
+    .remove("show");
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+buildPanelFilter();
+buildSuspendedPanelFilter();
+renderPanelPage();
+renderNotifications();
+
+</script>
 
 </body>
 </html>
