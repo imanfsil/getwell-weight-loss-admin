@@ -1,6 +1,3 @@
-GETWELL COMPLETE APP.JS	
-Copy the code from column B. This is the complete original app.js with the Google Apps Script URL inserted.	
-	
 Line	Code
 1	/* =========================================================
 2	   GETWELL WEIGHT LOSS ADMIN
