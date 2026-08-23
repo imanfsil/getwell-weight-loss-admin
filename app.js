@@ -644,6 +644,7 @@ function getwellAppointmentDuration(){
 ========================================================= */
 
 function getwellFollowUpSettings(){
+
   const settings =
     getwellSystemSettings();
 
@@ -747,7 +748,7 @@ function getwellReportSettings(){
    ========================================================= */
 
 const GETWELL_SHEETS_API_URL =
-  "https://script.google.com/macros/s/AKfycbwCAUk-c4fV3Ny7SfY2x3mWity4W8MKxJwlajxdFdUOaDAjFP7lgtb17_BbOXWlGT8kSg/exec";
+  "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
 
 const GETWELL_REMOTE_POLL_MS = 30000;
 const GETWELL_REMOTE_SAVE_KEY = "GETWELL_REMOTE_LAST_SAVE";
@@ -1289,7 +1290,7 @@ function getPatient(
 
   return (
     store().patients ||
-      []
+    []
   )
   .find(
     patient =>
@@ -1298,6 +1299,7 @@ function getPatient(
   ) ||
   null;
 
+   
 }
 
 
@@ -1446,6 +1448,36 @@ function visitTotal(
     (+billing.other.price || 0)
   );
 
+}
+
+
+/* =========================================================
+   PANEL TYPE NORMALIZER
+========================================================= */
+
+function normalizePanelType(value){
+
+  const v = String(
+    value || ""
+  ).trim().toUpperCase();
+
+  if(!v){
+    return "SELF_PAY";
+  }
+
+  if(
+    v === "SELF PAY" ||
+    v === "SELF-PAY" ||
+    v === "SELFPAY"
+  ){
+    return "SELF_PAY";
+  }
+
+  if(v === "OTHER"){
+    return "Other";
+  }
+
+  return v;
 }
 
 
@@ -1918,6 +1950,7 @@ function header(){
           .trim()}
       </div>
 
+      
       <div class="page-subtitle">
         Getwell Weight Loss Admin
       </div>
@@ -1934,7 +1967,8 @@ function header(){
       <span>
         ⌕
       </span>
-            <input
+
+      <input
         id="globalSearch"
         placeholder="Search patient or ID"
       >
@@ -2580,3 +2614,4 @@ document.addEventListener(
 
   }
 );
+   
