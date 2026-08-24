@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Patient Profile | Getwell</title>
+<link rel="stylesheet" href="styles.css?v=20260823-profile5">
+<script src="app.js?v=20260823-profile5"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<div class="modal-wrap" id="editPatientModal">
+  <div class="modal">
+    <div class="modal-head"><div><h2>Edit Patient</h2><p>Update patient information.</p></div><button class="modal-close" onclick="closeEditPatient()">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>Full Name</label><input id="editName"></div>
+        <div class="form-group"><label>Patient ID</label><input id="editPatientId" readonly></div>
+        <div class="form-group"><label>Phone</label><input id="editPhone"></div>
+        <div class="form-group"><label>Date of Birth</label><input id="editDob" type="date"></div>
+        <div class="form-group"><label>Gender</label><select id="editGender"><option value="">Select</option><option>Male</option><option>Female</option></select></div>
+        <div class="form-group"><label>Height (cm)</label><input id="editHeight" type="number"></div>
+        <div class="form-group"><label>Starting Weight (kg)</label><input id="editStartingWeight" type="number"></div>
+        <div class="form-group"><label>Goal Weight (kg)</label><input id="editGoalWeight" type="number"></div>
+        <div class="form-group"><label>Program Start Date</label><input id="editStartDate" type="date"></div>
+        <div class="form-group"><label>Panel / Payment</label><select id="editPanel"></select></div>
+        <div class="form-group"><label>Insurance / Panel Status</label><select id="editPanelStatus"><option value="Active">Active</option><option value="Suspended">Suspended</option></select></div>
+        <div class="form-group full"><label>Suspension / Claim Hold Notes</label><textarea id="editPanelSuspensionNote"></textarea></div>
+        <div class="form-group"><label>Doctor</label><select id="editDoctor"></select></div>
+        <div class="form-group"><label>Status</label><select id="editStatus"><option>Active</option><option>Completed</option><option>Inactive</option></select></div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="secondary" onclick="closeEditPatient()">Cancel</button><button class="primary" onclick="savePatientChanges()">Save Changes</button></div>
+  </div>
+</div>
+
+<div class="modal-wrap" id="visitModal">
+  <div class="modal" style="width:min(1000px,96vw)">
+    <div class="modal-head"><div><h2 id="visitModalTitle">Add Visit</h2><p id="visitModalSub"></p></div><button class="modal-close" onclick="closeVisit()">×</button></div>
+    <div class="modal-body">
+      <div class="visit-section-title">Visit Information</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Visit Date</label><input id="vDate" type="date"></div>
+        <div class="form-group"><label>Visit Number</label><input id="vNumber"></div>
+        <div class="form-group full"><label>Visit Type</label><input id="vType" placeholder="Consultation / Follow-up / Injection"></div>
+        <div class="form-group"><label>Weight (kg)</label><input id="vWeight" type="number"></div>
+        <div class="form-group"><label>Invoice Reference</label><input id="vInvoiceRef"></div>
+      </div>
+
+      <div class="visit-section-title">Arboleaf Body Composition</div>
+      <div class="form-group">
+        <label>Arboleaf PDF</label>
+        <input id="vPdf" type="file" accept="application/pdf">
+        <div id="existingPdf" class="row-sub" style="margin-top:6px"></div>
+        <div id="pdfReadStatus" class="badge gray" style="margin-top:8px">No PDF selected.</div>
+      </div>
+
+      <div class="visit-section-title">Visit Charges & Payment</div>
+      <div id="chargeBuilder"></div>
+      <div class="finance-card" style="margin-top:10px"><div class="label">VISIT TOTAL</div><div class="value" id="vTotal">RM 0.00</div></div>
+
+      <div class="visit-section-title">Payment Allocation</div>
+      <div class="claim-grid">
+        <div class="form-group"><label id="panelLabel">Panel / Insurance</label><input class="claim-input" id="vPanel" type="number" min="0" step="0.01"></div>
+        <div class="form-group"><label>Self-Pay / Co-Payment</label><input class="claim-input" id="vSelf" type="number" min="0" step="0.01"></div>
+      </div>
+      <div id="vValidation" class="badge gray">Enter charges.</div>
+
+      <div class="visit-section-title">Photos</div>
+      <div class="form-group">
+        <label>Upload visit / before-after photos</label>
+        <input id="vPhotos" type="file" accept="image/*" multiple>
+        <div id="existingPhotos" class="row-sub" style="margin-top:6px"></div>
+      </div>
+
+      <div class="visit-section-title">Visit Notes</div>
+      <textarea id="vNotes" class="form-group textarea"></textarea>
+    </div>
+    <div class="modal-foot"><button class="secondary" onclick="closeVisit()">Cancel</button><button class="primary" onclick="saveVisit()">Save Visit</button></div>
+  </div>
+</div>
+
+<div class="modal-wrap" id="claimModal">
+  <div class="modal">
+    <div class="modal-head"><div><h2 id="claimModalTitle">Add Claim</h2><p>Claims can be split, backdated, future-dated or entered on a non-visit day.</p></div><button class="modal-close" onclick="closeClaimModal()">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>Claim Date</label><input id="claimDateInput" type="date"></div>
+        <div class="form-group"><label>Claim Amount</label><input id="claimAmountInput" type="number" min="0" step="0.01"></div>
+        <div class="form-group full"><label>Related Visit (Optional)</label><select id="claimVisitInput"></select></div>
+        <div class="form-group full"><label>Claim Notes</label><textarea id="claimNotesInput" placeholder="e.g. Split claim from previous visit, outstanding balance, insurer submission..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="secondary" onclick="closeClaimModal()">Cancel</button><button class="primary" onclick="saveClaim()">Save Claim</button></div>
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const id = mapLegacyId(params.get("patient"));
+let p = getPatient(id);
+
+if(!p){
+  document.body.innerHTML = `<div style="padding:50px;text-align:center">Patient not found.<br><a class="primary" href="patients.html">Back to Patients</a></div>`;
+  throw new Error("Patient not found");
+}
+
+let editingVisitId = null;
+let editingClaimId = null;
+let editingCharges = [];
+
+if(window.pdfjsLib){
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+}
+
+function money2(value){ return money(Number(value)||0); }
+
+function renderDoctorOptions(select, selected=""){
+  if(!select) return;
+  select.innerHTML =
+    `<option value="">Select doctor</option>` +
+    getwellDoctorOptions().map(d =>
+      `<option value="${escapeHtml(d.name)}">${escapeHtml(d.name)}</option>`
+    ).join("");
+  select.value = selected || "";
+}
+
+function renderPanelOptions(select, selected=""){
+  if(!select) return;
+  select.innerHTML = getwellPanelOptions()
+    .map(panel => `<option value="${escapeHtml(panel.id)}">${escapeHtml(panel.name)}</option>`)
+    .join("");
+  select.value = selected || "SELF_PAY";
+}
+
+function openEditPatient(){
+  renderPanelOptions(editPanel, p.panelProvider || "SELF_PAY");
+  renderDoctorOptions(editDoctor, p.doctor || "");
+
+  editName.value=p.name||"";
+  editPatientId.value=p.id;
+  editPhone.value=p.phone||"";
+  editDob.value=p.dob||"";
+  editGender.value=p.gender||"";
+  editHeight.value=p.height||"";
+  editStartingWeight.value=p.startingWeight||"";
+  editGoalWeight.value=p.goalWeight||"";
+  editStartDate.value=p.startDate||"";
+  editPanelStatus.value=p.panelStatus||"Active";
+  editPanelSuspensionNote.value=p.panelSuspensionNote||"";
+  editStatus.value=p.status||"Active";
+  editPatientModal.classList.add("show");
+}
+
+function closeEditPatient(){ editPatientModal.classList.remove("show"); }
+
+function savePatientChanges(){
+  p.name=editName.value.trim();
+  p.phone=editPhone.value;
+  p.dob=editDob.value;
+  p.gender=editGender.value;
+  p.height=editHeight.value;
+  p.startingWeight=+editStartingWeight.value||0;
+  p.goalWeight=+editGoalWeight.value||0;
+  p.startDate=editStartDate.value;
+  p.panelProvider=normalizePanelType(editPanel.value);
+  p.panelStatus=patientUsesPanel(p)?editPanelStatus.value:"Active";
+  p.panelSuspensionNote=patientUsesPanel(p)?editPanelSuspensionNote.value.trim():"";
+  p.doctor=editDoctor.value||"";
+  p.status=editStatus.value;
+  upsertPatient(p);
+  p=getPatient(p.id);
+  closeEditPatient();
+  refresh();
+}
+
+function showSection(s,b){
+  document.querySelectorAll("[id^='sec-']").forEach(x=>x.style.display="none");
+  document.getElementById("sec-"+s).style.display="block";
+  document.querySelectorAll(".patient-tabs button").forEach(x=>x.classList.remove("active"));
+  if(b)b.classList.add("active");
+}
+
+function openAddVisit(){
+  editingVisitId=null;
+  editingCharges=[];
+  resetVisit();
+  visitModalTitle.textContent="Add Visit";
+  visitModalSub.textContent=p.name;
+  visitModal.classList.add("show");
+}
+
+function closeVisit(){
+  visitModal.classList.remove("show");
+  editingVisitId=null;
+}
+
+function resetVisit(){
+  vDate.value=new Date().toISOString().slice(0,10);
+  vNumber.value=`Visit #${(p.visits||[]).length+1}`;
+  vType.value="";
+  vWeight.value="";
+  vInvoiceRef.value="";
+  vPanel.value=0;
+  vSelf.value=0;
+  vNotes.value="";
+  vPdf.value="";
+  vPhotos.value="";
+  existingPdf.textContent="";
+  existingPhotos.textContent="";
+  pdfReadStatus.className="badge gray";
+  pdfReadStatus.textContent="No PDF selected.";
+  renderChargeBuilder();
+  updateVisitTotal();
+}
+
+function getChargesForVisit(v){
+  ensureVisit(v);
+  return (v.charges||[]).map(item => ({...item}));
+}
+
+function newCharge(category){
+  return {
+    id:`CH-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+    category,
+    itemId:"",
+    itemName:"",
+    price:0,
+    notes:""
+  };
+}
+
+function renderChargeBuilder(){
+  const categories=["Injection","Medication","Treatment","Additional"];
+  chargeBuilder.innerHTML=categories.map(category=>{
+    const rows=editingCharges.filter(c=>c.category===category);
+    const items=getwellChargeCatalog()[category]||[];
+    return `
+      <div class="card" style="margin-bottom:10px;border:1px solid var(--border);box-shadow:none">
+        <div class="card-head" style="padding:12px 14px">
+          <div><strong>${category}</strong><div class="row-sub">Select an item from Settings. Price is filled automatically but can be adjusted.</div></div>
+          <button class="secondary" type="button" onclick="addCharge('${category}')">＋ Add ${category}</button>
+        </div>
+        <div class="card-body" style="padding:12px 14px">
+          ${rows.length ? rows.map(row=>{
+            const index=editingCharges.indexOf(row);
+            return `
+              <div class="charge-line" style="display:grid;grid-template-columns:minmax(180px,1.4fr) 150px minmax(180px,1fr) auto;gap:8px;align-items:start;margin-bottom:8px">
+                <select class="claim-input" onchange="changeChargeItem(${index},this.value)">
+                  <option value="">Select item</option>
+                  ${items.map(item=>`<option value="${escapeHtml(item.id)}" ${String(row.itemId)===String(item.id)?"selected":""}>${escapeHtml(item.name)} — ${money2(item.price)}</option>`).join("")}
+                  ${row.itemId && !items.some(item=>String(item.id)===String(row.itemId)) ? `<option value="${escapeHtml(row.itemId)}" selected>${escapeHtml(row.itemName||"Legacy item")}</option>` : ""}
+                </select>
+                <input class="claim-input" type="number" min="0" step="0.01" value="${Number(row.price)||0}" oninput="changeChargePrice(${index},this.value)" placeholder="Price">
+                <input class="claim-input" value="${escapeHtml(row.notes||"")}" oninput="changeChargeNotes(${index},this.value)" placeholder="Notes">
+                <button class="secondary" type="button" onclick="removeCharge(${index})">×</button>
+              </div>
+            `;
+          }).join("") : `<div class="notif-empty">No ${category.toLowerCase()} added.</div>`}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function addCharge(category){
+  editingCharges.push(newCharge(category));
+  renderChargeBuilder();
+  updateVisitTotal();
+}
+
+function changeChargeItem(index,itemId){
+  const row=editingCharges[index];
+  if(!row)return;
+  const item=getwellChargeItem(row.category,itemId);
+  row.itemId=itemId;
+  row.itemName=item?.name||row.itemName||"";
+  if(item) row.price=Number(item.price)||0;
+  renderChargeBuilder();
+  updateVisitTotal();
+}
+
+function changeChargePrice(index,value){
+  if(editingCharges[index]) editingCharges[index].price=Math.max(0,Number(value)||0);
+  updateVisitTotal();
+}
+
+function changeChargeNotes(index,value){
+  if(editingCharges[index]) editingCharges[index].notes=value;
+}
+
+function removeCharge(index){
+  editingCharges.splice(index,1);
+  renderChargeBuilder();
+  updateVisitTotal();
+}
+
+function updateVisitTotal(){
+  const total=editingCharges.reduce((sum,c)=>sum+(Number(c.price)||0),0);
+  vTotal.textContent=money(total);
+
+  if(!patientUsesPanel(p)){
+    vPanel.value=0;
+    vSelf.value=total.toFixed(2);
+    vValidation.className="badge green";
+    vValidation.textContent="Self-Pay patient: full visit total is assigned to Self-Pay.";
+    return true;
+  }
+
+  const ok=Math.abs(total-((+vPanel.value||0)+(+vSelf.value||0)))<0.001;
+  vValidation.className="badge "+(ok?"green":"red");
+  vValidation.textContent=ok?"Panel + Self-Pay matches Visit Total.":"Panel + Self-Pay must equal Visit Total.";
+  return ok;
+}
+
+["vPanel","vSelf"].forEach(id=>document.getElementById(id).addEventListener("input",updateVisitTotal));
+
+function openEditVisit(vid){
+  const v=p.visits.find(x=>x.id===vid);
+  if(!v)return;
+
+  editingVisitId=vid;
+  editingCharges=getChargesForVisit(v);
+
+  vDate.value=v.dateKey||"";
+  vNumber.value=v.visit||"";
+  vType.value=v.type||"";
+  vWeight.value=v.weight==="—"?"":v.weight;
+  vInvoiceRef.value=v.invoiceReference||"";
+  vPanel.value=ensureVisit(v).billing.panel||0;
+  vSelf.value=ensureVisit(v).billing.selfPay||0;
+  vNotes.value=v.notes||"";
+  vPdf.value="";
+  vPhotos.value="";
+  existingPdf.textContent=v.pdfName?`Existing PDF: ${v.pdfName}`:"No PDF attached.";
+  existingPhotos.textContent=(v.photos||[]).length?`${v.photos.length} existing photo(s). New uploads will be added.`:"No photos attached.";
+  pdfReadStatus.className="badge "+(v.arboleafText?"green":"gray");
+  pdfReadStatus.textContent=v.arboleafText?"Arboleaf PDF already parsed.":"No new PDF selected.";
+
+  visitModalTitle.textContent="Edit Visit";
+  visitModalSub.textContent=`${p.name} · ${v.visit}`;
+  renderChargeBuilder();
+  visitModal.classList.add("show");
+  updateVisitTotal();
+}
+
+function normalizeMetricNumber(value){
+  const n=Number(String(value).replace(/,/g,""));
+  return Number.isFinite(n)?n:null;
+}
+
+async function extractPdfText(file){
+  if(!window.pdfjsLib) throw new Error("PDF reader is not available.");
+  const buffer=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:buffer}).promise;
+  let text="";
+  for(let pageNo=1;pageNo<=pdf.numPages;pageNo++){
+    const page=await pdf.getPage(pageNo);
+    const content=await page.getTextContent();
+    text += content.items.map(item=>item.str).join(" ") + "\n";
+  }
+  return text.replace(/\s+/g," ").trim();
+}
+
+function parseArboleafMetrics(text){
+  const clean=String(text||"").replace(/\s+/g," ").trim();
+  const definitions=[
+    ["Weight",/\bWeight\b\s*[:\-]?\s*([0-9]+(?:\.[0-9]+)?)\s*(kg|lbs)?/i],
+    ["BMI",/\bBMI\b\s*[:\-]?\s*([0-9]+(?:\.[0-9]+)?)/i],
+    ["Body Fat",/\bBody\s*Fat(?:\s*%|\s*Percent)?\b\s*[:\-]?\s*([0-9]+(?:\.[0-9]+)?)\s*%?/i],
+    ["Body Water",/\bBody\s*Water\b\s*[:\-]?\s*([0-9]+(?:\.[0-9]+)?)\s*%?/i],
+    ["Muscle Mass",/\bMuscle\s*Mass\b\s*[:\-]?\s*([0-9]+(?:\.[0-9]+)?)\s*(kg|lbs)?/i],
+    ["Skeletal Muscle",/\bSkeletal\s*Muscle\b\s*[:\-]?\s*([0-9]+(?:\.[0-9]+)?)\s*%?/i],
+    ["Bone Mass",/\bBone\s*Mass\b\s*[:\-]?\s*([0-9]+(?:\.[0-9]+)?)\s*(kg|lbs)?/i],
+    ["Visceral Fat",/\bVisceral\s*Fat(?:\s*Grade)?\b\s*[:\-]?\s*([0-9]+(?:\.[0-9]+)?)/i],
+    ["BMR",/\bBMR\b\s*[:\-]?\s*([0-9]+(?:\.[0-9]+)?)\s*(kcal)?/i],
+    ["Metabolic Age",/\bMetabolic\s*Age\b\s*[:\-]?\s*([0-9]+(?:\.[0-9]+)?)/i],
+    ["Protein",/\bProtein\b\s*[:\-]?\s*([0-9]+(?:\.[0-9]+)?)\s*%?/i],
+    ["Subcutaneous Fat",/\bSubcutaneous\s*Fat\b\s*[:\-]?\s*([0-9]+(?:\.[0-9]+)?)\s*%?/i],
+    ["Fat-free Body Weight",/\bFat[- ]free\s*Body\s*Weight\b\s*[:\-]?\s*([0-9]+(?:\.[0-9]+)?)\s*(kg|lbs)?/i],
+    ["Body Type",/\bBody\s*Type\b\s*[:\-]?\s*([A-Za-z][A-Za-z ]{1,30})/i]
+  ];
+
+  const metrics={};
+  definitions.forEach(([name,regex])=>{
+    const match=clean.match(regex);
+    if(match){
+      metrics[name]=name==="Body Type"
+        ? match[1].trim()
+        : {value:normalizeMetricNumber(match[1]),unit:match[2]||""};
+    }
+  });
+  return metrics;
+}
+
+function renderBodyComposition(){
+  const visits=(p.visits||[])
+    .filter(v=>v.arboleafMetrics && Object.keys(v.arboleafMetrics).length)
+    .sort((a,b)=>(a.dateKey||"").localeCompare(b.dateKey||""));
+
+  if(!visits.length){
+    composition.innerHTML=`<div class="notif-empty">No parsed Arboleaf body-composition data yet. Upload an Arboleaf PDF through a visit.</div>`;
+    return;
+  }
+
+  composition.innerHTML=visits.map(v=>{
+    const m=v.arboleafMetrics||{};
+    const cards=Object.entries(m).map(([name,data])=>{
+      if(typeof data==="string") return `<div class="finance-card"><div class="label">${escapeHtml(name)}</div><div class="value" style="font-size:18px">${escapeHtml(data)}</div></div>`;
+      return `<div class="finance-card"><div class="label">${escapeHtml(name)}</div><div class="value" style="font-size:18px">${escapeHtml(String(data.value))}${data.unit?" "+escapeHtml(data.unit):""}</div></div>`;
+    }).join("");
+    return `<div class="card" style="margin-bottom:12px"><div class="card-head"><div><h3>${escapeHtml(v.visit||"Visit")}</h3><p>${escapeHtml(v.dateKey||"")} · ${escapeHtml(v.pdfName||"Arboleaf PDF")}</p></div></div><div class="finance-grid">${cards}</div></div>`;
+  }).join("");
+}
+
+function renderFiles(){
+  const files=[];
+  (p.visits||[]).forEach(v=>{
+    if(v.pdfName || v.arboleafText) files.push({
+      type:"PDF",date:v.dateKey,name:v.pdfName||"Arboleaf PDF",visit:v.visit,
+      text:v.arboleafText||""
+    });
+    (v.photos||[]).forEach((photo,i)=>files.push({
+      type:"Photo",date:v.dateKey,name:photo.name||`Photo ${i+1}`,visit:v.visit,data:photo.data
+    }));
+  });
+
+  secFilesContent.innerHTML=files.length
+    ? files.map(file=> file.type==="Photo"
+      ? `<div class="row"><div class="avatar-small">📷</div><div class="row-main"><div class="row-title">${escapeHtml(file.name)}</div><div class="row-sub">${escapeHtml(file.date||"")} · ${escapeHtml(file.visit||"")}</div></div><img src="${file.data}" style="width:70px;height:70px;object-fit:cover;border-radius:10px"></div>`
+      : `<div class="row"><div class="avatar-small">PDF</div><div class="row-main"><div class="row-title">${escapeHtml(file.name)}</div><div class="row-sub">${escapeHtml(file.date||"")} · ${escapeHtml(file.visit||"")} · ${file.text?"Arboleaf text extracted":"File recorded"}</div></div></div>`
+    ).join("")
+    : `<div class="notif-empty">No files or photos attached to visits.</div>`;
+}
+
+function renderAppointments(){
+  const rows=(p.appointments||[]).slice().sort((a,b)=>(`${a.date||""} ${a.time||""}`).localeCompare(`${b.date||""} ${b.time||""}`));
+  patientAppointmentRows.innerHTML=rows.map(a=>`
+    <tr>
+      <td>${escapeHtml(a.date||"—")}</td>
+      <td>${escapeHtml(a.time||"—")}</td>
+      <td>${escapeHtml(a.type||"—")}</td>
+      <td>${escapeHtml(a.doctor||p.doctor||"—")}</td>
+      <td><span class="badge ${a.status==="Completed"?"green":a.status==="No Show"?"red":"blue"}">${escapeHtml(a.status||"Upcoming")}</span></td>
+      <td>${escapeHtml(a.notes||"—")}</td>
+    </tr>
+  `).join("") || `<tr><td colspan="6" class="notif-empty">No appointments recorded.</td></tr>`;
+}
+
+function resizeImageFile(file,maxSize=1000,quality=.72){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const scale=Math.min(1,maxSize/Math.max(img.width,img.height));
+        const canvas=document.createElement("canvas");
+        canvas.width=Math.round(img.width*scale);
+        canvas.height=Math.round(img.height*scale);
+        const ctx=canvas.getContext("2d");
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        resolve({name:file.name,data:canvas.toDataURL("image/jpeg",quality)});
+      };
+      img.onerror=reject;
+      img.src=reader.result;
+    };
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function saveVisit(){
+  if(!vDate.value||!vType.value.trim()){alert("Visit date and type are required.");return}
+  if(!updateVisitTotal()) return;
+
+  const old=editingVisitId?p.visits.find(x=>x.id===editingVisitId):null;
+  let arboleafText=old?.arboleafText||"";
+  let arboleafMetrics=old?.arboleafMetrics||{};
+  let pdfName=old?.pdfName||"";
+
+  if(vPdf.files?.[0]){
+    try{
+      pdfReadStatus.className="badge blue";
+      pdfReadStatus.textContent="Reading Arboleaf PDF…";
+      pdfName=vPdf.files[0].name;
+      arboleafText=await extractPdfText(vPdf.files[0]);
+      arboleafMetrics=parseArboleafMetrics(arboleafText);
+      pdfReadStatus.className="badge green";
+      pdfReadStatus.textContent=`PDF read successfully. ${Object.keys(arboleafMetrics).length} metric(s) detected.`;
+    }catch(error){
+      pdfReadStatus.className="badge red";
+      pdfReadStatus.textContent="PDF could not be read. The file name will still be saved.";
+      console.error(error);
+    }
+  }
+
+  let photos=Array.isArray(old?.photos)?[...old.photos]:[];
+  if(vPhotos.files?.length){
+    const newPhotos=[];
+    for(const file of Array.from(vPhotos.files).slice(0,5)){
+      try{ newPhotos.push(await resizeImageFile(file)); }catch(e){ console.error(e); }
+    }
+    photos=photos.concat(newPhotos);
+  }
+
+  const billing={
+    injection:{price:editingCharges.filter(c=>c.category==="Injection").reduce((s,c)=>s+(+c.price||0),0),notes:""},
+    medication:{price:editingCharges.filter(c=>c.category==="Medication").reduce((s,c)=>s+(+c.price||0),0),notes:""},
+    treatment:{price:editingCharges.filter(c=>c.category==="Treatment").reduce((s,c)=>s+(+c.price||0),0),notes:""},
+    other:{price:editingCharges.filter(c=>c.category==="Additional").reduce((s,c)=>s+(+c.price||0),0),notes:""},
+    panel:+vPanel.value||0,
+    selfPay:+vSelf.value||0
+  };
+
+  const firstByCategory=(category)=>editingCharges.find(c=>c.category===category);
+  const v={
+    ...(old||{}),
+    id:old?.id||`${p.id}-V${Date.now()}`,
+    dateKey:vDate.value,
+    visit:vNumber.value,
+    type:vType.value.trim(),
+    weight:vWeight.value||"—",
+    invoiceReference:vInvoiceRef.value,
+    injection:firstByCategory("Injection")?.itemName||"",
+    dose:"",
+    medication:firstByCategory("Medication")?.itemName||"",
+    additionalTreatment:firstByCategory("Treatment")?.itemName||"",
+    otherName:firstByCategory("Additional")?.itemName||"",
+    notes:vNotes.value,
+    pdfName,
+    arboleafText,
+    arboleafMetrics,
+    photos,
+    charges:editingCharges.map(c=>({...c})),
+    status:old?.status||"Completed",
+    billing
+  };
+
+  if(old)p.visits[p.visits.indexOf(old)]=v;
+  else p.visits.unshift(v);
+
+  if(v.weight&&v.weight!=="—")p.currentWeight=+v.weight;
+  upsertPatient(p);
+  p=getPatient(p.id);
+  closeVisit();
+  refresh();
+}
+
+function openClaimModal(claimId=null){
+  const c=claimId?ensureClaims(p).find(x=>x.id===claimId):null;
+  editingClaimId=c?.id||null;
+  claimDateInput.value=c?.claimDate||new Date().toISOString().slice(0,10);
+  claimAmountInput.value=c?.amount||"";
+  claimNotesInput.value=c?.notes||"";
+  claimVisitInput.innerHTML=`<option value="">No specific visit</option>`+
+    (p.visits||[]).map(v=>`<option value="${escapeHtml(v.id)}" ${c?.visitId===v.id?"selected":""}>${escapeHtml(v.visit)} · ${escapeHtml(v.dateKey)} · ${money(visitTotal(v))}</option>`).join("");
+  claimModalTitle.textContent=c?"Edit Claim":"Add Claim";
+  claimModal.classList.add("show");
+}
+
+function closeClaimModal(){claimModal.classList.remove("show");editingClaimId=null;}
+
+function saveClaim(){
+  const a=+claimAmountInput.value||0;
+  if(a<=0||!claimDateInput.value){alert("Claim date and amount are required.");return}
+
+  const arr=ensureClaims(p);
+  const old=editingClaimId?arr.find(x=>x.id===editingClaimId):null;
+
+  const obj={
+    ...(old||{}),
+    id:old?.id||`${p.id}-CLM${Date.now()}`,
+    amount:a,
+    claimDate:claimDateInput.value,
+    visitId:claimVisitInput.value,
+    notes:claimNotesInput.value.trim()
+  };
+
+  if(old)arr[arr.indexOf(old)]=obj;
+  else arr.push(obj);
+
+  upsertPatient(p);
+  p=getPatient(p.id);
+  closeClaimModal();
+  refresh();
+}
+
+function signedBalanceLabel(balance){
+  return balance < 0 ? "OVERCLAIMED" : "BALANCE TO CLAIM";
+}
+
+function refresh(){
+  p=getPatient(id);
+  if(!p)return;
+
+  patientAvatar.textContent=p.initials||"PT";
+  patientName.textContent=p.name;
+  patientId.textContent=p.id;
+  patientStatus.textContent=p.status||"Active";
+  patientPaymentBadge.textContent=getPanelName(p);
+  programStart.textContent=p.startDate||"—";
+  lastVisit.textContent=latestVisit(p)?.dateKey||"—";
+
+  const f=finance(p);
+  const balanceClass=f.balance<0?"red":"balance";
+
+  finance.innerHTML=patientUsesPanel(p)
+    ? `<div class="finance-card"><div class="label">GRAND TOTAL</div><div class="value">${money(f.grand)}</div></div>
+       <div class="finance-card"><div class="label">TOTAL CLAIMED</div><div class="value">${money(f.claimed)}</div></div>
+       <div class="finance-card ${balanceClass}"><div class="label">${signedBalanceLabel(f.balance)}</div><div class="value">${money(Math.abs(f.balance))}</div></div>`
+    : `<div class="finance-card"><div class="label">GRAND TOTAL</div><div class="value">${money(f.grand)}</div></div>
+       <div class="finance-card"><div class="label">TOTAL INJECTION</div><div class="value">${money(f.injection)}</div></div>
+       <div class="finance-card"><div class="label">TOTAL MEDICATION</div><div class="value">${money(f.medication)}</div></div>`;
+
+  breakdown.innerHTML=`
+    <div class="break"><span>Total Injection</span><strong>${money(f.injection)}</strong></div>
+    <div class="break"><span>Total Medication</span><strong>${money(f.medication)}</strong></div>
+    <div class="break"><span>Total Treatment</span><strong>${money(f.treatment)}</strong></div>
+    <div class="break"><span>Self-Pay / Co-Payment</span><strong>${money(f.selfpay)}</strong></div>
+  `;
+
+  overviewVisits.innerHTML=(p.visits||[]).map(v=>`
+    <div class="row"><div class="avatar-small">${escapeHtml(p.initials||"PT")}</div>
+      <div class="row-main"><div class="row-title">${escapeHtml(v.visit)} · ${escapeHtml(v.type)}</div>
+      <div class="row-sub">${escapeHtml(v.dateKey)} · ${money(visitTotal(v))}${v.pdfName?" · Arboleaf PDF":""}</div></div>
+      <button class="secondary" style="padding:7px 9px" onclick="openEditVisit('${escapeHtml(v.id)}')">Edit →</button>
+    </div>
+  `).join("")||`<div class="notif-empty">No visits.</div>`;
+
+  visitRows.innerHTML=(p.visits||[]).map(v=>`
+    <tr><td>${escapeHtml(v.dateKey||"—")}</td><td>${escapeHtml(v.visit||"—")}</td><td>${escapeHtml(v.type||"—")}</td>
+    <td>${escapeHtml(v.injection||v.charges?.find(c=>c.category==="Injection")?.itemName||"—")}</td>
+    <td>${escapeHtml(v.weight||"—")}</td><td>${money(visitTotal(v))}</td><td>${escapeHtml(v.status||"Completed")}</td>
+    <td><button class="secondary" style="padding:7px 9px" onclick="openEditVisit('${escapeHtml(v.id)}')">Edit</button></td></tr>
+  `).join("")||`<tr><td colspan="8" class="notif-empty">No visits.</td></tr>`;
+
+  const claimBalance=f.balance;
+  claimSummary.innerHTML=`<div class="finance-card"><div class="label">GRAND TOTAL</div><div class="value">${money(f.grand)}</div></div>
+    <div class="finance-card"><div class="label">TOTAL CLAIMED</div><div class="value">${money(f.claimed)}</div></div>
+    <div class="finance-card ${claimBalance<0?"red":"balance"}"><div class="label">${signedBalanceLabel(claimBalance)}</div><div class="value">${money(Math.abs(claimBalance))}</div></div>`;
+
+  claimRows.innerHTML=ensureClaims(p).map(c=>`
+    <tr><td>${escapeHtml(c.claimDate||"—")}</td><td>${escapeHtml(p.visits.find(v=>v.id===c.visitId)?.visit||"No specific visit")}</td>
+    <td>${money(c.amount)}</td><td>${escapeHtml(c.notes||"—")}</td>
+    <td><button class="secondary" style="padding:7px 9px" onclick="openClaimModal('${escapeHtml(c.id)}')">Edit</button></td></tr>
+  `).join("")||`<tr><td colspan="5" class="notif-empty">No claims recorded.</td></tr>`;
+
+  renderBodyComposition();
+  renderFiles();
+  renderAppointments();
+}
+
+document.getElementById("root").innerHTML=shell("Patient Profile","patients",`
+  <a class="back" href="patients.html">← Back to Patients</a>
+  <div class="patient-hero">
+    <div class="patient-main"><div class="patient-avatar" id="patientAvatar"></div>
+      <div class="patient-heading"><h1 id="patientName"></h1><div class="meta"><span id="patientId"></span><span class="badge green" id="patientStatus"></span><span class="panel-chip" id="patientPaymentBadge"></span></div></div>
+    </div>
+    <div class="hero-details"><div class="hero-detail"><span class="hero-label">Program Started</span><span id="programStart" class="hero-value"></span></div>
+      <div class="hero-detail"><span class="hero-label">Last Visit</span><span id="lastVisit" class="hero-value"></span></div>
+      <button class="secondary" onclick="openEditPatient()">✎ Edit Patient</button>
+    </div>
+  </div>
+
+  <div class="card"><div class="card-head"><div><h2>Program Financial Summary</h2><p>Automatically calculated from visits and claims.</p></div></div><div class="card-body"><div class="finance-grid" id="finance"></div><div class="breakdown" id="breakdown"></div></div></div>
+
+  <div class="patient-tabs">
+    <button class="active" onclick="showSection('overview',this)">Overview</button>
+    <button onclick="showSection('visits',this)">Visits</button>
+    <button onclick="showSection('composition',this)">Body Composition</button>
+    <button onclick="showSection('files',this)">Files & Photos</button>
+    <button onclick="showSection('appointments',this)">Appointments</button>
+    <button onclick="showSection('claims',this)">Panel Claims</button>
+  </div>
+
+  <section id="sec-overview" class="card"><div class="card-head"><div><h2>Recent Visits</h2><p>Edit any past visit using the same form as Add Visit.</p></div><button class="primary" onclick="openAddVisit()">＋ Add Visit</button></div><div id="overviewVisits"></div></section>
+
+  <section id="sec-visits" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Visit History</h2><p>Full visit editing is available.</p></div><button class="primary" onclick="openAddVisit()">＋ Add Visit</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Visit</th><th>Type</th><th>Injection</th><th>Weight</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody id="visitRows"></tbody></table></div></section>
+
+  <section id="sec-composition" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Body Composition</h2><p>Arboleaf metrics parsed from uploaded visit PDFs.</p></div></div><div id="composition" class="card-body"></div></section>
+
+  <section id="sec-files" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Files & Photos</h2><p>Files and photos attached to visits.</p></div></div><div id="secFilesContent"></div></section>
+
+  <section id="sec-appointments" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Appointments</h2><p>Appointment history for this patient.</p></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Time</th><th>Type</th><th>Doctor</th><th>Status</th><th>Notes</th></tr></thead><tbody id="patientAppointmentRows"></tbody></table></div></section>
+
+  <section id="sec-claims" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Panel Claims</h2><p>Split claims can be entered on any date, including dates when the patient did not attend.</p></div><button class="primary" onclick="openClaimModal()">＋ Add Claim</button></div><div class="card-body"><div class="finance-grid" id="claimSummary"></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Claim Date</th><th>Related Visit</th><th>Claim Amount</th><th>Notes</th><th></th></tr></thead><tbody id="claimRows"></tbody></table></div></section>
+`);
+
+const secFilesContent=document.getElementById("secFilesContent");
+refresh();
+
+if(params.get("openClaim")==="1"){
+  setTimeout(()=>{
+    showSection("claims",document.querySelector(".patient-tabs button:last-child"));
+    openClaimModal();
+  },150);
+}
+</script>
+</body>
+</html>
