@@ -1,0 +1,3263 @@
+/* =========================================================
+   GETWELL WEIGHT LOSS ADMIN
+   CENTRAL APP.JS
+========================================================= */
+
+
+/* =========================================================
+   STORAGE
+========================================================= */
+
+const STORE_KEY =
+  "getwell_final_v4";
+
+const THEME_KEY =
+  "getwell_theme_v4";
+
+const MIGRATION_KEY =
+  "getwell_pat_to_gw_v1";
+
+const GW_SETTINGS_UPDATED_KEY =
+  "GETWELL_SETTINGS_UPDATED";
+
+
+const seed = {
+  patients: []
+};
+
+
+/* =========================================================
+   SHARED HTML ESCAPING
+
+   escapeHtml() is called by app.js itself and by the inline
+   scripts in patients.html, appointments.html,
+   patient-profile.html, panel.html and reports.html, but it
+   used to be defined ONLY inside settings.html's inline
+   script. On every other page it was therefore undefined and
+   threw "escapeHtml is not defined", which is what stopped
+   the Add Patient / Add Appointment modals from opening.
+
+   It lives here now because app.js is the shared script all
+   pages load. settings.html still declares its own identical
+   escapeHtml() further down its inline script; a plain
+   function declaration there simply overrides this one, so
+   settings.html keeps working unchanged.
+========================================================= */
+
+function escapeHtml(value){
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+/* =========================================================
+   SYSTEM SETTINGS
+   IMPORTANT:
+   settings.html already owns:
+   SETTINGS_KEY
+   DEFAULT_SETTINGS
+   getSettings()
+   saveSettings()
+   settings
+
+   Therefore app.js MUST NOT declare
+   those names.
+========================================================= */
+
+/* ---------------------------------------------------------
+   DEFAULT SYSTEM SETTINGS
+
+   This is the single source of truth for defaults on the
+   READ side. It must stay shape-compatible with
+   DEFAULT_SETTINGS in settings.html (the WRITE side).
+
+   Previously the "general", "dashboard" and "reports" keys
+   were empty objects here, so on any browser that had never
+   opened the Settings page every dashboard/report toggle
+   read back as undefined.
+--------------------------------------------------------- */
+
+function getwellDefaultSystemSettings(){
+  return {
+    general: {
+      clinicName: "Getwell Clinic",
+      clinicLocation: "Puncak Alam",
+      contactNumber: "",
+      email: "",
+      operatingHours: "8:00 AM - 12:00 AM"
+    },
+
+    patient: {
+      idPrefix: "GW-",
+      idDigits: 4,
+      nextNumber: 1,
+      autoGenerateId: true,
+      statuses: [
+        {name:"Active",    enabled:true},
+        {name:"Inactive",  enabled:true},
+        {name:"Completed", enabled:true}
+      ],
+      defaultStatus: "Active"
+    },
+
+    panels: [
+      {id:"PMCARE",         name:"PMCARE",         enabled:true},
+      {id:"UITM",           name:"UITM",           enabled:true},
+      {id:"COMPUMED",       name:"COMPUMED",       enabled:true},
+      {id:"MICARE",         name:"MiCare",         enabled:true},
+      {id:"SELCARE",        name:"SELCARE",        enabled:true},
+      {id:"IHP",            name:"IHP",            enabled:true},
+      {id:"ASP",            name:"ASP",            enabled:true},
+      {id:"HEALTHCONNECT",  name:"HEALTHCONNECT",  enabled:true},
+      {id:"EMAS",           name:"EMAS",           enabled:true},
+      {id:"SPONSORED",      name:"SPONSORED",      enabled:true}
+    ],
+
+    doctors: [],
+
+    chargeCatalog: {
+      Injection: [],
+      Medication: [],
+      Treatment: [],
+      Additional: []
+    },
+
+    appointments: {
+      statuses: [
+        {name:"Upcoming",  enabled:true},
+        {name:"Completed", enabled:true},
+        {name:"No Show",   enabled:true},
+        {name:"Cancelled", enabled:true}
+      ],
+      types: [
+        {name:"Weight Loss Injection", enabled:true},
+        {name:"Consultation", enabled:true},
+        {name:"Follow-Up", enabled:true},
+        {name:"Body Composition Review", enabled:true},
+        {name:"Medication Review", enabled:true},
+        {name:"Treatment", enabled:true},
+        {name:"Other", enabled:true}
+      ],
+      defaultStatus: "Upcoming",
+      defaultType: "Follow-Up",
+      defaultDuration: 30
+    },
+
+    followUp: {
+      dueAfterDays: 5,
+      overdueAfterDays: 7,
+      defaultDays: 5,
+      minDays: 1,
+      maxDays: 30,
+      specialIntervals: []
+    },
+
+    dashboard: {
+      showTotalPatients: true,
+      showActivePatients: true,
+      showDueFollowUp: true,
+      showPanelPatients: true,
+      showAttention: true,
+      showPanelClaimOverview: true
+    },
+
+    reports: {
+      showPerformance: true,
+      showRevenue: true,
+      showPatientActivity: true,
+      showVisitSummary: true,
+      showPanelPerformance: true,
+      showSuspendedPolicies: true,
+      showAppointmentPerformance: true,
+      showDownloadPDF: true
+    },
+
+    features: {
+      patients: true,
+      appointments: true,
+      panel: true,
+      reports: true,
+      followUpAlerts: true,
+      panelClaims: true
+    }
+  };
+}
+
+
+function getwellSystemSettings(){
+
+  const defaults = getwellDefaultSystemSettings();
+
+  const raw =
+    localStorage.getItem(
+      "GETWELL_SYSTEM_CONFIG_V1"
+    );
+
+  if(!raw){
+    return defaults;
+  }
+
+  try{
+
+    const saved = JSON.parse(raw);
+
+    /*
+      Shallow-merge each top-level section over the defaults
+      so a config saved by an older build (which may be
+      missing whole sections) still returns a complete shape.
+    */
+    const merged = {...defaults};
+
+    Object.keys(saved || {}).forEach(key => {
+      const value = saved[key];
+
+      if(Array.isArray(value)){
+        merged[key] = value;
+      }else if(value && typeof value === "object"){
+        merged[key] = {...(defaults[key] || {}), ...value};
+      }else if(value !== undefined){
+        merged[key] = value;
+      }
+    });
+
+    return merged;
+
+  }catch(error){
+
+    console.error(
+      "Unable to read Getwell system settings:",
+      error
+    );
+
+    /*
+      Returning {} here used to blank out every panel, doctor
+      and charge item across the whole application after a
+      single malformed config value. Fall back to defaults.
+    */
+    return defaults;
+
+  }
+
+}
+
+
+/* =========================================================
+   PATIENT SETTINGS
+========================================================= */
+
+function getwellPatientStatuses(){
+
+  const settings =
+    getwellSystemSettings();
+
+
+  return Array.isArray(
+    settings.patient?.statuses
+  )
+    ? settings.patient.statuses
+    : [];
+
+}
+
+
+function getwellActivePatientStatuses(){
+
+  return getwellPatientStatuses()
+    .filter(
+      status =>
+        status &&
+        status.enabled
+    );
+
+}
+
+
+function getwellDefaultPatientStatus(){
+
+  const settings =
+    getwellSystemSettings();
+
+
+  const active =
+    getwellActivePatientStatuses();
+
+
+  const wanted =
+    settings.patient?.defaultStatus;
+
+
+  const match =
+    active.find(
+      status =>
+        status.name ===
+        wanted
+    );
+
+
+  if(match){
+
+    return match.name;
+
+  }
+
+
+  return (
+    active[0]?.name ||
+    "Active"
+  );
+
+}
+
+
+/* =========================================================
+   PATIENT ID SETTINGS
+========================================================= */
+
+function getwellPatientIdSettings(){
+
+  const settings =
+    getwellSystemSettings();
+
+
+  const patient =
+    settings.patient ||
+    {};
+
+
+  return {
+
+    prefix:
+      String(
+        patient.idPrefix ||
+        "GW-"
+      ),
+
+    digits:
+      Math.max(
+        1,
+        Number(
+          patient.idDigits
+        ) ||
+        4
+      ),
+
+    nextNumber:
+      Math.max(
+        1,
+        Number(
+          patient.nextNumber
+        ) ||
+        1
+      ),
+
+    autoGenerate:
+      patient.autoGenerateId !==
+      false
+
+  };
+
+}
+
+
+function getwellFormatPatientId(
+  number
+){
+
+  const config =
+    getwellPatientIdSettings();
+
+
+  return (
+    config.prefix +
+    String(
+      number
+    ).padStart(
+      config.digits,
+      "0"
+    )
+  );
+
+}
+
+
+function getwellNextPatientId(){
+
+  const config =
+    getwellPatientIdSettings();
+
+
+  return getwellFormatPatientId(
+    config.nextNumber
+  );
+
+}
+
+
+/* =========================================================
+   PANELS
+========================================================= */
+
+function getwellAllPanels(){
+
+  const settings =
+    getwellSystemSettings();
+
+
+  return Array.isArray(settings.panels)
+    ? settings.panels.map(panel => {
+        const copy = {...panel};
+        if(String(copy.id || "").toUpperCase() === "MICARE"){
+          copy.name = "MiCare";
+        }
+        return copy;
+      })
+    : [];
+
+}
+
+
+function getwellActivePanels(){
+
+  return getwellAllPanels()
+    .filter(
+      panel =>
+        panel &&
+        panel.enabled
+    );
+
+}
+
+
+function getwellPanelById(
+  id
+){
+
+  if(!id){
+
+    return null;
+
+  }
+
+
+  return getwellAllPanels()
+    .find(
+      panel =>
+        String(
+          panel.id
+        )
+        .toUpperCase() ===
+        String(
+          id
+        )
+        .toUpperCase()
+    ) ||
+    null;
+
+}
+
+
+function getwellPanelByName(
+  name
+){
+
+  if(!name){
+
+    return null;
+
+  }
+
+
+  return getwellAllPanels()
+    .find(
+      panel =>
+        String(
+          panel.name
+        )
+        .toLowerCase() ===
+        String(
+          name
+        )
+        .toLowerCase()
+    ) ||
+    null;
+
+}
+
+
+function getwellPanelOptions(){
+
+  return [
+
+    {
+      id:
+        "SELF_PAY",
+
+      name:
+        "Self-Pay",
+
+      enabled:
+        true
+
+    },
+
+    ...getwellActivePanels()
+
+  ];
+
+}
+
+
+/* =========================================================
+   PANEL NAME
+========================================================= */
+
+function getPanelName(
+  p
+){
+
+  if(
+    !p ||
+    p.panelProvider ===
+      "SELF_PAY"
+  ){
+
+    return "Self-Pay";
+
+  }
+
+
+  const configured =
+    getwellPanelById(
+      p.panelProvider
+    );
+
+
+  if(configured){
+
+    return configured.name;
+
+  }
+
+
+  /* Legacy values */
+
+  if(
+    p.panelProvider ===
+      "PANEL_A"
+  ){
+
+    return "MiCare";
+
+  }
+
+
+  if(
+    p.panelProvider ===
+      "PANEL_B"
+  ){
+
+    return "PMCare";
+
+  }
+
+
+  if(
+    p.panelProvider ===
+      "PANEL_C"
+  ){
+
+    return "Other Panel";
+
+  }
+
+
+  if(
+    p.panelProvider ===
+      "Other"
+  ){
+
+    return (
+      p.otherPanelName ||
+      "Panel"
+    );
+
+  }
+
+
+  return (
+    p.otherPanelName ||
+    p.panelProvider ||
+    "Panel"
+  );
+
+}
+
+
+/* =========================================================
+   DOCTORS & CHARGE CATALOG
+========================================================= */
+
+function getwellDoctors(){
+  const settings = getwellSystemSettings();
+  return Array.isArray(settings.doctors)
+    ? settings.doctors.filter(d => d && d.enabled !== false && String(d.name || "").trim())
+    : [];
+}
+
+function getwellDoctorOptions(){
+  return getwellDoctors().map(d => ({
+    id: d.id || String(d.name).trim(),
+    name: String(d.name).trim()
+  }));
+}
+
+function getwellChargeCatalog(){
+  const settings = getwellSystemSettings();
+  const fallback = {Injection:[], Medication:[], Treatment:[], Additional:[]};
+  const source = settings.chargeCatalog || {};
+  return ["Injection","Medication","Treatment","Additional"].reduce((out, category) => {
+    out[category] = Array.isArray(source[category])
+      ? source[category].filter(item => item && item.enabled !== false && String(item.name || "").trim())
+      : fallback[category];
+    return out;
+  }, {});
+}
+
+function getwellChargeItem(category, id){
+  return getwellChargeCatalog()[category]?.find(item => String(item.id) === String(id)) || null;
+}
+
+function getwellChargePrice(category, id){
+  const item = getwellChargeItem(category, id);
+  return item ? Number(item.price) || 0 : 0;
+}
+
+/* =========================================================
+   APPOINTMENT SETTINGS
+========================================================= */
+
+function getwellAppointmentStatuses(){
+
+  const settings =
+    getwellSystemSettings();
+
+
+  return Array.isArray(
+    settings.appointments?.statuses
+  )
+    ? settings.appointments.statuses
+        .filter(
+          status =>
+            status &&
+            status.enabled
+        )
+    : [];
+
+}
+
+function getwellAppointmentTypes(){
+  const settings=getwellSystemSettings();
+  const list=Array.isArray(settings.appointments?.types)
+    ? settings.appointments.types
+    : [];
+  return list.filter(x=>x && x.enabled!==false && String(x.name||"").trim());
+}
+
+function getwellFollowUpSettings(){
+  const settings=getwellSystemSettings();
+  const f=settings.followUp||{};
+  return {
+    dueAfterDays:Math.max(1,Number(f.dueAfterDays)||5),
+    overdueAfterDays:Math.max(1,Number(f.overdueAfterDays)||7),
+    defaultDays:Math.max(1,Number(f.defaultDays)||Number(f.dueAfterDays)||5),
+    minDays:Math.max(1,Number(f.minDays)||1),
+    maxDays:Math.max(1,Number(f.maxDays)||30),
+    specialIntervals:Array.isArray(f.specialIntervals)?f.specialIntervals:[]
+  };
+}
+
+function getwellSuggestedFollowUpDate(dateValue,days){
+  const d=new Date(String(dateValue||"").slice(0,10)+"T00:00:00");
+  if(Number.isNaN(d.getTime())) return "";
+  d.setDate(d.getDate()+Math.max(1,Number(days)||5));
+  return d.toISOString().slice(0,10);
+}
+
+function getwellHasFutureAppointment(patient){
+  const today=new Date().toISOString().slice(0,10);
+  return (patient?.appointments||[]).some(a=>
+    a && a.date && String(a.date).slice(0,10)>=today &&
+    a.status!=="Cancelled" && a.status!=="No Show"
+  );
+}
+
+function getwellCreateSuggestedAppointment(patient, visit){
+  if(!patient || !visit || getwellHasFutureAppointment(patient)) return null;
+
+  const f=getwellFollowUpSettings();
+  const days=Math.min(f.maxDays,Math.max(f.minDays,f.defaultDays));
+  const date=getwellSuggestedFollowUpDate(visit.dateKey,days);
+  if(!date) return null;
+
+  const appointment={
+    id:getwellNextAppointmentId(),
+    date,
+    time:"",
+    doctor:patient.doctor||"",
+    type:getwellSystemSettings().appointments?.defaultType || getwellAppointmentTypes()[0]?.name || "Follow-Up",
+    status:getwellDefaultAppointmentStatus(),
+    notes:`Automatically suggested ${days}-day follow-up after visit ${visit.visit||visit.id}.`,
+    source:"automatic",
+    autoGenerated:true,
+    followUpDays:days,
+    sourceVisitId:visit.id,
+    manuallyEdited:false,
+    updatedAt:new Date().toISOString()
+  };
+
+  if(!Array.isArray(patient.appointments)) patient.appointments=[];
+  patient.appointments.push(appointment);
+  return appointment;
+}
+
+
+
+
+function getwellDefaultAppointmentStatus(){
+
+  const settings =
+    getwellSystemSettings();
+
+
+  const statuses =
+    getwellAppointmentStatuses();
+
+
+  const wanted =
+    settings.appointments
+      ?.defaultStatus;
+
+
+  const match =
+    statuses.find(
+      status =>
+        status.name ===
+        wanted
+    );
+
+
+  return match
+    ? match.name
+    : (
+        statuses[0]?.name ||
+        "Upcoming"
+      );
+
+}
+
+
+function getwellAppointmentDuration(){
+
+  const settings =
+    getwellSystemSettings();
+
+
+  return Math.max(
+    5,
+    Number(
+      settings.appointments
+        ?.defaultDuration
+    ) ||
+    30
+  );
+
+}
+
+
+/* =========================================================
+   FOLLOW-UP
+========================================================= */
+
+function getwellFollowUpSettings(){
+
+  const settings =
+    getwellSystemSettings();
+
+
+  return {
+
+    dueAfterDays:
+      Math.max(
+        1,
+        Number(
+          settings.followUp
+            ?.dueAfterDays
+        ) ||
+        5
+      ),
+
+    overdueAfterDays:
+      Math.max(
+        1,
+        Number(
+          settings.followUp
+            ?.overdueAfterDays
+        ) ||
+        7
+      )
+
+  };
+
+}
+
+
+/* =========================================================
+   FEATURES
+========================================================= */
+
+function getwellFeatureEnabled(
+  feature
+){
+
+  const settings =
+    getwellSystemSettings();
+
+
+  if(
+    !settings.features ||
+    settings.features[feature] ===
+      undefined
+  ){
+
+    return true;
+
+  }
+
+
+  return !!settings.features[
+    feature
+  ];
+
+}
+
+
+/* =========================================================
+   DASHBOARD SETTINGS
+========================================================= */
+
+function getwellDashboardSettings(){
+
+  const settings =
+    getwellSystemSettings();
+
+
+  return (
+    settings.dashboard ||
+    {}
+  );
+
+}
+
+
+/* =========================================================
+   REPORT SETTINGS
+========================================================= */
+
+function getwellReportSettings(){
+
+  const settings =
+    getwellSystemSettings();
+
+
+  return (
+    settings.reports ||
+    {}
+  );
+
+}
+
+
+
+/* =========================================================
+/* =========================================================
+   GOOGLE SHEETS REMOTE STORAGE  (two-way)
+
+   Design notes — this section was rewritten because the
+   previous version could destroy data:
+
+   1. The old poller replaced the whole local store with the
+      whole remote store whenever the two differed. Any edit
+      made locally but not yet written to the Sheet was lost
+      on the next 30-second tick.
+      -> Now every sync MERGES per patient record, keeping
+         whichever side has the newer updatedAt stamp.
+
+   2. The old save used fetch(..., {mode:"no-cors"}), whose
+      response is unreadable, so a rejected or failed write
+      looked exactly like a successful one.
+      -> Now the save reads the JSON reply and surfaces a
+         clear success / failure message.
+
+   3. The old first-run push tested payload.dataVersion but
+      the value actually lives at payload.data.dataVersion,
+      so it never fired.
+      -> The merge handles an empty Sheet naturally.
+========================================================= */
+
+const GETWELL_SHEETS_API_URL =
+  "https://script.google.com/macros/s/AKfycbwCAUk-c4fV3Ny7SfY2x3mWity4W8MKxJwlajxdFdUOaDAjFP7lgtb17_BbOXWlGT8kSg/exec";
+
+const GETWELL_REMOTE_POLL_MS = 30000;
+const GETWELL_REMOTE_SAVE_KEY = "GETWELL_REMOTE_LAST_SAVE";
+const GETWELL_REMOTE_BASELINE_KEY = "GETWELL_REMOTE_BASELINE_V2";
+const GETWELL_PERSISTED_STORE_KEY = "GETWELL_PERSISTED_STORE_V2";
+
+let getwellSyncInFlight = false;
+
+
+function getwellRemoteConfigured(){
+  return (
+    GETWELL_SHEETS_API_URL &&
+    !GETWELL_SHEETS_API_URL.includes("PASTE_YOUR_")
+  );
+}
+
+
+/* ---------------------------------------------------------
+   STATUS MESSAGES
+   Small non-blocking toast so an operation never silently
+   does nothing. Styles are injected once so no page needs
+   a stylesheet change.
+--------------------------------------------------------- */
+
+function getwellEnsureToastStyles(){
+  if(document.getElementById("gwToastStyles")) return;
+  const style = document.createElement("style");
+  style.id = "gwToastStyles";
+  style.textContent = `
+    #gwToastHost{position:fixed;right:16px;bottom:16px;z-index:99999;
+      display:flex;flex-direction:column;gap:8px;pointer-events:none}
+    .gw-toast{pointer-events:auto;min-width:210px;max-width:360px;
+      padding:11px 13px;border-radius:10px;font-family:inherit;font-size:11px;
+      font-weight:500;line-height:16px;box-shadow:0 10px 30px rgba(15,23,42,.18);
+      border:1px solid transparent;opacity:0;transform:translateY(6px);
+      transition:opacity .18s ease,transform .18s ease}
+    .gw-toast.show{opacity:1;transform:translateY(0)}
+    .gw-toast.success{background:#ECFDF5;border-color:#A7F3D0;color:#15803D}
+    .gw-toast.error{background:#FEF2F2;border-color:#FECACA;color:#B91C1C}
+    .gw-toast.info{background:#E8F2FF;border-color:#C7DFFF;color:#1D4ED8}
+    html[data-theme="dark"] .gw-toast.success{background:#102A1A;border-color:#1F5133;color:#86EFAC}
+    html[data-theme="dark"] .gw-toast.error{background:#3A1515;border-color:#7F2626;color:#FCA5A5}
+    html[data-theme="dark"] .gw-toast.info{background:#15365C;border-color:#2F65A0;color:#93C5FD}
+  `;
+  document.head.appendChild(style);
+}
+
+
+
+function getwellConfirmDelete(label){
+  return new Promise(resolve=>{
+    const wrap=document.createElement("div");
+    wrap.className="modal-wrap show";
+    wrap.style.zIndex="100000";
+    wrap.innerHTML=`
+      <div class="modal" style="width:min(420px,92vw)">
+        <div class="modal-head">
+          <div><h2>Delete ${escapeHtml(label||"record")}</h2><p>Are you sure you want to delete this?</p></div>
+          <button class="modal-close" type="button" data-cancel>×</button>
+        </div>
+        <div class="modal-body"><div class="row-sub">This action cannot be undone.</div></div>
+        <div class="modal-foot">
+          <button class="secondary" type="button" data-cancel>Cancel</button>
+          <button class="primary" type="button" data-delete>Delete</button>
+        </div>
+      </div>`;
+    document.body.appendChild(wrap);
+    const finish=value=>{wrap.remove();resolve(value);};
+    wrap.querySelectorAll("[data-cancel]").forEach(b=>b.addEventListener("click",()=>finish(false)));
+    wrap.querySelector("[data-delete]").addEventListener("click",()=>finish(true));
+  });
+}
+
+function getwellNotify(message, kind){
+  const type = kind || "info";
+
+  /* Always leave a console trail for debugging. */
+  if(type === "error"){
+    console.error("[Getwell] " + message);
+  }else{
+    console.log("[Getwell] " + message);
+  }
+
+  if(!document.body) return;
+
+  getwellEnsureToastStyles();
+
+  let host = document.getElementById("gwToastHost");
+  if(!host){
+    host = document.createElement("div");
+    host.id = "gwToastHost";
+    document.body.appendChild(host);
+  }
+
+  const toast = document.createElement("div");
+  toast.className = "gw-toast " + type;
+  toast.textContent = message;
+  host.appendChild(toast);
+
+  requestAnimationFrame(() => toast.classList.add("show"));
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 220);
+  }, type === "error" ? 6000 : 3000);
+}
+
+
+/* ---------------------------------------------------------
+   RECORD STAMPING
+   Every write stamps updatedAt so the merge can decide
+   which side of the sync is newer.
+--------------------------------------------------------- */
+
+function getwellStampRecord(record){
+  if(record && typeof record === "object"){
+    record.updatedAt = new Date().toISOString();
+  }
+  return record;
+}
+
+
+function getwellRecordTime(record){
+  const value = record && record.updatedAt;
+  const time = value ? Date.parse(value) : NaN;
+  return Number.isFinite(time) ? time : 0;
+}
+
+
+function getwellLocalStoreSnapshot(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    return raw ? JSON.parse(raw) : structuredClone(seed);
+  }catch(error){
+    return structuredClone(seed);
+  }
+}
+
+
+/* ---------------------------------------------------------
+   READ  (Sheets -> Web)
+   JSONP, because a plain GET to Apps Script from a file://
+   or a different origin is blocked, and JSONP is what the
+   existing deployment already answers.
+--------------------------------------------------------- */
+
+function getwellRemoteRead(callback){
+  if(!getwellRemoteConfigured()){
+    callback(null);
+    return;
+  }
+
+  const callbackName =
+    "__getwellRemote_" +
+    Date.now() +
+    "_" +
+    Math.random().toString(36).slice(2);
+
+  const script = document.createElement("script");
+  let finished = false;
+
+  const cleanup = () => {
+    try{ delete window[callbackName]; }catch(e){}
+    script.remove();
+  };
+
+  const done = payload => {
+    if(finished) return;
+    finished = true;
+    cleanup();
+    callback(payload);
+  };
+
+  window[callbackName] = payload => done(payload);
+  script.onerror = () => done(null);
+
+  script.src =
+    GETWELL_SHEETS_API_URL +
+    (GETWELL_SHEETS_API_URL.includes("?") ? "&" : "?") +
+    "action=get&callback=" +
+    encodeURIComponent(callbackName) +
+    "&t=" +
+    Date.now();
+
+  document.head.appendChild(script);
+
+  setTimeout(() => done(null), 15000);
+}
+
+
+/* ---------------------------------------------------------
+   WRITE  (Web -> Sheets)
+   Real CORS request so the reply can actually be read.
+   Resolves {ok:true} or {ok:false, error:"..."}.
+--------------------------------------------------------- */
+
+function getwellRemoteSave(data){
+  if(!getwellRemoteConfigured()){
+    return Promise.resolve({ok:false, error:"Google Sheets URL is not configured."});
+  }
+
+  try{
+    localStorage.setItem(GETWELL_REMOTE_SAVE_KEY, String(Date.now()));
+  }catch(e){}
+
+  return fetch(
+    GETWELL_SHEETS_API_URL,
+    {
+      method: "POST",
+      headers: {"Content-Type": "text/plain;charset=utf-8"},
+      body: JSON.stringify({action:"save", data})
+    }
+  )
+    .then(response => response.text())
+    .then(text => {
+      let payload;
+      try{
+        payload = JSON.parse(text);
+      }catch(e){
+        /*
+          A login page instead of JSON almost always means the
+          Apps Script deployment is not set to
+          "Who has access: Anyone".
+        */
+        return {
+          ok:false,
+          error:"Google Sheets rejected the save. Check the Apps Script deployment is shared with \"Anyone\"."
+        };
+      }
+
+      if(payload && payload.ok){
+        return {ok:true, saved:payload.saved || null};
+      }
+
+      return {
+        ok:false,
+        error:(payload && payload.error) || "Google Sheets returned an unknown error."
+      };
+    })
+    .catch(error => {
+      return {
+        ok:false,
+        error:"Unable to reach Google Sheets. " + (error && error.message ? error.message : "Check the connection.")
+      };
+    });
+}
+
+
+/* ---------------------------------------------------------
+   FILE UPLOAD  (binary -> Google Drive)
+   Sheets cells cap out at 50,000 characters, so base64
+   images cannot live in the store. The binary goes to
+   Drive; only {id, name, url} is persisted.
+--------------------------------------------------------- */
+
+function getwellUploadFile(file){
+  if(!getwellRemoteConfigured()){
+    return Promise.resolve({ok:false, error:"Google Drive is not configured."});
+  }
+
+  return fetch(
+    GETWELL_SHEETS_API_URL,
+    {
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body: JSON.stringify({
+        action:"uploadFile",
+        file:{
+          name: file.name,
+          mimeType: file.mimeType,
+          dataBase64: file.dataBase64,
+          patientId: file.patientId || "",
+          visitId: file.visitId || ""
+        }
+      })
+    }
+  )
+    .then(response => response.text())
+    .then(text => {
+      let payload;
+      try{ payload = JSON.parse(text); }
+      catch(e){ return {ok:false, error:"Drive upload rejected (deployment not public?)."}; }
+
+      if(payload && payload.ok && payload.file){
+        return {ok:true, file:payload.file};
+      }
+      return {ok:false, error:(payload && payload.error) || "Drive upload failed."};
+    })
+    .catch(error => ({
+      ok:false,
+      error:"Unable to reach Google Drive. " + (error && error.message ? error.message : "")
+    }));
+}
+
+
+/* ---------------------------------------------------------
+   MERGE
+   Per-patient last-write-wins. Never deletes a record that
+   exists on only one side, so a row typed by hand into the
+   Sheet survives, and a patient added offline survives too.
+--------------------------------------------------------- */
+
+function getwellClone(value){
+  try{return structuredClone(value);}
+  catch(e){return JSON.parse(JSON.stringify(value));}
+}
+
+function getwellRemoteBaseline(){
+  try{
+    const raw=localStorage.getItem(GETWELL_REMOTE_BASELINE_KEY);
+    return raw?JSON.parse(raw):null;
+  }catch(e){return null;}
+}
+
+function getwellPersistedStore(){
+  try{
+    const raw=localStorage.getItem(GETWELL_PERSISTED_STORE_KEY);
+    return raw?JSON.parse(raw):null;
+  }catch(e){return null;}
+}
+
+function getwellSetPersistedStore(store){
+  try{localStorage.setItem(GETWELL_PERSISTED_STORE_KEY,JSON.stringify(getwellClone(store||{patients:[]})));}catch(e){}
+}
+
+
+function getwellSetRemoteBaseline(remote){
+  try{localStorage.setItem(GETWELL_REMOTE_BASELINE_KEY,JSON.stringify(getwellClone(remote||{patients:[]})));}catch(e){}
+}
+
+function getwellChildIds(patient,field){
+  return new Set((patient?.[field]||[]).filter(x=>x&&x.id).map(x=>String(x.id)));
+}
+
+/* Successful authoritative Sheet snapshots reconcile deletions.
+   A failed request never enters this function, so it can never
+   masquerade as a deletion. */
+function getwellReconcileRemoteDeletions(local,remote,baseline){
+  if(!baseline||!Array.isArray(baseline.patients)) return local;
+
+  const remotePatients=new Map((remote.patients||[]).filter(p=>p&&p.id).map(p=>[String(p.id),p]));
+  const baselinePatients=new Map((baseline.patients||[]).filter(p=>p&&p.id).map(p=>[String(p.id),p]));
+
+  const patients=(local.patients||[])
+    .filter(lp=>lp&&lp.id&&!(baselinePatients.has(String(lp.id))&&!remotePatients.has(String(lp.id))))
+    .map(lp=>{
+      const id=String(lp.id), rp=remotePatients.get(id), bp=baselinePatients.get(id);
+      if(!rp||!bp) return lp;
+      const out=getwellClone(lp);
+      ["appointments","visits","claims"].forEach(field=>{
+        const oldIds=getwellChildIds(bp,field);
+        const newIds=getwellChildIds(rp,field);
+        if(!oldIds.size) return;
+        out[field]=(out[field]||[]).filter(child=>child&&child.id&&!(oldIds.has(String(child.id))&&!newIds.has(String(child.id))));
+      });
+      return out;
+    });
+
+  return {...local,patients};
+}
+
+function getwellMergeStores(local,remote){
+  const localPatients=Array.isArray(local?.patients)?local.patients:[];
+  const remotePatients=Array.isArray(remote?.patients)?remote.patients:[];
+  const byId=new Map();
+  let remoteWon=false,localWon=false;
+
+  localPatients.forEach(p=>{if(p&&p.id)byId.set(String(p.id),p);});
+  remotePatients.forEach(p=>{
+    if(!p||!p.id)return;
+    const id=String(p.id),mine=byId.get(id);
+    if(!mine){byId.set(id,getwellClone(p));remoteWon=true;return;}
+    const lt=getwellRecordTime(mine),rt=getwellRecordTime(p);
+    if(rt>lt){byId.set(id,getwellClone(p));remoteWon=true;}
+    else if(lt>rt){localWon=true;}
+    else if(JSON.stringify(mine)!==JSON.stringify(p)){byId.set(id,getwellClone(p));remoteWon=true;}
+  });
+
+  const remoteIds=new Set(remotePatients.filter(p=>p&&p.id).map(p=>String(p.id)));
+  localPatients.forEach(p=>{if(p&&p.id&&!remoteIds.has(String(p.id)))localWon=true;});
+
+  return {merged:{...(remote||{}),...(local||{}),patients:Array.from(byId.values())},remoteWon,localWon};
+}
+
+function getwellCollectDeletions(before,current){
+  const d={patients:[],appointments:[],visits:[],charges:[],claims:[],files:[]};
+  if(!before||!Array.isArray(before.patients)) return d;
+  const currentPatients=new Map((current.patients||[]).filter(p=>p&&p.id).map(p=>[String(p.id),p]));
+
+  (before.patients||[]).forEach(bp=>{
+    if(!bp||!bp.id)return;
+    const pid=String(bp.id),cp=currentPatients.get(pid);
+    if(!cp){
+      d.patients.push(pid);
+      (bp.appointments||[]).forEach(a=>a?.id&&d.appointments.push(String(a.id)));
+      (bp.visits||[]).forEach(v=>{
+        if(!v?.id)return;
+        d.visits.push(String(v.id));
+        (v.charges||[]).forEach(c=>c?.id&&d.charges.push(String(c.id)));
+        (v.photos||[]).forEach(f=>f?.id&&d.files.push(String(f.id)));
+      });
+      (bp.claims||[]).forEach(c=>c?.id&&d.claims.push(String(c.id)));
+      return;
+    }
+    ["appointments","visits","claims"].forEach(field=>{
+      const oldIds=getwellChildIds(bp,field),newIds=getwellChildIds(cp,field);
+      oldIds.forEach(id=>{if(!newIds.has(id))d[field].push(id);});
+    });
+    const cv=new Map((cp.visits||[]).filter(v=>v?.id).map(v=>[String(v.id),v]));
+    (bp.visits||[]).forEach(v=>{
+      if(!v?.id)return;
+      const nv=cv.get(String(v.id));
+      if(!nv){
+        (v.charges||[]).forEach(c=>c?.id&&d.charges.push(String(c.id)));
+        (v.photos||[]).forEach(f=>f?.id&&d.files.push(String(f.id)));
+        return;
+      }
+      const nc=getwellChildIds(nv,"charges"),nf=getwellChildIds(nv,"photos");
+      (v.charges||[]).forEach(c=>c?.id&&!nc.has(String(c.id))&&d.charges.push(String(c.id)));
+      (v.photos||[]).forEach(f=>f?.id&&!nf.has(String(f.id))&&d.files.push(String(f.id)));
+    });
+  });
+  Object.keys(d).forEach(k=>d[k]=[...new Set(d[k])]);
+  return d;
+}
+
+function getwellRemoteDelete(deletions){
+  const has=Object.values(deletions||{}).some(x=>Array.isArray(x)&&x.length);
+  if(!has)return Promise.resolve({ok:true});
+  return fetch(GETWELL_SHEETS_API_URL,{
+    method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify({action:"deleteRecords",deletions})
+  }).then(r=>r.text()).then(text=>{
+    try{
+      const p=JSON.parse(text);
+      return p&&p.ok?p:{ok:false,error:p?.error||"Google Sheets deletion failed."};
+    }catch(e){return {ok:false,error:"Invalid Google Sheets deletion response."};}
+  }).catch(e=>({ok:false,error:"Unable to reach Google Sheets for deletion. "+(e?.message||"")}));
+}
+
+function getwellRemoteSaveSettings(settings){
+  if(!getwellRemoteConfigured())return Promise.resolve({ok:false,error:"Google Sheets URL is not configured."});
+  return fetch(GETWELL_SHEETS_API_URL,{
+    method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify({action:"saveSettings",settings})
+  }).then(r=>r.text()).then(text=>{
+    try{
+      const p=JSON.parse(text);
+      return p&&p.ok?p:{ok:false,error:p?.error||"Settings save failed."};
+    }catch(e){return {ok:false,error:"Invalid settings response."};}
+  }).catch(e=>({ok:false,error:"Unable to reach Google Sheets for settings. "+(e?.message||"")}));
+}
+
+function getwellSyncRemoteStore(allowReload){
+  if(!getwellRemoteConfigured()||getwellSyncInFlight)return;
+  getwellSyncInFlight=true;
+  getwellRemoteRead(payload=>{
+    getwellSyncInFlight=false;
+    if(!payload||payload.ok!==true||!payload.data)return;
+
+    const remote=payload.data;
+    const local=getwellLocalStoreSnapshot();
+    const baseline=getwellRemoteBaseline();
+
+    if(remote.settings&&typeof remote.settings==="object"){
+      try{
+        const raw=localStorage.getItem("GETWELL_SYSTEM_CONFIG_V1");
+        const localSettings=raw?JSON.parse(raw):null;
+        const rt=Date.parse(remote.settings.updatedAt||"")||0;
+        const lt=Date.parse(localSettings?.updatedAt||"")||0;
+        if(rt>lt){
+          localStorage.setItem("GETWELL_SYSTEM_CONFIG_V1",JSON.stringify(remote.settings));
+          localStorage.setItem("GETWELL_SETTINGS_UPDATED",String(Date.now()));
+          location.reload();
+          return;
+        }
+      }catch(e){}
+    }
+
+    const reconciled=getwellReconcileRemoteDeletions(local,remote,baseline);
+    const result=getwellMergeStores(reconciled,remote);
+
+    getwellSetRemoteBaseline(remote);
+
+    if(result.remoteWon||JSON.stringify(reconciled)!==JSON.stringify(local)){
+      localStorage.setItem(STORE_KEY,JSON.stringify(result.merged));
+      getwellSetPersistedStore(result.merged);
+      localStorage.setItem(MIGRATION_KEY,"done");
+      if(allowReload!==false){location.reload();return;}
+    }
+
+    if(result.localWon){
+      getwellRemoteSave(result.merged).then(saveResult=>{
+        if(!saveResult.ok)getwellNotify(saveResult.error,"error");
+        else {
+          getwellSetRemoteBaseline(result.merged);
+          getwellSetPersistedStore(result.merged);
+        }
+      });
+    }
+  });
+}
+
+function getwellStartRemoteSync(){
+  if(!getwellRemoteConfigured()) return;
+
+  setTimeout(() => getwellSyncRemoteStore(true), 250);
+
+  setInterval(() => {
+    const lastSave = Number(localStorage.getItem(GETWELL_REMOTE_SAVE_KEY) || 0);
+
+    /* Do not read back while a write is still travelling. */
+    if(Date.now() - lastSave < 5000) return;
+
+    getwellSyncRemoteStore(true);
+  }, GETWELL_REMOTE_POLL_MS);
+}
+
+
+/* =========================================================
+   RAW STORE
+========================================================= */
+
+function rawStore(){
+
+  const raw =
+    localStorage.getItem(
+      STORE_KEY
+    );
+
+
+  if(!raw){
+
+    localStorage.setItem(
+      STORE_KEY,
+      JSON.stringify(
+        seed
+      )
+    );
+
+
+    return structuredClone(
+      seed
+    );
+
+  }
+
+
+  try{
+
+    return JSON.parse(
+      raw
+    );
+
+  }catch(e){
+
+    localStorage.setItem(
+      STORE_KEY,
+      JSON.stringify(
+        seed
+      )
+    );
+
+
+    return structuredClone(
+      seed
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   LEGACY ID MIGRATION
+========================================================= */
+
+function migrateLegacyIds(
+  data
+){
+
+  if(
+    localStorage.getItem(
+      MIGRATION_KEY
+    ) ===
+    "done"
+  ){
+
+    return data;
+
+  }
+
+
+  const used =
+    new Set();
+
+
+  const map =
+    {};
+
+
+  (
+    data.patients ||
+    []
+  )
+  .forEach(
+    p => {
+
+      const old =
+        String(
+          p.id ||
+          ""
+        );
+
+
+      const match =
+        old.match(
+          /^PAT-(\d+)$/i
+        );
+
+
+      if(match){
+
+        const number =
+          String(
+            Number(
+              match[1]
+            )
+          )
+          .padStart(
+            4,
+            "0"
+          );
+
+
+        const newer =
+          `GW-${number}`;
+
+
+        map[old] =
+          newer;
+
+
+        p.id =
+          newer;
+
+
+        used.add(
+          newer
+        );
+
+      }
+
+    }
+  );
+
+
+  let next =
+    1;
+
+
+  (
+    data.patients ||
+    []
+  )
+  .forEach(
+    p => {
+
+      if(
+        !/^GW-\d+$/i.test(
+          p.id ||
+          ""
+        )
+      ){
+
+        while(
+          used.has(
+            `GW-${String(next).padStart(4,"0")}`
+          )
+        ){
+
+          next++;
+
+        }
+
+
+        p.id =
+          `GW-${String(next).padStart(4,"0")}`;
+
+
+        used.add(
+          p.id
+        );
+
+
+        next++;
+
+      }
+
+
+      if(
+        !p.panelStatus &&
+        patientUsesPanel(
+          p
+        )
+      ){
+
+        p.panelStatus =
+          "Active";
+
+      }
+
+
+      if(
+        !p.panelSuspensionNote
+      ){
+
+        p.panelSuspensionNote =
+          "";
+
+      }
+
+
+      (
+        p.appointments ||
+        []
+      )
+      .forEach(
+        a => {
+
+          if(
+            a.patientId &&
+            map[
+              a.patientId
+            ]
+          ){
+
+            a.patientId =
+              map[
+                a.patientId
+              ];
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+  localStorage.setItem(
+    STORE_KEY,
+    JSON.stringify(
+      data
+    )
+  );
+
+
+  localStorage.setItem(
+    MIGRATION_KEY,
+    "done"
+  );
+
+
+  return data;
+
+}
+
+
+/* =========================================================
+   STORE
+========================================================= */
+
+function store(){
+
+  return migrateLegacyIds(
+    rawStore()
+  );
+
+}
+
+
+function saveStore(
+  data
+){
+  const snapshot=structuredClone(data);
+  const deletions=getwellCollectDeletions(
+    getwellRemoteBaseline() || getwellPersistedStore(),
+    snapshot
+  );
+  localStorage.setItem(STORE_KEY,JSON.stringify(snapshot));
+
+  return getwellRemoteDelete(deletions).then(deleteResult=>{
+    if(!deleteResult.ok){
+      getwellNotify("Saved on this device, but deletion was NOT synchronized to Google Sheets. "+deleteResult.error,"error");
+      return deleteResult;
+    }
+    return getwellRemoteSave(snapshot).then(saveResult=>{
+      if(!saveResult.ok){
+        getwellNotify("Saved on this device, but NOT to Google Sheets. "+saveResult.error,"error");
+        return saveResult;
+      }
+      getwellSetRemoteBaseline(snapshot);
+      getwellSetPersistedStore(snapshot);
+      return saveResult;
+    });
+  });
+}
+
+
+/* =========================================================
+   PATIENT
+========================================================= */
+
+function mapLegacyId(
+  id
+){
+
+  const value =
+    String(
+      id ||
+      ""
+    );
+
+
+  const match =
+    value.match(
+      /^PAT-(\d+)$/i
+    );
+
+
+  return match
+    ? `GW-${String(Number(match[1])).padStart(4,"0")}`
+    : value;
+
+}
+
+
+function getPatient(
+  id
+){
+
+  const wanted =
+    mapLegacyId(
+      id
+    );
+
+
+  return (
+    store().patients ||
+    []
+  )
+  .find(
+    patient =>
+      patient.id ===
+      wanted
+  ) ||
+  null;
+
+   
+}
+
+
+function upsertPatient(
+  patient
+){
+
+  /*
+    Stamp the record so the two-way merge can tell which
+    side of the sync holds the newer version.
+  */
+  getwellStampRecord(patient);
+
+  const data =
+    store();
+
+
+  const index =
+    data.patients
+      .findIndex(
+        existing =>
+          existing.id ===
+          patient.id
+      );
+
+
+  if(index >= 0){
+
+    data.patients[index] =
+      patient;
+
+  }else{
+
+    data.patients.push(
+      patient
+    );
+
+  }
+
+
+  return saveStore(
+    data
+  );
+
+}
+
+
+/* ---------------------------------------------------------
+   PATIENT ID ALLOCATION
+   Advances settings.patient.nextNumber so the ID series
+   configured in Settings is actually honoured and never
+   hands out the same number twice.
+--------------------------------------------------------- */
+
+function getwellAdvancePatientNumber(usedNumber){
+  try{
+    const raw = localStorage.getItem("GETWELL_SYSTEM_CONFIG_V1");
+    const saved = raw ? JSON.parse(raw) : getwellDefaultSystemSettings();
+
+    if(!saved.patient || typeof saved.patient !== "object"){
+      saved.patient = getwellDefaultSystemSettings().patient;
+    }
+
+    const next = Math.max(
+      Number(saved.patient.nextNumber) || 1,
+      (Number(usedNumber) || 0) + 1
+    );
+
+    saved.patient.nextNumber = next;
+
+    localStorage.setItem(
+      "GETWELL_SYSTEM_CONFIG_V1",
+      JSON.stringify(saved)
+    );
+  }catch(error){
+    console.error("Unable to advance the patient ID counter:", error);
+  }
+}
+
+
+/*
+  Allocates the next free patient ID using the prefix and
+  digit width from Settings, skipping any number already
+  present in the store.
+*/
+function getwellAllocatePatientId(){
+  const config = getwellPatientIdSettings();
+  const existing = store().patients || [];
+
+  const pattern = new RegExp(
+    "^" + config.prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(\\d+)$",
+    "i"
+  );
+
+  let highest = 0;
+  existing.forEach(patient => {
+    const match = String(patient.id || "").match(pattern);
+    if(match) highest = Math.max(highest, Number(match[1]) || 0);
+  });
+
+  const number = Math.max(config.nextNumber, highest + 1);
+
+  return {
+    id: getwellFormatPatientId(number),
+    number
+  };
+}
+
+
+/* ---------------------------------------------------------
+   STABLE RECORD IDS
+
+   Appointments, visits and claims used to be keyed on
+   `${patient.id}-A${Date.now()}`, which is unstable, unsorted
+   and meaningless in a spreadsheet. They now use a readable
+   sequential series so a row can be identified by eye in the
+   Google Sheet and matched on upsert:
+
+     Patient      GW-0001
+     Appointment  APT-000001
+     Visit        VIS-000001
+     Claim        CLM-000001
+     File         FILE-000001
+
+   Existing records keep whatever id they already have.
+--------------------------------------------------------- */
+
+function getwellNextSequentialId(prefix, digits, collect){
+  const data = store();
+  const pattern = new RegExp("^" + prefix + "(\\d+)$", "i");
+
+  let highest = 0;
+
+  (data.patients || []).forEach(patient => {
+    (collect(patient) || []).forEach(item => {
+      const match = String((item && item.id) || "").match(pattern);
+      if(match) highest = Math.max(highest, Number(match[1]) || 0);
+    });
+  });
+
+  return prefix + String(highest + 1).padStart(digits, "0");
+}
+
+function getwellNextAppointmentId(){
+  return getwellNextSequentialId("APT-", 6, p => p.appointments);
+}
+
+function getwellNextVisitId(){
+  return getwellNextSequentialId("VIS-", 6, p => p.visits);
+}
+
+function getwellNextClaimId(){
+  return getwellNextSequentialId("CLM-", 6, p => p.claims);
+}
+
+
+/* =========================================================
+   CLAIMS
+========================================================= */
+
+function ensureClaims(
+  patient
+){
+
+  if(
+    !Array.isArray(
+      patient.claims
+    )
+  ){
+
+    patient.claims =
+      [];
+
+  }
+
+
+  return patient.claims;
+
+}
+
+
+/* =========================================================
+   VISITS
+========================================================= */
+
+function ensureVisit(visit){
+
+  if(!visit.billing){
+    visit.billing = {};
+  }
+
+  visit.billing.injection ||= {price:0,notes:""};
+  visit.billing.medication ||= {price:0,notes:""};
+  visit.billing.treatment ||= {price:0,notes:""};
+  visit.billing.other ||= {price:0,notes:""};
+
+  visit.billing.panel = Number(visit.billing.panel || 0);
+  visit.billing.selfPay = Number(visit.billing.selfPay || 0);
+
+  /*
+    New structure:
+    charges = [
+      {id, category, itemId, itemName, price, notes}
+    ]
+
+    Legacy visits are automatically converted once.
+  */
+  if(!Array.isArray(visit.charges)){
+    const legacy = [];
+
+    if(visit.injection || (+visit.billing.injection.price || 0)){
+      legacy.push({
+        id:`legacy-injection-${Date.now()}-${Math.random()}`,
+        category:"Injection",
+        itemId:"",
+        itemName:visit.injection || "",
+        price:+visit.billing.injection.price || 0,
+        notes:visit.billing.injection.notes || ""
+      });
+    }
+
+    if(visit.medication || (+visit.billing.medication.price || 0)){
+      legacy.push({
+        id:`legacy-medication-${Date.now()}-${Math.random()}`,
+        category:"Medication",
+        itemId:"",
+        itemName:visit.medication || "",
+        price:+visit.billing.medication.price || 0,
+        notes:visit.billing.medication.notes || ""
+      });
+    }
+
+    if(visit.additionalTreatment || (+visit.billing.treatment.price || 0)){
+      legacy.push({
+        id:`legacy-treatment-${Date.now()}-${Math.random()}`,
+        category:"Treatment",
+        itemId:"",
+        itemName:visit.additionalTreatment || "",
+        price:+visit.billing.treatment.price || 0,
+        notes:visit.billing.treatment.notes || ""
+      });
+    }
+
+    if(visit.otherName || (+visit.billing.other.price || 0)){
+      legacy.push({
+        id:`legacy-additional-${Date.now()}-${Math.random()}`,
+        category:"Additional",
+        itemId:"",
+        itemName:visit.otherName || "",
+        price:+visit.billing.other.price || 0,
+        notes:visit.billing.other.notes || ""
+      });
+    }
+
+    visit.charges = legacy;
+  }
+
+  return visit;
+}
+
+function visitTotal(visit){
+  ensureVisit(visit);
+  if(Array.isArray(visit.charges)){
+    return visit.charges.reduce(
+      (sum, item) => sum + (Number(item.price) || 0),
+      0
+    );
+  }
+
+  const billing = visit.billing;
+  return (
+    (+billing.injection.price || 0) +
+    (+billing.medication.price || 0) +
+    (+billing.treatment.price || 0) +
+    (+billing.other.price || 0)
+  );
+}
+
+function visitCategoryTotal(visit, category){
+  ensureVisit(visit);
+  return (visit.charges || [])
+    .filter(item => item.category === category)
+    .reduce((sum,item) => sum + (Number(item.price) || 0), 0);
+}
+
+
+
+/* =========================================================
+   PANEL TYPE NORMALIZER
+========================================================= */
+
+function normalizePanelType(value){
+
+  const v = String(
+    value || ""
+  ).trim().toUpperCase();
+
+  if(!v){
+    return "SELF_PAY";
+  }
+
+  if(
+    v === "SELF PAY" ||
+    v === "SELF-PAY" ||
+    v === "SELFPAY"
+  ){
+    return "SELF_PAY";
+  }
+
+  if(v === "OTHER"){
+    return "Other";
+  }
+
+  return v;
+}
+
+
+/* =========================================================
+   PANEL
+========================================================= */
+
+function patientUsesPanel(
+  patient
+){
+
+  return !!(
+    patient?.panelProvider &&
+    patient.panelProvider !==
+      "SELF_PAY"
+  );
+
+}
+
+
+function isPanelSuspended(
+  patient
+){
+
+  return (
+    patientUsesPanel(
+      patient
+    ) &&
+    (
+      patient.panelStatus ===
+        "Suspended" ||
+
+      patient.insuranceStatus ===
+        "Suspended"
+    )
+  );
+
+}
+
+
+function panelSuspensionNote(
+  patient
+){
+
+  return (
+    patient.panelSuspensionNote ||
+    patient.insuranceSuspensionNote ||
+    ""
+  );
+
+}
+
+
+/* =========================================================
+   FINANCE
+========================================================= */
+
+function grandTotal(
+  patient
+){
+
+  return (
+    patient.visits ||
+    []
+  )
+  .reduce(
+    (
+      total,
+      visit
+    ) =>
+      total +
+      visitTotal(
+        visit
+      ),
+    0
+  );
+
+}
+
+
+function claimsTotal(
+  patient
+){
+
+  return ensureClaims(
+    patient
+  )
+  .reduce(
+    (
+      total,
+      claim
+    ) =>
+      total +
+      (
+        +claim.amount ||
+        0
+      ),
+    0
+  );
+
+}
+
+
+function finance(
+  patient
+){
+
+  let injection =
+    0;
+
+  let medication =
+    0;
+
+  let treatment =
+    0;
+
+  let selfpay =
+    0;
+
+
+  (
+    patient.visits ||
+    []
+  )
+  .forEach(
+    visit => {
+
+      const billing = ensureVisit(visit).billing;
+
+      injection += visitCategoryTotal(visit,"Injection");
+      medication += visitCategoryTotal(visit,"Medication");
+      treatment += visitCategoryTotal(visit,"Treatment");
+      selfpay += +billing.selfPay || 0;
+
+    }
+  );
+
+
+  const grand =
+    grandTotal(
+      patient
+    );
+
+
+  const claimed =
+    claimsTotal(
+      patient
+    );
+
+
+  return {
+
+    grand,
+
+    claimed,
+
+    balance:
+      grand - claimed,
+
+    injection,
+
+    medication,
+
+    treatment,
+
+    selfpay
+
+  };
+
+}
+
+
+/* =========================================================
+   FOLLOW-UP
+========================================================= */
+
+function latestVisit(
+  patient
+){
+
+  return [
+    ...(patient.visits ||
+      [])
+  ]
+  .sort(
+    (
+      a,
+      b
+    ) =>
+      (
+        a.dateKey ||
+        ""
+      )
+      .localeCompare(
+        b.dateKey ||
+        ""
+      )
+  )
+  .at(
+    -1
+  ) ||
+  null;
+
+}
+
+
+function daysSince(
+  date
+){
+
+  if(!date){
+
+    return null;
+
+  }
+
+
+  const start =
+    new Date(
+      date +
+      "T00:00:00"
+    );
+
+
+  const today =
+    new Date();
+
+
+  today.setHours(
+    0,
+    0,
+    0,
+    0
+  );
+
+
+  return Math.floor(
+    (
+      today -
+      start
+    ) /
+    86400000
+  );
+
+}
+
+
+function alerts(){
+
+  const config =
+    getwellFollowUpSettings();
+
+
+  return (
+    store().patients ||
+    []
+  )
+  .map(
+    patient => {
+
+      const days =
+        daysSince(
+          latestVisit(
+            patient
+          )
+          ?.dateKey
+        );
+
+
+      if(
+        days === null ||
+        days <
+          config.dueAfterDays
+      ){
+
+        return null;
+
+      }
+
+
+      return {
+
+        id:
+          patient.id,
+
+        name:
+          patient.name,
+
+        days,
+
+        level:
+          days >=
+            config.overdueAfterDays
+            ? "overdue"
+            : "warning"
+
+      };
+
+    }
+  )
+  .filter(
+    Boolean
+  )
+  .sort(
+    (
+      a,
+      b
+    ) =>
+      b.days -
+      a.days
+  );
+
+}
+
+
+/* =========================================================
+   MONEY
+========================================================= */
+
+function money(
+  value
+){
+
+  return (
+    "RM " +
+    Number(
+      value ||
+      0
+    )
+    .toLocaleString(
+      "en-MY",
+      {
+        minimumFractionDigits:
+          2,
+
+        maximumFractionDigits:
+          2
+      }
+    )
+  );
+
+}
+
+
+/* =========================================================
+   THEME
+========================================================= */
+
+function applyTheme(
+  theme
+){
+
+  theme =
+    theme ===
+      "dark"
+      ? "dark"
+      : "light";
+
+
+  document.documentElement
+    .dataset.theme =
+    theme;
+
+
+  localStorage.setItem(
+    THEME_KEY,
+    theme
+  );
+
+
+  const button =
+    document.getElementById(
+      "themeToggle"
+    );
+
+
+  if(button){
+
+    button.textContent =
+      theme ===
+        "dark"
+        ? "☀"
+        : "☾";
+
+
+    button.title =
+      theme ===
+        "dark"
+        ? "Switch to Day Mode"
+        : "Switch to Night Mode";
+
+  }
+
+}
+
+
+function initTheme(){
+
+  applyTheme(
+    localStorage.getItem(
+      THEME_KEY
+    ) ||
+    "light"
+  );
+
+}
+
+
+function toggleTheme(){
+
+  const current =
+    document.documentElement
+      .dataset.theme ||
+    "light";
+
+
+  applyTheme(
+    current ===
+      "dark"
+      ? "light"
+      : "dark"
+  );
+
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+function header(){
+
+  const followUp =
+    getwellFollowUpSettings();
+
+
+  return `
+
+<header class="topbar">
+
+  <div class="topbar-left">
+
+    <div>
+
+      <div class="page-title">
+        ${document.title
+          .split("|")[0]
+          .trim()}
+      </div>
+
+      
+      <div class="page-subtitle">
+        Getwell Weight Loss Admin
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="topbar-right">
+
+    <div class="search-box">
+
+      <span>
+        ⌕
+      </span>
+
+      <input
+        id="globalSearch"
+        placeholder="Search patient or ID"
+      >
+
+    </div>
+
+
+    <div
+      id="notifWrap"
+      class="global-notification-wrap"
+    >
+
+      <button
+        class="icon-button"
+        onclick="toggleNotifications(event)"
+      >
+
+        🔔
+
+        <span
+          class="notification-count"
+          id="notifCount"
+          hidden
+        >
+          0
+        </span>
+
+      </button>
+
+
+      <div
+        id="notifPanel"
+        class="global-notification-panel"
+        hidden
+      >
+
+        <div class="notif-head">
+
+          <div>
+
+            <strong>
+              Follow-Up Alerts
+            </strong>
+
+            <span>
+              ${followUp.dueAfterDays}
+              days due ·
+              ${followUp.overdueAfterDays}
+              days overdue
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div id="notifBody"></div>
+
+      </div>
+
+    </div>
+
+
+    <button
+      class="theme-toggle"
+      id="themeToggle"
+      onclick="toggleTheme()"
+    >
+      ☾
+    </button>
+
+
+    <div class="user-avatar">
+      A
+    </div>
+
+
+  </div>
+
+</header>
+
+`;
+
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+function sidebar(
+  active
+){
+
+  const showPatients =
+    getwellFeatureEnabled(
+      "patients"
+    );
+
+
+  const showAppointments =
+    getwellFeatureEnabled(
+      "appointments"
+    );
+
+
+  const showPanel =
+    getwellFeatureEnabled(
+      "panel"
+    );
+
+
+  const showReports =
+    getwellFeatureEnabled(
+      "reports"
+    );
+
+
+  return `
+
+<aside class="sidebar">
+
+
+  <div
+    class="brand"
+    role="button"
+    tabindex="0"
+    aria-label="Go to Dashboard"
+    onclick="goHome()"
+    onkeydown="
+      if(
+        event.key==='Enter' ||
+        event.key===' '
+      ){
+        event.preventDefault();
+        goHome()
+      }
+    "
+  >
+
+    <div class="brand-mark">
+      G
+    </div>
+
+
+    <div>
+
+      <div class="brand-name">
+        GETWELL
+      </div>
+
+      <div class="brand-sub">
+        Weight Loss Admin
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <nav class="nav">
+
+    <div class="nav-label">
+      MAIN
+    </div>
+
+
+    <a
+      class="${
+        active ===
+          "dashboard"
+          ? "active"
+          : ""
+      }"
+      href="index.html"
+    >
+      ⌂ Dashboard
+    </a>
+
+
+    ${
+      showPatients
+        ? `
+
+          <a
+            class="${
+              active ===
+                "patients"
+                ? "active"
+                : ""
+            }"
+            href="patients.html"
+          >
+            ♙ Patients
+          </a>
+
+        `
+        : ""
+    }
+
+
+    ${
+      showAppointments
+        ? `
+
+          <a
+            class="${
+              active ===
+                "appointments"
+                ? "active"
+                : ""
+            }"
+            href="appointments.html"
+          >
+            ▣ Appointments
+          </a>
+
+        `
+        : ""
+    }
+
+
+    <div
+      class="nav-label"
+      style="margin-top:18px"
+    >
+      MANAGEMENT
+    </div>
+
+
+    ${
+      showPanel
+        ? `
+
+          <a
+            class="${
+              active ===
+                "panel"
+                ? "active"
+                : ""
+            }"
+            href="panel.html"
+          >
+            ▣ Panel
+          </a>
+
+        `
+        : ""
+    }
+
+
+    ${
+      showReports
+        ? `
+
+          <a
+            class="${
+              active ===
+                "reports"
+                ? "active"
+                : ""
+            }"
+            href="reports.html"
+          >
+            ▤ Reports
+          </a>
+
+        `
+        : ""
+    }
+
+
+    <a
+      class="${
+        active ===
+          "settings"
+          ? "active"
+          : ""
+      }"
+      href="settings.html"
+    >
+      ⚙ Settings
+    </a>
+
+
+  </nav>
+
+
+  <div class="sidebar-user">
+
+    <div class="user-card">
+
+      <div class="user-dot">
+        A
+      </div>
+
+      <div>
+
+        <div class="user-name">
+          Administrator
+        </div>
+
+        <div class="user-role">
+          Weight Loss Program
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+</aside>
+
+`;
+
+}
+
+
+/* =========================================================
+   HOME
+========================================================= */
+
+function goHome(){
+
+  window.location.href =
+    "index.html";
+
+}
+
+
+/* =========================================================
+   SHELL
+========================================================= */
+
+function shell(
+  title,
+  active,
+  body
+){
+
+  document.title =
+    title +
+    " | Getwell";
+
+
+  return `
+
+<div class="app">
+
+  ${sidebar(
+    active
+  )}
+
+  <main class="main">
+
+    ${header()}
+
+    <div class="content">
+
+      ${body}
+
+    </div>
+
+  </main>
+
+</div>
+
+`;
+
+}
+
+
+/* =========================================================
+   GLOBAL SEARCH
+========================================================= */
+
+function initGlobalSearch(){
+  const input = document.getElementById("globalSearch");
+  if(!input || input.dataset.bound === "1") return;
+  input.dataset.bound = "1";
+
+  const wrap = input.closest(".search-box");
+  if(!wrap) return;
+
+  let menu = wrap.querySelector(".global-search-results");
+  if(!menu){
+    menu = document.createElement("div");
+    menu.className = "global-search-results";
+    wrap.appendChild(menu);
+  }
+
+  const render = () => {
+    const q = String(input.value || "").trim().toLowerCase();
+    if(!q){
+      menu.innerHTML = "";
+      menu.hidden = true;
+      return;
+    }
+
+    const matches = (store().patients || [])
+      .filter(p => (`${p.name||""} ${p.id||""} ${p.phone||""} ${getPanelName(p)}`).toLowerCase().includes(q))
+      .slice(0,8);
+
+    menu.innerHTML = matches.length
+      ? matches.map(p => `
+          <button type="button" class="global-search-result"
+            onclick="window.location.href='patient-profile.html?patient=${encodeURIComponent(p.id)}'">
+            <strong>${escapeHtml(p.name || "Unnamed")}</strong>
+            <span>${escapeHtml(p.id || "")} · ${escapeHtml(getPanelName(p))}</span>
+          </button>
+        `).join("")
+      : `<div class="global-search-empty">No patients found.</div>`;
+
+    menu.hidden = false;
+  };
+
+  input.addEventListener("input", render);
+  input.addEventListener("keydown", event => {
+    if(event.key === "Enter"){
+      const first = menu.querySelector(".global-search-result");
+      if(first) first.click();
+    }
+    if(event.key === "Escape"){
+      menu.hidden = true;
+      input.blur();
+    }
+  });
+
+  document.addEventListener("click", event => {
+    if(!wrap.contains(event.target)) menu.hidden = true;
+  });
+}
+
+/* =========================================================
+   NOTIFICATIONS
+========================================================= */
+
+function toggleNotifications(
+  event
+){
+
+  if(event){
+
+    event.stopPropagation();
+
+  }
+
+
+  const panel =
+    document.getElementById(
+      "notifPanel"
+    );
+
+
+  if(!panel){
+
+    return;
+
+  }
+
+
+  panel.hidden =
+    !panel.hidden;
+
+
+  if(
+    !panel.hidden
+  ){
+
+    renderNotifications();
+
+  }
+
+}
+
+
+function renderNotifications(){
+
+  const list =
+    alerts();
+
+
+  const count =
+    document.getElementById(
+      "notifCount"
+    );
+
+
+  const body =
+    document.getElementById(
+      "notifBody"
+    );
+
+
+  if(
+    !count ||
+    !body
+  ){
+
+    return;
+
+  }
+
+
+  count.hidden =
+    list.length ===
+    0;
+
+
+  count.textContent =
+    list.length >
+      99
+      ? "99+"
+      : list.length;
+
+
+  if(!list.length){
+
+    body.innerHTML = `
+
+      <div class="notif-empty">
+        No patients are due.
+      </div>
+
+    `;
+
+
+    return;
+
+  }
+
+
+  body.innerHTML =
+    list
+      .map(
+        patient => `
+
+          <div
+            class="notif-item"
+            onclick="
+              location.href=
+                'patient-profile.html?patient=' +
+                encodeURIComponent(
+                  '${String(
+                    patient.id
+                  )
+                  .replace(
+                    /'/g,
+                    "\\'"
+                  )}'
+                )
+            "
+          >
+
+            <span
+              class="
+                notif-dot
+                ${patient.level}
+              "
+            ></span>
+
+
+            <div>
+
+              <div class="notif-name">
+                ${patient.name}
+              </div>
+
+
+              <div class="notif-text">
+
+                ${
+                  patient.level ===
+                    "overdue"
+                    ? "Overdue"
+                    : "Due for Follow-Up"
+                }
+
+                ·
+
+                ${patient.days}
+
+                days since last visit.
+
+              </div>
+
+            </div>
+
+          </div>
+
+        `
+      )
+      .join("");
+
+}
+
+
+/* =========================================================
+   CLOSE NOTIFICATIONS
+========================================================= */
+
+document.addEventListener(
+  "click",
+  event => {
+
+    const wrapper =
+      document.getElementById(
+        "notifWrap"
+      );
+
+
+    const panel =
+      document.getElementById(
+        "notifPanel"
+      );
+
+
+    if(
+      wrapper &&
+      panel &&
+      !wrapper.contains(
+        event.target
+      )
+    ){
+
+      panel.hidden =
+        true;
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   SETTINGS UPDATE
+========================================================= */
+
+window.addEventListener(
+  "storage",
+  event => {
+
+    if(
+      event.key ===
+      GW_SETTINGS_UPDATED_KEY
+    ){
+
+      /*
+        Settings page stays open.
+
+        Every other page reloads so
+        the new configuration applies.
+      */
+
+      if(
+        !location.pathname
+          .toLowerCase()
+          .endsWith(
+            "settings.html"
+          )
+      ){
+
+        location.reload();
+
+      }
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   INITIALIZATION
+========================================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    /*
+      Only READ settings here.
+
+      Do not call:
+      getSettings()
+      saveSettings()
+      mergeSettings()
+      because those belong to
+      settings.html.
+    */
+
+    getwellSystemSettings();
+
+
+    initTheme();
+    initGlobalSearch();
+
+    renderNotifications();
+
+
+    getwellStartRemoteSync();
+
+  }
+);
+   
