@@ -175,7 +175,7 @@ const DEFAULT_SETTINGS = {
         "MICARE",
 
       name:
-        "MICARE",
+        "MiCare",
 
       enabled:
         true
@@ -248,6 +248,21 @@ const DEFAULT_SETTINGS = {
     }
 
   ],
+
+  /* -------------------------------------------------------
+     DOCTORS
+  ------------------------------------------------------- */
+  doctors: [],
+
+  /* -------------------------------------------------------
+     VISIT CHARGE CATALOG
+  ------------------------------------------------------- */
+  chargeCatalog: {
+    Injection: [],
+    Medication: [],
+    Treatment: [],
+    Additional: []
+  },
 
 
   /* -------------------------------------------------------
@@ -811,6 +826,19 @@ document.getElementById(
 
       <button
         class="settings-tab"
+        data-section="catalog"
+        onclick="
+          showSettingsSection(
+            'catalog'
+          )
+        "
+      >
+        Doctors & Charges
+      </button>
+
+
+      <button
+        class="settings-tab"
         data-section="appointments"
         onclick="
           showSettingsSection(
@@ -1268,6 +1296,40 @@ document.getElementById(
       <!-- =================================================
            APPOINTMENTS
       ================================================== -->
+
+      <section
+        id="section-catalog"
+        class="settings-section"
+        hidden
+      >
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-head">
+            <div>
+              <h2>Doctors</h2>
+              <p>Doctors listed here can be selected when creating appointments and patient records.</p>
+            </div>
+            <button class="secondary" type="button" onclick="addDoctor()">＋ Add Doctor</button>
+          </div>
+          <div class="card-body">
+            <div id="doctorSettingsList"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>Visit Charges</h2>
+              <p>Manage selectable items and default prices for Injection, Medication, Treatment and Additional.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="chargeCatalogSettings"></div>
+          </div>
+        </div>
+
+      </section>
+
 
       <section
         id="section-appointments"
@@ -3455,6 +3517,149 @@ function renderFeatureOptions(){
 
 
 /* =========================================================
+   DOCTORS & CHARGE CATALOG
+========================================================= */
+
+function ensureCatalogSettings(){
+  if(!Array.isArray(settings.doctors)) settings.doctors = [];
+  if(!settings.chargeCatalog || typeof settings.chargeCatalog !== "object"){
+    settings.chargeCatalog = {};
+  }
+  ["Injection","Medication","Treatment","Additional"].forEach(category => {
+    if(!Array.isArray(settings.chargeCatalog[category])){
+      settings.chargeCatalog[category] = [];
+    }
+  });
+}
+
+function addDoctor(){
+  ensureCatalogSettings();
+  settings.doctors.push({
+    id: `DR-${Date.now()}`,
+    name: "New Doctor",
+    enabled: true
+  });
+  renderDoctors();
+}
+
+function updateDoctor(index, value){
+  ensureCatalogSettings();
+  if(settings.doctors[index]){
+    settings.doctors[index].name = value.trim();
+  }
+}
+
+function toggleDoctor(index){
+  ensureCatalogSettings();
+  if(settings.doctors[index]){
+    settings.doctors[index].enabled = settings.doctors[index].enabled === false;
+    renderDoctors();
+  }
+}
+
+function removeDoctor(index){
+  ensureCatalogSettings();
+  settings.doctors.splice(index,1);
+  renderDoctors();
+}
+
+function renderDoctors(){
+  ensureCatalogSettings();
+  const container = document.getElementById("doctorSettingsList");
+  if(!container) return;
+
+  container.innerHTML = settings.doctors.length
+    ? settings.doctors.map((doctor,index)=>`
+      <div class="settings-item">
+        <div class="settings-item-main">
+          <div class="settings-item-title">
+            <input class="settings-input"
+              value="${escapeHtml(doctor.name || "")}"
+              onchange="updateDoctor(${index}, this.value)">
+          </div>
+          <div class="settings-item-sub">Shown in appointment and patient Doctor dropdowns.</div>
+        </div>
+        <div class="settings-actions">
+          <button class="settings-toggle ${doctor.enabled !== false ? "on" : ""}"
+            onclick="toggleDoctor(${index})"></button>
+          <button class="secondary" type="button" onclick="removeDoctor(${index})">Delete</button>
+        </div>
+      </div>
+    `).join("")
+    : `<div class="notif-empty">No doctors configured. Click “Add Doctor”.</div>`;
+}
+
+function addChargeItem(category){
+  ensureCatalogSettings();
+  settings.chargeCatalog[category].push({
+    id: `${category.toUpperCase()}-${Date.now()}`,
+    name: "New Item",
+    price: 0,
+    enabled: true
+  });
+  renderChargeCatalog();
+}
+
+function updateChargeItem(category,index,key,value){
+  ensureCatalogSettings();
+  const item = settings.chargeCatalog[category][index];
+  if(!item) return;
+  item[key] = key === "price" ? Math.max(0, Number(value) || 0) : value.trim();
+}
+
+function toggleChargeItem(category,index){
+  ensureCatalogSettings();
+  const item = settings.chargeCatalog[category][index];
+  if(!item) return;
+  item.enabled = item.enabled === false;
+  renderChargeCatalog();
+}
+
+function removeChargeItem(category,index){
+  ensureCatalogSettings();
+  settings.chargeCatalog[category].splice(index,1);
+  renderChargeCatalog();
+}
+
+function renderChargeCatalog(){
+  ensureCatalogSettings();
+  const container = document.getElementById("chargeCatalogSettings");
+  if(!container) return;
+
+  const categories = ["Injection","Medication","Treatment","Additional"];
+  container.innerHTML = categories.map(category => `
+    <div style="margin-bottom:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <strong>${category}</strong>
+        <button class="secondary" type="button" onclick="addChargeItem('${category}')">＋ Add Item</button>
+      </div>
+
+      ${settings.chargeCatalog[category].length
+        ? settings.chargeCatalog[category].map((item,index)=>`
+          <div class="settings-item">
+            <div class="settings-item-main" style="display:grid;grid-template-columns:minmax(0,1fr) 140px;gap:8px;">
+              <input class="settings-input"
+                value="${escapeHtml(item.name || "")}"
+                onchange="updateChargeItem('${category}',${index},'name',this.value)">
+              <input class="settings-input" type="number" min="0" step="0.01"
+                value="${Number(item.price)||0}"
+                onchange="updateChargeItem('${category}',${index},'price',this.value)">
+            </div>
+            <div class="settings-actions">
+              <button class="settings-toggle ${item.enabled !== false ? "on" : ""}"
+                onclick="toggleChargeItem('${category}',${index})"></button>
+              <button class="secondary" type="button" onclick="removeChargeItem('${category}',${index})">Delete</button>
+            </div>
+          </div>
+        `).join("")
+        : `<div class="notif-empty">No ${category.toLowerCase()} items configured.</div>`
+      }
+    </div>
+  `).join("");
+}
+
+
+/* =========================================================
    SECTION NAVIGATION
 ========================================================= */
 
@@ -3608,6 +3813,19 @@ function saveAllSettings(){
 
 
   /* -------------------------------------------------------
+     DOCTORS & CHARGE CATALOG
+  ------------------------------------------------------- */
+  ensureCatalogSettings();
+
+  document
+    .querySelectorAll("#doctorSettingsList .settings-input")
+    .forEach((input,index) => {
+      if(settings.doctors[index]){
+        settings.doctors[index].name = input.value.trim();
+      }
+    });
+
+  /* -------------------------------------------------------
      APPOINTMENTS
   ------------------------------------------------------- */
 
@@ -3726,6 +3944,10 @@ function loadEverything(){
   loadGeneral();
 
   loadPatientSettings();
+
+  ensureCatalogSettings();
+  renderDoctors();
+  renderChargeCatalog();
 
   renderPanels();
 
