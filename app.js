@@ -102,8 +102,27 @@ function getwellSystemSettings(){
       },
 
 
-      panels: [],
+      panels: [
+        {id:"PMCARE",name:"PMCARE",enabled:true},
+        {id:"UITM",name:"UITM",enabled:true},
+        {id:"COMPUMED",name:"COMPUMED",enabled:true},
+        {id:"MICARE",name:"MiCare",enabled:true},
+        {id:"SELCARE",name:"SELCARE",enabled:true},
+        {id:"IHP",name:"IHP",enabled:true},
+        {id:"ASP",name:"ASP",enabled:true},
+        {id:"HEALTHCONNECT",name:"HEALTHCONNECT",enabled:true},
+        {id:"EMAS",name:"EMAS",enabled:true},
+        {id:"SPONSORED",name:"SPONSORED",enabled:true}
+      ],
 
+      doctors: [],
+
+      chargeCatalog: {
+        Injection: [],
+        Medication: [],
+        Treatment: [],
+        Additional: []
+      },
 
       appointments: {
 
@@ -378,10 +397,14 @@ function getwellAllPanels(){
     getwellSystemSettings();
 
 
-  return Array.isArray(
-    settings.panels
-  )
-    ? settings.panels
+  return Array.isArray(settings.panels)
+    ? settings.panels.map(panel => {
+        const copy = {...panel};
+        if(String(copy.id || "").toUpperCase() === "MICARE"){
+          copy.name = "MiCare";
+        }
+        return copy;
+      })
     : [];
 
 }
@@ -563,6 +586,45 @@ function getPanelName(
 
 }
 
+
+/* =========================================================
+   DOCTORS & CHARGE CATALOG
+========================================================= */
+
+function getwellDoctors(){
+  const settings = getwellSystemSettings();
+  return Array.isArray(settings.doctors)
+    ? settings.doctors.filter(d => d && d.enabled !== false && String(d.name || "").trim())
+    : [];
+}
+
+function getwellDoctorOptions(){
+  return getwellDoctors().map(d => ({
+    id: d.id || String(d.name).trim(),
+    name: String(d.name).trim()
+  }));
+}
+
+function getwellChargeCatalog(){
+  const settings = getwellSystemSettings();
+  const fallback = {Injection:[], Medication:[], Treatment:[], Additional:[]};
+  const source = settings.chargeCatalog || {};
+  return ["Injection","Medication","Treatment","Additional"].reduce((out, category) => {
+    out[category] = Array.isArray(source[category])
+      ? source[category].filter(item => item && item.enabled !== false && String(item.name || "").trim())
+      : fallback[category];
+    return out;
+  }, {});
+}
+
+function getwellChargeItem(category, id){
+  return getwellChargeCatalog()[category]?.find(item => String(item.id) === String(id)) || null;
+}
+
+function getwellChargePrice(category, id){
+  const item = getwellChargeItem(category, id);
+  return item ? Number(item.price) || 0 : 0;
+}
 
 /* =========================================================
    APPOINTMENT SETTINGS
@@ -748,7 +810,7 @@ function getwellReportSettings(){
    ========================================================= */
 
 const GETWELL_SHEETS_API_URL =
-  "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+  "https://script.google.com/macros/s/AKfycbwCAUk-c4fV3Ny7SfY2x3mWity4W8MKxJwlajxdFdUOaDAjFP7lgtb17_BbOXWlGT8kSg/exec";
 
 const GETWELL_REMOTE_POLL_MS = 30000;
 const GETWELL_REMOTE_SAVE_KEY = "GETWELL_REMOTE_LAST_SAVE";
@@ -1370,85 +1432,106 @@ function ensureClaims(
    VISITS
 ========================================================= */
 
-function ensureVisit(
-  visit
-){
+function ensureVisit(visit){
 
-  if(
-    !visit.billing
-  ){
-
-    visit.billing =
-      {};
-
+  if(!visit.billing){
+    visit.billing = {};
   }
 
+  visit.billing.injection ||= {price:0,notes:""};
+  visit.billing.medication ||= {price:0,notes:""};
+  visit.billing.treatment ||= {price:0,notes:""};
+  visit.billing.other ||= {price:0,notes:""};
 
-  visit.billing.injection ||=
-    {
-      price:0,
-      notes:""
-    };
+  visit.billing.panel = Number(visit.billing.panel || 0);
+  visit.billing.selfPay = Number(visit.billing.selfPay || 0);
 
+  /*
+    New structure:
+    charges = [
+      {id, category, itemId, itemName, price, notes}
+    ]
 
-  visit.billing.medication ||=
-    {
-      price:0,
-      notes:""
-    };
+    Legacy visits are automatically converted once.
+  */
+  if(!Array.isArray(visit.charges)){
+    const legacy = [];
 
+    if(visit.injection || (+visit.billing.injection.price || 0)){
+      legacy.push({
+        id:`legacy-injection-${Date.now()}-${Math.random()}`,
+        category:"Injection",
+        itemId:"",
+        itemName:visit.injection || "",
+        price:+visit.billing.injection.price || 0,
+        notes:visit.billing.injection.notes || ""
+      });
+    }
 
-  visit.billing.treatment ||=
-    {
-      price:0,
-      notes:""
-    };
+    if(visit.medication || (+visit.billing.medication.price || 0)){
+      legacy.push({
+        id:`legacy-medication-${Date.now()}-${Math.random()}`,
+        category:"Medication",
+        itemId:"",
+        itemName:visit.medication || "",
+        price:+visit.billing.medication.price || 0,
+        notes:visit.billing.medication.notes || ""
+      });
+    }
 
+    if(visit.additionalTreatment || (+visit.billing.treatment.price || 0)){
+      legacy.push({
+        id:`legacy-treatment-${Date.now()}-${Math.random()}`,
+        category:"Treatment",
+        itemId:"",
+        itemName:visit.additionalTreatment || "",
+        price:+visit.billing.treatment.price || 0,
+        notes:visit.billing.treatment.notes || ""
+      });
+    }
 
-  visit.billing.other ||=
-    {
-      price:0,
-      notes:""
-    };
+    if(visit.otherName || (+visit.billing.other.price || 0)){
+      legacy.push({
+        id:`legacy-additional-${Date.now()}-${Math.random()}`,
+        category:"Additional",
+        itemId:"",
+        itemName:visit.otherName || "",
+        price:+visit.billing.other.price || 0,
+        notes:visit.billing.other.notes || ""
+      });
+    }
 
-
-  visit.billing.panel =
-    Number(
-      visit.billing.panel ||
-      0
-    );
-
-
-  visit.billing.selfPay =
-    Number(
-      visit.billing.selfPay ||
-      0
-    );
-
+    visit.charges = legacy;
+  }
 
   return visit;
-
 }
 
+function visitTotal(visit){
+  ensureVisit(visit);
+  if(Array.isArray(visit.charges)){
+    return visit.charges.reduce(
+      (sum, item) => sum + (Number(item.price) || 0),
+      0
+    );
+  }
 
-function visitTotal(
-  visit
-){
-
-  const billing =
-    ensureVisit(
-      visit
-    ).billing;
-
-
+  const billing = visit.billing;
   return (
     (+billing.injection.price || 0) +
     (+billing.medication.price || 0) +
     (+billing.treatment.price || 0) +
     (+billing.other.price || 0)
   );
-
 }
+
+function visitCategoryTotal(visit, category){
+  ensureVisit(visit);
+  return (visit.charges || [])
+    .filter(item => item.category === category)
+    .reduce((sum,item) => sum + (Number(item.price) || 0), 0);
+}
+
 
 
 /* =========================================================
@@ -1605,30 +1688,12 @@ function finance(
   .forEach(
     visit => {
 
-      const billing =
-        ensureVisit(
-          visit
-        ).billing;
+      const billing = ensureVisit(visit).billing;
 
-
-      injection +=
-        +billing.injection.price ||
-        0;
-
-
-      medication +=
-        +billing.medication.price ||
-        0;
-
-
-      treatment +=
-        +billing.treatment.price ||
-        0;
-
-
-      selfpay +=
-        +billing.selfPay ||
-        0;
+      injection += visitCategoryTotal(visit,"Injection");
+      medication += visitCategoryTotal(visit,"Medication");
+      treatment += visitCategoryTotal(visit,"Treatment");
+      selfpay += +billing.selfPay || 0;
 
     }
   );
@@ -1653,11 +1718,7 @@ function finance(
     claimed,
 
     balance:
-      Math.max(
-        0,
-        grand -
-        claimed
-      ),
+      grand - claimed,
 
     injection,
 
@@ -2344,6 +2405,67 @@ function shell(
 
 
 /* =========================================================
+   GLOBAL SEARCH
+========================================================= */
+
+function initGlobalSearch(){
+  const input = document.getElementById("globalSearch");
+  if(!input || input.dataset.bound === "1") return;
+  input.dataset.bound = "1";
+
+  const wrap = input.closest(".search-box");
+  if(!wrap) return;
+
+  let menu = wrap.querySelector(".global-search-results");
+  if(!menu){
+    menu = document.createElement("div");
+    menu.className = "global-search-results";
+    wrap.appendChild(menu);
+  }
+
+  const render = () => {
+    const q = String(input.value || "").trim().toLowerCase();
+    if(!q){
+      menu.innerHTML = "";
+      menu.hidden = true;
+      return;
+    }
+
+    const matches = (store().patients || [])
+      .filter(p => (`${p.name||""} ${p.id||""} ${p.phone||""} ${getPanelName(p)}`).toLowerCase().includes(q))
+      .slice(0,8);
+
+    menu.innerHTML = matches.length
+      ? matches.map(p => `
+          <button type="button" class="global-search-result"
+            onclick="window.location.href='patient-profile.html?patient=${encodeURIComponent(p.id)}'">
+            <strong>${escapeHtml(p.name || "Unnamed")}</strong>
+            <span>${escapeHtml(p.id || "")} · ${escapeHtml(getPanelName(p))}</span>
+          </button>
+        `).join("")
+      : `<div class="global-search-empty">No patients found.</div>`;
+
+    menu.hidden = false;
+  };
+
+  input.addEventListener("input", render);
+  input.addEventListener("keydown", event => {
+    if(event.key === "Enter"){
+      const first = menu.querySelector(".global-search-result");
+      if(first) first.click();
+    }
+    if(event.key === "Escape"){
+      menu.hidden = true;
+      input.blur();
+    }
+  });
+
+  document.addEventListener("click", event => {
+    if(!wrap.contains(event.target)) menu.hidden = true;
+  });
+}
+
+/* =========================================================
    NOTIFICATIONS
 ========================================================= */
 
@@ -2605,7 +2727,7 @@ document.addEventListener(
 
 
     initTheme();
-
+    initGlobalSearch();
 
     renderNotifications();
 
