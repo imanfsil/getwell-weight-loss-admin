@@ -1371,14 +1371,15 @@ html[data-theme="dark"] .user-card:hover{
   background-repeat:no-repeat;
   background-image:linear-gradient(
     180deg,
-    var(--grad-1) 0px,
-    var(--grad-2) 66px,
-    var(--grad-3) 168px,
-    var(--grad-4) 270px,
-    var(--grad-5) 380px,
-    rgba(220,235,254,0) 510px
+    var(--grad-1) 0%,
+    var(--grad-2) 12%,
+    var(--grad-3) 30%,
+    var(--grad-4) 50%,
+    var(--grad-5) 68%,
+    rgba(220,235,254,.72) 78%,
+    rgba(238,245,255,0) 100%
   );
-  background-size:100% 510px;
+  background-size:100% 620px;
 }
 
 /* The dashboard gets the full soft wellness gradient from the
@@ -1388,14 +1389,15 @@ html[data-theme="dark"] .user-card:hover{
 .main-dash{
   background-image:linear-gradient(
     180deg,
-    var(--grad-1) 0px,
-    var(--grad-2) 66px,
-    var(--grad-3) 168px,
-    var(--grad-4) 258px,
-    var(--grad-5) 320px,
-    rgba(220,235,254,0) 400px
+    var(--grad-1) 0%,
+    var(--grad-2) 12%,
+    var(--grad-3) 31%,
+    var(--grad-4) 50%,
+    var(--grad-5) 68%,
+    rgba(220,235,254,.72) 80%,
+    rgba(238,245,255,0) 100%
   );
-  background-size:100% 400px;
+  background-size:100% 620px;
 }
 
 
@@ -1470,7 +1472,7 @@ html[data-theme="dark"] .user-card:hover{
 --------------------------------------------------------- */
 
 .topbar{
-  background:linear-gradient(180deg,var(--grad-1) 0px,var(--grad-2) 86px);
+  background:transparent;
   border-bottom:0;
 }
 
@@ -2096,26 +2098,33 @@ html[data-theme="dark"] .main{
   background-color:#080D19;
   background-image:linear-gradient(
     180deg,
-    var(--grad-1) 0px,
-    var(--grad-2) 66px,
-    rgba(18,35,63,.55) 80px,
-    rgba(8,13,25,0) 104px
+    var(--grad-1) 0%,
+    var(--grad-2) 14%,
+    var(--grad-3) 30%,
+    var(--grad-4) 50%,
+    var(--grad-5) 68%,
+    rgba(10,17,32,.72) 80%,
+    rgba(8,13,25,0) 100%
   );
+  background-size:100% 620px;
 }
 
 html[data-theme="dark"] .main-dash{
   background-image:linear-gradient(
     180deg,
-    var(--grad-1) 0px,
-    var(--grad-2) 66px,
-    var(--grad-3) 168px,
-    var(--grad-4) 268px,
-    rgba(8,13,25,0) 400px
+    var(--grad-1) 0%,
+    var(--grad-2) 14%,
+    var(--grad-3) 31%,
+    var(--grad-4) 50%,
+    var(--grad-5) 68%,
+    rgba(10,17,32,.72) 80%,
+    rgba(8,13,25,0) 100%
   );
+  background-size:100% 620px;
 }
 
 html[data-theme="dark"] .topbar{
-  background:linear-gradient(180deg,var(--grad-1) 0px,var(--grad-2) 86px);
+  background:transparent;
   border-bottom:0;
 }
 
@@ -2731,5 +2740,69 @@ html[data-theme="dark"] .main{
       rgba(8,13,25,0) 360px
     );
     background-size:100% 360px;
+  }
+}
+
+/* =========================================================
+   SMOOTH GLOBAL GRADIENT — FINAL OVERRIDE
+   One continuous gradient across the topbar + page content.
+   No hard bands, blocks, or abrupt fade-outs.
+========================================================= */
+.main,
+.main-dash{
+  background-color:var(--page) !important;
+  background-repeat:no-repeat !important;
+  background-position:top center !important;
+  background-image:linear-gradient(
+    180deg,
+    var(--grad-1) 0%,
+    var(--grad-2) 13%,
+    var(--grad-3) 31%,
+    var(--grad-4) 50%,
+    var(--grad-5) 67%,
+    rgba(220,235,254,.68) 79%,
+    rgba(238,245,255,.30) 89%,
+    rgba(238,245,255,0) 100%
+  ) !important;
+  background-size:100% 650px !important;
+}
+
+.topbar,
+html[data-theme="dark"] .topbar{
+  background:transparent !important;
+  border-bottom:0 !important;
+}
+
+html[data-theme="dark"] .main,
+html[data-theme="dark"] .main-dash{
+  background-color:#080D19 !important;
+  background-image:linear-gradient(
+    180deg,
+    #173D78 0%,
+    #214F91 13%,
+    #1B3557 31%,
+    #12243D 50%,
+    #0D182A 67%,
+    rgba(13,24,42,.72) 79%,
+    rgba(8,13,25,.30) 89%,
+    rgba(8,13,25,0) 100%
+  ) !important;
+  background-size:100% 650px !important;
+}
+
+@media (max-width:820px){
+  .main,
+  .main-dash{
+    background-size:100% 520px !important;
+  }
+
+  html[data-theme="dark"] .main,
+  html[data-theme="dark"] .main-dash{
+    background-size:100% 520px !important;
+  }
+
+  .topbar,
+  html[data-theme="dark"] .topbar{
+    background:transparent !important;
   }
 }
