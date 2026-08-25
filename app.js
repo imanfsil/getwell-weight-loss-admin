@@ -3344,9 +3344,17 @@ function header(
     ? `${getwellGreeting()}, ${escapeHtml(getwellAdminFirstName())} \u{1F44B}`
     : escapeHtml(document.title.split("|")[0].trim());
 
-  const subtitle = isDashboard
-    ? "Here's what's happening with your clinic today."
-    : "Getwell Weight Loss Admin";
+  const pageSubtitles = {
+    patients: "Manage patient records.",
+    appointments: "Manage appointments and follow-up attention from one place.",
+    panel: "Track panel patients, claim progress and outstanding balances.",
+    reports: "View clinic performance and financial reports.",
+    settings: "Manage how the Getwell Weight Loss Admin system works.",
+    patients_profile: "View and manage this patient's programme details.",
+    dashboard: "Here's what's happening with your clinic today."
+  };
+
+  const subtitle = pageSubtitles[active] || pageSubtitles.dashboard;
 
   return `
 
@@ -3369,11 +3377,9 @@ function header(
         ${title}
       </div>
 
-      ${isDashboard ? `
       <div class="page-subtitle">
         ${subtitle}
       </div>
-      ` : ""}
 
     </div>
 
