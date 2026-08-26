@@ -2122,19 +2122,20 @@ function getwellSyncRemoteStore(){
 }
 
 function getwellStartRemoteSync(){
-  if(!getwellRemoteConfigured()) return;
-
-  setTimeout(() => getwellSyncRemoteStore(), 250);
-
-  setInterval(() => {
-    const lastSave = Number(localStorage.getItem(GETWELL_REMOTE_SAVE_KEY) || 0);
-
-    /* Do not read back while a write is still travelling. */
-    if(Date.now() - lastSave < 5000) return;
-
-    getwellSyncRemoteStore();
-  }, GETWELL_REMOTE_POLL_MS);
+  /* Automatic polling is intentionally disabled. */
+  return false;
 }
+
+function getwellManualSync(){
+  if(!getwellRemoteConfigured()){
+    getwellNotify("Google Sheets sync is not configured.","error");
+    return false;
+  }
+  getwellSyncRemoteStore();
+  return true;
+}
+
+window.getwellManualSync = getwellManualSync;
 
 
 /* =========================================================
@@ -5699,6 +5700,29 @@ window.addEventListener(
 
 
 /* =========================================================
+   NAVIGATION / FORM SAFETY
+   ---------------------------------------------------------
+   The admin application is a multi-page app. A form submission
+   or an accidental Dashboard anchor must never be able to
+   replace the current page while the user is working.
+========================================================= */
+
+document.addEventListener("submit", event => {
+  /* There are no application forms that should submit to a URL.
+     All saves are handled by JavaScript. */
+  event.preventDefault();
+  event.stopPropagation();
+}, true);
+
+/* Record every real page transition for troubleshooting without
+   changing navigation behaviour. */
+window.addEventListener("beforeunload", () => {
+  try {
+    sessionStorage.setItem("GETWELL_LAST_PAGE", location.pathname + location.search);
+  } catch(e) {}
+});
+
+/* =========================================================
    INITIALIZATION
 ========================================================= */
 
@@ -5743,7 +5767,17 @@ document.addEventListener(
     }
 
 
-    getwellStartRemoteSync();
+    /*
+      STABILITY MODE:
+      Automatic background polling is intentionally disabled in
+      the frontend. It can never interrupt navigation, forms or
+      modals. Individual create/edit/delete operations still use
+      the existing Google Sheets save functions.
+
+      A manual sync remains available through
+      getwellManualSync() when staff explicitly request it.
+    */
+    // getwellStartRemoteSync();
 
   }
 );

@@ -19,6 +19,12 @@ Google Apps Script web app.
 | `styles.css` | All styling |
 | `Code.gs` | **Google Apps Script backend** (see below) |
 
+## Stability build — 26 August 2026
+
+This build intentionally disables automatic 30-second Google Sheets polling in the browser. The application must never interrupt a staff member who is navigating, typing into a form, or working inside a modal. Existing create/edit/delete actions continue to use the Google Sheets backend.
+
+Use `getwellManualSync()` from the browser console when an explicit remote refresh is required. The frontend no longer performs a background page refresh or automatic cross-tab re-render while staff are working.
+
 ## Setting up the Google Sheets backend
 
 `Code.gs` is the backend. It was missing from earlier builds,
