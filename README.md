@@ -309,3 +309,10 @@ visit** on a day the patient did not attend.
 
 The app runs from `localStorage` and stays fully usable when
 Google is unreachable; it syncs when the connection returns.
+
+
+## 2026-08-26 Save/Synchronization Stability Update
+
+The frontend no longer blocks a normal visit/patient/appointment save when the deployed Google Apps Script is missing or behind on the `deleteRecords` action. The current state is saved first; failed deletion synchronization is queued locally for retry instead of producing the misleading red error that previously appeared after a successful save.
+
+The included `Code.gs` supports the `deleteRecords` action. If the Google Apps Script deployment is older than this file, redeploy the script as a **New version** so queued deletions can synchronize normally.

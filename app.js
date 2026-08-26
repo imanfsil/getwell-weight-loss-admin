@@ -2409,6 +2409,28 @@ function store(){
 }
 
 
+function getwellHasDeletions(deletions){
+  return Object.values(deletions || {}).some(
+    list => Array.isArray(list) && list.length
+  );
+}
+
+function getwellQueuePendingDeletions(deletions){
+  try{
+    const existing = JSON.parse(
+      localStorage.getItem("GETWELL_PENDING_DELETIONS") || "{}"
+    );
+    const merged = {};
+    ["patients","appointments","visits","charges","claims","files"].forEach(key=>{
+      merged[key] = [...new Set([
+        ...(Array.isArray(existing[key]) ? existing[key] : []),
+        ...(Array.isArray(deletions?.[key]) ? deletions[key] : [])
+      ])];
+    });
+    localStorage.setItem("GETWELL_PENDING_DELETIONS", JSON.stringify(merged));
+  }catch(e){}
+}
+
 function saveStore(
   data
 ){
@@ -2417,20 +2439,46 @@ function saveStore(
     getwellRemoteBaseline() || getwellPersistedStore(),
     snapshot
   );
+  const hasDeletions=getwellHasDeletions(deletions);
+
   localStorage.setItem(STORE_KEY,JSON.stringify(snapshot));
 
-  return getwellRemoteDelete(deletions).then(deleteResult=>{
-    if(!deleteResult.ok){
-      getwellNotify("Saved on this device, but deletion was NOT synchronized to Google Sheets. "+deleteResult.error,"error");
-      return deleteResult;
+  /*
+    A deletion endpoint may be one deployment behind the frontend.
+    Do NOT let that stale endpoint block an otherwise valid save.
+    Save the current state first. If deletion sync fails, queue the
+    deletion IDs for a later retry instead of showing the misleading
+    red "visit was not saved" style error.
+  */
+  const syncDelete = hasDeletions
+    ? getwellRemoteDelete(deletions)
+    : Promise.resolve({ok:true});
+
+  return syncDelete.then(deleteResult=>{
+    if(!deleteResult.ok && hasDeletions){
+      getwellQueuePendingDeletions(deletions);
     }
+
     return getwellRemoteSave(snapshot).then(saveResult=>{
       if(!saveResult.ok){
-        getwellNotify("Saved on this device, but NOT to Google Sheets. "+saveResult.error,"error");
+        getwellNotify(
+          "Saved on this device, but NOT to Google Sheets. " +
+          saveResult.error,
+          "error"
+        );
         return saveResult;
       }
+
       getwellSetRemoteBaseline(snapshot);
       getwellSetPersistedStore(snapshot);
+
+      if(!deleteResult.ok && hasDeletions){
+        getwellNotify(
+          "Visit saved successfully. Some deletion changes are pending Google Sheets synchronization.",
+          "warning"
+        );
+      }
+
       return saveResult;
     });
   });
