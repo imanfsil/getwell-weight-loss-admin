@@ -1232,6 +1232,34 @@ document.getElementById("root").innerHTML=shell("Patient Profile","patients",`
 const secFilesContent=document.getElementById("secFilesContent");
 refresh();
 
+/* =========================================================
+   BACKGROUND SYNC -> IN-PLACE REFRESH
+
+   refresh() re-reads the patient and rewrites only the inner
+   containers. It does NOT touch the tab strip, the open
+   section, the modals or any form field, so the active tab
+   (Overview / Visits / Body Composition / Files & Photos /
+   Appointments / Panel Claims) survives a background sync.
+
+   If a modal is open -- Add Visit, Edit Visit, Edit Patient,
+   Add Claim, Profile Photo -- the guard in app.js defers this
+   callback entirely and replays it once the modal closes, so a
+   half-typed visit is never overwritten.
+========================================================= */
+
+getwellOnDataUpdated(() => {
+  const current = getPatient(id);
+  if(!current) return;   /* deleted elsewhere: leave the page as it is */
+  refresh();
+});
+
+/* A Settings change alters the Visit Type and charge dropdowns
+   the visit form builds, so re-render those lists too. */
+getwellOnSettingsUpdated(() => {
+  if(!getPatient(id)) return;
+  refresh();
+});
+
 if(params.get("openClaim")==="1"){
   setTimeout(()=>{
     showSection("claims",document.querySelector(".patient-tabs button:last-child"));

@@ -9,21 +9,38 @@
    controlled this page before still controls it now.
 ========================================================= */
 
-const ds = getwellDashboardSettings();
-const ps = store().patients || [];
-const al = alerts();
-const followUpConfig = getwellFollowUpSettings();
+/*
+  DASHBOARD STATE
 
-const panelPatients = ps.filter(patientUsesPanel);
-let panelGrand = 0, panelClaimed = 0;
-panelPatients.forEach(patient => {
-  const f = finance(patient);
-  panelGrand += f.grand;
-  panelClaimed += f.claimed;
-});
+  These used to be top-level `const`s computed once while the
+  page parsed, which meant the only way to show fresher numbers
+  was to reload the whole document -- and a reload is exactly
+  what was closing modals mid-edit. They are re-computed by
+  loadDashboardData() instead, so a background sync can refresh
+  the dashboard in place.
+*/
+let ds, ps, al, followUpConfig, panelPatients, panelGrand, panelClaimed, todayKey;
 
-/* Local calendar day; toISOString() reported yesterday before 8am in GMT+8. */
-const todayKey = getwellTodayKey();
+function loadDashboardData(){
+  ds = getwellDashboardSettings();
+  ps = store().patients || [];
+  al = alerts();
+  followUpConfig = getwellFollowUpSettings();
+
+  panelPatients = ps.filter(patientUsesPanel);
+  panelGrand = 0;
+  panelClaimed = 0;
+  panelPatients.forEach(patient => {
+    const f = finance(patient);
+    panelGrand += f.grand;
+    panelClaimed += f.claimed;
+  });
+
+  /* Local calendar day; toISOString() reported yesterday before 8am in GMT+8. */
+  todayKey = getwellTodayKey();
+}
+
+loadDashboardData();
 
 
 /* ---------------------------------------------------------
@@ -50,11 +67,12 @@ const kpiIcon = (name, tone) =>
    the same width and stretch to the same height.
 --------------------------------------------------------- */
 
+function buildKpiCards(){
 const newThisMonth = ps.filter(p => String(p.startDate || "").slice(0,7) === todayKey.slice(0,7)).length;
 const activeCount = ps.filter(p => p.status === "Active").length;
 const overdueCount = al.filter(a => a.level === "overdue").length;
 
-const kpiCards = [
+return [
   ds.showTotalPatients !== false ? `
     <div class="kpi">
       ${kpiIcon("people","")}
@@ -95,6 +113,7 @@ const kpiCards = [
       </div>
     </div>` : ""
 ].join("");
+}
 
 
 /* ---------------------------------------------------------
@@ -130,9 +149,10 @@ function formatTime(value){
   return `${String(hour).padStart(2,"0")}:${match[2]} ${suffix}`;
 }
 
+function buildAppointmentsCard(){
 const appointmentsToday = todaysAppointments();
 
-const appointmentsCard = getwellFeatureEnabled("appointments") ? `
+return getwellFeatureEnabled("appointments") ? `
   <div class="card">
     <div class="card-head">
       <div><h2>Today's Appointments</h2><p>${appointmentsToday.length} scheduled for today</p></div>
@@ -157,6 +177,7 @@ const appointmentsCard = getwellFeatureEnabled("appointments") ? `
     <a class="card-foot-link" href="appointments.html">${ICONS.calendar} View Full Calendar</a>
   </div>
 ` : "";
+}
 
 
 /* ---------------------------------------------------------
@@ -170,7 +191,8 @@ function overdueLabel(alert){
   return over + (over === 1 ? " day overdue" : " days overdue");
 }
 
-const followUpCard = ds.showAttention !== false ? `
+function buildFollowUpCard(){
+return ds.showAttention !== false ? `
   <div class="card">
     <div class="card-head">
       <div><h2>Patients Due for Follow-Up</h2><p>${followUpConfig.dueAfterDays} days due · ${followUpConfig.overdueAfterDays} days overdue</p></div>
@@ -197,6 +219,7 @@ const followUpCard = ds.showAttention !== false ? `
     <a class="card-foot-link" href="patients.html">${ICONS.chart} View All Follow-Ups</a>
   </div>
 ` : "";
+}
 
 
 /* ---------------------------------------------------------
@@ -277,11 +300,12 @@ function progressPercent(patient){
   return Math.max(0, Math.min(100, Math.round(percent)));
 }
 
+function buildRecentCard(){
 const recentPatients = ps.slice().sort((a,b) =>
   String(b.startDate || "").localeCompare(String(a.startDate || ""))
 ).slice(0,6);
 
-const recentCard = getwellFeatureEnabled("patients") ? `
+return getwellFeatureEnabled("patients") ? `
   <div class="card">
     <div class="card-head">
       <div><h2>Recent Patients</h2><p>Newest programme starts</p></div>
@@ -327,13 +351,15 @@ const recentCard = getwellFeatureEnabled("patients") ? `
     </div>
   </div>
 ` : "";
+}
 
 
 /* ---------------------------------------------------------
    ADD NEW PATIENT + PANEL CLAIM OVERVIEW
 --------------------------------------------------------- */
 
-const ctaCard = getwellFeatureEnabled("patients") ? `
+function buildCtaCard(){
+return getwellFeatureEnabled("patients") ? `
   <a class="cta-card" href="patients.html?add=1">
     <h2>Add New Patient</h2>
     <p>Register a new patient and start their weight loss journey with Getwell.</p>
@@ -341,8 +367,10 @@ const ctaCard = getwellFeatureEnabled("patients") ? `
     <div class="cta-art" aria-hidden="true">${ICONS.clipboard}</div>
   </a>
 ` : "";
+}
 
-const panelCard = (ds.showPanelClaimOverview !== false && getwellFeatureEnabled("panel")) ? `
+function buildPanelCard(){
+return (ds.showPanelClaimOverview !== false && getwellFeatureEnabled("panel")) ? `
   <div class="card">
     <div class="card-head">
       <div><h2>Panel Claim Overview</h2><p>Current claim workload</p></div>
@@ -357,17 +385,21 @@ const panelCard = (ds.showPanelClaimOverview !== false && getwellFeatureEnabled(
     </div>
   </div>
 ` : "";
+}
 
 
 /* ---------------------------------------------------------
    RENDER
 --------------------------------------------------------- */
 
-const dateLabel = new Date().toLocaleDateString("en-GB", {
-  weekday:"long", day:"numeric", month:"short", year:"numeric"
-});
+function renderDashboardPage(range){
+  const dateLabel = new Date().toLocaleDateString("en-GB", {
+    weekday:"long", day:"numeric", month:"short", year:"numeric"
+  });
 
-document.getElementById("root").innerHTML = shell("Dashboard","dashboard",`
+  const kpiCards = buildKpiCards();
+
+  document.getElementById("root").innerHTML = shell("Dashboard","dashboard",`
 
   <div class="date-row">
     <span class="date-pill">${ICONS.calendar}${escapeHtml(dateLabel)}</span>
@@ -376,21 +408,50 @@ document.getElementById("root").innerHTML = shell("Dashboard","dashboard",`
   ${kpiCards ? `<div class="kpi-grid">${kpiCards}</div>` : ""}
 
   <div class="dash-grid">
-    ${appointmentsCard}
-    ${followUpCard}
+    ${buildAppointmentsCard()}
+    ${buildFollowUpCard()}
     <div class="card prog-card" id="progCard"></div>
   </div>
 
   <div class="dash-grid-2">
-    ${recentCard}
+    ${buildRecentCard()}
     <div class="dash-side">
-      ${ctaCard}
-      ${panelCard}
+      ${buildCtaCard()}
+      ${buildPanelCard()}
     </div>
   </div>
 `);
 
-renderProgramme("month");
-renderNotifications();
+  renderProgramme(range || "month");
+  renderNotifications();
+}
+
+renderDashboardPage("month");
+
+
+/* =========================================================
+   BACKGROUND SYNC -> IN-PLACE REFRESH
+
+   Google Sheets synchronisation no longer reloads the
+   document. It writes the merged data and fires
+   "getwell:data-updated"; the dashboard recomputes its numbers
+   and redraws itself here.
+
+   The Programme Overview period the user selected is read back
+   out of the <select> first so "Last 3 Months" is not reset to
+   "This Month" by a background sync.
+========================================================= */
+
+getwellOnDataUpdated(() => {
+  const range = document.getElementById("progRange")?.value || "month";
+  loadDashboardData();
+  renderDashboardPage(range);
+});
+
+getwellOnSettingsUpdated(() => {
+  const range = document.getElementById("progRange")?.value || "month";
+  loadDashboardData();
+  renderDashboardPage(range);
+});
 
 </script></body></html>

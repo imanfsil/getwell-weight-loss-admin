@@ -3407,6 +3407,26 @@ renderReports();
 
 renderNotifications();
 
+
+/* =========================================================
+   BACKGROUND SYNC -> IN-PLACE REFRESH
+
+   renderReports() reads the selected month from #reportMonth,
+   so the chosen report period is preserved. buildMonthSelector()
+   is deliberately NOT re-run: it would reset the selection to
+   the current month.
+========================================================= */
+
+getwellOnDataUpdated(() => {
+  renderReports();
+  renderNotifications();
+});
+
+/* Settings control which report sections are visible. */
+getwellOnSettingsUpdated(() => {
+  renderReports();
+});
+
 </script>
 
 </body>

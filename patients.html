@@ -220,7 +220,7 @@ function renderPatients(q=""){
   kpis.innerHTML = `<div class="kpi"><div class="kpi-label">TOTAL PATIENTS</div><div class="kpi-value">${all.length}</div></div><div class="kpi"><div class="kpi-label">ACTIVE PATIENTS</div><div class="kpi-value">${all.filter(p=>p.status==="Active").length}</div></div><div class="kpi"><div class="kpi-label">PANEL PATIENTS</div><div class="kpi-value">${panelCount}</div></div><div class="kpi"><div class="kpi-label">INACTIVE</div><div class="kpi-value">${all.filter(p=>p.status==="Inactive").length}</div></div>`;
 }
 
-document.getElementById("root").innerHTML=shell("Patients","patients",`<div class="page-head"><div></div><button id="addPatientButton" class="primary" type="button">＋ Add Patient</button></div><div class="kpi-grid" id="patientKpis"></div><div class="card" style="margin-bottom:15px"><div class="card-body"><div class="form-group"><label>Search Patient</label><input class="claim-input" oninput="renderPatients(this.value)" placeholder="Search name, ID or phone"></div></div></div><div class="card"><div class="card-head"><div><h2>Patient List</h2><p>All patients use GW-XXXX IDs.</p></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Patient</th><th>ID</th><th>Panel / Payment</th><th>Current</th><th>Goal</th><th>Last Visit</th><th>Status</th><th></th></tr></thead><tbody id="patientRows"></tbody></table></div></div>`);
+document.getElementById("root").innerHTML=shell("Patients","patients",`<div class="page-head"><div></div><button id="addPatientButton" class="primary" type="button">＋ Add Patient</button></div><div class="kpi-grid" id="patientKpis"></div><div class="card" style="margin-bottom:15px"><div class="card-body"><div class="form-group"><label>Search Patient</label><input id="patientSearch" class="claim-input" oninput="renderPatients(this.value)" placeholder="Search name, ID or phone"></div></div></div><div class="card"><div class="card-head"><div><h2>Patient List</h2><p>All patients use GW-XXXX IDs.</p></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Patient</th><th>ID</th><th>Panel / Payment</th><th>Current</th><th>Goal</th><th>Last Visit</th><th>Status</th><th></th></tr></thead><tbody id="patientRows"></tbody></table></div></div>`);
 
 window.openAdd = openAdd;
 window.closeAdd = closeAdd;
@@ -247,4 +247,30 @@ if(new URLSearchParams(location.search).get("add") === "1"){
   openAdd();
   history.replaceState(null, "", "patients.html");
 }
+
+/* =========================================================
+   BACKGROUND SYNC -> IN-PLACE REFRESH
+
+   The patient table and the KPI row are re-rendered from the
+   merged store. The search box keeps whatever was typed in it
+   and the filtered result is rebuilt from that same text, so
+   searching for "Mahmood" and waiting through a sync leaves
+   both the query and the filtered rows exactly as they were.
+
+   If the Add Patient modal is open the guard in app.js parks
+   this callback until it closes.
+========================================================= */
+
+getwellOnDataUpdated(() => {
+  const search = document.getElementById("patientSearch");
+  renderPatients(search ? search.value : "");
+  renderNotifications();
+});
+
+/* Panel / doctor / status lists come from Settings. */
+getwellOnSettingsUpdated(() => {
+  renderPatientFormOptions();
+  const search = document.getElementById("patientSearch");
+  renderPatients(search ? search.value : "");
+});
 </script></body></html>

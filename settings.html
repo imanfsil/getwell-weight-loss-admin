@@ -4361,6 +4361,39 @@ showSettingsSection(
   "general"
 );
 
+
+/* =========================================================
+   BACKGROUND SYNC ON THE SETTINGS PAGE
+
+   This page is the settings EDITOR, so it is deliberately the
+   one page that is never re-rendered by a background sync.
+   Re-running loadEverything() here would throw away whatever
+   the user had typed and jump the tab strip back to General.
+
+   getwellSyncRemoteStore() in app.js already knows not to
+   overwrite GETWELL_SYSTEM_CONFIG_V1 while settings.html is
+   open. All that happens here is a one-line, non-blocking
+   notice; the user decides when to pick the change up by
+   pressing Cancel, which reloads the configuration from
+   storage without touching the page structure.
+
+   The open section, every input, and every unsaved edit are
+   left exactly as they are.
+========================================================= */
+
+let getwellSettingsNoticeShown = false;
+
+document.addEventListener("getwell:settings-updated", () => {
+  if(getwellSettingsNoticeShown) return;
+  getwellSettingsNoticeShown = true;
+
+  getwellNotify(
+    "Settings were changed elsewhere. Your edits on this page are untouched — " +
+    "press Cancel to load the newer configuration, or Save Changes to keep yours.",
+    "info"
+  );
+});
+
 </script>
 
 

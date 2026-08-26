@@ -1401,6 +1401,50 @@ buildSuspendedPanelFilter();
 renderPanelPage();
 renderNotifications();
 
+
+/* =========================================================
+   BACKGROUND SYNC -> IN-PLACE REFRESH
+
+   Google Sheets synchronisation no longer reloads the page.
+   It writes the merged data to localStorage and fires
+   "getwell:data-updated"; the panel lists are re-rendered
+   here instead.
+
+   The panel filter <select>s are rebuilt by buildPanelFilter()
+   from the same data, so their current choice is preserved by
+   re-reading it first. If a Panel Detail modal is open the
+   refresh is deferred by the guard in app.js and replayed the
+   moment it closes, so nothing on screen changes underneath
+   the user.
+========================================================= */
+
+getwellOnDataUpdated(() => {
+  const panelFilter = document.getElementById("panelFilter");
+  const suspendedFilter = document.getElementById("suspendedPanelFilter");
+  const panelChoice = panelFilter ? panelFilter.value : "";
+  const suspendedChoice = suspendedFilter ? suspendedFilter.value : "";
+
+  buildPanelFilter();
+  buildSuspendedPanelFilter();
+
+  /* Restore the selections the filters were showing. */
+  if(panelFilter && panelChoice){
+    if([...panelFilter.options].some(o => o.value === panelChoice)) panelFilter.value = panelChoice;
+  }
+  if(suspendedFilter && suspendedChoice){
+    if([...suspendedFilter.options].some(o => o.value === suspendedChoice)) suspendedFilter.value = suspendedChoice;
+  }
+
+  renderPanelPage();
+  renderNotifications();
+});
+
+getwellOnSettingsUpdated(() => {
+  buildPanelFilter();
+  buildSuspendedPanelFilter();
+  renderPanelPage();
+});
+
 </script>
 
 </body>

@@ -573,6 +573,30 @@ renderAppointmentFormOptions();
 renderAppointments();
 if(typeof renderNotifications === "function") renderNotifications();
 
+/* =========================================================
+   BACKGROUND SYNC -> IN-PLACE REFRESH
+
+   renderAppointments() reads the search box and the date
+   filter straight from the DOM, so both survive the refresh
+   untouched along with the follow-up table.
+
+   While the Add/Edit Appointment or Follow Up Now modal is
+   open the guard in app.js defers this callback, so the
+   selected patient, date, time, doctor, type and notes are
+   never cleared underneath the user.
+========================================================= */
+
+getwellOnDataUpdated(() => {
+  renderAppointments(document.getElementById("appointmentSearch")?.value || "");
+  renderNotifications();
+});
+
+/* Doctors, appointment types and statuses come from Settings. */
+getwellOnSettingsUpdated(() => {
+  renderAppointmentFormOptions();
+  renderAppointments(document.getElementById("appointmentSearch")?.value || "");
+});
+
 document.addEventListener("click", event => {
   const picker = document.querySelector(".patient-picker");
   const menu = document.getElementById("appointmentPatientDropdown");
