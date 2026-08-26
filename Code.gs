@@ -127,6 +127,69 @@ var HEADERS = {
 };
 
 
+/*
+  CALENDAR-DATE COLUMNS.
+
+  ROOT CAUSE OF THE ONE-DAY SHIFT
+  ---------------------------------------------------------
+  These columns hold a calendar date, not an instant in time.
+  The web app sends the exact string the user picked, e.g.
+  "2025-11-13". Writing that into a cell whose number format
+  is "Automatic" makes Google Sheets PARSE it and store a real
+  date/time value instead. Reading it back then hands this
+  script a Date object, and rendering that Date in any
+  timezone other than the one the sheet used produces the day
+  before -- which is how "2025-11-13" came back as
+  "2025-11-12T16:00:00.000Z" in GMT+8.
+
+  Every column listed here is forced to plain-text ("@")
+  format before it is written, so the string that goes in is
+  byte-for-byte the string that comes out. toDateKey() below
+  still repairs any value that was stored as a real date by an
+  earlier version of this script.
+*/
+var DATE_COLUMNS = {
+  Patients:     ["DOB","StartDate"],
+  Appointments: ["Date"],
+  Visits:       ["Date"],
+  Claims:       ["ClaimDate"]
+};
+
+
+/*
+  The timezone the SHEET used when it parsed a date cell.
+  Session.getScriptTimeZone() is the Apps Script project's
+  timezone, which is not necessarily the spreadsheet's; when
+  the two differ, formatting a cell Date with the script's
+  timezone is exactly what moves the day.
+*/
+function getBookTimeZone(){
+  try{
+    return SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone()
+      || Session.getScriptTimeZone();
+  }catch(error){
+    return Session.getScriptTimeZone();
+  }
+}
+
+
+/* Forces the calendar-date columns of one sheet to plain text. */
+function applyDateColumnFormat(name){
+  var columns = DATE_COLUMNS[name];
+  if(!columns || !columns.length) return;
+
+  var sheet   = getSheet(name);
+  var headers = HEADERS[name];
+  var rows    = Math.max(sheet.getMaxRows() - 1, 1);
+
+  columns.forEach(function(column){
+    var index = headers.indexOf(column);
+    if(index < 0) return;
+    sheet.getRange(2, index + 1, rows, 1).setNumberFormat("@");
+  });
+}
+
+
 /* ---------------------------------------------------------
    SETUP
 --------------------------------------------------------- */
@@ -155,9 +218,77 @@ function setupGetwell(){
     }
   });
 
+  /*
+    Force every calendar-date column to plain text so Sheets
+    stops re-parsing "2025-11-13" into a date/time value, and
+    repair any cell an earlier version already stored that way.
+  */
+  Object.keys(DATE_COLUMNS).forEach(function(name){
+    repairDateColumns(name);
+  });
+
   installGetwellEditTrigger();
 
-  return "Getwell setup complete. Sheets and onEdit trigger are ready.";
+  return "Getwell setup complete. Sheets, date columns and the onEdit trigger are ready.";
+}
+
+
+/*
+  ONE-TIME REPAIR, safe to run again at any time.
+
+  Reads each calendar-date column, converts whatever is there
+  (a real Date value, a full ISO timestamp, a dd/mm/yyyy
+  string) into a plain "YYYY-MM-DD" string, switches the column
+  to plain-text format and writes the clean values back.
+
+  Nothing else on the row is touched, and UpdatedAt is left
+  alone so the repair does not make every record look newer
+  than the copies in staff browsers.
+*/
+function repairDateColumns(name){
+  var columns = DATE_COLUMNS[name];
+  if(!columns || !columns.length) return {repaired:0};
+
+  var sheet   = getSheet(name);
+  var headers = HEADERS[name];
+  var lastRow = sheet.getLastRow();
+
+  applyDateColumnFormat(name);
+
+  if(lastRow < 2) return {repaired:0};
+
+  var repaired = 0;
+
+  columns.forEach(function(column){
+    var index = headers.indexOf(column);
+    if(index < 0) return;
+
+    var range  = sheet.getRange(2, index + 1, lastRow - 1, 1);
+    var values = range.getValues();
+    var next   = [];
+    var touched = false;
+
+    for(var i = 0; i < values.length; i++){
+      var original = values[i][0];
+      var clean    = original === "" || original === null ? "" : toDateKey(original);
+      if(clean !== original){ touched = true; repaired++; }
+      next.push([clean]);
+    }
+
+    if(touched) range.setValues(next);
+  });
+
+  return {repaired:repaired};
+}
+
+
+/* Repairs every date column in the whole workbook. */
+function repairGetwellDates(){
+  var total = 0;
+  Object.keys(DATE_COLUMNS).forEach(function(name){
+    total += repairDateColumns(name).repaired;
+  });
+  return "Repaired " + total + " calendar-date cell(s) to YYYY-MM-DD.";
 }
 
 
@@ -263,6 +394,13 @@ function upsertRows(name, records){
   var headers = HEADERS[name];
   var idKey   = headers[0];
 
+  /*
+    Plain-text format FIRST, so "2025-11-13" is stored as the
+    literal string and never re-parsed by Sheets into a
+    date/time value.
+  */
+  applyDateColumnFormat(name);
+
   var lastRow = sheet.getLastRow();
   var index   = {};
 
@@ -313,11 +451,58 @@ function toNumber(value){
   return isFinite(number) ? number : 0;
 }
 
+/*
+  Normalises any stored value back to a plain calendar date.
+
+  - Date object (a cell an older build let Sheets coerce)
+      -> formatted in the SPREADSHEET's timezone, which is the
+         timezone that produced the value in the first place.
+  - "2025-11-13"                -> unchanged.
+  - "2025-11-12T16:00:00.000Z"  -> "2025-11-13" (converted back
+         to the calendar day the user actually picked, instead
+         of blindly slicing off the first ten characters, which
+         would keep the off-by-one error forever).
+  - "13/11/2025"                -> "2025-11-13".
+*/
 function toDateKey(value){
   if(value instanceof Date){
-    return Utilities.formatDate(value, Session.getScriptTimeZone(), "yyyy-MM-dd");
+    return Utilities.formatDate(value, getBookTimeZone(), "yyyy-MM-dd");
   }
-  return toText(value).slice(0, 10);
+
+  var text = toText(value).trim();
+  if(!text) return "";
+
+  if(/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+
+  /* ISO datetime carrying a timezone: re-render as a local day. */
+  if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})$/.test(text)){
+    var parsed = new Date(text);
+    if(!isNaN(parsed.getTime())){
+      return Utilities.formatDate(parsed, getBookTimeZone(), "yyyy-MM-dd");
+    }
+    return text.slice(0, 10);
+  }
+
+  /* ISO datetime with no timezone: the date part is already local. */
+  if(/^\d{4}-\d{2}-\d{2}T/.test(text)) return text.slice(0, 10);
+
+  var dmy = text.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  if(dmy){
+    return dmy[3] + "-" + pad2(dmy[2]) + "-" + pad2(dmy[1]);
+  }
+
+  var ymd = text.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})$/);
+  if(ymd){
+    return ymd[1] + "-" + pad2(ymd[2]) + "-" + pad2(ymd[3]);
+  }
+
+  return text.slice(0, 10);
+}
+
+
+function pad2(value){
+  var text = String(value);
+  return text.length < 2 ? "0" + text : text;
 }
 
 function toTimeKey(value){
@@ -573,13 +758,13 @@ function saveStoreToSheets(data){
       PanelStatus:         toText(patient.panelStatus),
       PanelSuspensionNote: toText(patient.panelSuspensionNote),
       Phone:               toText(patient.phone),
-      DOB:                 toText(patient.dob),
+      DOB:                 toDateKey(patient.dob),
       Gender:              toText(patient.gender),
       Height:              toText(patient.height),
       StartingWeight:      toNumber(patient.startingWeight),
       CurrentWeight:       toNumber(patient.currentWeight),
       GoalWeight:          toNumber(patient.goalWeight),
-      StartDate:           toText(patient.startDate),
+      StartDate:           toDateKey(patient.startDate),
       Doctor:              toText(patient.doctor),
       UpdatedAt:           patientStamp,
 
@@ -595,7 +780,7 @@ function saveStoreToSheets(data){
       appointmentRows.push({
         AppointmentID: id,
         PatientID:     patientId,
-        Date:          toText(appointment.date),
+        Date:          toDateKey(appointment.date),
         Time:          toText(appointment.time),
         Doctor:        toText(appointment.doctor),
         Type:          toText(appointment.type),
@@ -615,7 +800,7 @@ function saveStoreToSheets(data){
       visitRows.push({
         VisitID:             visitId,
         PatientID:           patientId,
-        Date:                toText(visit.dateKey),
+        Date:                toDateKey(visit.dateKey),
         VisitNumber:         toText(visit.visit),
         Type:                toText(visit.type),
         Weight:              toText(visit.weight),
@@ -675,7 +860,7 @@ function saveStoreToSheets(data){
       claimRows.push({
         ClaimID:   claimId,
         PatientID: patientId,
-        ClaimDate: toText(claim.claimDate),
+        ClaimDate: toDateKey(claim.claimDate),
         Amount:    toNumber(claim.amount),
         VisitID:   toText(claim.visitId),
         Status:    toText(claim.status),

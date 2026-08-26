@@ -346,7 +346,7 @@ function openAddAppointment(){
   if(search) search.value="";
   if(selected) selected.hidden=true;
   if(dropdown){dropdown.hidden=true;dropdown.style.display="none";}
-  if(date) date.value=new Date().toISOString().slice(0,10);
+  if(date) date.value=getwellTodayKey();
   if(time) time.value="";
   if(doctor) doctor.value="";
   if(type) type.value=getwellSystemSettings().appointments.defaultType||getwellAppointmentTypes()[0]?.name||"";
@@ -366,7 +366,7 @@ function openEditAppointment(patientId, appointmentId){
   document.getElementById("deleteAppointmentButton").style.display = "inline-flex";
 
   setAppointmentPatient(patient.id);
-  document.getElementById("appointmentDate").value = appointment.date || "";
+  document.getElementById("appointmentDate").value = getwellDateKey(appointment.date);
   document.getElementById("appointmentTime").value = appointment.time || "";
   document.getElementById("appointmentDoctor").value = appointment.doctor || patient.doctor || "";
   document.getElementById("appointmentType").value = appointment.type || "";
@@ -403,7 +403,9 @@ function closeAppointmentModal(){
   editingAppointmentId = null;
 }
 
-function saveAppointment(){
+/* Async so the Google Sheets write is actually completed
+   before the list re-renders, matching Add Patient. */
+async function saveAppointment(){
   const patientId=document.getElementById("appointmentPatient")?.value||"";
   if(!patientId){alert("Please select a patient.");return;}
   const patient=getPatient(patientId);
@@ -413,7 +415,8 @@ function saveAppointment(){
   const appointment={
   ...(existing||{}),
   id:editingAppointmentId||getwellNextAppointmentId(),
-  date:document.getElementById("appointmentDate")?.value||"",
+  /* Date-only: kept as the picked "YYYY-MM-DD" string. */
+  date:getwellDateKey(document.getElementById("appointmentDate")?.value||""),
   time:document.getElementById("appointmentTime")?.value||"",
   doctor:document.getElementById("appointmentDoctor")?.value||"",
   type:(document.getElementById("appointmentType")?.value||"").trim(),
@@ -425,7 +428,7 @@ function saveAppointment(){
   const index=patient.appointments.findIndex(a=>a.id===appointment.id);
   const wasEditing=!!editingAppointmentId;
   if(index>=0) patient.appointments[index]=appointment; else patient.appointments.push(appointment);
-  upsertPatient(patient);
+  await upsertPatient(patient);
   getwellLogActivity(
     wasEditing?"Edit":"Add",
     "Appointment",
@@ -464,7 +467,7 @@ function renderAppointments(q=""){
     `).join("") || `<tr><td colspan="8" class="notif-empty">No appointments found.</td></tr>`;
   }
 
-  const today = new Date().toISOString().slice(0,10);
+  const today = getwellTodayKey();
   const appointmentKpis = document.getElementById("appointmentKpis");
   if(appointmentKpis) appointmentKpis.innerHTML = `
     <div class="kpi"><div class="kpi-label">TODAY</div><div class="kpi-value">${all.filter(a=>a.date===today).length}</div></div>

@@ -266,6 +266,34 @@ const DEFAULT_SETTINGS = {
 
 
   /* -------------------------------------------------------
+     VISIT TYPES
+
+     Visit Type on the Add Visit form used to be a free-text
+     box. It is a dropdown now, fed from this list, so it uses
+     the SAME Settings architecture as doctors, panels and the
+     charge catalog rather than a separate store.
+
+     {id, name, enabled} deliberately matches the charge
+     catalog shape. Setting enabled:false removes a type from
+     NEW visits without touching any visit already saved with
+     it -- the visit record stores the type NAME, so history is
+     self-contained.
+
+     Must stay in step with getwellDefaultSystemSettings()
+     in app.js, which is the READ side.
+  ------------------------------------------------------- */
+  visitTypes: [
+    {id:"VT-CONSULTATION",  name:"Consultation",       enabled:true},
+    {id:"VT-FOLLOWUP",      name:"Follow-up",          enabled:true},
+    {id:"VT-INJECTION",     name:"Injection",          enabled:true},
+    {id:"VT-REVIEW",        name:"Weight Loss Review", enabled:true},
+    {id:"VT-MEDREVIEW",     name:"Medication Review",  enabled:true},
+    {id:"VT-PROCEDURE",     name:"Procedure",          enabled:true},
+    {id:"VT-OTHER",         name:"Other",              enabled:true}
+  ],
+
+
+  /* -------------------------------------------------------
      APPOINTMENTS
   ------------------------------------------------------- */
 
@@ -1337,6 +1365,19 @@ document.getElementById(
           </div>
           <div class="card-body">
             <div id="doctorSettingsList"></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-head">
+            <div>
+              <h2>Visit Types</h2>
+              <p>These fill the Visit Type dropdown on Add Visit. Switching one off removes it from new visits; visits already saved with it keep it.</p>
+            </div>
+            <button class="secondary" type="button" onclick="addVisitType()">＋ Add Visit Type</button>
+          </div>
+          <div class="card-body">
+            <div id="visitTypeSettings"></div>
           </div>
         </div>
 
@@ -3657,6 +3698,108 @@ function ensureCatalogSettings(){
       settings.chargeCatalog[category] = [];
     }
   });
+  ensureVisitTypeSettings();
+}
+
+
+/* =========================================================
+   VISIT TYPES
+
+   Same add / rename / enable / delete lifecycle as the charge
+   catalog above, and stored in the same settings object, so it
+   rides the existing Settings -> localStorage -> Settings sheet
+   pipeline with no schema change: the Settings sheet holds one
+   JSON blob under the key SYSTEM.
+
+   Deleting a type only removes it from the choices offered for
+   NEW visits. Every visit already saved keeps working, because
+   a visit stores the type NAME on its own row in the Visits
+   sheet, and the Add Visit dropdown re-adds any unrecognised
+   value as "(not in Settings)" instead of blanking it.
+========================================================= */
+
+function ensureVisitTypeSettings(){
+  if(!Array.isArray(settings.visitTypes)){
+    /*
+      A configuration saved by an older build has no
+      visitTypes key at all. Seed it from the defaults rather
+      than leaving the Add Visit dropdown empty.
+    */
+    settings.visitTypes = deepClone(DEFAULT_SETTINGS.visitTypes);
+  }
+
+  /* Repair rows saved without an id. */
+  settings.visitTypes.forEach((type,index) => {
+    if(type && !type.id){
+      type.id = `VT-${Date.now()}-${index}`;
+    }
+  });
+}
+
+function addVisitType(){
+  ensureVisitTypeSettings();
+  settings.visitTypes.push({
+    id: `VT-${Date.now()}`,
+    name: "New Visit Type",
+    enabled: true
+  });
+  renderVisitTypes();
+}
+
+function updateVisitType(index,value){
+  ensureVisitTypeSettings();
+  const item = settings.visitTypes[index];
+  if(!item) return;
+  item.name = String(value || "").trim();
+}
+
+function toggleVisitType(index){
+  ensureVisitTypeSettings();
+  const item = settings.visitTypes[index];
+  if(!item) return;
+  item.enabled = item.enabled === false;
+  renderVisitTypes();
+}
+
+function removeVisitType(index){
+  ensureVisitTypeSettings();
+  const item = settings.visitTypes[index];
+  if(!item) return;
+
+  if(!confirm(
+    `Remove the visit type "${item.name || ""}"?\n\n` +
+    "It will no longer be offered on new visits. Visits already " +
+    "saved with it keep it and are not changed."
+  )) return;
+
+  settings.visitTypes.splice(index,1);
+  renderVisitTypes();
+}
+
+function renderVisitTypes(){
+  ensureVisitTypeSettings();
+  const container = document.getElementById("visitTypeSettings");
+  if(!container) return;
+
+  container.innerHTML = settings.visitTypes.length
+    ? settings.visitTypes.map((type,index)=>`
+      <div class="settings-item">
+        <div class="settings-item-main">
+          <div class="settings-item-title">
+            <input class="settings-input" data-visit-type-index="${index}"
+              value="${escapeHtml(type.name || "")}"
+              onchange="updateVisitType(${index}, this.value)">
+          </div>
+          <div class="settings-item-sub">${type.enabled !== false ? "Available on new visits." : "Hidden from new visits. Existing visits keep it."}</div>
+        </div>
+        <div class="settings-actions">
+          <button class="settings-toggle ${type.enabled !== false ? "on" : ""}"
+            onclick="toggleVisitType(${index})"></button>
+          <button class="secondary" type="button" onclick="removeVisitType(${index})">Delete</button>
+        </div>
+      </div>
+    `).join("")
+    : `<div class="notif-empty">No visit types configured. Click “Add Visit Type”.</div>`;
 }
 
 function addDoctor(){
@@ -3766,9 +3909,11 @@ function renderChargeCatalog(){
           <div class="settings-item">
             <div class="settings-item-main" style="display:grid;grid-template-columns:minmax(0,1fr) 140px;gap:8px;">
               <input class="settings-input"
+                data-charge-category="${category}" data-charge-index="${index}" data-charge-key="name"
                 value="${escapeHtml(item.name || "")}"
                 onchange="updateChargeItem('${category}',${index},'name',this.value)">
               <input class="settings-input" type="number" min="0" step="0.01"
+                data-charge-category="${category}" data-charge-index="${index}" data-charge-key="price"
                 value="${Number(item.price)||0}"
                 onchange="updateChargeItem('${category}',${index},'price',this.value)">
             </div>
@@ -3952,6 +4097,38 @@ function saveAllSettings(){
       }
     });
 
+  /*
+    VISIT TYPES & CHARGE ITEMS
+
+    The inline onchange handlers already keep `settings` in
+    step, but an input that is still focused when Save is
+    clicked can miss its change event. Re-reading the fields
+    here by their data-* index is what makes "edit a name, hit
+    Save, refresh" reliable.
+  */
+  document
+    .querySelectorAll("#visitTypeSettings [data-visit-type-index]")
+    .forEach(input => {
+      const item = settings.visitTypes[Number(input.dataset.visitTypeIndex)];
+      if(item) item.name = input.value.trim();
+    });
+
+  document
+    .querySelectorAll("#chargeCatalogSettings [data-charge-category]")
+    .forEach(input => {
+      const list = settings.chargeCatalog[input.dataset.chargeCategory];
+      const item = Array.isArray(list) ? list[Number(input.dataset.chargeIndex)] : null;
+      if(!item) return;
+      if(input.dataset.chargeKey === "price"){
+        item.price = Math.max(0, Number(input.value) || 0);
+      }else{
+        item.name = input.value.trim();
+      }
+    });
+
+  /* Drop rows the user left completely blank. */
+  settings.visitTypes = settings.visitTypes.filter(t => t && String(t.name || "").trim());
+
   /* -------------------------------------------------------
      APPOINTMENTS
   ------------------------------------------------------- */
@@ -4046,8 +4223,8 @@ function saveAllSettings(){
       "Edit",
       "Settings",
       "System Settings",
-      "Clinic, patient ID, panels, doctors, charges, " +
-      "appointments and follow-up settings saved"
+      "Clinic, patient ID, panels, doctors, visit types, " +
+      "charges, appointments and follow-up settings saved"
     );
   }
 
@@ -4105,6 +4282,7 @@ function loadEverything(){
 
   ensureCatalogSettings();
   renderDoctors();
+  renderVisitTypes();
   renderChargeCatalog();
 
   renderPanels();

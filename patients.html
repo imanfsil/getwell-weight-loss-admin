@@ -67,14 +67,47 @@ function openAdd(){
   document.getElementById("addPatientModal").classList.add("show");
   document.getElementById("pId").value=generatePatientId();
   styleGeneratedPatientId();
-  document.getElementById("pStartDate").value=new Date().toISOString().slice(0,10);
+  /*
+    getwellTodayKey() reads the LOCAL calendar day.
+    new Date().toISOString().slice(0,10) returned yesterday
+    between midnight and 8am in Malaysia (GMT+8).
+  */
+  document.getElementById("pStartDate").value=getwellTodayKey();
 }
 
 function closeAdd(){
   document.getElementById("addPatientModal").classList.remove("show");
 }
 
-function savePatient(){
+/*
+  ROOT CAUSE OF "A NEW PATIENT DOES NOT LOAD CORRECTLY"
+  ---------------------------------------------------------
+  upsertPatient() is ASYNCHRONOUS. It writes to localStorage
+  straight away, but the Google Sheets round-trip it returns a
+  promise for was never awaited: this function called it and
+  immediately did
+
+      location.href = "patient-profile.html?patient=..."
+
+  The navigation tore down the page while the fetch to Apps
+  Script was still in flight, so the write was cancelled and
+  the patient never reached the Sheet. The profile page then
+  opened, its 30-second sync read a Sheet snapshot that did not
+  contain the new patient, and the record stayed half-present
+  until somebody opened Edit Patient and saved it a second
+  time -- which is exactly the workaround that was being used.
+
+  savePatient() is now async and AWAITS the save. There is no
+  timer and no arbitrary delay anywhere: the profile opens
+  because the write genuinely finished.
+
+  Offline behaviour is unchanged. saveStore() always commits to
+  localStorage first and reports a failed remote write through
+  the application's existing notification, so a clinic with no
+  connection still gets a working local record and a visible
+  warning rather than a silent success.
+*/
+async function savePatient(){
   const pNameEl=document.getElementById("pName");
   const pPhoneEl=document.getElementById("pPhone");
   const pDobEl=document.getElementById("pDob");
@@ -99,24 +132,75 @@ function savePatient(){
     id,name,initials:nm,status:getwellDefaultPatientStatus(),
     panelProvider:pv,otherPanelName:"",
     panelStatus:"Active",panelSuspensionNote:"",
-    phone:pPhoneEl?.value||"",dob:pDobEl?.value||"",gender:pGenderEl?.value||"",
+    phone:pPhoneEl?.value||"",
+    /* Date-only fields keep the exact string the date picker
+       produced. No Date object, no toISOString(), no shift. */
+    dob:getwellDateKey(pDobEl?.value||""),
+    gender:pGenderEl?.value||"",
     height:pHeightEl?.value||"",startingWeight:sw,currentWeight:sw,
     goalWeight:Number(pGoalEl?.value||0)||0,
-    startDate:pStartDateEl?.value||new Date().toISOString().slice(0,10),
+    startDate:getwellDateKey(pStartDateEl?.value||"")||getwellTodayKey(),
     doctor:pDoctorEl?.value||"",
     visits:[],claims:[],appointments:[],measurements:[]
   };
 
-  upsertPatient(p);
+  const button=document.getElementById("savePatientButton");
+  const originalLabel=button?button.textContent:"";
+  if(button){
+    button.disabled=true;
+    button.textContent="Saving…";
+  }
+
+  let saveResult;
+
+  try{
+    /* THE FIX: wait for the record to be persisted locally AND
+       pushed to Google Sheets before going anywhere. */
+    saveResult=await upsertPatient(p);
+  }catch(error){
+    console.error("Unable to save the new patient:",error);
+    saveResult={ok:false,error:error?.message||"Unexpected error while saving."};
+  }finally{
+    if(button){
+      button.disabled=false;
+      button.textContent=originalLabel;
+    }
+  }
+
+  /* The ID series only advances once the record actually exists. */
   getwellAdvancePatientNumber(allocation.number);
+
   getwellLogActivity(
     "Add",
     "Patient",
     `${p.id} · ${p.name}`,
     `Panel: ${getPanelName(p)} · Doctor: ${p.doctor||"—"}`
   );
-  getwellNotify("Patient saved successfully.","success");
+
+  /*
+    saveStore() has already raised its own error toast if the
+    Sheets write failed, so this only confirms the good case.
+    The record is committed locally either way, which is what
+    keeps the app usable with no connection.
+  */
+  if(saveResult && saveResult.ok === false){
+    getwellNotify(
+      "Patient saved on this device. Google Sheets will be updated as soon as the connection returns.",
+      "error"
+    );
+  }else{
+    getwellNotify("Patient saved successfully.","success");
+  }
+
   closeAdd();
+
+  /* Verify the record can genuinely be read back before opening it. */
+  if(!getPatient(p.id)){
+    getwellNotify("The patient could not be read back after saving. Please try again.","error");
+    renderPatients();
+    return;
+  }
+
   location.href="patient-profile.html?patient="+encodeURIComponent(p.id);
 }
 
@@ -130,7 +214,7 @@ function renderPatients(q=""){
   rows.innerHTML = ps.map(p => {
     const v = typeof latestVisit === "function" ? latestVisit(p) : null;
     const panelName = typeof getPanelName === "function" ? getPanelName(p) : (p.panelProvider || "Self-Pay");
-    return `<tr><td><div class="cell-patient"><span class="avatar-small">${getwellPatientAvatar(p)}</span><span class="cell-patient-text"><strong>${escapeHtml(p.name||"")}</strong><div class="row-sub">${escapeHtml(p.phone||"—")}</div></span></div></td><td>${escapeHtml(p.id||"")}</td><td><span class="panel-chip">${escapeHtml(panelName)}</span></td><td>${escapeHtml(p.currentWeight||"—")} kg</td><td>${escapeHtml(p.goalWeight||"—")} kg</td><td>${escapeHtml(v?.dateKey||"—")}</td><td><span class="badge ${p.status==="Active"?"green":"gray"}">${escapeHtml(p.status||"")}</span></td><td><a class="secondary" style="padding:7px 9px" href="patient-profile.html?patient=${encodeURIComponent(p.id||"")}">Open →</a></td></tr>`;
+    return `<tr><td><div class="cell-patient"><span class="avatar-small">${getwellPatientAvatar(p)}</span><span class="cell-patient-text"><strong>${escapeHtml(p.name||"")}</strong><div class="row-sub">${escapeHtml(p.phone||"—")}</div></span></div></td><td>${escapeHtml(p.id||"")}</td><td><span class="panel-chip">${escapeHtml(panelName)}</span></td><td>${escapeHtml(p.currentWeight||"—")} kg</td><td>${escapeHtml(p.goalWeight||"—")} kg</td><td>${escapeHtml(getwellDateKey(v?.dateKey)||"—")}</td><td><span class="badge ${p.status==="Active"?"green":"gray"}">${escapeHtml(p.status||"")}</span></td><td><a class="secondary" style="padding:7px 9px" href="patient-profile.html?patient=${encodeURIComponent(p.id||"")}">Open →</a></td></tr>`;
   }).join("") || `<tr><td colspan="8" class="notif-empty">No patients found.</td></tr>`;
   const panelCount = typeof patientUsesPanel === "function" ? all.filter(patientUsesPanel).length : 0;
   kpis.innerHTML = `<div class="kpi"><div class="kpi-label">TOTAL PATIENTS</div><div class="kpi-value">${all.length}</div></div><div class="kpi"><div class="kpi-label">ACTIVE PATIENTS</div><div class="kpi-value">${all.filter(p=>p.status==="Active").length}</div></div><div class="kpi"><div class="kpi-label">PANEL PATIENTS</div><div class="kpi-value">${panelCount}</div></div><div class="kpi"><div class="kpi-label">INACTIVE</div><div class="kpi-value">${all.filter(p=>p.status==="Inactive").length}</div></div>`;

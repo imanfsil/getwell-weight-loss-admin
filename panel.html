@@ -1209,7 +1209,7 @@ function openPanelDetail(
 
                           <td>
                             ${
-                              claim.claimDate ||
+                              getwellDateKey(claim.claimDate) ||
                               "—"
                             }
                           </td>
@@ -1326,7 +1326,7 @@ function openPanelDetail(
                     </td>
 
                     <td>
-                      ${escapeHtml(visit.dateKey)}
+                      ${escapeHtml(getwellDateKey(visit.dateKey))}
                     </td>
 
                     <td>

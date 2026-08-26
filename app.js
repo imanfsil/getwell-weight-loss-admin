@@ -55,6 +55,164 @@ function escapeHtml(value){
 
 
 /* =========================================================
+   CALENDAR DATES  (DATE-ONLY, TIMEZONE-SAFE)
+
+   ROOT CAUSE OF THE "VISIT DATE SHIFTS BY ONE DAY" BUG
+   ---------------------------------------------------------
+   Visit Date, Date of Birth, Program Start Date, Appointment
+   Date and Claim Date are CALENDAR DATES, not instants in
+   time. They must never be turned into a JavaScript Date and
+   then serialised with toISOString(), because toISOString()
+   renders in UTC. In Malaysia (GMT+8) the calendar date
+   2025-11-13 becomes "2025-11-12T16:00:00.000Z" -- the day
+   before.
+
+   The same trap exists on the Google Sheets side: writing the
+   string "2025-11-13" into a cell whose number format is
+   "automatic" makes Sheets store a real date/time value, and
+   reading it back hands Apps Script a Date object that then
+   gets rendered in whatever timezone happens to be active.
+
+   Everything below keeps calendar dates as plain
+   "YYYY-MM-DD" strings from the <input type="date"> all the
+   way to the Sheet and back.
+========================================================= */
+
+/*
+  Local calendar day for a JS Date. Uses the LOCAL parts, so
+  it never crosses a day boundary the way toISOString() does.
+*/
+function getwellIsoDay(date){
+  const pad = n => String(n).padStart(2, "0");
+  return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
+}
+
+
+/*
+  Today's calendar date in the browser's own timezone.
+  Replaces every `getwellTodayKey()`, which
+  in GMT+8 returned YESTERDAY between 00:00 and 08:00.
+*/
+function getwellTodayKey(){
+  return getwellIsoDay(new Date());
+}
+
+
+/*
+  THE SINGLE NORMALISER for every date-only value in the app.
+
+  - ""                          -> ""
+  - "2025-11-13"                -> "2025-11-13"   (untouched)
+  - "2025-11-13T00:00:00"       -> "2025-11-13"   (no zone: plain slice)
+  - "2025-11-12T16:00:00.000Z"  -> "2025-11-13"   (zoned: converted back
+                                                   to the local calendar
+                                                   day, which is what the
+                                                   user originally picked)
+  - Date object                 -> its local calendar day
+  - "13/11/2025" or "13-11-2025"-> "2025-11-13"
+  - anything else               -> "" rather than corrupt data
+
+  The zoned branch is what repairs records already stored in
+  Google Sheets as full ISO timestamps: it is a lossless
+  round-trip back to the day the user actually selected.
+*/
+function getwellDateKey(value){
+  if(value === null || value === undefined || value === "") return "";
+
+  if(value instanceof Date){
+    return Number.isNaN(value.getTime()) ? "" : getwellIsoDay(value);
+  }
+
+  const text = String(value).trim();
+  if(!text) return "";
+
+  /* Already a plain calendar date. */
+  if(/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+
+  /* ISO datetime carrying a timezone (Z or +08:00): re-render locally. */
+  if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})$/.test(text)){
+    const parsed = new Date(text);
+    return Number.isNaN(parsed.getTime()) ? text.slice(0,10) : getwellIsoDay(parsed);
+  }
+
+  /* ISO datetime with no timezone: the date part is already local. */
+  if(/^\d{4}-\d{2}-\d{2}T/.test(text)) return text.slice(0,10);
+
+  /* dd/mm/yyyy or dd-mm-yyyy, as typed by hand into the Sheet. */
+  const dmy = text.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  if(dmy){
+    const pad = n => String(n).padStart(2,"0");
+    return `${dmy[3]}-${pad(dmy[2])}-${pad(dmy[1])}`;
+  }
+
+  /* yyyy/mm/dd */
+  const ymd = text.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})$/);
+  if(ymd){
+    const pad = n => String(n).padStart(2,"0");
+    return `${ymd[1]}-${pad(ymd[2])}-${pad(ymd[3])}`;
+  }
+
+  /* Last resort: let the engine try, but only accept a real date. */
+  const parsed = new Date(text);
+  return Number.isNaN(parsed.getTime()) ? "" : getwellIsoDay(parsed);
+}
+
+
+/*
+  Walks the whole store and rewrites every calendar date to
+  "YYYY-MM-DD". Called from store(), so EVERY page - profile,
+  patients, appointments, panel, reports, dashboard - sees
+  normalised dates without each of them having to remember.
+
+  Legacy rows already holding "2025-11-12T16:00:00.000Z" are
+  repaired here, and the repair is written back to
+  localStorage once so the next save pushes the clean value
+  to Google Sheets.
+*/
+function getwellNormalizeStoreDates(data){
+  if(!data || !Array.isArray(data.patients)) return data;
+
+  let changed = false;
+
+  const fix = (record, field) => {
+    if(!record || record[field] === undefined || record[field] === null) return;
+    const next = getwellDateKey(record[field]);
+    if(next !== record[field]){
+      record[field] = next;
+      changed = true;
+    }
+  };
+
+  data.patients.forEach(patient => {
+    if(!patient) return;
+
+    fix(patient, "dob");
+    fix(patient, "startDate");
+
+    (patient.visits || []).forEach(visit => {
+      if(!visit) return;
+      /* Some very old rows used `date` instead of `dateKey`. */
+      if(!visit.dateKey && visit.date) visit.dateKey = visit.date;
+      fix(visit, "dateKey");
+      if(visit.date !== undefined) fix(visit, "date");
+    });
+
+    (patient.appointments || []).forEach(appointment => fix(appointment, "date"));
+    (patient.claims || []).forEach(claim => fix(claim, "claimDate"));
+    (patient.measurements || []).forEach(measurement => fix(measurement, "date"));
+  });
+
+  if(changed){
+    try{
+      localStorage.setItem(STORE_KEY, JSON.stringify(data));
+    }catch(e){}
+  }
+
+  return data;
+}
+
+
+/* =========================================================
    SYSTEM SETTINGS
    IMPORTANT:
    settings.html already owns:
@@ -125,6 +283,30 @@ function getwellDefaultSystemSettings(){
       Treatment: [],
       Additional: []
     },
+
+    /*
+      VISIT TYPES
+
+      Visit Type used to be a free-text box on the Add Visit
+      form, so every member of staff spelled it differently and
+      nothing could be reported on reliably. It is now a
+      dropdown fed from here, managed in
+      Settings -> Doctors & Charges -> Visit Types.
+
+      Same shape as the other catalogs on purpose:
+      {id, name, enabled}. `enabled:false` removes a type from
+      NEW visits while leaving every historical visit that
+      already used it untouched.
+    */
+    visitTypes: [
+      {id:"VT-CONSULTATION",  name:"Consultation",       enabled:true},
+      {id:"VT-FOLLOWUP",      name:"Follow-up",          enabled:true},
+      {id:"VT-INJECTION",     name:"Injection",          enabled:true},
+      {id:"VT-REVIEW",        name:"Weight Loss Review", enabled:true},
+      {id:"VT-MEDREVIEW",     name:"Medication Review",  enabled:true},
+      {id:"VT-PROCEDURE",     name:"Procedure",          enabled:true},
+      {id:"VT-OTHER",         name:"Other",              enabled:true}
+    ],
 
     appointments: {
       statuses: [
@@ -634,13 +816,76 @@ function getwellChargeCatalog(){
   }, {});
 }
 
+/*
+  Every configured item INCLUDING the disabled ones.
+
+  getwellChargeCatalog() above filters to what may be chosen
+  for a NEW visit. History needs the unfiltered list: a visit
+  saved last month that used an item since disabled must still
+  show that item's real name when it is reopened.
+*/
+function getwellChargeCatalogAll(){
+  const settings = getwellSystemSettings();
+  const source = settings.chargeCatalog || {};
+  return ["Injection","Medication","Treatment","Additional"].reduce((out, category) => {
+    out[category] = Array.isArray(source[category])
+      ? source[category].filter(item => item && String(item.name || "").trim())
+      : [];
+    return out;
+  }, {});
+}
+
 function getwellChargeItem(category, id){
   return getwellChargeCatalog()[category]?.find(item => String(item.id) === String(id)) || null;
+}
+
+/* Lookup across enabled AND disabled items, for historical rows. */
+function getwellChargeItemAny(category, id){
+  if(!id) return null;
+  return getwellChargeCatalogAll()[category]?.find(item => String(item.id) === String(id)) || null;
 }
 
 function getwellChargePrice(category, id){
   const item = getwellChargeItem(category, id);
   return item ? Number(item.price) || 0 : 0;
+}
+
+
+/* =========================================================
+   VISIT TYPES  (Settings -> Doctors & Charges -> Visit Types)
+
+   Mirrors the doctor / charge-catalog readers exactly, so the
+   Visit Type dropdown behaves like every other Settings-driven
+   dropdown in the application.
+========================================================= */
+
+/* Every configured type, including disabled ones. */
+function getwellAllVisitTypes(){
+  const settings = getwellSystemSettings();
+  return Array.isArray(settings.visitTypes)
+    ? settings.visitTypes.filter(type => type && String(type.name || "").trim())
+    : [];
+}
+
+/* Only the types that may be chosen for a NEW visit. */
+function getwellVisitTypes(){
+  return getwellAllVisitTypes().filter(type => type.enabled !== false);
+}
+
+/*
+  The visit record stores the type NAME, not an id, exactly as
+  it always did. That keeps every historical visit readable
+  and keeps the Visits sheet's `Type` column unchanged.
+*/
+function getwellVisitTypeOptions(){
+  return getwellVisitTypes().map(type => ({
+    id: type.id || String(type.name).trim(),
+    name: String(type.name).trim()
+  }));
+}
+
+function getwellDefaultVisitType(){
+  return getwellVisitTypes()[0]?.name || "";
 }
 
 /* =========================================================
@@ -675,14 +920,18 @@ function getwellAppointmentTypes(){
 }
 
 function getwellSuggestedFollowUpDate(dateValue,days){
-  const d=new Date(String(dateValue||"").slice(0,10)+"T00:00:00");
+  const base=getwellDateKey(dateValue);
+  if(!base) return "";
+  const d=new Date(base+"T00:00:00");
   if(Number.isNaN(d.getTime())) return "";
   d.setDate(d.getDate()+Math.max(1,Number(days)||5));
-  return d.toISOString().slice(0,10);
+  /* Local parts, not toISOString(): in GMT+8 the latter
+     returned the previous calendar day. */
+  return getwellIsoDay(d);
 }
 
 function getwellHasFutureAppointment(patient){
-  const today=new Date().toISOString().slice(0,10);
+  const today=getwellTodayKey();
   return (patient?.appointments||[]).some(a=>
     a && a.date && String(a.date).slice(0,10)>=today &&
     a.status!=="Cancelled" && a.status!=="No Show"
@@ -802,7 +1051,7 @@ function getwellFollowUpSettings(){
 
 function getwellFollowUpRecords(){
   const config = getwellFollowUpSettings();
-  const today = new Date().toISOString().slice(0,10);
+  const today = getwellTodayKey();
 
   return (store().patients || [])
     .map(patient => {
@@ -1476,21 +1725,43 @@ function getwellSyncRemoteStore(allowReload){
 
     getwellSetRemoteBaseline(remote);
 
-    if(result.remoteWon||JSON.stringify(reconciled)!==JSON.stringify(local)){
+    const storeChanged =
+      result.remoteWon || JSON.stringify(reconciled)!==JSON.stringify(local);
+
+    if(storeChanged){
       localStorage.setItem(STORE_KEY,JSON.stringify(result.merged));
       getwellSetPersistedStore(result.merged);
       localStorage.setItem(MIGRATION_KEY,"done");
-      if(allowReload!==false){location.reload();return;}
     }
 
+    /*
+      ORDER MATTERS.
+
+      This used to reload the page the moment the remote copy
+      won, and RETURN -- which skipped the block below. A
+      record that existed only in this browser (a patient
+      registered seconds earlier, whose write had not reached
+      the Sheet yet) was therefore not pushed on that cycle and
+      had to wait for the next 30-second poll.
+
+      The local-only push now happens FIRST, and the reload
+      waits for it to finish.
+    */
     if(result.localWon){
       getwellRemoteSave(result.merged).then(saveResult=>{
-        if(!saveResult.ok)getwellNotify(saveResult.error,"error");
-        else {
+        if(!saveResult.ok){
+          getwellNotify(saveResult.error,"error");
+        }else{
           getwellSetRemoteBaseline(result.merged);
           getwellSetPersistedStore(result.merged);
         }
+        if(storeChanged && allowReload!==false) location.reload();
       });
+      return;
+    }
+
+    if(storeChanged && allowReload!==false){
+      location.reload();
     }
   });
 }
@@ -1768,8 +2039,15 @@ function migrateLegacyIds(
 
 function store(){
 
-  return migrateLegacyIds(
-    rawStore()
+  /*
+    Calendar dates are normalised on the way OUT of storage,
+    so every page reads "YYYY-MM-DD" no matter what the Sheet,
+    an older build or a hand-typed row put in there.
+  */
+  return getwellNormalizeStoreDates(
+    migrateLegacyIds(
+      rawStore()
+    )
   );
 
 }
@@ -2848,11 +3126,13 @@ function getwellShiftMonths(date, months){
 }
 
 
-function getwellIsoDay(date){
-  const pad = n => String(n).padStart(2, "0");
-  return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
-}
-
+/*
+  getwellIsoDay() now lives in the CALENDAR DATES section at
+  the top of this file next to getwellDateKey() and
+  getwellTodayKey(). It used to be declared here as well; two
+  identical declarations of the same name is exactly the kind
+  of drift that makes a date fix look like it did not apply.
+*/
 
 function getwellProgrammeOverview(range){
   const patients = getwellProgrammePatients();
@@ -4066,10 +4346,9 @@ function getwellNotifications(){
 
   if(prefs.appointments !== false){
     const today = new Date();
-    const todayKey = today.toISOString().slice(0,10);
+    const todayKey = getwellIsoDay(today);
 
-    const horizon = new Date(today.getTime() + 7 * 86400000)
-      .toISOString().slice(0,10);
+    const horizon = getwellIsoDay(new Date(today.getTime() + 7 * 86400000));
 
     patients.forEach(patient => {
       (patient.appointments || []).forEach(appointment => {

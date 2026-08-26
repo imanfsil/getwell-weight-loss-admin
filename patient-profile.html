@@ -100,7 +100,7 @@
       <div class="form-grid">
         <div class="form-group"><label>Visit Date</label><input id="vDate" type="date"></div>
         <div class="form-group"><label>Visit Number</label><input id="vNumber"></div>
-        <div class="form-group full"><label>Visit Type</label><input id="vType" placeholder="Consultation / Follow-up / Injection"></div>
+        <div class="form-group full"><label>Visit Type</label><select id="vType"></select></div>
         <div class="form-group"><label>Weight (kg)</label><input id="vWeight" type="number"></div>
         <div class="form-group"><label>Invoice Reference</label><input id="vInvoiceRef"></div>
       </div>
@@ -216,6 +216,34 @@ function renderPanelOptions(select, selected=""){
   select.value = selected || "SELF_PAY";
 }
 
+/*
+  VISIT TYPE
+
+  Was a free-text <input>. It is now a <select> fed from
+  Settings -> Doctors & Charges -> Visit Types, using the same
+  preserveCurrentOption() guard as the doctor, panel and status
+  dropdowns above.
+
+  That guard is what protects history: a visit saved as
+  "Consultation" still shows "Consultation" after the type has
+  been disabled or deleted in Settings, because the value is
+  re-added as an option marked "(not in Settings)" instead of
+  being silently reset to "". Only the list offered for NEW
+  visits changes.
+*/
+function renderVisitTypeOptions(select, selected=""){
+  if(!select) return;
+
+  select.innerHTML =
+    `<option value="">Select visit type</option>` +
+    getwellVisitTypeOptions().map(type =>
+      `<option value="${escapeHtml(type.name)}">${escapeHtml(type.name)}</option>`
+    ).join("");
+
+  preserveCurrentOption(select, selected, "(not in Settings)");
+  select.value = selected || "";
+}
+
 /* Patient statuses now come from Settings instead of being hardcoded. */
 function renderStatusOptions(select, selected=""){
   if(!select) return;
@@ -234,12 +262,12 @@ function openEditPatient(){
   editName.value=p.name||"";
   editPatientId.value=p.id;
   editPhone.value=p.phone||"";
-  editDob.value=p.dob||"";
+  editDob.value=getwellDateKey(p.dob);
   editGender.value=p.gender||"";
   editHeight.value=p.height||"";
   editStartingWeight.value=p.startingWeight||"";
   editGoalWeight.value=p.goalWeight||"";
-  editStartDate.value=p.startDate||"";
+  editStartDate.value=getwellDateKey(p.startDate);
   editPanelStatus.value=p.panelStatus||"Active";
   editPanelSuspensionNote.value=p.panelSuspensionNote||"";
   editPatientModal.classList.add("show");
@@ -372,21 +400,23 @@ async function removePatientPhoto(){
   getwellNotify("Profile photo removed. The patient's initials are shown again.", "success");
 }
 
-function savePatientChanges(){
+async function savePatientChanges(){
   p.name=editName.value.trim();
   p.phone=editPhone.value;
-  p.dob=editDob.value;
+  p.dob=getwellDateKey(editDob.value);
   p.gender=editGender.value;
   p.height=editHeight.value;
   p.startingWeight=+editStartingWeight.value||0;
   p.goalWeight=+editGoalWeight.value||0;
-  p.startDate=editStartDate.value;
+  p.startDate=getwellDateKey(editStartDate.value);
   p.panelProvider=normalizePanelType(editPanel.value);
   p.panelStatus=patientUsesPanel(p)?editPanelStatus.value:"Active";
   p.panelSuspensionNote=patientUsesPanel(p)?editPanelSuspensionNote.value.trim():"";
   p.doctor=editDoctor.value||"";
   p.status=editStatus.value;
-  upsertPatient(p);
+  /* Awaited so the profile only re-renders once the record is
+     genuinely persisted, matching Add Patient. */
+  await upsertPatient(p);
   getwellLogActivity(
     "Edit",
     "Patient",
@@ -476,9 +506,11 @@ function closeVisit(){
 }
 
 function resetVisit(){
-  vDate.value=new Date().toISOString().slice(0,10);
+  /* Local calendar day. toISOString() gave yesterday in GMT+8
+     between midnight and 8am. */
+  vDate.value=getwellTodayKey();
   vNumber.value=`Visit #${(p.visits||[]).length+1}`;
-  vType.value="";
+  renderVisitTypeOptions(vType, getwellDefaultVisitType());
   vWeight.value="";
   vInvoiceRef.value="";
   vPanel.value=0;
@@ -510,6 +542,51 @@ function newCharge(category){
   };
 }
 
+/*
+  HISTORICAL CHARGE ITEMS
+
+  A charge row stores {itemId, itemName, price}. The NAME is
+  stored on the row itself, so removing an item from Settings
+  can never erase what a past visit was billed for -- the
+  Charges sheet keeps its own copy.
+
+  What used to go wrong was only in this form: a <select>
+  whose value matches no <option> silently falls back to "",
+  so reopening an old visit whose item had since been removed
+  showed "Select item" and re-saving wiped the name. Two cases
+  needed covering:
+
+    1. The item still exists but is DISABLED  -> its real name.
+    2. The item is gone, or the row is legacy data with no
+       itemId at all (only a name)            -> a synthetic
+       "legacy:<name>" option so the name survives a re-save.
+
+  Both are appended to that one row's dropdown only, and never
+  appear as choices on a new row.
+*/
+const LEGACY_ITEM_PREFIX="legacy:";
+
+function chargeRowOptionValue(row){
+  if(row.itemId) return String(row.itemId);
+  return row.itemName ? LEGACY_ITEM_PREFIX+row.itemName : "";
+}
+
+function historicalChargeOption(row, enabledItems){
+  const value=chargeRowOptionValue(row);
+  if(!value) return "";
+
+  /* Already offered as a normal enabled option: nothing to add. */
+  if(enabledItems.some(item=>String(item.id)===value)) return "";
+
+  /* Case 1: still configured, just disabled. */
+  const disabledItem=getwellChargeItemAny(row.category,row.itemId);
+  const label=disabledItem
+    ? `${disabledItem.name} (disabled in Settings)`
+    : `${row.itemName||"Historical item"} (not in Settings)`;
+
+  return `<option value="${escapeHtml(value)}" selected>${escapeHtml(label)}</option>`;
+}
+
 function renderChargeBuilder(){
   const categories=["Injection","Medication","Treatment","Additional"];
   chargeBuilder.innerHTML=categories.map(category=>{
@@ -529,7 +606,7 @@ function renderChargeBuilder(){
                 <select class="claim-input" onchange="changeChargeItem(${index},this.value)">
                   <option value="">Select item</option>
                   ${items.map(item=>`<option value="${escapeHtml(item.id)}" ${String(row.itemId)===String(item.id)?"selected":""}>${escapeHtml(item.name)} — ${money2(item.price)}</option>`).join("")}
-                  ${row.itemId && !items.some(item=>String(item.id)===String(row.itemId)) ? `<option value="${escapeHtml(row.itemId)}" selected>${escapeHtml(row.itemName||"Legacy item")}</option>` : ""}
+                  ${historicalChargeOption(row,items)}
                 </select>
                 <input class="claim-input" type="number" min="0" step="0.01" value="${Number(row.price)||0}" oninput="changeChargePrice(${index},this.value)" placeholder="Price">
                 <input class="claim-input" value="${escapeHtml(row.notes||"")}" oninput="changeChargeNotes(${index},this.value)" placeholder="Notes">
@@ -549,11 +626,28 @@ function addCharge(category){
   updateVisitTotal();
 }
 
-function changeChargeItem(index,itemId){
+function changeChargeItem(index,value){
   const row=editingCharges[index];
   if(!row)return;
-  const item=getwellChargeItem(row.category,itemId);
-  row.itemId=itemId;
+
+  /*
+    Re-selecting the historical placeholder must not turn
+    "legacy:Tirzepatide 2.5mg" into an itemId. It keeps the
+    stored name and leaves itemId empty, exactly as the record
+    was written originally.
+  */
+  if(String(value).startsWith(LEGACY_ITEM_PREFIX)){
+    row.itemId="";
+    row.itemName=String(value).slice(LEGACY_ITEM_PREFIX.length);
+    renderChargeBuilder();
+    updateVisitTotal();
+    return;
+  }
+
+  /* Look the item up including disabled ones, so choosing a
+     disabled historical entry keeps its correct name. */
+  const item=getwellChargeItemAny(row.category,value);
+  row.itemId=value;
   row.itemName=item?.name||row.itemName||"";
   if(item) row.price=Number(item.price)||0;
   renderChargeBuilder();
@@ -602,9 +696,15 @@ function openEditVisit(vid){
   editingVisitId=vid;
   editingCharges=getChargesForVisit(v);
 
-  vDate.value=v.dateKey||"";
+  /*
+    getwellDateKey() repairs a record that was already stored
+    as "2025-11-12T16:00:00.000Z" back to "2025-11-13", so the
+    date input populates with the day the user originally
+    picked and saving again does not shift it further.
+  */
+  vDate.value=getwellDateKey(v.dateKey);
   vNumber.value=v.visit||"";
-  vType.value=v.type||"";
+  renderVisitTypeOptions(vType, v.type||"");
   vWeight.value=v.weight==="—"?"":v.weight;
   vInvoiceRef.value=v.invoiceReference||"";
   vPanel.value=ensureVisit(v).billing.panel||0;
@@ -690,7 +790,7 @@ function renderBodyComposition(){
       if(typeof data==="string") return `<div class="finance-card"><div class="label">${escapeHtml(name)}</div><div class="value" style="font-size:18px">${escapeHtml(data)}</div></div>`;
       return `<div class="finance-card"><div class="label">${escapeHtml(name)}</div><div class="value" style="font-size:18px">${escapeHtml(String(data.value))}${data.unit?" "+escapeHtml(data.unit):""}</div></div>`;
     }).join("");
-    return `<div class="card" style="margin-bottom:12px"><div class="card-head"><div><h3>${escapeHtml(v.visit||"Visit")}</h3><p>${escapeHtml(v.dateKey||"")} · ${escapeHtml(v.pdfName||"Arboleaf PDF")}</p></div></div><div class="finance-grid">${cards}</div></div>`;
+    return `<div class="card" style="margin-bottom:12px"><div class="card-head"><div><h3>${escapeHtml(v.visit||"Visit")}</h3><p>${escapeHtml(getwellDateKey(v.dateKey))} · ${escapeHtml(v.pdfName||"Arboleaf PDF")}</p></div></div><div class="finance-grid">${cards}</div></div>`;
   }).join("");
 }
 
@@ -698,13 +798,13 @@ function renderFiles(){
   const files=[];
   (p.visits||[]).forEach(v=>{
     if(v.pdfName || v.arboleafText || v.pdfFile) files.push({
-      type:"PDF",date:v.dateKey,name:(v.pdfFile&&v.pdfFile.name)||v.pdfName||"Arboleaf PDF",visit:v.visit,
+      type:"PDF",date:getwellDateKey(v.dateKey),name:(v.pdfFile&&v.pdfFile.name)||v.pdfName||"Arboleaf PDF",visit:v.visit,
       text:v.arboleafText||"",
       url:(v.pdfFile&&v.pdfFile.url)||"",
       storage:(v.pdfFile&&v.pdfFile.storage)||""
     });
     (v.photos||[]).forEach((photo,i)=>files.push({
-      type:"Photo",date:v.dateKey,name:photo.name||`Photo ${i+1}`,visit:v.visit,
+      type:"Photo",date:getwellDateKey(v.dateKey),name:photo.name||`Photo ${i+1}`,visit:v.visit,
       data:photo.data||"", url:photo.url||"", storage:photo.storage||"local"
     }));
   });
@@ -904,9 +1004,17 @@ async function saveVisit(){
   const v={
     ...(old||{}),
     id:old?.id||getwellNextVisitId(),
-    dateKey:vDate.value,
+    /*
+      DATE-ONLY. vDate.value is already "YYYY-MM-DD" straight
+      from <input type="date">; getwellDateKey() is a guard, not
+      a conversion. It is never turned into a Date object and
+      never passed through toISOString(), which is what used to
+      turn 13-Nov-2025 into 2025-11-12T16:00:00.000Z.
+    */
+    dateKey:getwellDateKey(vDate.value),
     visit:vNumber.value,
-    type:vType.value.trim(),
+    /* Now a Settings-driven <select>. */
+    type:String(vType.value||"").trim(),
     weight:vWeight.value||"—",
     invoiceReference:vInvoiceRef.value,
     injection:firstByCategory("Injection")?.itemName||"",
@@ -962,11 +1070,11 @@ async function saveVisit(){
 function openClaimModal(claimId=null){
   const c=claimId?ensureClaims(p).find(x=>x.id===claimId):null;
   editingClaimId=c?.id||null;
-  claimDateInput.value=c?.claimDate||new Date().toISOString().slice(0,10);
+  claimDateInput.value=getwellDateKey(c?.claimDate)||getwellTodayKey();
   claimAmountInput.value=c?.amount||"";
   claimNotesInput.value=c?.notes||"";
   claimVisitInput.innerHTML=`<option value="">No specific visit</option>`+
-    (p.visits||[]).map(v=>`<option value="${escapeHtml(v.id)}" ${c?.visitId===v.id?"selected":""}>${escapeHtml(v.visit)} · ${escapeHtml(v.dateKey)} · ${money(visitTotal(v))}</option>`).join("");
+    (p.visits||[]).map(v=>`<option value="${escapeHtml(v.id)}" ${c?.visitId===v.id?"selected":""}>${escapeHtml(v.visit)} · ${escapeHtml(getwellDateKey(v.dateKey))} · ${money(visitTotal(v))}</option>`).join("");
   claimModalTitle.textContent=c?"Edit Claim":"Add Claim";
   document.getElementById("deleteClaimButton").style.display=c?"inline-flex":"none";
   claimModal.classList.add("show");
@@ -974,7 +1082,7 @@ function openClaimModal(claimId=null){
 
 function closeClaimModal(){claimModal.classList.remove("show");editingClaimId=null;}
 
-function saveClaim(){
+async function saveClaim(){
   const a=+claimAmountInput.value||0;
   if(a<=0||!claimDateInput.value){alert("Claim date and amount are required.");return}
 
@@ -985,7 +1093,7 @@ function saveClaim(){
     ...(old||{}),
     id:old?.id||getwellNextClaimId(),
     amount:a,
-    claimDate:claimDateInput.value,
+    claimDate:getwellDateKey(claimDateInput.value),
     visitId:claimVisitInput.value,
     notes:claimNotesInput.value.trim()
   };
@@ -993,7 +1101,7 @@ function saveClaim(){
   if(old)arr[arr.indexOf(old)]=obj;
   else arr.push(obj);
 
-  upsertPatient(p);
+  await upsertPatient(p);
   getwellLogActivity(
     old?"Edit":"Add",
     "Claim",
@@ -1020,8 +1128,8 @@ function refresh(){
   patientId.textContent=p.id;
   patientStatus.textContent=p.status||"Active";
   patientPaymentBadge.textContent=getPanelName(p);
-  programStart.textContent=p.startDate||"—";
-  lastVisit.textContent=latestVisit(p)?.dateKey||"—";
+  programStart.textContent=getwellDateKey(p.startDate)||"—";
+  lastVisit.textContent=getwellDateKey(latestVisit(p)?.dateKey)||"—";
 
   const f=finance(p);
   const balanceClass=f.balance<0?"red":"balance";
@@ -1052,13 +1160,13 @@ function refresh(){
   overviewVisits.innerHTML=(p.visits||[]).map(v=>`
     <div class="row"><div class="avatar-small">${getwellPatientAvatar(p)}</div>
       <div class="row-main"><div class="row-title">${escapeHtml(v.visit)} · ${escapeHtml(v.type)}</div>
-      <div class="row-sub">${escapeHtml(v.dateKey)} · ${money(visitTotal(v))}${v.pdfName?" · Arboleaf PDF":""}</div></div>
+      <div class="row-sub">${escapeHtml(getwellDateKey(v.dateKey))} · ${money(visitTotal(v))}${v.pdfName?" · Arboleaf PDF":""}</div></div>
       <button class="secondary" style="padding:7px 9px" onclick="openEditVisit('${escapeHtml(v.id)}')">Edit →</button>
     </div>
   `).join("")||`<div class="notif-empty">No visits.</div>`;
 
   visitRows.innerHTML=(p.visits||[]).map(v=>`
-    <tr><td>${escapeHtml(v.dateKey||"—")}</td><td>${escapeHtml(v.visit||"—")}</td><td>${escapeHtml(v.type||"—")}</td>
+    <tr><td>${escapeHtml(getwellDateKey(v.dateKey)||"—")}</td><td>${escapeHtml(v.visit||"—")}</td><td>${escapeHtml(v.type||"—")}</td>
     <td>${escapeHtml(v.injection||v.charges?.find(c=>c.category==="Injection")?.itemName||"—")}</td>
     <td>${escapeHtml(v.weight||"—")}</td><td>${money(visitTotal(v))}</td><td>${escapeHtml(v.status||"Completed")}</td>
     <td><button class="secondary" style="padding:7px 9px" onclick="openEditVisit('${escapeHtml(v.id)}')">Edit</button></td></tr>
@@ -1070,7 +1178,7 @@ function refresh(){
     <div class="finance-card ${claimBalance<0?"red":"balance"}"><div class="label">${signedBalanceLabel(claimBalance)}</div><div class="value">${money(Math.abs(claimBalance))}</div></div>`;
 
   claimRows.innerHTML=ensureClaims(p).map(c=>`
-    <tr><td>${escapeHtml(c.claimDate||"—")}</td><td>${escapeHtml((p.visits||[]).find(v=>v.id===c.visitId)?.visit||"No specific visit")}</td>
+    <tr><td>${escapeHtml(getwellDateKey(c.claimDate)||"—")}</td><td>${escapeHtml((p.visits||[]).find(v=>v.id===c.visitId)?.visit||"No specific visit")}</td>
     <td>${money(c.amount)}</td><td>${escapeHtml(c.notes||"—")}</td>
     <td><button class="secondary" style="padding:7px 9px" onclick="openClaimModal('${escapeHtml(c.id)}')">Edit</button></td></tr>
   `).join("")||`<tr><td colspan="5" class="notif-empty">No claims recorded.</td></tr>`;

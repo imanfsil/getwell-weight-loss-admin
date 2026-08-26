@@ -22,7 +22,8 @@ panelPatients.forEach(patient => {
   panelClaimed += f.claimed;
 });
 
-const todayKey = new Date().toISOString().slice(0,10);
+/* Local calendar day; toISOString() reported yesterday before 8am in GMT+8. */
+const todayKey = getwellTodayKey();
 
 
 /* ---------------------------------------------------------

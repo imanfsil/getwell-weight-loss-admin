@@ -43,6 +43,26 @@ apart. Install it like this:
    **Manage deployments → edit → Version: New version**, or the
    old code keeps serving.
 
+### One-time step after this update
+
+Re-paste `Code.gs`, run **`setupGetwell()`** once, then
+**re-deploy the web app** (Manage deployments → edit → Version:
+New version). `setupGetwell()` now also switches the calendar-date
+columns (`Patients.DOB`, `Patients.StartDate`, `Appointments.Date`,
+`Visits.Date`, `Claims.ClaimDate`) to plain-text format and repairs
+any cell an earlier version stored as a real date or an ISO
+timestamp.
+
+`repairGetwellDates()` does the repair on its own and is safe to
+re-run at any time. Nothing else on a row is touched and
+`UpdatedAt` is deliberately left alone, so the repair does not
+make every record look newer than the copies in staff browsers.
+
+The front end repairs the same values on its own as it reads
+them, so the app is correct even before you run this — the
+Apps Script step is what stops the Sheet itself from
+re-introducing the shift.
+
 ### Sheets it creates
 
 `Patients`, `Appointments`, `Visits`, `Charges`, `Claims`, `Files`, `Settings`
@@ -169,10 +189,55 @@ columns should now start to the right of column T.
 ## Settings
 
 Everything in Settings feeds the rest of the app: doctors,
-panels, charge items and prices, appointment statuses, patient
-statuses, patient ID format, follow-up thresholds, and which
-Dashboard/Report sections are shown. There are no separate
-hardcoded lists on individual pages.
+**visit types**, charge items and prices, panels, appointment
+statuses, patient statuses, patient ID format, follow-up
+thresholds, and which Dashboard/Report sections are shown.
+There are no separate hardcoded lists on individual pages.
+
+### Visit types
+
+**Settings → Doctors & Charges → Visit Types** feeds the Visit
+Type dropdown on Add Visit. It is stored as `settings.visitTypes`
+inside the existing configuration object, so it travels through
+the same `Settings` sheet (one JSON blob under the key `SYSTEM`)
+as everything else — **no schema change and no new sheet**.
+
+Each entry is `{id, name, enabled}`, the same shape as a charge
+item. The toggle hides a type from *new* visits; Delete removes
+it from the list. Neither touches a visit already saved with
+that type, because a visit stores the type **name** on its own
+row in the `Visits` sheet.
+
+### Removing a charge item or a visit type
+
+Historical data is never rewritten. A visit's charges carry
+their own `itemName` and `price` in the `Charges` sheet, so a
+past visit keeps showing `Tirzepatide 2.5mg` after that item is
+removed from Settings. When such a visit is reopened for
+editing, the dropdown re-adds the stored value labelled
+*(disabled in Settings)* or *(not in Settings)* rather than
+resetting the field to blank — which is what used to erase the
+name on the next save.
+
+## Calendar dates
+
+Visit Date, Date of Birth, Program Start Date, Appointment Date
+and Claim Date are **calendar dates**, stored everywhere as
+plain `YYYY-MM-DD` strings.
+
+They are never converted into a JavaScript `Date` and then
+serialised with `toISOString()`. In Malaysia (GMT+8) that turns
+`2025-11-13` into `2025-11-12T16:00:00.000Z` — the previous day.
+`getwellDateKey()` in `app.js` is the single normaliser; it also
+converts any value already stored as an ISO timestamp back to
+the calendar day the user originally picked, and `store()` runs
+it over the whole store on every read.
+
+On the Sheets side, `Code.gs` forces the date columns to
+plain-text (`@`) number format before writing, so Google Sheets
+cannot re-parse `"2025-11-13"` into a date/time value, and
+`toDateKey()` formats using the **spreadsheet's** timezone
+rather than the script project's.
 
 ## Panel claims
 
