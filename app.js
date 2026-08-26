@@ -2965,6 +2965,9 @@ function finance(
   let treatment =
     0;
 
+  let miscellaneous =
+    0;
+
   let selfpay =
     0;
 
@@ -2981,6 +2984,7 @@ function finance(
       injection += visitCategoryTotal(visit,"Injection");
       medication += visitCategoryTotal(visit,"Medication");
       treatment += visitCategoryTotal(visit,"Treatment");
+      miscellaneous += visitCategoryTotal(visit,"Additional");
       selfpay += +billing.selfPay || 0;
 
     }
@@ -3013,6 +3017,8 @@ function finance(
     medication,
 
     treatment,
+
+    miscellaneous,
 
     selfpay
 

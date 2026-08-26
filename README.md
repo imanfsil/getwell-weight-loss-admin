@@ -316,3 +316,10 @@ Google is unreachable; it syncs when the connection returns.
 The frontend no longer blocks a normal visit/patient/appointment save when the deployed Google Apps Script is missing or behind on the `deleteRecords` action. The current state is saved first; failed deletion synchronization is queued locally for retry instead of producing the misleading red error that previously appeared after a successful save.
 
 The included `Code.gs` supports the `deleteRecords` action. If the Google Apps Script deployment is older than this file, redeploy the script as a **New version** so queued deletions can synchronize normally.
+
+### Financial Summary — Miscellaneous
+The patient financial summary now includes **Total Miscellaneous**, calculated from visit charges in the existing **Additional** category. This keeps the existing charge-category structure unchanged while making miscellaneous charges visible in the patient financial breakdown.
+
+
+
+Financial summary update: Total Miscellaneous is calculated from visit charges in the Additional category and is displayed as a fifth breakdown card. The breakdown uses a responsive 5-column layout on desktop and wraps on smaller screens.
