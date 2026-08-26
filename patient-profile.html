@@ -167,6 +167,12 @@ let editingVisitId = null;
 let editingClaimId = null;
 let editingCharges = [];
 
+// Explicit element references. Do not rely on browser-created globals from element IDs.
+const chargeBuilderEl = document.getElementById("chargeBuilder");
+const vTotalEl = document.getElementById("vTotal");
+const vPanelEl = document.getElementById("vPanel");
+const vSelfEl = document.getElementById("vSelf");
+
 if(window.pdfjsLib){
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
@@ -513,8 +519,8 @@ function resetVisit(){
   renderVisitTypeOptions(vType, getwellDefaultVisitType());
   vWeight.value="";
   vInvoiceRef.value="";
-  vPanel.value=0;
-  vSelf.value=0;
+  vPanelEl.value=0;
+  vSelfEl.value=0;
   vNotes.value="";
   vPdf.value="";
   vPhotos.value="";
@@ -589,7 +595,7 @@ function historicalChargeOption(row, enabledItems){
 
 function renderChargeBuilder(){
   const categories=["Injection","Medication","Treatment","Additional"];
-  chargeBuilder.innerHTML=categories.map(category=>{
+  chargeBuilderEl.innerHTML=categories.map(category=>{
     const rows=editingCharges.filter(c=>c.category===category);
     const items=getwellChargeCatalog()[category]||[];
     return `
@@ -670,24 +676,31 @@ function removeCharge(index){
 }
 
 function updateVisitTotal(){
-  const total=editingCharges.reduce((sum,c)=>sum+(Number(c.price)||0),0);
-  vTotal.textContent=money(total);
+  // Calculate directly from the current charge rows every time.
+  // This remains reliable even after several visits have been created/edited.
+  const total=editingCharges.reduce((sum,c)=>{
+    const value=Number.parseFloat(c?.price);
+    return sum + (Number.isFinite(value) && value > 0 ? value : 0);
+  },0);
+
+  vTotalEl.textContent=money(total);
 
   if(!patientUsesPanel(p)){
-    vPanel.value=0;
-    vSelf.value=total.toFixed(2);
+    vPanelEl.value=0;
+    vSelfEl.value=total.toFixed(2);
     vValidation.className="badge green";
     vValidation.textContent="Self-Pay patient: full visit total is assigned to Self-Pay.";
     return true;
   }
 
-  const ok=Math.abs(total-((+vPanel.value||0)+(+vSelf.value||0)))<0.001;
+  const ok=Math.abs(total-((+vPanelEl.value||0)+(+vSelfEl.value||0)))<0.001;
   vValidation.className="badge "+(ok?"green":"red");
   vValidation.textContent=ok?"Panel + Self-Pay matches Visit Total.":"Panel + Self-Pay must equal Visit Total.";
   return ok;
 }
 
-["vPanel","vSelf"].forEach(id=>document.getElementById(id).addEventListener("input",updateVisitTotal));
+vPanelEl.addEventListener("input",updateVisitTotal);
+vSelfEl.addEventListener("input",updateVisitTotal);
 
 function openEditVisit(vid){
   const v=(p.visits||[]).find(x=>x.id===vid);
@@ -707,8 +720,8 @@ function openEditVisit(vid){
   renderVisitTypeOptions(vType, v.type||"");
   vWeight.value=v.weight==="—"?"":v.weight;
   vInvoiceRef.value=v.invoiceReference||"";
-  vPanel.value=ensureVisit(v).billing.panel||0;
-  vSelf.value=ensureVisit(v).billing.selfPay||0;
+  vPanelEl.value=ensureVisit(v).billing.panel||0;
+  vSelfEl.value=ensureVisit(v).billing.selfPay||0;
   vNotes.value=v.notes||"";
   vPdf.value="";
   vPhotos.value="";
@@ -996,8 +1009,8 @@ async function saveVisit(){
     medication:{price:editingCharges.filter(c=>c.category==="Medication").reduce((s,c)=>s+(+c.price||0),0),notes:""},
     treatment:{price:editingCharges.filter(c=>c.category==="Treatment").reduce((s,c)=>s+(+c.price||0),0),notes:""},
     other:{price:editingCharges.filter(c=>c.category==="Additional").reduce((s,c)=>s+(+c.price||0),0),notes:""},
-    panel:+vPanel.value||0,
-    selfPay:+vSelf.value||0
+    panel:+vPanelEl.value||0,
+    selfPay:+vSelfEl.value||0
   };
 
   const firstByCategory=(category)=>editingCharges.find(c=>c.category===category);
