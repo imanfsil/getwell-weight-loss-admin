@@ -1808,7 +1808,7 @@ function getwellRemoteSaveSettings(settings){
    UI-SAFE BACKGROUND REFRESH
    ---------------------------------------------------------
    Background synchronisation must never destroy what the user
-   is doing. It used to call location.reload(), which threw
+   is doing. It previously called location.reload(), which threw
    away the whole document: an open Add Visit / Edit Patient /
    Add Appointment / Add Claim modal vanished mid-typing, the
    active tab reset to Overview, and search boxes cleared.
@@ -2121,9 +2121,43 @@ function getwellSyncRemoteStore(){
   });
 }
 
+let getwellRemoteSyncTimer = null;
+let getwellRemoteSyncHooksInstalled = false;
+
 function getwellStartRemoteSync(){
-  /* Automatic polling is intentionally disabled. */
-  return false;
+  if(!getwellRemoteConfigured()) return false;
+
+  /*
+    Cross-device sync is REQUIRED: localStorage belongs to the
+    current browser/device, so a phone can never see data saved
+    on the PC unless we read the shared Google Sheets store.
+
+    The old implementation used a full page reload after sync.
+    This version keeps the safe in-place merge/refresh mechanism
+    above, so polling can be enabled without closing modals or
+    navigating to Dashboard.
+  */
+  if(!getwellRemoteSyncHooksInstalled){
+    getwellRemoteSyncHooksInstalled = true;
+
+    /* Pull immediately when the page opens. */
+    setTimeout(() => getwellSyncRemoteStore(), 150);
+
+    /* Pull periodically so another device's changes appear. */
+    getwellRemoteSyncTimer = setInterval(
+      () => getwellSyncRemoteStore(),
+      GETWELL_REMOTE_POLL_MS
+    );
+
+    /* Phones often suspend timers in the background. Pull again
+       when the page becomes visible or is restored from history. */
+    document.addEventListener('visibilitychange', () => {
+      if(document.visibilityState === 'visible') getwellSyncRemoteStore();
+    });
+    window.addEventListener('pageshow', () => getwellSyncRemoteStore());
+  }
+
+  return true;
 }
 
 function getwellManualSync(){
@@ -5822,16 +5856,16 @@ document.addEventListener(
 
 
     /*
-      STABILITY MODE:
-      Automatic background polling is intentionally disabled in
-      the frontend. It can never interrupt navigation, forms or
-      modals. Individual create/edit/delete operations still use
-      the existing Google Sheets save functions.
+      CROSS-DEVICE SYNC:
+      Start the safe background reader. It reads Google Sheets
+      immediately and every 30 seconds, then merges changes in
+      place. It NEVER reloads the document, so forms/modals are
+      protected by getwellUiBusy().
 
-      A manual sync remains available through
-      getwellManualSync() when staff explicitly request it.
+      The manual sync remains available through
+      getwellManualSync() as well.
     */
-    // getwellStartRemoteSync();
+    getwellStartRemoteSync();
 
   }
 );
