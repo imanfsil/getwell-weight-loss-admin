@@ -59,6 +59,16 @@
    CONFIGURATION
 --------------------------------------------------------- */
 
+/*
+  Bumped whenever the contract with the front end changes. The
+  web app reads it back on every save; if it is absent or older
+  than the build the front end expects, the front end says so
+  instead of pretending the record was stored. This is what
+  makes "the deployment is behind the code" a visible error
+  rather than a silent one.
+*/
+var GETWELL_BACKEND_VERSION = "2026-08-28.verified-writes.1";
+
 var GETWELL_DRIVE_FOLDER = "Getwell Patient Files";
 
 var SHEETS = {
@@ -173,19 +183,21 @@ function getBookTimeZone(){
 }
 
 
-/* Forces the calendar-date columns of one sheet to plain text. */
+/* Forces the calendar-date columns of one sheet to plain text.
+   Columns are located by header TEXT, so this still works after
+   somebody inserts or reorders a column. */
 function applyDateColumnFormat(name){
   var columns = DATE_COLUMNS[name];
   if(!columns || !columns.length) return;
 
-  var sheet   = getSheet(name);
-  var headers = HEADERS[name];
+  var context = getSheetContext(name);
+  var sheet   = context.sheet;
   var rows    = Math.max(sheet.getMaxRows() - 1, 1);
 
   columns.forEach(function(column){
-    var index = headers.indexOf(column);
-    if(index < 0) return;
-    sheet.getRange(2, index + 1, rows, 1).setNumberFormat("@");
+    var position = context.map[column];
+    if(!position) return;
+    sheet.getRange(2, position, rows, 1).setNumberFormat("@");
   });
 }
 
@@ -195,27 +207,15 @@ function applyDateColumnFormat(name){
 --------------------------------------------------------- */
 
 function setupGetwell(){
-  var book = SpreadsheetApp.getActiveSpreadsheet();
-
+  /*
+    getSheetContext() creates the sheet if it is missing, writes
+    the header row if the sheet is blank, and appends any
+    canonical column this sheet does not have yet to the RIGHT of
+    the existing ones. Columns that already exist are never
+    moved, renamed or reordered, so no existing row is disturbed.
+  */
   Object.keys(HEADERS).forEach(function(name){
-    var sheet = book.getSheetByName(name) || book.insertSheet(name);
-    var headers = HEADERS[name];
-
-    var existing = sheet.getLastColumn()
-      ? sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0]
-      : [];
-
-    /* Only write headers that are missing; never disturb extra columns. */
-    var needsHeader = false;
-    for(var i = 0; i < headers.length; i++){
-      if(String(existing[i] || "") !== headers[i]) needsHeader = true;
-    }
-
-    if(needsHeader){
-      sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-      sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold");
-      sheet.setFrozenRows(1);
-    }
+    getSheetContext(name);
   });
 
   /*
@@ -249,8 +249,8 @@ function repairDateColumns(name){
   var columns = DATE_COLUMNS[name];
   if(!columns || !columns.length) return {repaired:0};
 
-  var sheet   = getSheet(name);
-  var headers = HEADERS[name];
+  var context = getSheetContext(name);
+  var sheet   = context.sheet;
   var lastRow = sheet.getLastRow();
 
   applyDateColumnFormat(name);
@@ -260,10 +260,10 @@ function repairDateColumns(name){
   var repaired = 0;
 
   columns.forEach(function(column){
-    var index = headers.indexOf(column);
-    if(index < 0) return;
+    var position = context.map[column];
+    if(!position) return;
 
-    var range  = sheet.getRange(2, index + 1, lastRow - 1, 1);
+    var range  = sheet.getRange(2, position, lastRow - 1, 1);
     var values = range.getValues();
     var next   = [];
     var touched = false;
@@ -339,60 +339,173 @@ function getwellOnEdit(event){
 
 
 /* ---------------------------------------------------------
-   SHEET HELPERS
+   SHEET RESOLUTION  (requirement 8: sheet name detection)
+
+   getSheetByName() is exact and case-sensitive, so a tab that
+   a human renamed to "visits" or that carries a stray trailing
+   space used to look MISSING. The old code then quietly created
+   a SECOND sheet and wrote to that one, which is one way the
+   tab you are looking at stays empty while the script reports
+   success. Resolution is now exact-first, then trimmed and
+   case-insensitive.
 --------------------------------------------------------- */
 
-function getSheet(name){
+function findSheetByName(name){
   var book  = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = book.getSheetByName(name);
+  var exact = book.getSheetByName(name);
+  if(exact) return exact;
 
-  if(!sheet){
-    sheet = book.insertSheet(name);
-    sheet.getRange(1, 1, 1, HEADERS[name].length).setValues([HEADERS[name]]);
-    sheet.setFrozenRows(1);
+  var wanted = String(name).trim().toLowerCase();
+  var all    = book.getSheets();
+
+  for(var i = 0; i < all.length; i++){
+    if(String(all[i].getName()).trim().toLowerCase() === wanted) return all[i];
   }
+
+  return null;
+}
+
+
+function getSheet(name){
+  var sheet = findSheetByName(name);
+  if(sheet) return sheet;
+
+  var book = SpreadsheetApp.getActiveSpreadsheet();
+  sheet = book.insertSheet(name);
+  sheet.getRange(1, 1, 1, HEADERS[name].length).setValues([HEADERS[name]]);
+  sheet.getRange(1, 1, 1, HEADERS[name].length).setFontWeight("bold");
+  sheet.setFrozenRows(1);
 
   return sheet;
 }
 
 
-function readSheet(name){
+/* ---------------------------------------------------------
+   COLUMN MAPPING  (requirement 9: header/column mapping)
+
+   The old code addressed columns by their POSITION in the
+   HEADERS array. That silently writes into the wrong columns
+   the moment somebody inserts a column, reorders two of them,
+   or renames one. Every read and write now resolves columns by
+   the header TEXT actually present in row 1.
+
+   A canonical column the sheet does not have yet is appended to
+   the RIGHT of everything that is already there, so existing
+   columns never move and no existing row has to be rewritten.
+--------------------------------------------------------- */
+
+function getSheetContext(name){
+  var canonical = HEADERS[name];
+  if(!canonical) throw new Error("Unknown sheet requested: " + name);
+
   var sheet = getSheet(name);
+  var width = sheet.getLastColumn();
+
+  var actual = width
+    ? sheet.getRange(1, 1, 1, width).getValues()[0].map(function(value){
+        return String(value === null || value === undefined ? "" : value).trim();
+      })
+    : [];
+
+  var hasHeader = actual.some(function(value){ return value !== ""; });
+
+  if(!hasHeader){
+    sheet.getRange(1, 1, 1, canonical.length).setValues([canonical]);
+    sheet.getRange(1, 1, 1, canonical.length).setFontWeight("bold");
+    sheet.setFrozenRows(1);
+    actual = canonical.slice();
+  }
+
+  var map = {};
+  actual.forEach(function(header, position){
+    if(header && !(header in map)) map[header] = position + 1;
+  });
+
+  var missing = canonical.filter(function(header){ return !map[header]; });
+
+  if(missing.length){
+    var start  = Math.max(actual.length, sheet.getLastColumn()) + 1;
+    var needed = start + missing.length - 1;
+
+    if(sheet.getMaxColumns() < needed){
+      sheet.insertColumnsAfter(sheet.getMaxColumns(), needed - sheet.getMaxColumns());
+    }
+
+    sheet.getRange(1, start, 1, missing.length).setValues([missing]);
+    sheet.getRange(1, start, 1, missing.length).setFontWeight("bold");
+
+    missing.forEach(function(header, offset){ map[header] = start + offset; });
+    actual = actual.concat(missing);
+  }
+
+  return {
+    name:      name,
+    sheet:     sheet,
+    map:       map,
+    headers:   canonical,
+    idHeader:  canonical[0],
+    idColumn:  map[canonical[0]],
+    width:     Math.max(actual.length, sheet.getLastColumn(), canonical.length)
+  };
+}
+
+
+function readSheet(name){
+  var context = getSheetContext(name);
+  var sheet   = context.sheet;
   var lastRow = sheet.getLastRow();
 
   if(lastRow < 2) return [];
 
-  var headers = HEADERS[name];
-  var values  = sheet.getRange(2, 1, lastRow - 1, headers.length).getValues();
+  var values = sheet.getRange(2, 1, lastRow - 1, context.width).getValues();
 
   return values
     .map(function(row){
       var record = {};
-      headers.forEach(function(header, index){
-        record[header] = row[index];
+      context.headers.forEach(function(header){
+        var column = context.map[header];
+        record[header] = column ? row[column - 1] : "";
       });
       return record;
     })
     .filter(function(record){
       /* Skip blank rows left behind by deletions. */
-      return String(record[HEADERS[name][0]] || "").trim() !== "";
+      return String(record[context.idHeader] === null || record[context.idHeader] === undefined
+        ? "" : record[context.idHeader]).trim() !== "";
     });
 }
 
 
 /*
-  THE CORE OF REQUIREMENT 4.
+  UPSERT, NEVER CLEAR-AND-REWRITE.
 
-  Builds a map of ID -> sheet row number once, then updates
-  matched rows in place and appends only genuinely new ones.
-  Nothing is ever cleared.
+  Three things changed here, all of them about not failing
+  silently:
+
+  1. Columns are addressed through the header map, not by array
+     position, so data can no longer land in the wrong column.
+
+  2. A record whose ID cell is empty used to be dropped with
+     `if(!id) return;` and no trace. It is now REPORTED back to
+     the caller, which turns it into a visible error instead of
+     a row that never appears.
+
+  3. Rows whose values are already identical are left untouched
+     and counted as `unchanged`. The web app posts the WHOLE
+     store on every save, so the old code rewrote every row of
+     every sheet each time; on a busy sheet that is what pushes
+     the script towards its execution-time limit, and a script
+     that dies part-way writes Patients (first) and never
+     reaches Visits (third) -- which is exactly the shape of the
+     reported bug.
 */
 function upsertRows(name, records){
-  if(!records || !records.length) return {updated:0, created:0};
+  var context = getSheetContext(name);
+  var sheet   = context.sheet;
+  var headers = context.headers;
 
-  var sheet   = getSheet(name);
-  var headers = HEADERS[name];
-  var idKey   = headers[0];
+  var result = {updated:0, created:0, unchanged:0, written:[], rejected:[]};
+  if(!records || !records.length) return result;
 
   /*
     Plain-text format FIRST, so "2025-11-13" is stored as the
@@ -401,44 +514,133 @@ function upsertRows(name, records){
   */
   applyDateColumnFormat(name);
 
-  var lastRow = sheet.getLastRow();
-  var index   = {};
+  var width    = context.width;
+  var lastRow  = sheet.getLastRow();
+  var existing = lastRow >= 2 ? sheet.getRange(2, 1, lastRow - 1, width).getValues() : [];
 
-  if(lastRow >= 2){
-    var ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
-    for(var i = 0; i < ids.length; i++){
-      var id = String(ids[i][0] || "").trim();
-      if(id) index[id] = i + 2;
-    }
+  var rowOf = {};
+  for(var i = 0; i < existing.length; i++){
+    var existingId = String(existing[i][context.idColumn - 1] || "").trim();
+    if(existingId && rowOf[existingId] === undefined) rowOf[existingId] = i;
   }
 
-  var appended = [];
-  var updated  = 0;
+  var appended    = [];
+  var appendedIds = [];
+  var appendAt    = {};
+
+  var fill = function(row, record){
+    var changed = false;
+    headers.forEach(function(header){
+      var column = context.map[header];
+      if(!column) return;
+
+      var value = record[header];
+      value = (value === undefined || value === null) ? "" : value;
+
+      var before = row[column - 1];
+      before = (before === undefined || before === null) ? "" : before;
+
+      if(String(before) !== String(value)){
+        row[column - 1] = value;
+        changed = true;
+      }
+    });
+    return changed;
+  };
 
   records.forEach(function(record){
-    var id = String(record[idKey] || "").trim();
-    if(!id) return;
+    var id = String(record[context.idHeader] === null || record[context.idHeader] === undefined
+      ? "" : record[context.idHeader]).trim();
 
-    var row = headers.map(function(header){
-      var value = record[header];
-      return value === undefined || value === null ? "" : value;
-    });
-
-    if(index[id]){
-      sheet.getRange(index[id], 1, 1, headers.length).setValues([row]);
-      updated++;
-    }else{
-      appended.push(row);
+    if(!id){
+      result.rejected.push(name + ": a record arrived with no " + context.idHeader + " and was not written.");
+      return;
     }
+
+    /* The same ID twice in one payload: update the pending row. */
+    if(appendAt[id] !== undefined){
+      fill(appended[appendAt[id]], record);
+      return;
+    }
+
+    if(rowOf[id] !== undefined){
+      var position = rowOf[id];
+      var current  = existing[position].slice();
+
+      if(fill(current, record)){
+        sheet.getRange(position + 2, 1, 1, width).setValues([current]);
+        existing[position] = current;
+        result.updated++;
+      }else{
+        result.unchanged++;
+      }
+
+      result.written.push(id);
+      return;
+    }
+
+    var row = [];
+    for(var c = 0; c < width; c++) row.push("");
+    fill(row, record);
+
+    appendAt[id] = appended.length;
+    appended.push(row);
+    appendedIds.push(id);
   });
 
   if(appended.length){
     sheet
-      .getRange(sheet.getLastRow() + 1, 1, appended.length, headers.length)
+      .getRange(sheet.getLastRow() + 1, 1, appended.length, width)
       .setValues(appended);
+
+    result.created = appended.length;
+    result.written = result.written.concat(appendedIds);
   }
 
-  return {updated:updated, created:appended.length};
+  return result;
+}
+
+
+/*
+  VERIFY THE WRITE.
+
+  upsertRows() reporting "created 1" is not proof. This reads
+  the ID column back out of the sheet AFTER the write and says
+  which of the IDs the web app sent are genuinely on a row now.
+  Everything the front end trusts is built on this.
+*/
+function verifyIds(name, ids){
+  var unique = [];
+  var seen   = {};
+
+  (ids || []).forEach(function(id){
+    var key = String(id === null || id === undefined ? "" : id).trim();
+    if(key && !seen[key]){ seen[key] = true; unique.push(key); }
+  });
+
+  if(!unique.length) return {expected:0, present:[], missing:[]};
+
+  var context = getSheetContext(name);
+  var sheet   = context.sheet;
+  var lastRow = sheet.getLastRow();
+  var have    = {};
+
+  if(lastRow >= 2){
+    var column = sheet.getRange(2, context.idColumn, lastRow - 1, 1).getValues();
+    for(var i = 0; i < column.length; i++){
+      var value = String(column[i][0] || "").trim();
+      if(value) have[value] = true;
+    }
+  }
+
+  var present = [];
+  var missing = [];
+
+  unique.forEach(function(id){
+    if(have[id]) present.push(id); else missing.push(id);
+  });
+
+  return {expected:unique.length, present:present, missing:missing};
 }
 
 
@@ -740,11 +942,15 @@ function saveStoreToSheets(data){
   var claimRows       = [];
   var fileRows        = [];
 
-  var stamp = new Date().toISOString();
+  var stamp    = new Date().toISOString();
+  var rejected = [];
 
   patients.forEach(function(patient){
     var patientId = toText(patient.id);
-    if(!patientId) return;
+    if(!patientId){
+      rejected.push("A patient arrived with no PatientID and was not written.");
+      return;
+    }
 
     var patientStamp = toText(patient.updatedAt) || stamp;
 
@@ -776,7 +982,10 @@ function saveStoreToSheets(data){
 
     (patient.appointments || []).forEach(function(appointment){
       var id = toText(appointment.id);
-      if(!id) return;
+      if(!id){
+        rejected.push("An appointment on " + patientId + " arrived with no AppointmentID.");
+        return;
+      }
       appointmentRows.push({
         AppointmentID: id,
         PatientID:     patientId,
@@ -792,7 +1001,10 @@ function saveStoreToSheets(data){
 
     (patient.visits || []).forEach(function(visit){
       var visitId = toText(visit.id);
-      if(!visitId) return;
+      if(!visitId){
+        rejected.push("A visit on " + patientId + " arrived with no VisitID and was not written.");
+        return;
+      }
 
       var billing = visit.billing || {};
       var pdfFile = visit.pdfFile || {};
@@ -824,7 +1036,10 @@ function saveStoreToSheets(data){
 
       (visit.charges || []).forEach(function(charge){
         var chargeId = toText(charge.id);
-        if(!chargeId) return;
+        if(!chargeId){
+          rejected.push("A charge on visit " + visitId + " arrived with no ChargeID.");
+          return;
+        }
         chargeRows.push({
           ChargeID:  chargeId,
           VisitID:   visitId,
@@ -856,7 +1071,10 @@ function saveStoreToSheets(data){
 
     (patient.claims || []).forEach(function(claim){
       var claimId = toText(claim.id);
-      if(!claimId) return;
+      if(!claimId){
+        rejected.push("A claim on " + patientId + " arrived with no ClaimID.");
+        return;
+      }
       claimRows.push({
         ClaimID:   claimId,
         PatientID: patientId,
@@ -870,14 +1088,102 @@ function saveStoreToSheets(data){
     });
   });
 
+  /*
+    ---------------------------------------------------------
+    WRITE, THEN PROVE THE WRITE.
+    ---------------------------------------------------------
+    The old version returned upsertRows()' own counters and the
+    front end treated ok:true as "the visit is in the sheet".
+    It is not proof: a backend that ignores visits entirely,
+    that writes them to a different tab, or that dies part-way
+    through the six sheets all produce a perfectly cheerful
+    ok:true.
+
+    So every sheet is now read BACK after the write and the IDs
+    the web app sent are checked against what is actually on a
+    row. `verified` is that proof; `missing` is what did not
+    make it. doPost() refuses to answer ok:true unless `missing`
+    is empty for every sheet.
+  */
+  var plan = [
+    {key:"patients",     sheet:SHEETS.PATIENTS,     rows:patientRows,     id:"PatientID"},
+    {key:"appointments", sheet:SHEETS.APPOINTMENTS, rows:appointmentRows, id:"AppointmentID"},
+    {key:"visits",       sheet:SHEETS.VISITS,       rows:visitRows,       id:"VisitID"},
+    {key:"charges",      sheet:SHEETS.CHARGES,      rows:chargeRows,      id:"ChargeID"},
+    {key:"claims",       sheet:SHEETS.CLAIMS,       rows:claimRows,       id:"ClaimID"},
+    {key:"files",        sheet:SHEETS.FILES,        rows:fileRows,        id:"FileID"}
+  ];
+
+  var counts   = {};
+  var verified = {};
+  var missing  = {};
+
+  plan.forEach(function(step){
+    var outcome = upsertRows(step.sheet, step.rows);
+
+    counts[step.key] = {
+      updated:   outcome.updated,
+      created:   outcome.created,
+      unchanged: outcome.unchanged
+    };
+
+    outcome.rejected.forEach(function(message){ rejected.push(message); });
+
+    var expected = step.rows.map(function(row){ return row[step.id]; });
+    var check    = verifyIds(step.sheet, expected);
+
+    verified[step.key] = check.present;
+    missing[step.key]  = check.missing;
+  });
+
   return {
-    patients:     upsertRows(SHEETS.PATIENTS,     patientRows),
-    appointments: upsertRows(SHEETS.APPOINTMENTS, appointmentRows),
-    visits:       upsertRows(SHEETS.VISITS,       visitRows),
-    charges:      upsertRows(SHEETS.CHARGES,      chargeRows),
-    claims:       upsertRows(SHEETS.CLAIMS,       claimRows),
-    files:        upsertRows(SHEETS.FILES,        fileRows)
+    counts:   counts,
+    verified: verified,
+    missing:  missing,
+    rejected: rejected,
+    sheets:   describeSheets()
   };
+}
+
+
+/*
+  A compact description of what the script can actually see, so
+  a support question can be answered without screen sharing.
+*/
+function describeSheets(){
+  var out = {};
+
+  Object.keys(HEADERS).forEach(function(name){
+    try{
+      var context = getSheetContext(name);
+      out[name] = {
+        tab:      context.sheet.getName(),
+        rows:     Math.max(context.sheet.getLastRow() - 1, 0),
+        idColumn: context.idColumn
+      };
+    }catch(error){
+      out[name] = {error:String(error)};
+    }
+  });
+
+  return out;
+}
+
+
+/* Turns the `missing` map into one sentence a human can act on. */
+function describeMissing(result){
+  var parts = [];
+
+  Object.keys(result.missing || {}).forEach(function(key){
+    var list = result.missing[key] || [];
+    if(list.length){
+      parts.push(list.length + " " + key + " (" + list.slice(0, 5).join(", ") + ")");
+    }
+  });
+
+  return parts.length
+    ? "These records were sent but are not on a row in the spreadsheet afterwards: " + parts.join("; ") + "."
+    : "";
 }
 
 
@@ -994,14 +1300,40 @@ function doGet(e){
 
   try{
     if(action === "get"){
-      return jsonResponse({ok:true, data:buildStore()}, callback);
+      return jsonResponse(
+        {ok:true, version:GETWELL_BACKEND_VERSION, data:buildStore()},
+        callback
+      );
     }
 
     if(action === "ping"){
-      return jsonResponse({ok:true, message:"Getwell backend is reachable."}, callback);
+      return jsonResponse(
+        {ok:true, version:GETWELL_BACKEND_VERSION, message:"Getwell backend is reachable."},
+        callback
+      );
     }
 
-    return jsonResponse({ok:false, error:"Unknown action: " + action}, callback);
+    /*
+      Answers "is the deployment actually running this file, and
+      which tabs is it writing to?" without opening the editor.
+      Open the /exec URL with ?action=diagnose in a browser.
+    */
+    if(action === "diagnose"){
+      return jsonResponse({
+        ok:      true,
+        version: GETWELL_BACKEND_VERSION,
+        book:    SpreadsheetApp.getActiveSpreadsheet().getName(),
+        tabs:    SpreadsheetApp.getActiveSpreadsheet().getSheets().map(function(sheet){
+                   return sheet.getName();
+                 }),
+        sheets:  describeSheets()
+      }, callback);
+    }
+
+    return jsonResponse(
+      {ok:false, version:GETWELL_BACKEND_VERSION, error:"Unknown action: " + action},
+      callback
+    );
 
   }catch(error){
     return jsonResponse({ok:false, error:String(error)}, callback);
@@ -1030,33 +1362,71 @@ function doPost(e){
 
     if(action === "save"){
       if(!body.data || !body.data.patients){
-        return jsonResponse({ok:false, error:"The save payload contained no patients."});
+        return jsonResponse({
+          ok:false,
+          version:GETWELL_BACKEND_VERSION,
+          error:"The save payload contained no patients."
+        });
       }
 
       var result = saveStoreToSheets(body.data);
-      return jsonResponse({ok:true, saved:result});
+
+      var shortfall = 0;
+      Object.keys(result.missing).forEach(function(key){
+        shortfall += (result.missing[key] || []).length;
+      });
+
+      /*
+        THE POINT OF THE WHOLE EXERCISE.
+
+        ok:true now means "every record you sent has been read
+        back off a row in the spreadsheet". Anything less is
+        ok:false with the list of what is missing, so the browser
+        can refuse to tell the user the visit was saved.
+      */
+      if(shortfall || result.rejected.length){
+        return jsonResponse({
+          ok:       false,
+          version:  GETWELL_BACKEND_VERSION,
+          error:    (describeMissing(result) + " " + result.rejected.join(" ")).trim(),
+          saved:    result.counts,
+          verified: result.verified,
+          missing:  result.missing,
+          rejected: result.rejected,
+          sheets:   result.sheets
+        });
+      }
+
+      return jsonResponse({
+        ok:       true,
+        version:  GETWELL_BACKEND_VERSION,
+        saved:    result.counts,
+        verified: result.verified,
+        sheets:   result.sheets
+      });
     }
 
     if(action === "deleteRecords"){
       return jsonResponse({
         ok:true,
+        version:GETWELL_BACKEND_VERSION,
         deleted:deleteRecordsFromSheets(body.deletions || {})
       });
     }
 
     if(action === "saveSettings"){
-      if(!body.settings) return jsonResponse({ok:false,error:"No settings were supplied."});
-      return jsonResponse({ok:true,saved:saveSettingsToSheet(body.settings)});
+      if(!body.settings) return jsonResponse({ok:false,version:GETWELL_BACKEND_VERSION,error:"No settings were supplied."});
+      return jsonResponse({ok:true,version:GETWELL_BACKEND_VERSION,saved:saveSettingsToSheet(body.settings)});
     }
 
     if(action === "uploadFile"){
       return jsonResponse(storeDriveFile(body.file));
     }
 
-    return jsonResponse({ok:false, error:"Unknown action: " + action});
+    return jsonResponse({ok:false, version:GETWELL_BACKEND_VERSION, error:"Unknown action: " + action});
 
   }catch(error){
-    return jsonResponse({ok:false, error:String(error)});
+    return jsonResponse({ok:false, version:GETWELL_BACKEND_VERSION, error:String(error)});
 
   }finally{
     lock.releaseLock();

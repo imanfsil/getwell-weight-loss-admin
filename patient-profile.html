@@ -358,7 +358,7 @@ async function handlePatientPhoto(input){
   }
 
   Object.assign(p, result.photo);
-  await upsertPatient(p);
+  const saveResult = await upsertPatient(p);
 
   getwellLogActivity(
     "Edit",
@@ -380,7 +380,7 @@ async function handlePatientPhoto(input){
       "error"
     );
   }else{
-    getwellNotify("Profile photo updated.", "success");
+    getwellAnnounceSave(saveResult, "Profile photo updated.");
   }
 }
 
@@ -390,7 +390,7 @@ async function removePatientPhoto(){
   if(!await getwellConfirmDelete("Profile Photo")) return;
 
   Object.assign(p, getwellClearedPatientPhoto());
-  await upsertPatient(p);
+  const saveResult = await upsertPatient(p);
 
   getwellLogActivity(
     "Edit",
@@ -403,7 +403,7 @@ async function removePatientPhoto(){
   refresh();
   renderPatientPhotoControls();
 
-  getwellNotify("Profile photo removed. The patient's initials are shown again.", "success");
+  getwellAnnounceSave(saveResult, "Profile photo removed. The patient's initials are shown again.");
 }
 
 async function savePatientChanges(){
@@ -422,14 +422,18 @@ async function savePatientChanges(){
   p.status=editStatus.value;
   /* Awaited so the profile only re-renders once the record is
      genuinely persisted, matching Add Patient. */
-  await upsertPatient(p);
+  const saveResult=await upsertPatient(p);
   getwellLogActivity(
     "Edit",
     "Patient",
     `${p.id} · ${p.name}`,
     `Status: ${p.status} · Panel: ${getPanelName(p)}`
   );
-  getwellNotify("Patient saved successfully.","success");
+  if(!getwellAnnounceSave(saveResult,"Patient saved to Google Sheets.")){
+    p=getPatient(p.id);
+    refresh();
+    return;
+  }
   p=getPatient(p.id);
   closeEditPatient();
   refresh();
@@ -442,14 +446,14 @@ async function deletePatientRecord(){
   const removedName=p.name||"";
   const data=store();
   data.patients=(data.patients||[]).filter(x=>x&&x.id!==id);
-  await saveStore(data);
+  const saveResult=await saveStore(data);
   getwellLogActivity(
     "Delete",
     "Patient",
     `${id} · ${removedName}`,
     "Patient record and all its visits, claims and appointments removed"
   );
-  getwellNotify("Patient deleted successfully.","success");
+  if(!getwellAnnounceSave(saveResult,"Patient deleted from Google Sheets.")) return;
   location.href="patients.html";
 }
 
@@ -458,14 +462,18 @@ async function deleteVisitRecord(){
   if(!await getwellConfirmDelete("Visit")) return;
   const removedVisit=(p.visits||[]).find(v=>v&&v.id===editingVisitId);
   p.visits=(p.visits||[]).filter(v=>v&&v.id!==editingVisitId);
-  await upsertPatient(p);
+  const saveResult=await upsertPatient(p);
   getwellLogActivity(
     "Delete",
     "Visit",
     `${editingVisitId} · ${p.name||p.id}`,
     removedVisit?`Visit date ${removedVisit.dateKey||removedVisit.date||""}`:""
   );
-  getwellNotify("Visit deleted successfully.","success");
+  if(!getwellAnnounceSave(saveResult,"Visit deleted from Google Sheets.")){
+    p=getPatient(p.id);
+    refresh();
+    return;
+  }
   closeVisit();
   p=getPatient(p.id);
   refresh();
@@ -476,14 +484,18 @@ async function deleteClaimRecord(){
   if(!await getwellConfirmDelete("Claim")) return;
   const removedClaim=(p.claims||[]).find(c=>c&&c.id===editingClaimId);
   p.claims=(p.claims||[]).filter(c=>c&&c.id!==editingClaimId);
-  await upsertPatient(p);
+  const saveResult=await upsertPatient(p);
   getwellLogActivity(
     "Delete",
     "Claim",
     `${editingClaimId} · ${p.name||p.id}`,
     removedClaim?`${money(removedClaim.amount||0)} · ${removedClaim.claimDate||""}`:""
   );
-  getwellNotify("Claim deleted successfully.","success");
+  if(!getwellAnnounceSave(saveResult,"Claim deleted from Google Sheets.")){
+    p=getPatient(p.id);
+    refresh();
+    return;
+  }
   closeClaimModal();
   p=getPatient(p.id);
   refresh();
@@ -1061,7 +1073,23 @@ async function saveVisit(){
     suggestedAppointment=getwellCreateSuggestedAppointment(p,v);
   }
 
-  await upsertPatient(p);
+  /*
+    ROOT CAUSE OF "THE APP SAID THE VISIT WAS SAVED BUT THE
+    VISITS SHEET IS EMPTY"
+    -------------------------------------------------------
+    upsertPatient() returns the outcome of the Google Sheets
+    write. This function used to throw that value away and
+    show the green "Visit saved successfully." toast no matter
+    what came back -- so a visit that never reached the sheet
+    was indistinguishable from one that did.
+
+    The result is now inspected. The success message appears
+    only when Code.gs has read the Visit ID back off a row in
+    the Visits sheet, and the modal stays open on failure so
+    the work is not lost behind a closed dialog.
+  */
+  const saveResult = await upsertPatient(p);
+
   getwellLogActivity(
     old?"Edit":"Add",
     "Visit",
@@ -1069,12 +1097,25 @@ async function saveVisit(){
     `${v.dateKey||""} · ${v.type||""} · ${money(visitTotal(v))}` +
       (suggestedAppointment?` · follow-up suggested ${suggestedAppointment.date}`:"")
   );
+
+  if(saveResult && saveResult.ok === false){
+    /* saveStore() has already shown the detailed reason. */
+    getwellNotify(
+      `Visit ${v.id} was NOT stored in the Visits sheet. It is kept on this device and will be retried.`,
+      "error"
+    );
+    p=getPatient(p.id);
+    refresh();
+    return;
+  }
+
   getwellNotify(
     suggestedAppointment
-      ? `Visit saved. Suggested follow-up: ${suggestedAppointment.date}`
-      : "Visit saved successfully.",
+      ? `Visit ${v.id} saved to Google Sheets. Suggested follow-up: ${suggestedAppointment.date}`
+      : `Visit ${v.id} saved to Google Sheets.`,
     "success"
   );
+
   p=getPatient(p.id);
   closeVisit();
   refresh();
@@ -1114,14 +1155,18 @@ async function saveClaim(){
   if(old)arr[arr.indexOf(old)]=obj;
   else arr.push(obj);
 
-  await upsertPatient(p);
+  const saveResult=await upsertPatient(p);
   getwellLogActivity(
     old?"Edit":"Add",
     "Claim",
     `${obj.id} · ${p.name||p.id}`,
     `${money(obj.amount)} · ${obj.claimDate||""}`
   );
-  getwellNotify("Claim saved successfully.","success");
+  if(!getwellAnnounceSave(saveResult,`Claim ${obj.id} saved to Google Sheets.`)){
+    p=getPatient(p.id);
+    refresh();
+    return;
+  }
   p=getPatient(p.id);
   closeClaimModal();
   refresh();

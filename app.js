@@ -1218,8 +1218,20 @@ const GETWELL_SHEETS_API_URL =
 
 const GETWELL_REMOTE_POLL_MS = 30000;
 const GETWELL_REMOTE_SAVE_KEY = "GETWELL_REMOTE_LAST_SAVE";
-const GETWELL_REMOTE_BASELINE_KEY = "GETWELL_REMOTE_BASELINE_V2";
+const GETWELL_REMOTE_BASELINE_KEY = "GETWELL_REMOTE_BASELINE_V3";
 const GETWELL_PERSISTED_STORE_KEY = "GETWELL_PERSISTED_STORE_V2";
+
+/* Records this browser has created but has NOT seen confirmed on a
+   row in Google Sheets. See the OUTBOX section below. */
+const GETWELL_UNCONFIRMED_KEY = "GETWELL_UNCONFIRMED_V1";
+
+/* The Code.gs contract this build expects. A deployment that does
+   not report a version at all is older than the verified-write
+   backend and cannot prove that a visit reached the sheet. */
+const GETWELL_REQUIRED_BACKEND = "2026-08-28.verified-writes.1";
+
+const GETWELL_RECORD_KEYS =
+  ["patients","appointments","visits","charges","claims","files"];
 
 let getwellSyncInFlight = false;
 
@@ -1405,6 +1417,176 @@ function getwellRemoteRead(callback){
 }
 
 
+/* =========================================================
+   THE OUTBOX
+   ---------------------------------------------------------
+   Google Sheets is the database. localStorage is a cache and
+   a QUEUE, never the record of truth.
+
+   Every ID this browser has written but has not yet seen
+   confirmed on a row in the spreadsheet is listed here. Two
+   rules follow from that list, and together they are what
+   stops a visit from disappearing:
+
+     1. An unconfirmed record is retried on the next sync.
+     2. An unconfirmed record is NEVER removed by the
+        synchroniser. "Absent from the Sheets response" means
+        "not written yet", not "deleted".
+
+   An ID leaves the outbox only when the backend has read it
+   back off a row, or when a remote snapshot contains it.
+========================================================= */
+
+function getwellUnconfirmed(){
+  try{
+    const raw = localStorage.getItem(GETWELL_UNCONFIRMED_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    const out = {};
+    GETWELL_RECORD_KEYS.forEach(key => {
+      out[key] = new Set((Array.isArray(parsed[key]) ? parsed[key] : []).map(String));
+    });
+    return out;
+  }catch(e){
+    const out = {};
+    GETWELL_RECORD_KEYS.forEach(key => { out[key] = new Set(); });
+    return out;
+  }
+}
+
+function getwellWriteUnconfirmed(sets){
+  try{
+    const plain = {};
+    GETWELL_RECORD_KEYS.forEach(key => { plain[key] = [...(sets[key] || [])]; });
+    localStorage.setItem(GETWELL_UNCONFIRMED_KEY, JSON.stringify(plain));
+  }catch(e){}
+}
+
+function getwellMarkUnconfirmed(ids){
+  const sets = getwellUnconfirmed();
+  GETWELL_RECORD_KEYS.forEach(key => {
+    (ids?.[key] || []).forEach(id => sets[key].add(String(id)));
+  });
+  getwellWriteUnconfirmed(sets);
+}
+
+function getwellMarkConfirmed(ids){
+  const sets = getwellUnconfirmed();
+  GETWELL_RECORD_KEYS.forEach(key => {
+    (ids?.[key] || []).forEach(id => sets[key].delete(String(id)));
+  });
+  getwellWriteUnconfirmed(sets);
+}
+
+function getwellHasUnconfirmed(){
+  const sets = getwellUnconfirmed();
+  return GETWELL_RECORD_KEYS.some(key => sets[key].size > 0);
+}
+
+
+/* ---------------------------------------------------------
+   WHAT THIS PAYLOAD CLAIMS TO BE SAVING
+
+   Mirrors exactly what Code.gs turns into rows, including the
+   fallback FileID it generates for a photo that has no id of
+   its own, so the two sides agree on what "confirmed" means.
+--------------------------------------------------------- */
+
+function getwellExpectedRemoteIds(payload){
+  const ids = {};
+  GETWELL_RECORD_KEYS.forEach(key => { ids[key] = []; });
+
+  (payload?.patients || []).forEach(patient => {
+    if(!patient || !patient.id) return;
+    ids.patients.push(String(patient.id));
+
+    (patient.appointments || []).forEach(appointment => {
+      if(appointment && appointment.id) ids.appointments.push(String(appointment.id));
+    });
+
+    (patient.claims || []).forEach(claim => {
+      if(claim && claim.id) ids.claims.push(String(claim.id));
+    });
+
+    (patient.visits || []).forEach(visit => {
+      if(!visit || !visit.id) return;
+      const visitId = String(visit.id);
+      ids.visits.push(visitId);
+
+      (visit.charges || []).forEach(charge => {
+        if(charge && charge.id) ids.charges.push(String(charge.id));
+      });
+
+      /* Only Drive-backed photos become rows; device-only ones do not. */
+      (visit.photos || []).forEach((photo, position) => {
+        if(!photo || !photo.driveId) return;
+        ids.files.push(String(photo.id || ("FILE-" + visitId + "-" + (position + 1))));
+      });
+    });
+  });
+
+  return ids;
+}
+
+
+/* ---------------------------------------------------------
+   DID THE BACKEND ACTUALLY STORE IT?
+
+   ROOT CAUSE OF "THE VISITS TAB IS EMPTY BUT THE APP SAID
+   THE VISIT WAS SAVED"
+   ---------------------------------------------------------
+   The old code took `ok:true` from Apps Script as proof and
+   went no further. `ok:true` is not proof. A deployment that
+   is behind this file, that ignores visits, or that dies after
+   writing the Patients sheet all answer `ok:true` just as
+   happily -- which is why the patient appeared in the sheet
+   and the visit did not, with no error anywhere.
+
+   Code.gs now reads every ID back OFF A ROW after writing and
+   returns them in `verified`. This function refuses to call a
+   save successful unless every ID that went out came back in
+   that list.
+--------------------------------------------------------- */
+
+function getwellVerifyRemoteSave(expected, payload){
+  if(!payload || !payload.verified){
+    return {
+      ok:false,
+      stale:true,
+      error:
+        "The Google Apps Script deployment is older than this version of the app " +
+        "and cannot confirm that the record reached the spreadsheet. Re-paste Code.gs, " +
+        "run setupGetwell(), then Deploy \u2192 Manage deployments \u2192 edit \u2192 Version: New version."
+    };
+  }
+
+  const missing = {};
+  let shortfall = 0;
+
+  GETWELL_RECORD_KEYS.forEach(key => {
+    const confirmed = new Set((payload.verified[key] || []).map(String));
+    const gone = (expected[key] || []).filter(id => !confirmed.has(String(id)));
+    if(gone.length){
+      missing[key] = gone;
+      shortfall += gone.length;
+    }
+  });
+
+  if(shortfall){
+    const detail = Object.keys(missing)
+      .map(key => missing[key].length + " " + key + " (" + missing[key].slice(0, 3).join(", ") + ")")
+      .join("; ");
+
+    return {
+      ok:false,
+      missing,
+      error:"Google Sheets did not store: " + detail + "."
+    };
+  }
+
+  return {ok:true};
+}
+
+
 /* ---------------------------------------------------------
    WRITE  (Web -> Sheets)
    Real CORS request so the reply can actually be read.
@@ -1412,8 +1594,17 @@ function getwellRemoteRead(callback){
 --------------------------------------------------------- */
 
 function getwellRemoteSave(data){
+  const sanitized = getwellSanitizeForRemote(data);
+  const expected  = getwellExpectedRemoteIds(sanitized);
+
+  const fail = (message, extra) => {
+    getwellRecordSyncStatus(false, message);
+    getwellMarkUnconfirmed(expected);
+    return Object.assign({ok:false, error:message, expected}, extra || {});
+  };
+
   if(!getwellRemoteConfigured()){
-    return Promise.resolve({ok:false, error:"Google Sheets URL is not configured."});
+    return Promise.resolve(fail("Google Sheets URL is not configured."));
   }
 
   try{
@@ -1425,7 +1616,7 @@ function getwellRemoteSave(data){
     {
       method: "POST",
       headers: {"Content-Type": "text/plain;charset=utf-8"},
-      body: JSON.stringify({action:"save", data:getwellSanitizeForRemote(data)})
+      body: JSON.stringify({action:"save", data:sanitized})
     }
   )
     .then(response => response.text())
@@ -1439,44 +1630,45 @@ function getwellRemoteSave(data){
           Apps Script deployment is not set to
           "Who has access: Anyone".
         */
-        const message =
-          "Google Sheets rejected the save. Check the Apps Script deployment is shared with \"Anyone\".";
-
-        getwellRecordSyncStatus(false, message);
-
-        return {
-          ok:false,
-          error:message
-        };
+        return fail(
+          "Google Sheets rejected the save. Check the Apps Script deployment is shared with \"Anyone\"."
+        );
       }
 
-      if(payload && payload.ok){
-        getwellRecordSyncStatus(true);
-        return {ok:true, saved:payload.saved || null};
+      if(!payload || !payload.ok){
+        return fail(
+          (payload && payload.error) || "Google Sheets returned an unknown error.",
+          {missing: payload && payload.missing}
+        );
       }
 
-      const message =
-        (payload && payload.error) || "Google Sheets returned an unknown error.";
+      /*
+        ok:true is where the old code stopped. It is not enough.
+        Every ID that went out must come back in payload.verified,
+        which Code.gs builds by reading the ID column back OFF THE
+        SHEET after writing.
+      */
+      const proof = getwellVerifyRemoteSave(expected, payload);
 
-      getwellRecordSyncStatus(false, message);
+      if(!proof.ok){
+        return fail(proof.error, {missing:proof.missing, stale:proof.stale});
+      }
+
+      getwellRecordSyncStatus(true);
+      getwellMarkConfirmed(expected);
 
       return {
-        ok:false,
-        error:message
+        ok:true,
+        verified:true,
+        saved:payload.saved || null,
+        confirmed:payload.verified,
+        version:payload.version || ""
       };
     })
-    .catch(error => {
-      const message =
-        "Unable to reach Google Sheets. " +
-        (error && error.message ? error.message : "Check the connection.");
-
-      getwellRecordSyncStatus(false, message);
-
-      return {
-        ok:false,
-        error:message
-      };
-    });
+    .catch(error => fail(
+      "Unable to reach Google Sheets. " +
+      (error && error.message ? error.message : "Check the connection.")
+    ));
 }
 
 
@@ -1539,11 +1731,52 @@ function getwellClone(value){
   catch(e){return JSON.parse(JSON.stringify(value));}
 }
 
-function getwellRemoteBaseline(){
+/* =========================================================
+   THE BASELINE
+   ---------------------------------------------------------
+   The baseline answers one question: "which records did Google
+   Sheets confirm it was holding, the last time we looked?"
+
+   The old code answered it with getwellSetRemoteBaseline(snapshot)
+   from inside saveStore() -- i.e. with the browser's OWN copy of
+   the data, which had never been confirmed by anything. That is
+   the second half of the reported bug. Once the browser believed
+   the sheet was holding a visit it had in fact never stored, the
+   next 30-second poll saw the visit "missing from the sheet",
+   concluded it had been deleted, and removed it from
+   localStorage too.
+
+   A baseline is now stamped with where it came from, and only a
+   baseline read back out of Google Sheets ("remote") is ever
+   allowed to justify a deletion.
+========================================================= */
+
+function getwellReadBaseline(){
   try{
-    const raw=localStorage.getItem(GETWELL_REMOTE_BASELINE_KEY);
-    return raw?JSON.parse(raw):null;
-  }catch(e){return null;}
+    const raw = localStorage.getItem(GETWELL_REMOTE_BASELINE_KEY);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    if(!parsed) return null;
+
+    /* Older builds stored the bare store. Treat it as untrusted. */
+    if(Array.isArray(parsed.patients)) return {source:"legacy", store:parsed};
+
+    return parsed.store ? parsed : null;
+  }catch(e){ return null; }
+}
+
+/* The store part, whatever its origin. Used for diffing deletions
+   the USER made in this browser. */
+function getwellRemoteBaseline(){
+  const baseline = getwellReadBaseline();
+  return baseline ? baseline.store : null;
+}
+
+/* The store part ONLY when it genuinely came from Google Sheets.
+   Used for the one operation that removes data. */
+function getwellAuthoritativeBaseline(){
+  const baseline = getwellReadBaseline();
+  return baseline && baseline.source === "remote" ? baseline.store : null;
 }
 
 function getwellPersistedStore(){
@@ -1558,25 +1791,55 @@ function getwellSetPersistedStore(store){
 }
 
 
-function getwellSetRemoteBaseline(remote){
-  try{localStorage.setItem(GETWELL_REMOTE_BASELINE_KEY,JSON.stringify(getwellClone(remote||{patients:[]})));}catch(e){}
+function getwellSetRemoteBaseline(remote, source){
+  try{
+    localStorage.setItem(
+      GETWELL_REMOTE_BASELINE_KEY,
+      JSON.stringify({
+        source: source || "remote",
+        at:     new Date().toISOString(),
+        store:  getwellClone(remote || {patients:[]})
+      })
+    );
+  }catch(e){}
 }
 
 function getwellChildIds(patient,field){
   return new Set((patient?.[field]||[]).filter(x=>x&&x.id).map(x=>String(x.id)));
 }
 
-/* Successful authoritative Sheet snapshots reconcile deletions.
-   A failed request never enters this function, so it can never
-   masquerade as a deletion. */
+/*
+   Removes, from this browser, records that Google Sheets has
+   genuinely had deleted out from under it.
+
+   THREE GUARDS, all of them absent before:
+
+   1. `baseline` must have come from an actual Sheets read
+      (getwellAuthoritativeBaseline). A snapshot of our own
+      unconfirmed local data can no longer authorise a deletion.
+
+   2. A record listed in the outbox -- created here, never yet
+      confirmed on a row -- is never removed. Its absence from
+      the response means "not written yet", not "deleted".
+
+   3. A failed request never reaches this function at all, so a
+      network error still cannot masquerade as a deletion.
+*/
 function getwellReconcileRemoteDeletions(local,remote,baseline){
   if(!baseline||!Array.isArray(baseline.patients)) return local;
+
+  const pending=getwellUnconfirmed();
 
   const remotePatients=new Map((remote.patients||[]).filter(p=>p&&p.id).map(p=>[String(p.id),p]));
   const baselinePatients=new Map((baseline.patients||[]).filter(p=>p&&p.id).map(p=>[String(p.id),p]));
 
   const patients=(local.patients||[])
-    .filter(lp=>lp&&lp.id&&!(baselinePatients.has(String(lp.id))&&!remotePatients.has(String(lp.id))))
+    .filter(lp=>{
+      if(!lp||!lp.id) return false;
+      const id=String(lp.id);
+      if(pending.patients.has(id)) return true;
+      return !(baselinePatients.has(id)&&!remotePatients.has(id));
+    })
     .map(lp=>{
       const id=String(lp.id), rp=remotePatients.get(id), bp=baselinePatients.get(id);
       if(!rp||!bp) return lp;
@@ -1585,12 +1848,46 @@ function getwellReconcileRemoteDeletions(local,remote,baseline){
         const oldIds=getwellChildIds(bp,field);
         const newIds=getwellChildIds(rp,field);
         if(!oldIds.size) return;
-        out[field]=(out[field]||[]).filter(child=>child&&child.id&&!(oldIds.has(String(child.id))&&!newIds.has(String(child.id))));
+        out[field]=(out[field]||[]).filter(child=>{
+          if(!child||!child.id) return false;
+          const childId=String(child.id);
+          if(pending[field] && pending[field].has(childId)) return true;
+          return !(oldIds.has(childId)&&!newIds.has(childId));
+        });
       });
       return out;
     });
 
   return {...local,patients};
+}
+
+
+/*
+   When the remote copy of a patient wins the timestamp contest,
+   the whole local record used to be thrown away -- including a
+   visit saved here seconds ago that simply had not reached the
+   sheet yet. Anything still in the outbox is carried across.
+*/
+function getwellPreserveUnconfirmedChildren(incoming, existing){
+  if(!incoming || !existing) return incoming;
+
+  const pending = getwellUnconfirmed();
+
+  ["visits","appointments","claims"].forEach(field => {
+    const have = new Set((incoming[field] || []).filter(x => x && x.id).map(x => String(x.id)));
+
+    (existing[field] || []).forEach(child => {
+      if(!child || !child.id) return;
+      const childId = String(child.id);
+      if(have.has(childId)) return;
+      if(!(pending[field] && pending[field].has(childId))) return;
+
+      if(!Array.isArray(incoming[field])) incoming[field] = [];
+      incoming[field].push(getwellClone(child));
+    });
+  });
+
+  return incoming;
 }
 
 /* =========================================================
@@ -1722,11 +2019,15 @@ function getwellMergeStores(local,remote){
     const id=String(p.id),mine=byId.get(id);
     if(!mine){byId.set(id,getwellClone(p));remoteWon=true;return;}
     const lt=getwellRecordTime(mine),rt=getwellRecordTime(p);
-    if(rt>lt){byId.set(id,getwellPreserveLocalPhoto(getwellClone(p),mine));remoteWon=true;}
+    const adopt=incoming=>getwellPreserveUnconfirmedChildren(
+      getwellPreserveLocalPhoto(getwellClone(incoming),mine),
+      mine
+    );
+    if(rt>lt){byId.set(id,adopt(p));remoteWon=true;}
     else if(lt>rt){localWon=true;}
     /* Equal timestamps: compare what the Sheet actually stores,
        not the raw objects. See getwellCanonicalPatient(). */
-    else if(!getwellSameRecord(mine,p)){byId.set(id,getwellPreserveLocalPhoto(getwellClone(p),mine));remoteWon=true;}
+    else if(!getwellSameRecord(mine,p)){byId.set(id,adopt(p));remoteWon=true;}
   });
 
   const remoteIds=new Set(remotePatients.filter(p=>p&&p.id).map(p=>String(p.id)));
@@ -2033,10 +2334,18 @@ function getwellSyncRemoteStore(){
     }
 
     getwellRecordSyncStatus(true);
+    getwellNoteBackendVersion(payload.version);
 
     const remote=payload.data;
     const local=getwellLocalStoreSnapshot();
-    const baseline=getwellRemoteBaseline();
+
+    /* ONLY a snapshot that genuinely came back out of Google
+       Sheets may authorise removing anything. */
+    const baseline=getwellAuthoritativeBaseline();
+
+    /* Anything the sheet is now holding is confirmed, so it can
+       leave the outbox. */
+    getwellMarkConfirmed(getwellExpectedRemoteIds(remote));
 
     /* -----------------------------------------------------
        SETTINGS
@@ -2082,7 +2391,7 @@ function getwellSyncRemoteStore(){
     const reconciled=getwellReconcileRemoteDeletions(local,remote,baseline);
     const result=getwellMergeStores(reconciled,remote);
 
-    getwellSetRemoteBaseline(remote);
+    getwellSetRemoteBaseline(remote,"remote");
 
     /*
       storeChanged is now honest. getwellSameRecord() means a
@@ -2104,12 +2413,12 @@ function getwellSyncRemoteStore(){
       exactly as before, so a patient registered seconds ago
       reaches the Sheet on this cycle rather than the next one.
     */
-    if(result.localWon){
+    if(result.localWon || getwellHasUnconfirmed()){
       getwellRemoteSave(result.merged).then(saveResult=>{
         if(!saveResult.ok){
           getwellNotify(saveResult.error,"error");
         }else{
-          getwellSetRemoteBaseline(result.merged);
+          getwellSetRemoteBaseline(result.merged,"verified-save");
           getwellSetPersistedStore(result.merged);
         }
         if(storeChanged) getwellRequestUiRefresh({reason:"merge"});
@@ -2159,6 +2468,95 @@ function getwellStartRemoteSync(){
 
   return true;
 }
+
+/* ---------------------------------------------------------
+   IS THE DEPLOYMENT RUNNING THE CODE.GS IN THIS PROJECT?
+
+   Warns once per page if the /exec URL answers without a
+   version, or with one this build does not expect. That is the
+   single most likely reason for a record to be accepted and
+   then not appear in the spreadsheet.
+--------------------------------------------------------- */
+
+let getwellBackendWarned = false;
+
+function getwellNoteBackendVersion(version){
+  if(getwellBackendWarned) return;
+
+  if(!version){
+    getwellBackendWarned = true;
+    getwellNotify(
+      "The Google Apps Script deployment is older than this app. Re-paste Code.gs, " +
+      "run setupGetwell(), then re-deploy as a New version.",
+      "error"
+    );
+    return;
+  }
+
+  if(version !== GETWELL_REQUIRED_BACKEND){
+    getwellBackendWarned = true;
+    console.warn(
+      "[Getwell] Backend version " + version +
+      " differs from the expected " + GETWELL_REQUIRED_BACKEND + "."
+    );
+  }
+}
+
+
+/* Prints what the deployment can see. Run getwellDiagnose() in
+   the browser console when a record does not reach a sheet. */
+function getwellDiagnose(){
+  if(!getwellRemoteConfigured()){
+    console.error("[Getwell] Google Sheets URL is not configured.");
+    return Promise.resolve(null);
+  }
+
+  return fetch(
+    GETWELL_SHEETS_API_URL +
+    (GETWELL_SHEETS_API_URL.includes("?") ? "&" : "?") +
+    "action=diagnose&t=" + Date.now()
+  )
+    .then(response => response.text())
+    .then(text => {
+      let payload = null;
+      try{ payload = JSON.parse(text); }catch(e){
+        console.error("[Getwell] The deployment did not answer with JSON. " +
+          "It is probably not shared with \"Anyone\". First 200 characters:", text.slice(0, 200));
+        return null;
+      }
+      console.log("[Getwell] Backend diagnosis:", payload);
+      console.log("[Getwell] Unconfirmed records still queued in this browser:",
+        JSON.parse(localStorage.getItem(GETWELL_UNCONFIRMED_KEY) || "{}"));
+      return payload;
+    })
+    .catch(error => {
+      console.error("[Getwell] Could not reach the deployment:", error);
+      return null;
+    });
+}
+
+window.getwellDiagnose = getwellDiagnose;
+
+
+/* ---------------------------------------------------------
+   ONE PLACE THAT DECIDES WHETHER A SAVE WORKED
+
+   Every "... saved successfully" message in the app goes
+   through here. saveStore() has already raised a detailed red
+   toast describing the failure, so this only adds the green
+   confirmation, and only when Google Sheets has confirmed the
+   row. Callers use the boolean to decide whether to close the
+   modal.
+--------------------------------------------------------- */
+
+function getwellAnnounceSave(result, successMessage){
+  if(result && result.ok === false) return false;
+  if(successMessage) getwellNotify(successMessage, "success");
+  return true;
+}
+
+window.getwellAnnounceSave = getwellAnnounceSave;
+
 
 function getwellManualSync(){
   if(!getwellRemoteConfigured()){
@@ -2495,21 +2893,36 @@ function saveStore(
 
     return getwellRemoteSave(snapshot).then(saveResult=>{
       if(!saveResult.ok){
+        /*
+          The record stays in localStorage and in the outbox so
+          nothing the user typed is thrown away and the write is
+          retried -- but the caller is told plainly that Google
+          Sheets does NOT have it, and the baseline is left
+          untouched so the synchroniser cannot later mistake the
+          record for one the sheet has deleted.
+        */
         getwellNotify(
-          "Saved on this device, but NOT to Google Sheets. " +
+          "NOT saved to Google Sheets. Kept on this device and will be retried. " +
           saveResult.error,
           "error"
         );
         return saveResult;
       }
 
-      getwellSetRemoteBaseline(snapshot);
+      /*
+        Only a VERIFIED save updates the baseline, because the
+        baseline is what authorises deletions later on. The old
+        code set it here unconditionally from the local snapshot,
+        which is how an unsaved visit ended up being deleted from
+        the browser on the next poll.
+      */
+      getwellSetRemoteBaseline(snapshot,"verified-save");
       getwellSetPersistedStore(snapshot);
 
       if(!deleteResult.ok && hasDeletions){
         getwellNotify(
-          "Visit saved successfully. Some deletion changes are pending Google Sheets synchronization.",
-          "warning"
+          "Saved to Google Sheets. Some deletion changes are still pending synchronization.",
+          "info"
         );
       }
 

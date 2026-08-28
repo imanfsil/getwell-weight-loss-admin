@@ -384,14 +384,17 @@ async function deleteAppointment(){
   if(!await getwellConfirmDelete("Appointment")) return;
   const removed=(patient.appointments||[]).find(a=>a&&a.id===editingAppointmentId);
   patient.appointments=(patient.appointments||[]).filter(a=>a&&a.id!==editingAppointmentId);
-  await upsertPatient(patient);
+  const saveResult=await upsertPatient(patient);
   getwellLogActivity(
     "Delete",
     "Appointment",
     `${editingAppointmentId} · ${patient.name||patient.id}`,
     removed?`${removed.date||""} ${removed.time||""} ${removed.type||""}`.trim():""
   );
-  getwellNotify("Appointment deleted successfully.","success");
+  if(!getwellAnnounceSave(saveResult,"Appointment deleted from Google Sheets.")){
+    renderAppointments();
+    return;
+  }
   closeAppointmentModal();
   renderAppointments();
 }
@@ -428,14 +431,22 @@ async function saveAppointment(){
   const index=patient.appointments.findIndex(a=>a.id===appointment.id);
   const wasEditing=!!editingAppointmentId;
   if(index>=0) patient.appointments[index]=appointment; else patient.appointments.push(appointment);
-  await upsertPatient(patient);
+  const saveResult=await upsertPatient(patient);
   getwellLogActivity(
     wasEditing?"Edit":"Add",
     "Appointment",
     `${appointment.id} · ${patient.name||patient.id}`,
     `${appointment.date||""} ${appointment.time||""} ${appointment.type||""} · ${appointment.status||""}`.trim()
   );
-  getwellNotify(editingAppointmentId?"Appointment updated successfully.":"Appointment saved successfully.","success");
+  if(!getwellAnnounceSave(
+      saveResult,
+      wasEditing
+        ? `Appointment ${appointment.id} updated in Google Sheets.`
+        : `Appointment ${appointment.id} saved to Google Sheets.`
+    )){
+    renderAppointments(document.getElementById("appointmentSearch")?.value||"");
+    return;
+  }
   closeAppointmentModal();
   renderAppointments(document.getElementById("appointmentSearch")?.value||"");
 }

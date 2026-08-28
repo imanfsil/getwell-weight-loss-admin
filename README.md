@@ -25,6 +25,77 @@ This build intentionally disables automatic 30-second Google Sheets polling in t
 
 Use `getwellManualSync()` from the browser console when an explicit remote refresh is required. The frontend no longer performs a background page refresh or automatic cross-tab re-render while staff are working.
 
+## 2026-08-28 — Verified writes (Google Sheets is the record)
+
+### What was wrong
+
+A visit was written to `localStorage`, posted to Apps Script, and
+then announced as saved **without anyone checking that a row had
+appeared in the `Visits` sheet**. Two separate defects:
+
+1. **`saveVisit()` ignored the result.** `upsertPatient()` returns
+   the outcome of the Sheets write. `patient-profile.html` threw
+   that value away and showed the green *"Visit saved
+   successfully."* toast unconditionally.
+
+2. **`ok:true` was treated as proof, and it is not.** The old
+   `doPost()` answered `ok:true` as soon as it had run to the end,
+   whatever it had actually written. A deployment that is behind
+   this file, that writes to a differently-named tab, or that runs
+   out of execution time after the `Patients` sheet all answer
+   `ok:true` — which is exactly the reported symptom: the patient
+   appears, the visit does not, and nothing complains.
+
+Then a third defect turned the failed save into data loss:
+
+3. **The browser trusted its own copy as the baseline.**
+   `saveStore()` called `getwellSetRemoteBaseline(snapshot)` with
+   local, unconfirmed data. On the next 30-second poll the
+   synchroniser saw a visit that "used to be in the sheet" and was
+   no longer there, concluded it had been deleted, and removed it
+   from `localStorage` too. That is why the visit appeared briefly
+   and then vanished.
+
+### What changed
+
+| Piece | Behaviour |
+|---|---|
+| `verifyIds()` in `Code.gs` | After writing, reads the ID column back **off the sheet** and returns which IDs are genuinely on a row. |
+| `doPost` → `save` | `ok:true` now means *every record you sent was read back off a row*. Anything less is `ok:false` plus a `missing` map. |
+| `getSheetContext()` | Sheets are found case-insensitively and trimmed, and **columns are addressed by header text**, not by array position — so a renamed tab or a reordered/inserted column no longer writes into the wrong place or silently creates a duplicate tab. |
+| `upsertRows()` | Reports records with a blank ID instead of dropping them; leaves rows whose values are unchanged completely untouched (large sheets no longer risk the execution-time limit). |
+| `getwellVerifyRemoteSave()` | The browser compares the IDs it sent against `verified` and refuses to call the save successful otherwise. |
+| The outbox (`GETWELL_UNCONFIRMED_V1`) | Records written here but not yet confirmed on a row. They are retried on every sync and **can never be removed by the synchroniser**. |
+| Baselines are tagged | Only a snapshot that genuinely came back out of Google Sheets (`source:"remote"`) may authorise removing anything. |
+| `getwellAnnounceSave()` | Every "…saved successfully" message in the app goes through one function that checks the result first. |
+
+### Is `localStorage` still used?
+
+Yes, as a **cache and an outbox** — never as the database.
+
+- **Cache** so pages render instantly and the clinic keeps working
+  when Google is unreachable.
+- **Outbox** so a write that failed is retried rather than lost.
+- Administrator profile, activity log, session lock and theme stay
+  local by design; none of that is clinical data.
+
+Clear the browser's storage and the complete patient, visit,
+charge, appointment and claim history is rebuilt from the sheets.
+
+### Redeployment is required
+
+`Code.gs` changed, so the deployed script must be updated or the
+app will (correctly) refuse to confirm any save:
+
+1. Sheet → **Extensions → Apps Script**, replace `Code.gs`, Save.
+2. Run **`setupGetwell()`** once.
+3. **Deploy → Manage deployments → edit → Version: New version**.
+4. Open the `/exec` URL with `?action=diagnose` — it should report
+   `"version": "2026-08-28.verified-writes.1"` and list your tabs.
+
+In the browser console, `getwellDiagnose()` prints the same thing
+plus anything still queued in the outbox.
+
 ## Setting up the Google Sheets backend
 
 `Code.gs` is the backend. It was missing from earlier builds,

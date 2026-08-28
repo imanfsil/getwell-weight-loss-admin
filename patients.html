@@ -184,13 +184,22 @@ async function savePatient(){
     keeps the app usable with no connection.
   */
   if(saveResult && saveResult.ok === false){
+    /*
+      saveStore() has already explained WHY. The record stays in
+      this browser and in the outbox so it is retried, but it is
+      not described as saved, and the profile is not opened as
+      though the Sheet were holding it.
+    */
     getwellNotify(
-      "Patient saved on this device. Google Sheets will be updated as soon as the connection returns.",
+      `Patient ${p.id} is NOT in Google Sheets yet. It is kept on this device and will be retried.`,
       "error"
     );
-  }else{
-    getwellNotify("Patient saved successfully.","success");
+    closeAdd();
+    renderPatients();
+    return;
   }
+
+  getwellNotify(`Patient ${p.id} saved to Google Sheets.`,"success");
 
   closeAdd();
 
