@@ -1228,7 +1228,7 @@ const GETWELL_UNCONFIRMED_KEY = "GETWELL_UNCONFIRMED_V1";
 /* The Code.gs contract this build expects. A deployment that does
    not report a version at all is older than the verified-write
    backend and cannot prove that a visit reached the sheet. */
-const GETWELL_REQUIRED_BACKEND = "2026-08-28.verified-writes.1";
+const GETWELL_REQUIRED_BACKEND = "2026-08-31.verified-writes.3";
 
 const GETWELL_RECORD_KEYS =
   ["patients","appointments","visits","charges","claims","files"];

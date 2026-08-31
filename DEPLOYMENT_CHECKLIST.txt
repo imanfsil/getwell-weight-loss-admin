@@ -1,0 +1,31 @@
+GETWELL WEIGHT LOSS ADMIN — SAFE GOOGLE SHEETS DEPLOYMENT
+Build: 2026-08-31.verified-writes.3
+
+IMPORTANT: Google Sheets is the permanent data store. This build never clears the Patients, Visits, Claims, Charges, Appointments or Files tabs during a normal save. It updates/creates records by stable ID and verifies the IDs after writing.
+
+1. Open the SAME Google Sheet used by the clinic.
+2. Extensions -> Apps Script.
+3. Replace ALL contents of Code.gs with the Code.gs included in this project. Save.
+4. Run setupGetwell() once. Approve permissions if Google asks.
+5. If the old project already has data, DO NOT delete any tabs or rows.
+6. Deploy -> Manage deployments.
+7. Open the existing Web app deployment with the pencil icon.
+8. Select Version -> New version, then Deploy. Keep the same /exec URL if possible.
+9. The Web app must use:
+   Execute as: Me
+   Who has access: Anyone
+10. Put the existing /exec URL in app.js at GETWELL_SHEETS_API_URL. Do not use a /dev URL.
+11. Push the whole project folder to GitHub, including the updated Code.gs and app.js.
+12. Test the deployment in a browser:
+   YOUR_EXEC_URL?action=diagnose
+   The JSON must show version 2026-08-31.verified-writes.3.
+13. Open the web app and refresh. The backend-version warning should be gone.
+14. Before real clinic use, create one test patient and one test visit. Confirm both rows appear in Google Sheets. Then edit the visit and save again; it should update the same VisitID rather than create a duplicate.
+
+DO NOT:
+- Do not use the Apps Script /dev URL in the live web app.
+- Do not delete/recreate the Google Sheet to fix deployment issues.
+- Do not manually clear the Patients/Visits tabs.
+- Do not create a second deployment URL unless necessary.
+
+If a save fails, the frontend keeps the local copy in its outbox and tells the user that Google Sheets has NOT confirmed the save. It does not claim success.

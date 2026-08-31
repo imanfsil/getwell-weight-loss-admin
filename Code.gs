@@ -67,7 +67,7 @@
   makes "the deployment is behind the code" a visible error
   rather than a silent one.
 */
-var GETWELL_BACKEND_VERSION = "2026-08-28.verified-writes.1";
+var GETWELL_BACKEND_VERSION = "2026-08-31.verified-writes.3";
 
 var GETWELL_DRIVE_FOLDER = "Getwell Patient Files";
 
@@ -1268,7 +1268,8 @@ function deleteRowsByIds(name, ids){
   var wanted={};
   unique.forEach(function(id){wanted[id]=true;});
 
-  var values=sheet.getRange(2,1,lastRow-1,1).getValues();
+  var idColumn = getSheetContext(name).idColumn;
+  var values=sheet.getRange(2,idColumn,lastRow-1,1).getValues();
   var rows=[];
   values.forEach(function(row,index){
     var id=toText(row[0]).trim();
