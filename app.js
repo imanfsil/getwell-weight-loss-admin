@@ -6323,43 +6323,178 @@ setInterval(
 ========================================================= */
 
 
-/* The body-composition metrics the existing Arboleaf parser
-   produces, in the order they are offered in the selector.
-   "Body Type" is deliberately absent: it is a word, not a
-   number, so it cannot be plotted on a line chart. It is
-   still shown by the existing renderBodyComposition(). */
-const GETWELL_BODY_METRICS = [
-  {name:"Weight",               unit:"kg",   decimals:1},
-  {name:"BMI",                  unit:"",     decimals:1},
-  {name:"Body Fat",             unit:"%",    decimals:1},
-  {name:"Body Water",           unit:"%",    decimals:1},
-  {name:"Muscle Mass",          unit:"kg",   decimals:1},
-  {name:"Skeletal Muscle",      unit:"%",    decimals:1},
-  {name:"Bone Mass",            unit:"kg",   decimals:1},
-  {name:"Visceral Fat",         unit:"",     decimals:0},
-  {name:"BMR",                  unit:"kcal", decimals:0},
-  {name:"Metabolic Age",        unit:"yrs",  decimals:0},
-  {name:"Protein",              unit:"%",    decimals:1},
-  {name:"Subcutaneous Fat",     unit:"%",    decimals:1},
-  {name:"Fat-free Body Weight", unit:"kg",   decimals:1}
+/* =========================================================
+   ARBOLEAF METRIC REGISTRY
+   ---------------------------------------------------------
+   Taken directly from the Arboleaf / Yolanda "Body
+   Composition Analysis" report supplied by the clinic. Both
+   layouts in circulation were read to build this list — the
+   3-page single-column export and the 2-page two-column
+   export. They print the same measurements in a different
+   arrangement, so the parser below works off labels rather
+   than positions.
+
+   THE 12 CORE CATEGORIES (core:true) are the measurements the
+   report prints with a printed Normal Range, in report order:
+
+     Body Composition Analysis  Body Water, Protein,
+                                Bone Mass, Body Fat Mass
+     Muscle Fat Analysis        Weight, Body Fat Mass,
+                                Skeletal Muscle
+     Fat Analysis               BMI, PBF (Body Fat
+                                Percentage), Visceral Fat
+     Additional Data            Subcutaneous Fat Percentage,
+                                BMR, LBM (Fat-free Body
+                                Weight), Skeletal Muscle
+
+   De-duplicated that is exactly twelve, and those twelve are
+   the selectable metrics in the patient profile.
+
+   Everything else the report prints — the second Additional
+   Data block, the derived Soft Lean Mass column, the Fitness
+   score and the Weight Control block — is still parsed and
+   still stored, listed under "Additional data" so the
+   headline list stays the twelve the clinic asked for.
+
+   `aliases` carry the keys older saved visits already use, so
+   history recorded by the previous parser keeps resolving
+   without migrating a single row in Google Sheets.
+
+   `min` / `max` are generous physiological bounds. They never
+   change a value — they only flag a reading that almost
+   certainly came out of OCR wrong, so staff can see which
+   numbers to check before the visit is saved.
+========================================================= */
+
+const GETWELL_ARBOLEAF_METRICS = [
+
+  /* ---- the twelve core categories, in report order ---- */
+  {name:"Weight",                      unit:"kg",    decimals:1, core:true, min:20,  max:400, better:"lower",
+   aliases:[], labels:["Weight"]},
+  {name:"BMI",                         unit:"kg/m²", decimals:1, core:true, min:8,   max:90, better:"lower",
+   aliases:[], labels:["BMI"]},
+  {name:"Body Fat Percentage",         unit:"%",     decimals:1, core:true, min:2,   max:75, better:"lower",
+   aliases:["PBF","PBF(%)","Body Fat","Body Fat %"], labels:["Body Fat Percentage","PBF"]},
+  {name:"Body Fat Mass",               unit:"kg",    decimals:2, core:true, min:1,   max:200, better:"lower",
+   aliases:[], labels:["Body Fat Mass"]},
+  {name:"Skeletal Muscle",             unit:"kg",    decimals:1, core:true, min:5,   max:80, better:"higher",
+   aliases:[], labels:["Skeletal Muscle"]},
+  {name:"Body Water",                  unit:"L",     decimals:1, core:true, min:10,  max:90, better:"higher",
+   aliases:[], labels:["Body Water"]},
+  {name:"Protein",                     unit:"kg",    decimals:1, core:true, min:2,   max:30, better:"higher",
+   aliases:[], labels:["Protein"]},
+  {name:"Bone Mass",                   unit:"kg",    decimals:2, core:true, min:0.8, max:8,
+   aliases:[], labels:["Bone Mass"]},
+  {name:"Visceral Fat",                unit:"",      decimals:0, core:true, min:1,   max:60, better:"lower",
+   aliases:["Visceral Fat Grade"], labels:["Visceral Fat"]},
+  {name:"Subcutaneous Fat Percentage", unit:"%",     decimals:1, core:true, min:2,   max:70, better:"lower",
+   aliases:["Subcutaneous Fat"], labels:["Subcutaneous Fat Percentage"]},
+  {name:"BMR",                         unit:"kcal",  decimals:0, core:true, min:500, max:4000,
+   aliases:["Basal Metabolic Rate"], labels:["BMR","Basal Metabolic Rate"]},
+  {name:"Fat-free Body Weight",        unit:"kg",    decimals:1, core:true, min:15,  max:150, better:"higher",
+   aliases:["LBM","Fat Free Mass","Fat-free Mass"], labels:["LBM","Fat-free Body Weight","Fat Free Mass"]},
+
+  /* ---- supplementary values the same report prints ---- */
+  {name:"Soft Lean Mass",             unit:"kg",   decimals:1, min:10,  max:150, aliases:[], labels:["Soft Lean Mass"]},
+  {name:"Muscle Mass Percentage",     unit:"%",    decimals:1, min:15,  max:95,  aliases:[], labels:["Muscle Mass Percentage"]},
+  {name:"Subcutaneous Fat Mass",      unit:"kg",   decimals:2, min:1,   max:150, aliases:[], labels:["Subcutaneous Fat"]},
+  {name:"Skeletal Muscle Percentage", unit:"%",    decimals:1, min:8,   max:70,
+   aliases:["Skeletal Muscle (%)"], labels:["Skeletal Muscle (%)"]},
+  {name:"Bone Mass Percentage",       unit:"%",    decimals:1, min:1,   max:12,  aliases:[], labels:["Bone Mass Percentage"]},
+  {name:"Protein Percentage",         unit:"%",    decimals:1, min:5,   max:30,  aliases:[], labels:["Protein Percentage"]},
+  {name:"Body Water Percentage",      unit:"%",    decimals:1, min:20,  max:80,  aliases:[], labels:["Body Water Percentage"]},
+  {name:"SMI",                        unit:"",     decimals:1, min:2,   max:20,  aliases:[], labels:["SMI"]},
+  {name:"Waist-to-Hip Ratio",         unit:"",     decimals:2, min:0.4, max:2,
+   aliases:["Waist-Hip Ratio","Estimated Waist-to-Hip Ratio"],
+   labels:["Estimated Waist-to-Hip Ratio","Waist-to-Hip Ratio","Waist-Hip Ratio"]},
+  {name:"Fitness Score",              unit:"/100", decimals:1, min:0,    max:100, aliases:["Fitness score"], labels:["Fitness score"]},
+  {name:"Normal Weight",              unit:"kg",   decimals:2, min:20,   max:200, aliases:["Normal weight"], labels:["Normal weight"]},
+  {name:"Weight Control",             unit:"kg",   decimals:2, min:-200, max:200, aliases:[], labels:["Weight Control"]},
+  {name:"Fat Mass Control",           unit:"kg",   decimals:2, min:-200, max:200, aliases:["Fat mass control"], labels:["Fat mass control"]},
+  {name:"Muscle Control",             unit:"kg",   decimals:2, min:-200, max:200, aliases:["Muscle control"], labels:["Muscle control"]},
+
+  /* ---- carried for history recorded by the previous parser ---- */
+  /* Body Type is a word, not a number: it is stored, shown and
+     carried into the comparison, but never charted.
+     getwellArboleafValue() returns null for it, which keeps it
+     out of every metric selector automatically. */
+  {name:"Body Type",                  unit:"",     decimals:0, text:true, aliases:[], labels:["Body Type"]},
+  {name:"Muscle Mass",                unit:"kg",   decimals:1, min:5, max:120, legacy:true, aliases:[], labels:[]},
+  {name:"Metabolic Age",              unit:"yrs",  decimals:0, min:5, max:120, legacy:true, aliases:[], labels:["Metabolic Age"]}
 ];
 
+/* The twelve the clinic selects between. */
+const GETWELL_ARBOLEAF_CORE = GETWELL_ARBOLEAF_METRICS.filter(metric => metric.core);
+
+/* Kept under its previous name so nothing that already reads
+   this list has to change. */
+const GETWELL_BODY_METRICS = GETWELL_ARBOLEAF_METRICS;
+
+
+/* Loose key so "Body Fat %", "body fat percentage" and
+   "BodyFatPercentage" all land on the same metric. */
+function getwellMetricKey(name){
+  return String(name || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+const GETWELL_METRIC_INDEX = (() => {
+  const index = {};
+  GETWELL_ARBOLEAF_METRICS.forEach(metric => {
+    index[getwellMetricKey(metric.name)] = metric;
+    (metric.aliases || []).forEach(alias => {
+      const key = getwellMetricKey(alias);
+      if(!index[key]) index[key] = metric;
+    });
+  });
+  return index;
+})();
+
 function getwellMetricDefinition(name){
-  return GETWELL_BODY_METRICS.find(metric => metric.name === name) || {name, unit:"", decimals:1};
+  return GETWELL_METRIC_INDEX[getwellMetricKey(name)]
+      || {name, unit:"", decimals:1, aliases:[], labels:[]};
+}
+
+
+/* Every name a stored visit might have used for this metric:
+   canonical first, then its aliases. */
+function getwellMetricNameCandidates(metricName){
+  const definition = getwellMetricDefinition(metricName);
+  return [definition.name].concat(definition.aliases || []);
 }
 
 
 /*
-  A single Arboleaf reading.
-  The parser stores numbers as {value, unit} and Body Type as
-  a plain string, so both shapes are handled and anything that
-  is not a finite number is reported as "not recorded".
+  A single Arboleaf reading, read off ONE visit.
+
+  The parser stores numbers as {value, unit} and older builds
+  sometimes stored a bare number or a string, so every shape is
+  handled and anything that is not a finite number is reported
+  as "not recorded".
 */
 function getwellArboleafValue(visit, metricName){
   const metrics = visit && visit.arboleafMetrics;
   if(!metrics || typeof metrics !== "object") return null;
 
-  const raw = metrics[metricName];
+  const definition = getwellMetricDefinition(metricName);
+
+  /* Canonical name first, then every name an older build may
+     have written, then a loose key match. Nothing is migrated;
+     the reader simply understands the older spellings. */
+  let raw;
+
+  for(const candidate of getwellMetricNameCandidates(metricName)){
+    if(Object.prototype.hasOwnProperty.call(metrics, candidate)){
+      raw = metrics[candidate];
+      break;
+    }
+  }
+
+  if(raw === undefined){
+    const wanted = getwellMetricKey(definition.name);
+    const match = Object.keys(metrics).find(key => getwellMetricKey(key) === wanted);
+    if(match) raw = metrics[match];
+  }
+
   if(raw === null || raw === undefined || raw === "") return null;
 
   /* Number(null) and Number("") are both 0, which would turn a
@@ -6371,28 +6506,102 @@ function getwellArboleafValue(visit, metricName){
   const value = Number(rawValue);
   if(!Number.isFinite(value)) return null;
 
-  const unit = (typeof raw === "object" && raw.unit) ? String(raw.unit) : "";
+  const unit = (typeof raw === "object" && raw.unit) ? String(raw.unit) : definition.unit;
   return {value, unit};
 }
 
 
-/* "Visit #3" -> 3. Used only to break ties between two visits
-   recorded on the same calendar day. */
+/*
+  The one non-numeric measurement. Kept separate from
+  getwellArboleafValue() so a word can never leak into a chart
+  or a change calculation.
+*/
+function getwellArboleafText(visit, metricName){
+  const metrics = visit && visit.arboleafMetrics;
+  if(!metrics || typeof metrics !== "object") return "";
+
+  for(const candidate of getwellMetricNameCandidates(metricName)){
+    const raw = metrics[candidate];
+    if(typeof raw === "string" && raw.trim()) return raw.trim();
+    if(raw && typeof raw === "object" && typeof raw.value === "string" && raw.value.trim()){
+      return raw.value.trim();
+    }
+  }
+  return "";
+}
+
+
+/* Does this visit carry any Arboleaf reading at all? */
+function getwellVisitHasArboleaf(visit){
+  const metrics = visit && visit.arboleafMetrics;
+  if(!metrics || typeof metrics !== "object") return false;
+  return GETWELL_ARBOLEAF_METRICS.some(metric =>
+    metric.text ? getwellArboleafText(visit, metric.name) : getwellArboleafValue(visit, metric.name)
+  );
+}
+
+
+/* =========================================================
+   CHRONOLOGICAL VISIT ORDER  +  DERIVED VISIT NUMBERS
+   ---------------------------------------------------------
+   VISIT DATE is the only thing that decides order. The order
+   staff happened to type visits in, the order rows sit in the
+   Google Sheet, the creation timestamp and the visit number
+   somebody typed into the form are all ignored for ordering.
+
+   Consequences, all of them deliberate:
+
+     - a visit entered late but dated earlier drops straight
+       into its correct place;
+     - "Visit 1, Visit 2, Visit 3…" is DERIVED from that
+       order every single time it is displayed, so inserting
+       or deleting a visit renumbers the rest immediately;
+     - the stored visit.visit text is never trusted for
+       display, only re-written to match on save so the Sheet
+       stays consistent;
+     - VisitID is never touched by any of this.
+
+   Ties on the same calendar day are broken deterministically —
+   visit time if the record has one, then creation timestamp,
+   then VisitID — so a page reload never shuffles two visits
+   recorded on the same day.
+========================================================= */
+
+/* "Visit #3" -> 3. Only ever a last-resort tie-break. */
 function getwellVisitOrdinal(visit){
   const match = String((visit && visit.visit) || "").match(/(\d+)/);
   return match ? Number(match[1]) : 0;
 }
 
 
-/*
-  Every visit on ONE patient, oldest first.
+/* A stable secondary key for two visits on the same date. */
+function getwellVisitTieBreak(visit){
+  if(!visit) return "";
 
-  - Duplicate visit ids are collapsed so an id that appears
-    twice cannot produce two points for the same visit.
-  - Out-of-order visit dates are sorted here, before anything
-    is plotted.
-  - A visit with no usable date keeps its place at the end
-    rather than being dropped, so nothing silently disappears.
+  /* If the record carries a time, that is the most meaningful
+     ordering within a day. */
+  const time = String(visit.time || visit.visitTime || "").trim();
+  if(/^\d{1,2}:\d{2}/.test(time)) return "1|" + time.padStart(5, "0");
+
+  const created = String(visit.createdAt || visit.created || "").trim();
+  if(created) return "2|" + created;
+
+  /* VisitIDs are sequential (VIS-000001, VIS-000002, …), so
+     they order by creation without needing a timestamp. */
+  return "3|" + String(visit.id || "");
+}
+
+
+/*
+  Every visit on ONE patient, oldest first, each row carrying
+  its DERIVED visit number and label.
+
+  - Duplicate visit ids are collapsed, so an id that appears
+    twice cannot produce two points on a graph or two rows in
+    the history.
+  - A visit with no usable date is kept, placed after the
+    dated ones, and left out of the numbering rather than
+    silently dropped.
 */
 function getwellPatientVisitsSorted(patient){
   const seen = new Set();
@@ -6409,7 +6618,7 @@ function getwellPatientVisitsSorted(patient){
     rows.push({visit, dateKey});
   });
 
-  return rows.sort((a, b) => {
+  rows.sort((a, b) => {
     /* Undated visits go last instead of pretending to be the
        oldest reading in the programme. */
     if(!a.dateKey && b.dateKey) return 1;
@@ -6418,8 +6627,70 @@ function getwellPatientVisitsSorted(patient){
     const byDate = String(a.dateKey).localeCompare(String(b.dateKey));
     if(byDate) return byDate;
 
+    const byTie = getwellVisitTieBreak(a.visit).localeCompare(getwellVisitTieBreak(b.visit));
+    if(byTie) return byTie;
+
     return getwellVisitOrdinal(a.visit) - getwellVisitOrdinal(b.visit);
   });
+
+  rows.forEach((row, index) => {
+    row.number = index + 1;
+    row.label  = `Visit ${index + 1}`;
+    row.id     = row.visit.id || "";
+    row.hasArboleaf = getwellVisitHasArboleaf(row.visit);
+  });
+
+  return rows;
+}
+
+
+/* The derived number/label for one visit of one patient. */
+function getwellVisitNumber(patient, visit){
+  if(!visit) return null;
+  const rows = getwellPatientVisitsSorted(patient);
+  const row = rows.find(item => item.visit === visit)
+           || rows.find(item => visit.id && item.visit.id === visit.id);
+  return row ? row.number : null;
+}
+
+function getwellVisitLabel(patient, visit){
+  const number = getwellVisitNumber(patient, visit);
+  return number ? `Visit ${number}` : (visit && visit.visit) || "Visit";
+}
+
+
+/*
+  Re-write the stored visit.visit text so Google Sheets agrees
+  with what the app displays.
+
+  Called just before a save. It only ever touches the visit
+  NUMBER field:
+
+    - VisitID is never read, written or regenerated here;
+    - no visit is added, removed or reordered in the array;
+    - a visit whose number is already correct is left exactly
+      as it is, so a save that changes nothing writes nothing
+      new into that column.
+
+  Returns the number of visits whose label actually changed.
+*/
+function getwellRenumberVisits(patient){
+  if(!patient || !Array.isArray(patient.visits)) return 0;
+
+  let changed = 0;
+
+  getwellPatientVisitsSorted(patient).forEach(row => {
+    /* Undated visits keep whatever they had; there is no
+       honest chronological position to give them. */
+    if(!row.dateKey) return;
+
+    if(row.visit.visit !== row.label){
+      row.visit.visit = row.label;
+      changed++;
+    }
+  });
+
+  return changed;
 }
 
 
@@ -6476,7 +6747,10 @@ function getwellPatientWeightSeries(patient){
       dateKey: row.dateKey,
       label:   getwellShortVisitDate(row.dateKey),
       full:    getwellShortVisitDate(row.dateKey, true),
-      visit:   row.visit.visit || "Visit",
+      /* The DERIVED label, so a tooltip never shows a stale
+         "Visit 5" for what is chronologically Visit 2. */
+      visit:   row.label,
+      number:  row.number,
       value:   weight.value,
       source:  weight.source
     });
@@ -6503,7 +6777,8 @@ function getwellPatientMetricSeries(patient, metricName){
       dateKey: row.dateKey,
       label:   getwellShortVisitDate(row.dateKey),
       full:    getwellShortVisitDate(row.dateKey, true),
-      visit:   row.visit.visit || "Visit",
+      visit:   row.label,
+      number:  row.number,
       value:   reading.value,
       unit:    reading.unit || definition.unit
     });
@@ -6513,15 +6788,28 @@ function getwellPatientMetricSeries(patient, metricName){
 }
 
 
-/* Which of the metrics above this patient actually has at
-   least one reading for. Nothing else is offered, so the
-   selector can never open an empty chart. */
+/*
+  Which metrics this patient actually has at least one reading
+  for. Nothing else is offered, so the selector can never open
+  an empty chart.
+
+  The result keeps the registry's order, which is the order the
+  Arboleaf report prints them in: the twelve core categories
+  first, the supplementary values after.
+*/
 function getwellPatientAvailableMetrics(patient){
   const visits = getwellPatientVisitsSorted(patient);
 
-  return GETWELL_BODY_METRICS.filter(metric =>
+  return GETWELL_ARBOLEAF_METRICS.filter(metric =>
     visits.some(row => getwellArboleafValue(row.visit, metric.name))
   );
+}
+
+/* How many visits carry a reading for this metric. Part 23:
+   a single reading is shown but never drawn as a trend. */
+function getwellMetricReadingCount(patient, metricName){
+  return getwellPatientVisitsSorted(patient)
+    .filter(row => getwellArboleafValue(row.visit, metricName)).length;
 }
 
 
@@ -6827,4 +7115,676 @@ function getwellRenderProgressChart(config){
         ${xAxisTitle}
       </svg>
     </div>`;
+}
+
+
+/* =========================================================
+   TWO-VISIT COMPARISON
+   ---------------------------------------------------------
+   Compares ANY two visits of ONE patient — they do not have
+   to be consecutive, and the order they were picked in does
+   not matter: the earlier/later roles are decided from the
+   VISIT DATES (falling back to the derived chronological
+   position when two visits share a date), never from the
+   visit number typed into the form.
+
+   Every numeric change is later − earlier, so a loss reads
+   as a negative number.
+
+   Arboleaf is optional throughout. With no Arboleaf on either
+   visit the comparison still carries date, weight, height,
+   absolute change and percentage change; the metric rows are
+   simply empty and the caller renders the basic form.
+========================================================= */
+
+function getwellVisitRow(patient, visitId){
+  return getwellPatientVisitsSorted(patient).find(row => row.id === visitId) || null;
+}
+
+
+function getwellCompareVisits(patient, visitIdA, visitIdB){
+  const rowA = getwellVisitRow(patient, visitIdA);
+  const rowB = getwellVisitRow(patient, visitIdB);
+
+  if(!rowA || !rowB) return null;
+  if(rowA.id === rowB.id) return {sameVisit:true};
+
+  /* THE DATE DECIDES. getwellPatientVisitsSorted() is already
+     ordered oldest -> newest, so the row with the smaller
+     chronological position is the earlier visit whichever way
+     round the user picked them. */
+  const earlier = rowA.number <= rowB.number ? rowA : rowB;
+  const later   = rowA.number <= rowB.number ? rowB : rowA;
+
+  const earlierWeight = getwellVisitWeight(earlier.visit);
+  const laterWeight   = getwellVisitWeight(later.visit);
+
+  const heightRaw = Number(patient && patient.height);
+  const height = Number.isFinite(heightRaw) && heightRaw > 0 ? heightRaw : null;
+
+  let weightChange = null;
+  let weightPercent = null;
+
+  if(earlierWeight && laterWeight){
+    weightChange = laterWeight.value - earlierWeight.value;
+    if(earlierWeight.value > 0){
+      weightPercent = (weightChange / earlierWeight.value) * 100;
+    }
+  }
+
+  /*
+    One row per metric either visit actually recorded. A metric
+    present on one side only is kept with a null on the other
+    and a null change — the caller shows an em dash. No value
+    is ever carried across from the other visit, from the
+    patient record, or from any other patient.
+  */
+  const metrics = GETWELL_ARBOLEAF_METRICS.map(definition => {
+    const before = getwellArboleafValue(earlier.visit, definition.name);
+    const after  = getwellArboleafValue(later.visit,   definition.name);
+
+    if(!before && !after) return null;
+
+    return {
+      name:     definition.name,
+      unit:     (after && after.unit) || (before && before.unit) || definition.unit,
+      decimals: definition.decimals,
+      core:     !!definition.core,
+      /* Which direction counts as progress for this
+         measurement: losing fat is good, losing muscle is not.
+         Used only for colour, never for the arithmetic. */
+      better:   definition.better || null,
+      earlier:  before ? before.value : null,
+      later:    after  ? after.value  : null,
+      change:   (before && after) ? after.value - before.value : null,
+      percent:  (before && after && before.value !== 0)
+                  ? ((after.value - before.value) / Math.abs(before.value)) * 100
+                  : null
+    };
+  }).filter(Boolean);
+
+  const bothHaveArboleaf = earlier.hasArboleaf && later.hasArboleaf;
+
+  return {
+    sameVisit: false,
+    patient,
+    height,
+    earlier: {
+      id:      earlier.id,
+      number:  earlier.number,
+      label:   earlier.label,
+      dateKey: earlier.dateKey,
+      date:    getwellShortVisitDate(earlier.dateKey, true),
+      weight:  earlierWeight ? earlierWeight.value : null,
+      weightSource: earlierWeight ? earlierWeight.source : null,
+      hasArboleaf: earlier.hasArboleaf,
+      visit:   earlier.visit
+    },
+    later: {
+      id:      later.id,
+      number:  later.number,
+      label:   later.label,
+      dateKey: later.dateKey,
+      date:    getwellShortVisitDate(later.dateKey, true),
+      weight:  laterWeight ? laterWeight.value : null,
+      weightSource: laterWeight ? laterWeight.source : null,
+      hasArboleaf: later.hasArboleaf,
+      visit:   later.visit
+    },
+    weightChange,
+    weightPercent,
+    metrics,
+    coreMetrics: metrics.filter(metric => metric.core),
+    bothHaveArboleaf,
+    /* Only render the body-composition section when there is
+       something real to render (Part 13: no empty Arboleaf
+       sections). */
+    hasComposition: metrics.length > 0,
+    days: (earlier.dateKey && later.dateKey)
+      ? Math.round(
+          (new Date(later.dateKey + "T00:00:00") - new Date(earlier.dateKey + "T00:00:00"))
+          / 86400000
+        )
+      : null
+  };
+}
+
+
+/*
+  Is this change progress? Returns "good", "warn" or "" when
+  the measurement has no meaningful direction (Metabolic Age
+  aside, things like SMI or Body Type do not).
+*/
+function getwellChangeTone(change, better){
+  if(change === null || change === undefined || !Number.isFinite(change) || change === 0) return "";
+  if(!better) return "";
+  const improving = better === "lower" ? change < 0 : change > 0;
+  return improving ? "good" : "warn";
+}
+
+
+/*
+  jsPDF's built-in Helvetica is WinAnsi, so "kg/m²" and the
+  typographic minus come out as blanks. Text bound for the PDF
+  goes through here first.
+*/
+function getwellPdfText(value){
+  return String(value === null || value === undefined ? "" : value)
+    .replace(/²/g, "2")
+    .replace(/³/g, "3")
+    .replace(/−/g, "-")
+    .replace(/[–—]/g, "-")
+    .replace(/·/g, "-")
+    .replace(/[^\x00-\xFF]/g, "");
+}
+
+
+/* "-8.0 kg" / "+1.2 kg" / "—" */
+function getwellSignedValue(value, decimals, unit){
+  if(value === null || value === undefined || !Number.isFinite(value)) return "—";
+  const places = Number.isFinite(decimals) ? decimals : 1;
+  const sign = value > 0 ? "+" : value < 0 ? "−" : "";
+  const text = Math.abs(value).toFixed(places);
+  return `${sign}${text}${unit ? " " + unit : ""}`;
+}
+
+
+/* =========================================================
+   ARBOLEAF REPORT PARSER
+   ---------------------------------------------------------
+   Reads the text of an Arboleaf / Yolanda "Body Composition
+   Analysis" report and maps it onto the registry above.
+
+   Two things about these reports drive the design:
+
+   1. THE EXPORTS THE CLINIC ACTUALLY HAS CARRY NO TEXT.
+      Both sample PDFs are produced by the Arboleaf app as
+      page images (Skia/PDF, no embedded fonts, zero text
+      objects). pdf.js therefore extracts nothing from them,
+      which is exactly why uploading a report used to record
+      no metrics at all. The upload path now falls back to
+      OCR, and this parser is written to cope with OCR output
+      rather than clean text.
+
+   2. THE VALUE ALWAYS SITS NEXT TO ITS PRINTED NORMAL RANGE.
+      Every measured row reads
+          <label> … <value> <low>~<high>
+      so the printed range is used as an anchor: the reading is
+      the last plausible number in front of it. That survives
+      the bar-chart tick labels ("55 85 115 145 175 205%")
+      that sit between the label and the value on the Muscle
+      Fat and Fat Analysis rows, and it works for both report
+      layouts without hard-coding any coordinates.
+
+   Nothing here guesses. A value that cannot be read is left
+   out, and a value that lands outside the metric's
+   physiological bounds is returned flagged rather than
+   silently trusted — the Add Visit form shows both states and
+   asks staff to confirm before anything is saved.
+========================================================= */
+
+/*
+  Label matchers. `need` tokens must ALL appear in the line,
+  `avoid` tokens must not — which is how "Body Fat Mass",
+  "Body Fat Percentage" and "Subcutaneous Fat" stay separate
+  even when OCR mangles a label's first character ("nody
+  Water", "aay Fat Mass").
+
+  `byUnit` handles the pairs the report distinguishes only by
+  unit: Subcutaneous Fat is printed once as a percentage and
+  once in kilograms under the same words, and so is Skeletal
+  Muscle. The unit printed next to the number decides which
+  metric the reading belongs to, which is far more reliable
+  than hoping the word "Percentage" survived OCR on the right
+  line.
+*/
+const GETWELL_ARBOLEAF_MATCHERS = [
+  {metric:"Fitness Score",              need:["fitness score"],          avoid:[]},
+  {metric:"Body Water Percentage",      need:["body water percentage"],  avoid:[]},
+  {metric:"Muscle Mass Percentage",     need:["muscle mass percentage"], avoid:[]},
+  {metric:"Bone Mass Percentage",       need:["bone mass percentage"],   avoid:[]},
+  {metric:"Protein Percentage",         need:["protein percentage"],     avoid:[]},
+  {metric:"Waist-to-Hip Ratio",         need:["waist"],                  avoid:[]},
+  {metric:"SMI",                        need:["smi"],                    avoid:[]},
+  {metric:"Normal Weight",              need:["normal weight"],          avoid:[]},
+  {metric:"Fat Mass Control",           need:["fat mass control"],       avoid:[]},
+  {metric:"Muscle Control",             need:["muscle control"],         avoid:[]},
+  {metric:"Weight Control",             need:["weight control"],         avoid:[]},
+  {metric:"BMR",                        need:["bmr"],                    avoid:[]},
+  {metric:"BMR",                        need:["basal metabolic"],        avoid:[]},
+  {metric:"Fat-free Body Weight",       need:["lbm"],                    avoid:[]},
+  {metric:"Fat-free Body Weight",       need:["fat-free body weight"],   avoid:[]},
+  {metric:"Fat-free Body Weight",       need:["fat free mass"],          avoid:[]},
+  {metric:"Soft Lean Mass",             need:["soft lean mass"],         avoid:[]},
+  {metric:"Metabolic Age",              need:["metabolic age"],          avoid:[]},
+  {metric:"Body Fat Percentage",        need:["pbf"],                    avoid:[]},
+  {metric:"Body Fat Percentage",        need:["body fat percentage"],    avoid:["segmental","/"]},
+
+  /* Same words, different unit -> different metric. */
+  {metric:"Subcutaneous Fat Percentage", need:["subcutaneous"], avoid:[],
+   byUnit:{"%":"Subcutaneous Fat Percentage", "kg":"Subcutaneous Fat Mass"}},
+  {metric:"Skeletal Muscle",             need:["skeletal muscle"], avoid:[],
+   byUnit:{"%":"Skeletal Muscle Percentage", "kg":"Skeletal Muscle"}},
+
+  /* "Body Fat Mass" wraps mid-word in the two-column export
+     ("Body Fat Ma" / "ss"), so the anchor stops short of the
+     full phrase. */
+  {metric:"Body Fat Mass", need:["fat ma"],
+   avoid:["control","percentage","segmental","subcutaneous","/","normal","lack"]},
+  {metric:"Visceral Fat",  need:["visceral"], avoid:[]},
+  {metric:"Bone Mass",     need:["bone mass"], avoid:["percentage","normal","lack"]},
+  {metric:"Body Water",    need:["water"],     avoid:["percentage","normal","lack"]},
+  {metric:"Protein",       need:["protein"],   avoid:["percentage","normal","lack"]},
+  {metric:"BMI",           need:["bmi"],       avoid:["under","normal","over"]},
+  {metric:"Weight",        need:["weight"],
+   avoid:["normal","control","fat-free","fat free","lbm","height","body water","ideal"]},
+
+  /*
+    Fallbacks for the plainer wording a text-layer export (or a
+    differently worded Arboleaf firmware) may use. They come
+    last and both step aside when the fuller label is on the
+    same line, so they can never take a reading away from "Body
+    Fat Mass" or "Muscle Mass Percentage".
+  */
+  {metric:"Body Fat Percentage", need:["body fat"],    avoid:["fat ma","mass","segmental","/"], fallback:true},
+  {metric:"Muscle Mass",         need:["muscle mass"], avoid:["percentage","skeletal","control"], fallback:true}
+];
+
+/* The report's own wording is always tried first; the plainer
+   forms only run as a second pass, for metrics the first pass
+   did not find at all. */
+const GETWELL_ARBOLEAF_PRIMARY  = GETWELL_ARBOLEAF_MATCHERS.filter(m => !m.fallback);
+const GETWELL_ARBOLEAF_FALLBACK = GETWELL_ARBOLEAF_MATCHERS.filter(m => m.fallback);
+
+
+/*
+  OCR clean-up that cannot change a reading: table pipes and
+  box-drawing become spaces, the various tilde/dash forms used
+  for ranges are normalised, and a thousands comma inside a
+  number is dropped.
+*/
+function getwellNormalizeReportText(text){
+  return String(text || "")
+    .replace(/\r/g, "\n")
+    .replace(/[|¦︱│]/g, " ")
+    .replace(/[—–−‐‑]/g, "-")
+    .replace(/[〜～≈]/g, "~")
+    .replace(/(\d),(\d{3})\b/g, "$1$2")
+    .replace(/[ \t ]+/g, " ");
+}
+
+
+/* Every number in a fragment, with where it was found. */
+function getwellNumbersIn(fragment){
+  const found = [];
+  const pattern = /-?\d+(?:\.\d+)?/g;
+  let match;
+  while((match = pattern.exec(fragment)) !== null){
+    found.push({value:Number(match[0]), index:match.index, text:match[0], end:pattern.lastIndex});
+  }
+  return found;
+}
+
+
+/*
+  The printed normal range next to a reading: "18.5~25",
+  "<=0.85", "< 1.0". Tolerant of one or two OCR characters
+  sitting between the low value and the tilde, because
+  "47.7~58.2" routinely comes back as "47./~58.2".
+*/
+function getwellFindPrintedRange(text){
+  return text.match(/(-?\d+(?:\.\d+)?)\.?\s*[^\d~\n]{0,2}~\s*(-?\d+(?:\.\d+)?)/)
+      || text.match(/<\s*=?\s*(-?\d+(?:\.\d+)?)/);
+}
+
+
+/*
+  Read one measurement out of a fragment of text belonging to a
+  single metric.
+
+  Returns {value, unit, anchored, plausible} or null.
+
+    anchored  - the number sits directly in front of the
+                report's own printed normal range. That is the
+                structural signature of a real reading, and the
+                strongest confidence signal available.
+    plausible - the number is inside the metric's
+                physiological bounds.
+
+  A reading that is neither is still returned, but the caller
+  keeps looking and, failing that, marks it for checking.
+*/
+function getwellReadMetricFragment(fragment, definition, depth){
+  let text = String(fragment || "");
+
+  /* Visceral Fat prints its scale inline as "Under 10 Over";
+     that 10 is an axis label, not a measurement. */
+  text = text.replace(/under\s+-?\d+(?:\.\d+)?\s+over/ig, " ");
+
+  /*
+    Two cells of a two-column table can land in one fragment —
+    "30.6% 18.5~26.7  45.8kg 35.89~43.86". Each printed range
+    closes a cell, so the fragment is split after every range
+    and the cell whose printed unit matches this metric wins.
+    Without that, a weight in kilograms would be read off the
+    percentage cell that happens to come first.
+  */
+  if(!depth){
+    const ranges = [];
+    const pattern = /(-?\d+(?:\.\d+)?)\.?\s*[^\d~\n]{0,2}~\s*(-?\d+(?:\.\d+)?)/g;
+    let hit;
+    while((hit = pattern.exec(text)) !== null) ranges.push(pattern.lastIndex);
+
+    if(ranges.length > 1){
+      const cells = [];
+      let from = 0;
+      ranges.forEach(to => { cells.push(text.slice(from, to)); from = to; });
+      if(from < text.length) cells.push(text.slice(from));
+
+      const readings = cells
+        .map(cell => getwellReadMetricFragment(cell, definition, 1))
+        .filter(Boolean);
+
+      if(readings.length){
+        readings.sort((a, b) =>
+          (Number(b.unitMatched) - Number(a.unitMatched)) ||
+          (Number(b.plausible)   - Number(a.plausible))   ||
+          (Number(b.anchored)    - Number(a.anchored))
+        );
+        return readings[0];
+      }
+    }
+  }
+
+  const rangeMatch = getwellFindPrintedRange(text);
+  const anchored = !!rangeMatch && rangeMatch.index > 0;
+  const searchArea = anchored ? text.slice(0, rangeMatch.index) : text;
+
+  /*
+    Bar-chart tick labels sit between the label and the value
+    and always finish with a percent sign ("55 85 115 145 175
+    205%"). Everything up to that marker is scale, not reading.
+  */
+  const tick = /\d+\s*%(?=[^%]*$)/.exec(searchArea);
+  const afterTicks = (tick && /\d\s+\d+\s+\d+/.test(searchArea.slice(0, tick.index)))
+    ? searchArea.slice(tick.index + tick[0].length)
+    : searchArea;
+
+  let candidates = getwellNumbersIn(afterTicks);
+  let area = afterTicks;
+
+  if(!candidates.length){
+    candidates = getwellNumbersIn(searchArea);
+    area = searchArea;
+  }
+  if(!candidates.length) return null;
+
+  /*
+    A run of four or more ascending numbers with no printed
+    range is a chart axis ("55 85 115 145 175 205"), not a
+    reading. Rejecting it outright sends the scan on to the
+    line underneath, which is where the bar-chart rows actually
+    print their value.
+  */
+  if(!anchored && candidates.length >= 4){
+    const ascending = candidates.every((item, i) => i === 0 || item.value > candidates[i - 1].value);
+    if(ascending) return null;
+  }
+
+  const min = Number.isFinite(definition.min) ? definition.min : -Infinity;
+  const max = Number.isFinite(definition.max) ? definition.max : Infinity;
+  const inBounds = value => value >= min && value <= max;
+
+  /*
+    OCR drops decimal points, so "34.7" arrives as "34 7" and
+    "97.15" as "97.1 5". When the final candidate is a lone
+    digit sitting immediately after another number, the two are
+    re-joined — as a new decimal place if the first already has
+    one, otherwise as the decimal point itself — but only when
+    the result lands inside the metric's bounds.
+  */
+  if(candidates.length >= 2){
+    const last = candidates[candidates.length - 1];
+    const prev = candidates[candidates.length - 2];
+    const between = area.slice(prev.end, last.index);
+
+    if(/^ ?$/.test(between) && /^\d$/.test(last.text)){
+      const joinedText = prev.text.includes(".")
+        ? `${prev.text}${last.text}`
+        : `${prev.text}.${last.text}`;
+      const joined = Number(joinedText);
+
+      if(Number.isFinite(joined) && inBounds(joined) && !inBounds(last.value)){
+        candidates = candidates.slice(0, -2).concat([{
+          value: joined, index: prev.index, text: joinedText, end: last.end
+        }]);
+      }else if(Number.isFinite(joined) && inBounds(joined) && !prev.text.includes(".")){
+        candidates = candidates.slice(0, -2).concat([{
+          value: joined, index: prev.index, text: joinedText, end: last.end
+        }]);
+      }
+    }
+  }
+
+  /* The unit printed straight after a number: "45.8kg",
+     "1360kcal", "30.6%". */
+  const unitAfter = item => {
+    const tail = area.slice(item.end, item.end + 8);
+    const match = tail.match(/^\s*(kg\/m2|kg\/m²|kcal|kg|lbs|%|L\b)/i);
+    return match ? match[1] : "";
+  };
+
+  const wantedUnit = String(definition.unit || "").toLowerCase();
+  const plausible = candidates.filter(item => inBounds(item.value));
+  const pool = plausible.length ? plausible : candidates;
+
+  /*
+    When the report prints the unit, it settles which number on
+    a shared line belongs to this metric — "30.6% … 45.8kg" is
+    unambiguous even though both numbers are plausible for a
+    weight.
+  */
+  const unitMatched = (wantedUnit && anchored)
+    ? pool.filter(item => unitAfter(item).toLowerCase() === wantedUnit)
+    : [];
+
+  const shortlist = unitMatched.length ? unitMatched : pool;
+
+  /*
+    With a printed range to anchor against, the reading is the
+    number closest in front of it, so take the last. With no
+    anchor the reading follows its label directly, so take the
+    first.
+  */
+  const chosen = anchored ? shortlist[shortlist.length - 1] : shortlist[0];
+  const unit = unitAfter(chosen);
+
+  return {
+    value: chosen.value,
+    unit: unit || definition.unit,
+    anchored,
+    plausible: inBounds(chosen.value),
+    unitMatched: !!unit && unit.toLowerCase() === wantedUnit
+  };
+}
+
+
+/*
+  Parse a whole Arboleaf report.
+
+  Returns {metrics, flagged} where `metrics` is keyed by
+  canonical metric name in the {value, unit} shape the rest of
+  the app already stores, and `flagged` names the metrics whose
+  reading was not confirmed by a printed normal range or fell
+  outside physiological bounds — the Add Visit form shows those
+  in amber and asks staff to check them.
+*/
+function getwellParseArboleafReport(text){
+  const normalized = getwellNormalizeReportText(text);
+  const lines = normalized.split("\n").map(line => line.trim()).filter(Boolean);
+
+  const readings = {};   /* metric -> best reading so far */
+
+  const offer = (metricName, reading) => {
+    if(!reading || !Number.isFinite(reading.value)) return;
+
+    /* Anchored to the report's own printed normal range is the
+       strongest signal, then physiological plausibility, then a
+       matching printed unit. */
+    const score = (reading.anchored ? 4 : 0)
+                + (reading.plausible ? 2 : 0)
+                + (reading.unitMatched ? 1 : 0);
+    const held = readings[metricName];
+    if(held && held.score >= score) return;
+
+    readings[metricName] = {reading, score};
+  };
+
+  const scan = (matchers) => lines.forEach((line, lineIndex) => {
+    const lower = line.toLowerCase();
+
+    /* Where each known label starts on this line. A two-column
+       layout puts two metrics on one line, so each label owns
+       only the text up to the next label. */
+    const hits = [];
+
+    matchers.forEach(matcher => {
+      const anchor = matcher.need[0];
+      const at = lower.indexOf(anchor);
+      if(at < 0) return;
+      if(!matcher.need.every(token => lower.includes(token))) return;
+
+      hits.push({matcher, at, end:at + anchor.length});
+    });
+
+    if(!hits.length) return;
+
+    /* Longest label first at the same position, so "Normal
+       weight" beats the "weight" sitting inside it. */
+    hits.sort((a, b) => (a.at - b.at) || ((b.end - b.at) - (a.end - a.at)));
+
+    /*
+      Drop any label that starts INSIDE a label already
+      accepted on this line. "Normal weight 63.86kg" holds one
+      reading, not a Normal Weight and a Weight, and without
+      this the plain Weight matcher would swallow the value.
+    */
+    const outer = [];
+    hits.forEach(hit => {
+      const nested = outer.some(kept => hit.at >= kept.at && hit.at < kept.end);
+      if(!nested) outer.push(hit);
+    });
+
+    hits.length = 0;
+    outer.forEach(hit => hits.push(hit));
+
+    /*
+      `avoid` is judged on the label's OWN slice of the line,
+      not the whole line. The two-column export prints a
+      measured row and a tick-box row side by side — "Protein
+      90.3   Body Fat Mass | Normal | Lack | Over" — and only
+      the tick-box half should be discarded.
+    */
+    const kept = hits.filter((hit, index) => {
+      const nextAt = index + 1 < hits.length ? hits[index + 1].at : line.length;
+      const own = lower.slice(hit.at, nextAt);
+      return !(hit.matcher.avoid || []).some(token => own.includes(token));
+    });
+
+    hits.length = 0;
+    kept.forEach(hit => hits.push(hit));
+    if(!hits.length) return;
+
+    hits.forEach((hit, index) => {
+      const nextAt = index + 1 < hits.length ? hits[index + 1].at : line.length;
+      const definition = getwellMetricDefinition(hit.matcher.metric);
+
+      /*
+        Candidate fragments, best first: the label's own slice
+        of this line, then the next two lines. A wrapped table
+        cell prints the label on one line and the value on the
+        next, and the bar-chart rows print the scale beside the
+        label and the value underneath it.
+
+        The scan stops as soon as another metric's label
+        appears, so a reading is never stolen from the row below.
+      */
+      const fragments = [{text:line.slice(hit.end, nextAt), own:true}];
+
+      for(let ahead = 1; ahead <= 2; ahead++){
+        const nextLine = lines[lineIndex + ahead];
+        if(!nextLine) break;
+
+        const nextLower = nextLine.toLowerCase();
+        const firstDigit = nextLine.search(/\d/);
+
+        /*
+          Only a label at the START of the next line means the
+          next row has begun. The two-column export prints the
+          right-hand column's label after the left-hand
+          column's value on the same physical line, and that
+          must not stop the scan.
+        */
+        const startsAnotherMetric = GETWELL_ARBOLEAF_MATCHERS.some(other => {
+          if(other.metric === hit.matcher.metric) return false;
+          if(!other.need.every(token => nextLower.includes(token))) return false;
+
+          const at = nextLower.indexOf(other.need[0]);
+          return at <= 8 || (firstDigit >= 0 && at < firstDigit);
+        });
+        if(startsAnotherMetric) break;
+
+        fragments.push({text:nextLine, own:false});
+      }
+
+      fragments.forEach(fragment => {
+        const reading = getwellReadMetricFragment(fragment.text, definition);
+        if(!reading) return;
+
+        /*
+          A number picked up from a following line is only
+          accepted when the report's own structure confirms it —
+          a printed normal range, or a printed unit that matches
+          the metric. Without that, a stray "1%" from a diagram
+          caption two lines down would be read as a Visceral Fat
+          grade of 1.
+        */
+        if(!fragment.own && !reading.anchored && !(reading.unitMatched && reading.plausible)) return;
+
+        /* Same words, different unit -> different metric. */
+        let target = hit.matcher.metric;
+        if(hit.matcher.byUnit){
+          const unitKey = String(reading.unit || "").toLowerCase();
+          target = hit.matcher.byUnit[unitKey] || hit.matcher.byUnit["kg"] || target;
+          reading.unit = getwellMetricDefinition(target).unit;
+        }
+
+        offer(target, reading);
+      });
+    });
+  });
+
+  scan(GETWELL_ARBOLEAF_PRIMARY);
+  scan(GETWELL_ARBOLEAF_FALLBACK.filter(matcher => !readings[matcher.metric]));
+
+  const metrics = {};
+  const flagged = [];
+
+  Object.keys(readings).forEach(name => {
+    const {reading, score} = readings[name];
+    metrics[name] = {value:reading.value, unit:reading.unit || ""};
+    /* Only a reading confirmed by its own printed normal range
+       AND inside physiological bounds is taken on trust. */
+    if(score < 6) flagged.push(name);
+  });
+
+  /* Body Type is the one non-numeric measurement the report
+     carries, and older visits already store it. */
+  const bodyType = normalized.match(/\bBody\s*Type\b\s*[:\-]?\s*([A-Za-z][A-Za-z ]{1,28})/i);
+  if(bodyType){
+    const word = bodyType[1].trim().replace(/\s+/g, " ");
+    if(word) metrics["Body Type"] = word;
+  }
+
+  return {metrics, flagged};
 }

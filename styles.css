@@ -3434,3 +3434,275 @@ html[data-theme="dark"] .dash-empty-icon{
     grid-template-columns:1fr;
   }
 }
+
+/* =========================================================
+   BODY COMPOSITION AREA
+   ---------------------------------------------------------
+   The Arboleaf review grid in the visit form, the two-visit
+   comparison, and the single-reading state. Same design
+   language as everything else: Poppins, white cards, --border
+   hairlines, --ink-blue accents, dark theme following the
+   existing variables.
+========================================================= */
+
+/* --- section band above the progress cards --- */
+
+.section-band{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  margin:20px 0 0;
+  padding:0 2px;
+}
+
+.section-band h2{
+  margin:0;
+  font-size:14px;
+  font-weight:700;
+}
+
+.section-band p{
+  margin:0;
+  font-size:10.5px;
+  line-height:16px;
+  color:var(--muted);
+}
+
+/* --- Arboleaf review grid (Add / Edit Visit) --- */
+
+.arb-review{
+  margin-top:12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--surface);
+  padding:14px;
+}
+
+.arb-review-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+
+.arb-review-head strong{
+  display:block;
+  font-size:11.5px;
+}
+
+.arb-review-head span{
+  display:block;
+  margin-top:3px;
+  font-size:10px;
+  line-height:15px;
+  color:var(--muted);
+  max-width:52ch;
+}
+
+.arb-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:9px;
+}
+
+.arb-grid-extra{
+  margin-top:9px;
+  padding-top:12px;
+  border-top:1px dashed var(--border);
+}
+
+.arb-field{
+  position:relative;
+  min-width:0;
+}
+
+.arb-field label{
+  display:block;
+  font-size:9.5px;
+  line-height:14px;
+  color:#475569;
+  margin-bottom:4px;
+}
+
+.arb-field label span{
+  color:var(--muted);
+}
+
+.arb-field input{
+  width:100%;
+  height:34px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card);
+  padding:0 9px;
+  font-family:inherit;
+  font-size:11px;
+  color:var(--navy);
+  outline:0;
+}
+
+.arb-field input:focus{
+  border-color:var(--ink-blue,#2563EB);
+}
+
+/* A reading the reader could not confirm against the report's
+   own printed normal range. */
+.arb-field.flagged input{
+  border-color:var(--orange);
+  background:#FFFBF3;
+}
+
+.arb-flag{
+  position:absolute;
+  top:0;
+  right:0;
+  font-size:8.5px;
+  font-weight:700;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color:#B45309;
+  background:var(--tint-amber,#FEF3C7);
+  border-radius:999px;
+  padding:2px 6px;
+}
+
+/* --- two-visit comparison --- */
+
+.compare-picker{
+  display:flex;
+  align-items:flex-end;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+
+.compare-field{
+  flex:1 1 210px;
+  min-width:0;
+}
+
+.compare-field label{
+  display:block;
+  font-size:10px;
+  font-weight:600;
+  color:var(--muted);
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  margin-bottom:5px;
+}
+
+.compare-field .metric-select{
+  width:100%;
+}
+
+.compare-with{
+  font-size:10.5px;
+  font-weight:600;
+  color:var(--muted);
+  padding-bottom:10px;
+}
+
+.compare-report{
+  height:34px;
+  flex:0 0 auto;
+}
+
+.compare-summary{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:10px;
+}
+
+.compare-stat{
+  border:1px solid var(--border-light);
+  border-radius:12px;
+  padding:12px 14px;
+  background:var(--surface);
+  min-width:0;
+}
+
+.compare-stat .label{
+  font-size:10px;
+  color:var(--muted);
+}
+
+.compare-stat .value{
+  font-size:19px;
+  font-weight:700;
+  margin-top:4px;
+  line-height:1.2;
+}
+
+.compare-stat .value.good{color:var(--green)}
+.compare-stat .value.warn{color:var(--orange)}
+
+.compare-stat .note{
+  font-size:9.5px;
+  line-height:14px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+.compare-unit{
+  color:var(--muted);
+  font-weight:400;
+}
+
+/* Green means progress for THAT measurement: losing fat is
+   progress, losing muscle is not. */
+.table .change-good{color:var(--green);font-weight:600}
+.table .change-warn{color:var(--orange);font-weight:600}
+
+/* Supplementary metrics sit quieter than the twelve core ones. */
+.table tr.compare-extra td:first-child{color:var(--muted)}
+
+/* --- a metric with only one reading --- */
+
+.single-reading{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  text-align:center;
+  padding:30px 20px;
+  border:1px dashed var(--border);
+  border-radius:12px;
+  background:var(--surface);
+  margin:12px 0 2px;
+}
+
+.single-reading-value{
+  font-size:26px;
+  font-weight:700;
+  color:var(--ink-blue,#2563EB);
+}
+
+.single-reading-note{
+  font-size:10.5px;
+  line-height:16px;
+  color:var(--muted);
+  max-width:46ch;
+}
+
+/* --- dark theme --- */
+
+html[data-theme="dark"] .arb-review{background:#151E30;border-color:#334155}
+html[data-theme="dark"] .arb-field input{background:#101827;border-color:#3B4A61;color:#F8FAFC}
+html[data-theme="dark"] .arb-field.flagged input{background:#2A2013;border-color:#9A6A22}
+html[data-theme="dark"] .arb-field label{color:#CBD5E1}
+html[data-theme="dark"] .arb-flag{background:#3B2D13;color:#FCD34D}
+html[data-theme="dark"] .compare-stat{background:#151E30;border-color:#334155}
+html[data-theme="dark"] .single-reading{background:#151E30;border-color:#334155}
+html[data-theme="dark"] .section-band h2{color:#F8FAFC}
+
+/* --- smaller screens --- */
+
+@media (max-width:760px){
+  .compare-picker{flex-direction:column;align-items:stretch}
+  .compare-with{padding:0;text-align:center}
+  .compare-report{width:100%}
+  .arb-grid{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+}
