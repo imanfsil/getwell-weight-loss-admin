@@ -3072,3 +3072,365 @@ html[data-theme="dark"] .metric-current{background:#151E30;border-color:#334155;
   .progress-summary{grid-template-columns:1fr}
   .progress-stat .value{font-size:17px}
 }
+
+/* =========================================================
+   DASHBOARD LAYOUT BALANCE
+   ---------------------------------------------------------
+   The dashboard used to lay its main row out with
+   `align-items:start`, so each card kept its natural height.
+   Programme Overview is intrinsically the tallest of the
+   three, which left Today's Appointments and Patients Due
+   for Follow-Up ending early and a large empty band across
+   the bottom of the row — the same thing happened under
+   Recent Patients, which is shorter than the CTA + Panel
+   column beside it.
+
+   The fix is structural rather than dimensional: the row
+   stretches, each card becomes a flex column, the content
+   area is the part that grows, and the footer button stays
+   pinned to the bottom. No card is given a fixed height;
+   the only sizing hint is a min-height so a quiet clinic
+   day still produces a card of deliberate size instead of a
+   sliver.
+
+   Nothing here changes what the dashboard reads or writes.
+========================================================= */
+
+/* --- Main row: three cards, one shared height --- */
+
+.dash-grid{
+  align-items:stretch;
+}
+
+.dash-grid-2{
+  align-items:stretch;
+}
+
+/*
+  A floor, not a fixed height. The cards still grow past this
+  whenever their content needs the room; it only stops a day
+  with no appointments and no follow-ups from collapsing the
+  row into three stubs. Scales with the viewport so 1366 and
+  1920 both look deliberate.
+*/
+.dash-grid > .dash-card{
+  min-height:clamp(320px, 25vw, 430px);
+}
+
+/* --- Card internals: head fixed, body grows, footer pinned --- */
+
+.dash-card{
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+
+.dash-card > .card-head{
+  flex:0 0 auto;
+}
+
+/*
+  The scrollable middle. min-height:0 is what actually lets a
+  flex child shrink below its content and scroll — without it
+  the card would grow instead and the row would lose its
+  shared height again.
+*/
+.dash-card-body{
+  flex:1 1 auto;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
+
+.dash-card-body > .row{
+  flex:0 0 auto;
+}
+
+/* Card body of Programme Overview and any other .card-body
+   sitting inside a stretched dashboard card. */
+.dash-card > .card-body{
+  flex:1 1 auto;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* Recent Patients: the table is the part that takes the slack. */
+.dash-card > .table-wrap{
+  flex:1 1 auto;
+  min-height:0;
+  overflow:auto;
+}
+
+/* .card-foot-link keeps its own 14px top margin, so the
+   growing body above it already puts it at the bottom. */
+.dash-card > .card-foot-link{
+  flex:0 0 auto;
+}
+
+/* A quiet scrollbar, so a long list does not shout. */
+.dash-card-body::-webkit-scrollbar,
+.dash-card > .table-wrap::-webkit-scrollbar{
+  width:8px;
+  height:8px;
+}
+
+.dash-card-body::-webkit-scrollbar-thumb,
+.dash-card > .table-wrap::-webkit-scrollbar-thumb{
+  background:var(--border);
+  border-radius:999px;
+}
+
+.dash-card-body::-webkit-scrollbar-track,
+.dash-card > .table-wrap::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+/* --- Programme Overview: tiles take the spare height --- */
+
+.prog-card .prog-summary-grid{
+  flex:1 1 auto;
+  grid-auto-rows:minmax(0,1fr);
+  align-content:stretch;
+}
+
+.prog-card .prog-tile{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.prog-card .prog-explainer{
+  flex:0 0 auto;
+  margin-top:auto;
+}
+
+/* --- Intentional empty states --- */
+
+.dash-empty{
+  flex:1 1 auto;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  padding:26px 20px;
+  text-align:center;
+}
+
+.dash-empty-icon{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  display:grid;
+  place-items:center;
+  background:var(--surface);
+  border:1px solid var(--border-light);
+  color:var(--muted);
+}
+
+.dash-empty-icon svg{
+  width:20px;
+  height:20px;
+}
+
+.dash-empty-title{
+  font-size:11.5px;
+  font-weight:600;
+  color:var(--navy);
+}
+
+.dash-empty-note{
+  font-size:10.5px;
+  line-height:16px;
+  color:var(--muted);
+  max-width:250px;
+}
+
+html[data-theme="dark"] .dash-empty-icon{
+  background:#1B263A;
+  border-color:#334155;
+  color:#B8C4D4;
+}
+
+/* --- Bottom row: Recent Patients vs the CTA / Panel column --- */
+
+.dash-side{
+  height:100%;
+}
+
+/*
+  The gradient CTA absorbs whatever slack the right column
+  has, and its "+" drops to the bottom of the card, so the
+  extra height reads as design rather than padding.
+*/
+.dash-side > .cta-card{
+  flex:1 1 auto;
+  display:flex;
+  flex-direction:column;
+  min-height:190px;
+}
+
+.dash-side > .cta-card .cta-plus{
+  margin-top:auto;
+}
+
+.dash-side > .card{
+  flex:0 0 auto;
+}
+
+/* --- Responsive --- */
+
+@media (max-width:1180px){
+  /* Programme Overview goes full width here, so a tall
+     minimum would only reintroduce empty space. */
+  .dash-grid .prog-card{
+    min-height:0;
+  }
+
+  .dash-grid > .dash-card{
+    min-height:clamp(300px, 34vw, 380px);
+  }
+}
+
+@media (max-width:900px){
+  /* Single column: every card sizes to its own content and
+     nothing is trapped behind an inner scrollbar. */
+  .dash-grid > .dash-card,
+  .dash-grid-2 > .dash-card{
+    min-height:0;
+  }
+
+  .dash-card-body{
+    overflow-y:visible;
+  }
+
+  .dash-side > .cta-card{
+    flex:0 0 auto;
+  }
+}
+
+/*
+  The Panel Claim Overview stacks its three totals vertically
+  in the narrow dashboard column, which made the right-hand
+  column noticeably taller than Recent Patients beside it.
+  Tightening the tiles here (dashboard side column only —
+  the Panel page and the patient profile keep the roomier
+  version) brings the two columns to a similar natural
+  height, and the gradient CTA above absorbs whatever
+  difference is left.
+*/
+.dash-side .finance-card{
+  padding:13px 14px;
+}
+
+.dash-side .finance-card .value{
+  font-size:18px;
+  margin-top:4px;
+}
+
+.dash-side .finance-stack{
+  gap:9px;
+}
+
+.dash-side .card-body{
+  padding:14px;
+}
+
+/* ---------------------------------------------------------
+   RECENT PATIENTS TABLE — fit the row without scrolling
+
+   The compact table declares min-width:860px and never
+   wraps, so at 1366 and 1440 it scrolled sideways inside its
+   card and the Status / Open columns were cut off. Two
+   changes, both presentational:
+
+   1. the bottom row gives Recent Patients more of the width
+      (the right-hand column only needs room for the CTA and
+      three stacked totals);
+   2. the dashboard copy of the table uses tighter cell
+      padding and a narrower progress meter.
+
+   Measured: every column now fits inside the card with no
+   sideways scroll at 1366, 1440, 1600 and 1920. Below about
+   1300 it scrolls exactly as it always did, and under 900 the
+   row stacks.
+--------------------------------------------------------- */
+
+.dash-grid-2{
+  grid-template-columns:minmax(0,2.4fr) minmax(300px,1fr);
+}
+
+.dash-grid-2 .table.compact{
+  min-width:720px;
+}
+
+.dash-grid-2 .table.compact th,
+.dash-grid-2 .table.compact td{
+  padding-left:8px;
+  padding-right:8px;
+}
+
+.dash-grid-2 .table.compact .progress-cell{
+  min-width:84px;
+  gap:6px;
+}
+
+.dash-grid-2 .table.compact .progress-track{
+  min-width:40px;
+}
+
+@media (max-width:900px){
+  .dash-grid-2{
+    grid-template-columns:1fr;
+  }
+}
+
+/* ---------------------------------------------------------
+   GRIDS THAT FIT THE CARDS THAT ARE ACTUALLY THERE
+
+   Settings can switch individual KPIs and dashboard cards
+   off. With fixed `repeat(4,1fr)` / `repeat(3,1fr)` tracks
+   the hidden card left an empty column behind — the exact
+   "cards floating in a big empty area" effect, but caused by
+   configuration rather than content.
+
+   auto-fit collapses the tracks nobody is using, so three
+   KPIs spread across the full width as three, and two main
+   cards spread as two. The minimums are sized so a full set
+   still lands on one row at 1024 (KPIs) and 1180 (main row);
+   the breakpoints below are the existing ones, restated here
+   because this block comes last in the file.
+--------------------------------------------------------- */
+
+.kpi-grid{
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+}
+
+.dash-grid{
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+}
+
+@media (max-width:1180px){
+  /* Programme Overview still spans the full row here, from
+     the original breakpoint further up this file. */
+  .dash-grid{
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  }
+}
+
+@media (max-width:1024px){
+  .kpi-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media (max-width:900px){
+  .dash-grid,
+  .dash-grid-2{
+    grid-template-columns:1fr;
+  }
+}

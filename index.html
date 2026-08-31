@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Dashboard | Getwell</title><link rel="stylesheet" href="styles.css?v=20260831-progress"><script src="app.js?v=20260831-progress"></script></head><body><div id="root"></div><script>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Dashboard | Getwell</title><link rel="stylesheet" href="styles.css?v=20260831-dashboard"><script src="app.js?v=20260831-dashboard"></script></head><body><div id="root"></div><script>
 
 /* =========================================================
    GETWELL DASHBOARD
@@ -59,6 +59,24 @@ const ICONS = {
 
 const kpiIcon = (name, tone) =>
   `<div class="kpi-icon ${tone}">${ICONS[name]}</div>`;
+
+
+/*
+  EMPTY STATES
+
+  A card whose list is empty used to render a single line of
+  grey text, which left the rest of a stretched card looking
+  broken. This fills the card's content area with a centred
+  icon, a heading and one line of context, so "nothing to do
+  today" reads as a deliberate state rather than a failure to
+  load.
+*/
+const dashEmpty = (icon, title, note) => `
+  <div class="dash-empty">
+    <div class="dash-empty-icon">${ICONS[icon]}</div>
+    <div class="dash-empty-title">${title}</div>
+    <div class="dash-empty-note">${note}</div>
+  </div>`;
 
 
 /* ---------------------------------------------------------
@@ -153,14 +171,14 @@ function buildAppointmentsCard(){
 const appointmentsToday = todaysAppointments();
 
 return getwellFeatureEnabled("appointments") ? `
-  <div class="card">
+  <div class="card dash-card">
     <div class="card-head">
       <div><h2>Today's Appointments</h2><p>${appointmentsToday.length} scheduled for today</p></div>
       <a class="card-link" href="appointments.html">View all</a>
     </div>
 
-    <div>
-      ${appointmentsToday.slice(0,5).map(row => `
+    <div class="dash-card-body">
+      ${appointmentsToday.slice(0,6).map(row => `
         <div class="row" role="button" tabindex="0"
              onclick="location.href='patient-profile.html?patient=${encodeURIComponent(row.patient.id)}'"
              onkeydown="if(event.key==='Enter'){location.href='patient-profile.html?patient=${encodeURIComponent(row.patient.id)}'}">
@@ -171,7 +189,11 @@ return getwellFeatureEnabled("appointments") ? `
           </div>
           <span class="badge ${row.status === "Completed" ? "green" : row.status === "No Show" ? "red" : row.status === "Cancelled" ? "gray" : "blue"}">${escapeHtml(row.status)}</span>
         </div>
-      `).join("") || `<div class="notif-empty">No appointments scheduled for today.</div>`}
+      `).join("") || dashEmpty(
+        "calendar",
+        "No appointments scheduled for today.",
+        "Bookings made for today will appear here as soon as they are saved."
+      )}
     </div>
 
     <a class="card-foot-link" href="appointments.html">${ICONS.calendar} View Full Calendar</a>
@@ -193,14 +215,14 @@ function overdueLabel(alert){
 
 function buildFollowUpCard(){
 return ds.showAttention !== false ? `
-  <div class="card">
+  <div class="card dash-card">
     <div class="card-head">
-      <div><h2>Patients Due for Follow-Up</h2><p>${followUpConfig.dueAfterDays} days due · ${followUpConfig.overdueAfterDays} days overdue</p></div>
+      <div><h2>Patients Due for Follow-Up</h2><p>${al.length ? al.length + " due · " : ""}${followUpConfig.dueAfterDays} days due · ${followUpConfig.overdueAfterDays} days overdue</p></div>
       <a class="card-link" href="patients.html">View all</a>
     </div>
 
-    <div>
-      ${al.slice(0,5).map(alert => {
+    <div class="dash-card-body">
+      ${al.slice(0,6).map(alert => {
         const patient = getPatient(alert.id) || {id:alert.id, name:alert.name};
         return `
         <div class="row" role="button" tabindex="0"
@@ -213,7 +235,11 @@ return ds.showAttention !== false ? `
           </div>
           <span class="follow-flag ${alert.level}">${escapeHtml(overdueLabel(alert))}</span>
         </div>`;
-      }).join("") || `<div class="notif-empty">No follow-up alerts.</div>`}
+      }).join("") || dashEmpty(
+        "shield",
+        "No follow-ups due.",
+        `Every patient has been seen within the last ${followUpConfig.dueAfterDays} days.`
+      )}
     </div>
 
     <a class="card-foot-link" href="patients.html">${ICONS.chart} View All Follow-Ups</a>
@@ -309,12 +335,16 @@ function progressPercent(patient){
 }
 
 function buildRecentCard(){
+/* Seven rather than six: the bottom row now stretches to the
+   height of the CTA + Panel column beside it, and one more row
+   of real patients is a better use of that space than another
+   centimetre of white. */
 const recentPatients = ps.slice().sort((a,b) =>
   String(b.startDate || "").localeCompare(String(a.startDate || ""))
-).slice(0,6);
+).slice(0,7);
 
 return getwellFeatureEnabled("patients") ? `
-  <div class="card">
+  <div class="card dash-card">
     <div class="card-head">
       <div><h2>Recent Patients</h2><p>Newest programme starts</p></div>
       <a class="card-link" href="patients.html">View all patients</a>
@@ -357,6 +387,8 @@ return getwellFeatureEnabled("patients") ? `
         </tbody>
       </table>
     </div>
+
+    <a class="card-foot-link" href="patients.html">${ICONS.people} View All Patients</a>
   </div>
 ` : "";
 }
@@ -418,7 +450,7 @@ function renderDashboardPage(){
   <div class="dash-grid">
     ${buildAppointmentsCard()}
     ${buildFollowUpCard()}
-    <div class="card prog-card" id="progCard"></div>
+    <div class="card prog-card dash-card" id="progCard"></div>
   </div>
 
   <div class="dash-grid-2">
