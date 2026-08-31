@@ -6298,3 +6298,533 @@ setInterval(
   60000
 );
    
+
+
+/* =========================================================
+   PATIENT PROGRESS — SERIES BUILDERS AND CHART RENDERER
+   ---------------------------------------------------------
+   Added for the per-patient "Weight Progress" and "Body
+   Composition Progress" sections on patient-profile.html.
+
+   These helpers are PURE READERS. They never write, never
+   touch saveStore()/upsertPatient() and never change the
+   Google Sheets architecture. Every point is read straight
+   out of the visits that are already persisted on the
+   patient record:
+
+       visit.dateKey
+       visit.visit
+       visit.weight
+       visit.arboleafMetrics
+
+   Nothing is averaged across patients, nothing is
+   interpolated and nothing is invented: a visit with no
+   value for the requested measurement is simply skipped.
+========================================================= */
+
+
+/* The body-composition metrics the existing Arboleaf parser
+   produces, in the order they are offered in the selector.
+   "Body Type" is deliberately absent: it is a word, not a
+   number, so it cannot be plotted on a line chart. It is
+   still shown by the existing renderBodyComposition(). */
+const GETWELL_BODY_METRICS = [
+  {name:"Weight",               unit:"kg",   decimals:1},
+  {name:"BMI",                  unit:"",     decimals:1},
+  {name:"Body Fat",             unit:"%",    decimals:1},
+  {name:"Body Water",           unit:"%",    decimals:1},
+  {name:"Muscle Mass",          unit:"kg",   decimals:1},
+  {name:"Skeletal Muscle",      unit:"%",    decimals:1},
+  {name:"Bone Mass",            unit:"kg",   decimals:1},
+  {name:"Visceral Fat",         unit:"",     decimals:0},
+  {name:"BMR",                  unit:"kcal", decimals:0},
+  {name:"Metabolic Age",        unit:"yrs",  decimals:0},
+  {name:"Protein",              unit:"%",    decimals:1},
+  {name:"Subcutaneous Fat",     unit:"%",    decimals:1},
+  {name:"Fat-free Body Weight", unit:"kg",   decimals:1}
+];
+
+function getwellMetricDefinition(name){
+  return GETWELL_BODY_METRICS.find(metric => metric.name === name) || {name, unit:"", decimals:1};
+}
+
+
+/*
+  A single Arboleaf reading.
+  The parser stores numbers as {value, unit} and Body Type as
+  a plain string, so both shapes are handled and anything that
+  is not a finite number is reported as "not recorded".
+*/
+function getwellArboleafValue(visit, metricName){
+  const metrics = visit && visit.arboleafMetrics;
+  if(!metrics || typeof metrics !== "object") return null;
+
+  const raw = metrics[metricName];
+  if(raw === null || raw === undefined || raw === "") return null;
+
+  /* Number(null) and Number("") are both 0, which would turn a
+     missing reading into a real-looking measurement of zero.
+     The blank shapes are rejected before the conversion. */
+  const rawValue = (typeof raw === "object") ? raw.value : raw;
+  if(rawValue === null || rawValue === undefined || String(rawValue).trim() === "") return null;
+
+  const value = Number(rawValue);
+  if(!Number.isFinite(value)) return null;
+
+  const unit = (typeof raw === "object" && raw.unit) ? String(raw.unit) : "";
+  return {value, unit};
+}
+
+
+/* "Visit #3" -> 3. Used only to break ties between two visits
+   recorded on the same calendar day. */
+function getwellVisitOrdinal(visit){
+  const match = String((visit && visit.visit) || "").match(/(\d+)/);
+  return match ? Number(match[1]) : 0;
+}
+
+
+/*
+  Every visit on ONE patient, oldest first.
+
+  - Duplicate visit ids are collapsed so an id that appears
+    twice cannot produce two points for the same visit.
+  - Out-of-order visit dates are sorted here, before anything
+    is plotted.
+  - A visit with no usable date keeps its place at the end
+    rather than being dropped, so nothing silently disappears.
+*/
+function getwellPatientVisitsSorted(patient){
+  const seen = new Set();
+  const rows = [];
+
+  ((patient && patient.visits) || []).forEach(visit => {
+    if(!visit) return;
+
+    const dateKey = getwellDateKey(visit.dateKey || visit.date || "");
+    const identity = visit.id || `${dateKey}|${visit.visit || ""}`;
+    if(seen.has(identity)) return;
+    seen.add(identity);
+
+    rows.push({visit, dateKey});
+  });
+
+  return rows.sort((a, b) => {
+    /* Undated visits go last instead of pretending to be the
+       oldest reading in the programme. */
+    if(!a.dateKey && b.dateKey) return 1;
+    if(a.dateKey && !b.dateKey) return -1;
+
+    const byDate = String(a.dateKey).localeCompare(String(b.dateKey));
+    if(byDate) return byDate;
+
+    return getwellVisitOrdinal(a.visit) - getwellVisitOrdinal(b.visit);
+  });
+}
+
+
+/* "2026-08-01" -> "1 Aug" / "1 Aug 2026". */
+function getwellShortVisitDate(dateKey, withYear){
+  const key = getwellDateKey(dateKey);
+  if(!key) return "No date";
+
+  const parts = key.split("-");
+  const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  if(Number.isNaN(date.getTime())) return key;
+
+  return date.toLocaleDateString("en-GB", withYear
+    ? {day:"numeric", month:"short", year:"numeric"}
+    : {day:"numeric", month:"short"});
+}
+
+
+/*
+  WEIGHT AT A VISIT
+
+  Priority, exactly as specified:
+    1. the Weight field typed into that visit;
+    2. the Arboleaf "Weight" parsed from that same visit's PDF;
+    3. nothing — the visit is skipped.
+
+  The patient's current/starting weight is never substituted
+  for a historical visit, and no other patient is ever read.
+*/
+function getwellVisitWeight(visit){
+  const typed = Number(visit && visit.weight);
+  if(Number.isFinite(typed) && typed > 0) return {value:typed, source:"visit"};
+
+  const parsed = getwellArboleafValue(visit, "Weight");
+  if(parsed && parsed.value > 0) return {value:parsed.value, source:"arboleaf"};
+
+  return null;
+}
+
+
+/*
+  The patient's weight series: one point per visit that
+  actually recorded a weight.
+*/
+function getwellPatientWeightSeries(patient){
+  const points = [];
+
+  getwellPatientVisitsSorted(patient).forEach(row => {
+    const weight = getwellVisitWeight(row.visit);
+    if(!weight) return;
+
+    points.push({
+      id:      row.visit.id || "",
+      dateKey: row.dateKey,
+      label:   getwellShortVisitDate(row.dateKey),
+      full:    getwellShortVisitDate(row.dateKey, true),
+      visit:   row.visit.visit || "Visit",
+      value:   weight.value,
+      source:  weight.source
+    });
+  });
+
+  return points;
+}
+
+
+/*
+  The patient's series for one Arboleaf metric. Visits with no
+  reading for that metric are skipped, never filled in.
+*/
+function getwellPatientMetricSeries(patient, metricName){
+  const definition = getwellMetricDefinition(metricName);
+  const points = [];
+
+  getwellPatientVisitsSorted(patient).forEach(row => {
+    const reading = getwellArboleafValue(row.visit, metricName);
+    if(!reading) return;
+
+    points.push({
+      id:      row.visit.id || "",
+      dateKey: row.dateKey,
+      label:   getwellShortVisitDate(row.dateKey),
+      full:    getwellShortVisitDate(row.dateKey, true),
+      visit:   row.visit.visit || "Visit",
+      value:   reading.value,
+      unit:    reading.unit || definition.unit
+    });
+  });
+
+  return points;
+}
+
+
+/* Which of the metrics above this patient actually has at
+   least one reading for. Nothing else is offered, so the
+   selector can never open an empty chart. */
+function getwellPatientAvailableMetrics(patient){
+  const visits = getwellPatientVisitsSorted(patient);
+
+  return GETWELL_BODY_METRICS.filter(metric =>
+    visits.some(row => getwellArboleafValue(row.visit, metric.name))
+  );
+}
+
+
+/*
+  SUMMARY FIGURES FOR THE WEIGHT PROGRESS HEADER
+
+  Starting weight prefers the registered Starting Weight on
+  the patient record and falls back to the earliest recorded
+  visit weight when the field was never filled in.
+*/
+function getwellPatientWeightSummary(patient, series){
+  const points = series || getwellPatientWeightSeries(patient);
+
+  const registeredStart = Number(patient && patient.startingWeight);
+  const firstPoint = points.length ? points[0].value : null;
+  const latest = points.length ? points[points.length - 1].value : null;
+
+  const start = (Number.isFinite(registeredStart) && registeredStart > 0)
+    ? registeredStart
+    : firstPoint;
+
+  const goalRaw = Number(patient && patient.goalWeight);
+  const goal = (Number.isFinite(goalRaw) && goalRaw > 0) ? goalRaw : null;
+
+  const lost = (start !== null && latest !== null) ? (start - latest) : null;
+
+  return {
+    start,
+    latest,
+    goal,
+    lost,
+    startFromVisit: !(Number.isFinite(registeredStart) && registeredStart > 0),
+    visits: points.length
+  };
+}
+
+
+/* =========================================================
+   PROGRESS CHART
+
+   Inline SVG, no charting library, no network dependency, so
+   it renders the same offline as it does online and inherits
+   the Poppins/blue theme through styles.css.
+
+   It draws exactly the points it is handed: real dots on real
+   visits, joined by straight segments. Nothing is smoothed,
+   averaged, interpolated or resampled.
+========================================================= */
+
+/* Shared hover tooltip, created once and reused. */
+function getwellChartTooltipNode(){
+  let node = document.getElementById("gwChartTooltip");
+  if(!node){
+    node = document.createElement("div");
+    node.id = "gwChartTooltip";
+    node.className = "gw-chart-tooltip";
+    node.setAttribute("role", "status");
+    document.body.appendChild(node);
+  }
+  return node;
+}
+
+function getwellChartPointIn(target){
+  const node = getwellChartTooltipNode();
+  const box = target.getBoundingClientRect();
+
+  node.innerHTML =
+    `<span class="gw-chart-tooltip-title">${escapeHtml(target.getAttribute("data-tip-title") || "")}</span>` +
+    `<span class="gw-chart-tooltip-value">${escapeHtml(target.getAttribute("data-tip-value") || "")}</span>` +
+    (target.getAttribute("data-tip-note")
+      ? `<span class="gw-chart-tooltip-note">${escapeHtml(target.getAttribute("data-tip-note"))}</span>`
+      : "");
+
+  node.classList.add("show");
+
+  /* Measured after the content is in place so the tooltip is
+     centred on the dot and never runs off the viewport. */
+  const width = node.offsetWidth;
+  const height = node.offsetHeight;
+
+  let left = box.left + box.width / 2 - width / 2;
+  left = Math.max(8, Math.min(left, window.innerWidth - width - 8));
+
+  let top = box.top - height - 10;
+  if(top < 8) top = box.bottom + 10;
+
+  node.style.left = `${Math.round(left)}px`;
+  node.style.top  = `${Math.round(top)}px`;
+}
+
+function getwellChartPointOut(){
+  const node = document.getElementById("gwChartTooltip");
+  if(node) node.classList.remove("show");
+}
+
+function getwellFormatMetric(value, decimals){
+  const places = Number.isFinite(decimals) ? decimals : 1;
+  return Number(value).toFixed(places);
+}
+
+
+/*
+  config = {
+    points:    [{label, full, visit, value}]   required
+    unit:      "kg"                            axis + tooltip suffix
+    decimals:  1
+    yLabel:    "Weight (kg)"
+    xLabel:    "Visit date"
+    reference: {value, label}   optional target line (goal weight)
+    ariaLabel: "..."
+  }
+*/
+/*
+  RESPONSIVE GEOMETRY
+
+  The chart is one SVG scaled to the width of its card, so the
+  viewBox itself has to change shape on a narrow screen —
+  otherwise a 760x300 box squashed into a phone column ends up
+  about 130px tall with 4px axis labels. Three bands: phone,
+  tablet, desktop. getwellChartBand() lets a page notice when
+  the band actually changed and redraw, instead of redrawing on
+  every pixel of a resize.
+*/
+function getwellChartBand(){
+  const width = (typeof window !== "undefined" && window.innerWidth) || 1200;
+  if(width <= 560) return 0;
+  if(width <= 900) return 1;
+  return 2;
+}
+
+function getwellChartLayout(){
+  const band = getwellChartBand();
+
+  /* padLeft has to clear the widest tick label at that band's
+     font size, or the rotated Y-axis title collides with it. */
+  if(band === 0) return {
+    width:400, height:340, padLeft:60, padRight:14, padTop:16, padBottom:78,
+    axisSize:13, titleSize:14, maxLabels:4
+  };
+
+  if(band === 1) return {
+    width:580, height:320, padLeft:56, padRight:18, padTop:18, padBottom:70,
+    axisSize:11.5, titleSize:12, maxLabels:6
+  };
+
+  return {
+    width:760, height:300, padLeft:54, padRight:20, padTop:20, padBottom:62,
+    axisSize:10, titleSize:10.5, maxLabels:8
+  };
+}
+
+function getwellRenderProgressChart(config){
+  const points = (config && config.points) || [];
+  if(!points.length) return "";
+
+  const unit     = (config.unit || "").trim();
+  const decimals = Number.isFinite(config.decimals) ? config.decimals : 1;
+  const suffix   = unit ? ` ${unit}` : "";
+
+  const layout = getwellChartLayout();
+
+  const width  = layout.width;
+  const height = layout.height;
+  const padLeft   = layout.padLeft;
+  const padRight  = layout.padRight;
+  const padTop    = layout.padTop;
+  const padBottom = layout.padBottom;
+
+  const spanX = width  - padLeft - padRight;
+  const spanY = height - padTop  - padBottom;
+
+  const values = points.map(point => point.value);
+  const reference = (config.reference && Number.isFinite(Number(config.reference.value)))
+    ? {value:Number(config.reference.value), label:config.reference.label || "Target"}
+    : null;
+
+  /* The goal line is inside the scale so it is always visible
+     rather than clipped off the top or bottom of the plot. */
+  const domain = reference ? values.concat([reference.value]) : values;
+
+  let min = Math.min(...domain);
+  let max = Math.max(...domain);
+
+  if(max - min < 0.5){
+    /* A flat or single-point series still needs a readable
+       axis instead of a divide-by-zero. */
+    const centre = (max + min) / 2;
+    min = centre - 1;
+    max = centre + 1;
+  }else{
+    const pad = (max - min) * 0.12;
+    min -= pad;
+    max += pad;
+  }
+
+  const x = index => points.length === 1
+    ? padLeft + spanX / 2
+    : padLeft + (spanX * index) / (points.length - 1);
+
+  const y = value => padTop + spanY * (1 - (value - min) / (max - min));
+
+  /* --- Y axis: five evenly spaced gridlines --- */
+  const tickCount = 4;
+  const gridlines = [];
+  for(let i = 0; i <= tickCount; i++){
+    const value = max - ((max - min) * i) / tickCount;
+    const py = y(value);
+    gridlines.push(`
+      <line class="gw-grid" x1="${padLeft}" y1="${py.toFixed(1)}" x2="${(width - padRight).toFixed(1)}" y2="${py.toFixed(1)}"></line>
+      <text class="gw-axis-text" x="${(padLeft - 9).toFixed(1)}" y="${(py + 3.5).toFixed(1)}" text-anchor="end">${getwellFormatMetric(value, decimals)}</text>
+    `);
+  }
+
+  /* --- X axis labels: thinned out when there are many visits,
+         but every visit still gets its own dot and tooltip. --- */
+  const lastIndex = points.length - 1;
+  const maxLabels = layout.maxLabels;
+  const step = points.length <= maxLabels ? 1 : Math.ceil(points.length / maxLabels);
+  const rotate = points.length > Math.min(5, maxLabels);
+
+  const xLabels = points.map((point, index) => {
+    if(index !== lastIndex && index % step !== 0) return "";
+    const px = x(index);
+    const py = height - padBottom + 20;
+    /* The outermost labels are pinned to the plot edges so a
+       long date at either end is not clipped by the viewBox. */
+    const anchor = index === 0 ? "start" : index === lastIndex ? "end" : "middle";
+
+    return rotate
+      ? `<text class="gw-axis-text" transform="translate(${px.toFixed(1)},${py.toFixed(1)}) rotate(-38)" text-anchor="end">${escapeHtml(point.label)}</text>`
+      : `<text class="gw-axis-text" x="${px.toFixed(1)}" y="${py.toFixed(1)}" text-anchor="${anchor}">${escapeHtml(point.label)}</text>`;
+  }).join("");
+
+  /* --- Series --- */
+  const coords = points.map((point, index) => `${x(index).toFixed(1)},${y(point.value).toFixed(1)}`);
+
+  const line = points.length > 1
+    ? `<polyline class="gw-series-line" points="${coords.join(" ")}"></polyline>`
+    : "";
+
+  const area = points.length > 1
+    ? `<polygon class="gw-series-area" points="${padLeft},${(height - padBottom).toFixed(1)} ${coords.join(" ")} ${x(lastIndex).toFixed(1)},${(height - padBottom).toFixed(1)}"></polygon>`
+    : "";
+
+  const dots = points.map((point, index) => {
+    const px = x(index).toFixed(1);
+    const py = y(point.value).toFixed(1);
+    const title = `${point.visit || "Visit"} · ${point.full || point.label}`;
+    const value = `${getwellFormatMetric(point.value, decimals)}${suffix}`;
+
+    return `
+      <g class="gw-point">
+        <circle class="gw-dot" cx="${px}" cy="${py}" r="4.5"></circle>
+        <circle class="gw-dot-hit" cx="${px}" cy="${py}" r="16"
+                data-tip-title="${escapeHtml(title)}"
+                data-tip-value="${escapeHtml(value)}"
+                ${point.note ? `data-tip-note="${escapeHtml(point.note)}"` : ""}
+                tabindex="0"
+                onmouseenter="getwellChartPointIn(this)"
+                onmouseleave="getwellChartPointOut()"
+                onfocus="getwellChartPointIn(this)"
+                onblur="getwellChartPointOut()"
+                ontouchstart="getwellChartPointIn(this)"><title>${escapeHtml(title)} — ${escapeHtml(value)}</title></circle>
+      </g>`;
+  }).join("");
+
+  /* --- Optional target line (goal weight) --- */
+  const referenceLine = reference ? `
+    <line class="gw-reference" x1="${padLeft}" y1="${y(reference.value).toFixed(1)}" x2="${(width - padRight).toFixed(1)}" y2="${y(reference.value).toFixed(1)}"></line>
+    <text class="gw-reference-text" x="${(width - padRight).toFixed(1)}" y="${(y(reference.value) - 6).toFixed(1)}" text-anchor="end">${escapeHtml(reference.label)} ${getwellFormatMetric(reference.value, decimals)}${escapeHtml(suffix)}</text>
+  ` : "";
+
+  const yAxisTitle = config.yLabel
+    ? `<text class="gw-axis-title" transform="translate(12,${(padTop + spanY / 2).toFixed(1)}) rotate(-90)" text-anchor="middle">${escapeHtml(config.yLabel)}</text>`
+    : "";
+
+  const xAxisTitle = config.xLabel
+    ? `<text class="gw-axis-title" x="${(padLeft + spanX / 2).toFixed(1)}" y="${(height - 6).toFixed(1)}" text-anchor="middle">${escapeHtml(config.xLabel)}</text>`
+    : "";
+
+  return `
+    <div class="gw-chart-wrap">
+      <svg class="gw-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet"
+           style="--gw-axis-size:${layout.axisSize}px;--gw-title-size:${layout.titleSize}px"
+           role="img" aria-label="${escapeHtml(config.ariaLabel || "Progress chart")}">
+        <defs>
+          <linearGradient id="gwProgressFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#2563EB" stop-opacity=".20"></stop>
+            <stop offset="100%" stop-color="#2563EB" stop-opacity="0"></stop>
+          </linearGradient>
+        </defs>
+
+        ${gridlines.join("")}
+        <line class="gw-axis-line" x1="${padLeft}" y1="${(height - padBottom).toFixed(1)}" x2="${(width - padRight).toFixed(1)}" y2="${(height - padBottom).toFixed(1)}"></line>
+        <line class="gw-axis-line" x1="${padLeft}" y1="${padTop}" x2="${padLeft}" y2="${(height - padBottom).toFixed(1)}"></line>
+
+        ${referenceLine}
+        ${area}
+        ${line}
+        ${dots}
+        ${xLabels}
+        ${yAxisTitle}
+        ${xAxisTitle}
+      </svg>
+    </div>`;
+}

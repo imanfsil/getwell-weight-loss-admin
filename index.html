@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Dashboard | Getwell</title><link rel="stylesheet" href="styles.css?v=20260825-premium"><script src="app.js?v=20260825-premium"></script></head><body><div id="root"></div><script>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Dashboard | Getwell</title><link rel="stylesheet" href="styles.css?v=20260831-progress"><script src="app.js?v=20260831-progress"></script></head><body><div id="root"></div><script>
 
 /* =========================================================
    GETWELL DASHBOARD
@@ -223,47 +223,45 @@ return ds.showAttention !== false ? `
 
 
 /* ---------------------------------------------------------
-   PROGRAMME OVERVIEW
+   PROGRAMME OVERVIEW  (clinic-level counts only)
+
+   The weight-change chart that used to live here has been
+   removed on purpose. It averaged the weight change of every
+   patient in the clinic into a single line, which looks like
+   one patient's weight journey but is not one.
+
+   The real progress chart now lives where it belongs: on the
+   patient's own profile, built only from that patient's own
+   visits (patient-profile.html -> "Weight Progress").
+
+   What is left here is a plain head count. Every number below
+   counts patients, never kilograms, so it cannot be misread
+   as somebody's weight curve.
 --------------------------------------------------------- */
 
-function programmeCardHtml(range){
-  const data = getwellProgrammeOverview(range);
+function programmeCardHtml(){
+  /* getwellProgrammeOverview() is unchanged in app.js; only its
+     goal/on-track counts are used now. The averaged series it
+     also returns is deliberately not rendered anywhere. */
+  const data = getwellProgrammeOverview("all");
 
-  const hasAverage = data.avgChange !== null && data.patients > 0;
-  const gained = hasAverage && data.avgChange > 0;
-
-  const delta = (data.deltaKg === null || data.deltaKg === undefined)
-    ? ""
-    : `<span class="prog-delta${data.deltaKg > 0 ? " up" : ""}">${data.deltaKg <= 0 ? "↓" : "↑"} ${Math.abs(data.deltaKg).toFixed(1)} kg</span>`;
+  const tracked = data.patients;
+  const needsAttention = Math.max(0, tracked - data.goalsAchieved - data.onTrack);
 
   return `
     <div class="card-head">
-      <div><h2>Programme Overview</h2><p>Across ${data.patients} patient${data.patients === 1 ? "" : "s"} with a recorded start weight</p></div>
-      <select class="prog-select" id="progRange" onchange="renderProgramme(this.value)" aria-label="Programme period">
-        <option value="month"${range === "month" ? " selected" : ""}>This Month</option>
-        <option value="quarter"${range === "quarter" ? " selected" : ""}>Last 3 Months</option>
-        <option value="all"${range === "all" ? " selected" : ""}>All Time</option>
-      </select>
+      <div>
+        <h2>Programme Overview</h2>
+        <p>Clinic-wide totals across ${tracked} patient${tracked === 1 ? "" : "s"} with a recorded start weight</p>
+      </div>
     </div>
 
     <div class="card-body">
-      <div class="prog-head">
-        <div>
-          <div class="kpi-label">AVERAGE WEIGHT CHANGE</div>
-          <div class="prog-metric">
-            <span class="prog-value" style="color:${hasAverage && !gained ? "var(--green)" : "var(--navy)"}">${hasAverage ? (data.avgChange > 0 ? "+" : "") + data.avgChange.toFixed(2) : "—"}</span>
-            <span class="prog-unit">kg</span>
-          </div>
+      <div class="prog-summary-grid">
+        <div class="prog-tile">
+          <div class="label">Patients Tracked</div>
+          <div class="value">${tracked}</div>
         </div>
-        <div>
-          ${delta}
-          ${delta ? `<div class="prog-note">vs previous period</div>` : ""}
-        </div>
-      </div>
-
-      ${getwellRenderMiniChart(data.series)}
-
-      <div class="prog-split">
         <div class="prog-tile">
           <div class="label">Goals Achieved</div>
           <div class="value good">${data.goalsAchieved}</div>
@@ -272,16 +270,26 @@ function programmeCardHtml(range){
           <div class="label">On Track</div>
           <div class="value info">${data.onTrack}</div>
         </div>
+        <div class="prog-tile">
+          <div class="label">Not Yet Progressing</div>
+          <div class="value">${needsAttention}</div>
+        </div>
       </div>
+
+      <p class="prog-explainer">
+        Clinic-level head counts, not a weight graph. Individual
+        weight and body-composition progress is charted on each
+        patient's own profile, from that patient's visits.
+      </p>
     </div>
 
     ${getwellFeatureEnabled("reports") ? `<a class="card-foot-link" href="reports.html">${ICONS.chart} View Reports</a>` : ""}
   `;
 }
 
-function renderProgramme(range){
+function renderProgramme(){
   const card = document.getElementById("progCard");
-  if(card) card.innerHTML = programmeCardHtml(range);
+  if(card) card.innerHTML = programmeCardHtml();
 }
 
 
@@ -392,7 +400,7 @@ return (ds.showPanelClaimOverview !== false && getwellFeatureEnabled("panel")) ?
    RENDER
 --------------------------------------------------------- */
 
-function renderDashboardPage(range){
+function renderDashboardPage(){
   const dateLabel = new Date().toLocaleDateString("en-GB", {
     weekday:"long", day:"numeric", month:"short", year:"numeric"
   });
@@ -422,11 +430,11 @@ function renderDashboardPage(range){
   </div>
 `);
 
-  renderProgramme(range || "month");
+  renderProgramme();
   renderNotifications();
 }
 
-renderDashboardPage("month");
+renderDashboardPage();
 
 
 /* =========================================================
@@ -437,21 +445,19 @@ renderDashboardPage("month");
    "getwell:data-updated"; the dashboard recomputes its numbers
    and redraws itself here.
 
-   The Programme Overview period the user selected is read back
-   out of the <select> first so "Last 3 Months" is not reset to
-   "This Month" by a background sync.
+   The Programme Overview period selector was removed along
+   with the averaged weight chart, so there is no longer any
+   selection to preserve across a background sync.
 ========================================================= */
 
 getwellOnDataUpdated(() => {
-  const range = document.getElementById("progRange")?.value || "month";
   loadDashboardData();
-  renderDashboardPage(range);
+  renderDashboardPage();
 });
 
 getwellOnSettingsUpdated(() => {
-  const range = document.getElementById("progRange")?.value || "month";
   loadDashboardData();
-  renderDashboardPage(range);
+  renderDashboardPage();
 });
 
 </script></body></html>

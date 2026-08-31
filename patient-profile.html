@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Patient Profile | Getwell</title>
-<link rel="stylesheet" href="styles.css?v=20260826-stable">
-<script src="app.js?v=20260826-stable"></script>
+<link rel="stylesheet" href="styles.css?v=20260831-progress">
+<script src="app.js?v=20260831-progress"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
@@ -819,6 +819,217 @@ function renderBodyComposition(){
   }).join("");
 }
 
+
+/* =========================================================
+   WEIGHT PROGRESS  /  BODY COMPOSITION PROGRESS
+
+   This is THIS patient's progress and nothing else. Every
+   point is read out of this patient's own saved visits
+   (visit.dateKey, visit.visit, visit.weight,
+   visit.arboleafMetrics) through the shared readers in
+   app.js. No other patient is touched, no average is taken,
+   no weekly/monthly buckets are invented and no missing
+   reading is interpolated: a visit with no value for the
+   measurement being charted is simply not plotted.
+
+   Nothing here writes. Adding these sections did not change
+   how anything is saved — Add/Edit/Delete Visit still call
+   upsertPatient() exactly as before, and because refresh()
+   re-reads the patient with getPatient(id), the charts
+   redraw themselves from the Sheet-backed data after every
+   save, delete, background sync or page reload.
+========================================================= */
+
+/* Remembered so a background sync (or any refresh()) does not
+   knock the selector back to Weight mid-review. */
+let selectedBodyMetric = "";
+
+const EM_DASH = "—";
+
+function progressMetricCell(visit, metricName){
+  const reading = getwellArboleafValue(visit, metricName);
+  if(!reading) return EM_DASH;   /* absent is "—", never 0 */
+
+  const definition = getwellMetricDefinition(metricName);
+  const unit = reading.unit || definition.unit;
+  const value = getwellFormatMetric(reading.value, definition.decimals);
+
+  return unit ? `${value} ${unit}` : value;
+}
+
+
+function renderWeightProgress(){
+  const host = document.getElementById("weightProgress");
+  if(!host) return;
+
+  const visits = getwellPatientVisitsSorted(p);
+
+  if(!visits.length){
+    host.innerHTML = `<div class="notif-empty">No visit data yet.</div>`;
+    return;
+  }
+
+  const series = getwellPatientWeightSeries(p);
+
+  if(!series.length){
+    host.innerHTML = `<div class="notif-empty">No weight measurements recorded yet.</div>`;
+    return;
+  }
+
+  const summary = getwellPatientWeightSummary(p, series);
+
+  const kg = value => (value === null || value === undefined)
+    ? EM_DASH
+    : `${getwellFormatMetric(value, 1)} kg`;
+
+  /* Down is good: a loss is shown in green, a gain in amber. */
+  const lostClass = summary.lost === null ? "" : (summary.lost > 0 ? " good" : (summary.lost < 0 ? " warn" : ""));
+  const lostText = summary.lost === null
+    ? EM_DASH
+    : `${summary.lost > 0 ? "↓ " : summary.lost < 0 ? "↑ " : ""}${getwellFormatMetric(Math.abs(summary.lost), 1)} kg`;
+
+  const chart = getwellRenderProgressChart({
+    points: series,
+    unit: "kg",
+    decimals: 1,
+    yLabel: "Weight (kg)",
+    xLabel: "Visit date",
+    reference: summary.goal ? {value: summary.goal, label: "Goal"} : null,
+    ariaLabel: `Weight recorded at each visit for ${p.name || p.id}`
+  });
+
+  /* Named rather than counted, so it is obvious exactly which
+     point came from the PDF instead of the Weight field. */
+  const fallbackVisits = series.filter(point => point.source === "arboleaf").map(point => point.visit);
+  const fallbackNote = fallbackVisits.length
+    ? `<p class="progress-note">${escapeHtml(fallbackVisits.join(", "))} had no Weight field filled in, so the weight parsed from that visit's Arboleaf PDF was used.</p>`
+    : "";
+
+  host.innerHTML = `
+    <div class="progress-summary">
+      <div class="progress-stat">
+        <div class="label">Starting Weight</div>
+        <div class="value">${kg(summary.start)}</div>
+        <div class="note">${summary.start === null ? "Not recorded" : (summary.startFromVisit ? "From earliest visit" : "From patient record")}</div>
+      </div>
+      <div class="progress-stat">
+        <div class="label">Latest Weight</div>
+        <div class="value">${kg(summary.latest)}</div>
+        <div class="note">${escapeHtml(series[series.length - 1].full)}</div>
+      </div>
+      <div class="progress-stat">
+        <div class="label">Goal Weight</div>
+        <div class="value">${summary.goal === null ? EM_DASH : kg(summary.goal)}</div>
+        <div class="note">${summary.goal === null ? "No goal set" : "Target line on chart"}</div>
+      </div>
+      <div class="progress-stat">
+        <div class="label">Total Weight Lost</div>
+        <div class="value${lostClass}">${lostText}</div>
+        <div class="note">${summary.lost === null ? "Needs a starting weight" : "Starting weight vs latest visit"}</div>
+      </div>
+      <div class="progress-stat">
+        <div class="label">Recorded Visits</div>
+        <div class="value">${series.length}</div>
+        <div class="note">${series.length === visits.length ? "All visits weighed" : `${visits.length} visit${visits.length === 1 ? "" : "s"} in total`}</div>
+      </div>
+    </div>
+    ${chart}
+    ${fallbackNote}
+  `;
+}
+
+
+function renderBodyCompositionProgress(metricName){
+  const host = document.getElementById("bodyCompositionProgress");
+  if(!host) return;
+
+  const available = getwellPatientAvailableMetrics(p);
+
+  if(!available.length){
+    selectedBodyMetric = "";
+    host.innerHTML = `<div class="notif-empty">No Arboleaf measurements recorded yet.</div>`;
+    return;
+  }
+
+  /* Keep the current choice if it is still available, otherwise
+     fall back to Weight, otherwise to whatever exists. */
+  let selected = metricName || selectedBodyMetric;
+  if(!available.some(metric => metric.name === selected)){
+    selected = available.some(metric => metric.name === "Weight") ? "Weight" : available[0].name;
+  }
+  selectedBodyMetric = selected;
+
+  const definition = getwellMetricDefinition(selected);
+  const series = getwellPatientMetricSeries(p, selected);
+  const unit = (series.length && series[0].unit) || definition.unit;
+
+  const options = available.map(metric =>
+    `<option value="${escapeHtml(metric.name)}"${metric.name === selected ? " selected" : ""}>${escapeHtml(metric.name)}</option>`
+  ).join("");
+
+  const yLabel = unit ? `${selected} (${unit})` : selected;
+
+  const body = series.length
+    ? getwellRenderProgressChart({
+        points: series,
+        unit,
+        decimals: definition.decimals,
+        yLabel,
+        xLabel: "Visit date",
+        ariaLabel: `${selected} recorded at each Arboleaf visit for ${p.name || p.id}`
+      })
+    : `<div class="notif-empty">No ${escapeHtml(selected)} readings recorded yet.</div>`;
+
+  const skipped = getwellPatientVisitsSorted(p).length - series.length;
+
+  host.innerHTML = `
+    <div class="metric-picker">
+      <label for="bodyMetricSelect">Metric</label>
+      <select id="bodyMetricSelect" class="metric-select"
+              onchange="renderBodyCompositionProgress(this.value)">${options}</select>
+      <span class="metric-current">${escapeHtml(yLabel)}</span>
+    </div>
+    ${body}
+    ${series.length && skipped > 0
+      ? `<p class="progress-note">${skipped} visit${skipped === 1 ? "" : "s"} without a ${escapeHtml(selected)} reading ${skipped === 1 ? "is" : "are"} not plotted.</p>`
+      : ""}
+  `;
+}
+
+
+/*
+  The visit-by-visit table under the charts. It exists to make
+  it obvious that the lines above are drawn from real visits:
+  every plotted point has a row here. A metric that was never
+  recorded shows an em dash, never a zero.
+*/
+function renderVisitProgressTable(){
+  const host = document.getElementById("visitProgressRows");
+  if(!host) return;
+
+  const visits = getwellPatientVisitsSorted(p);
+
+  if(!visits.length){
+    host.innerHTML = `<tr><td colspan="6" class="notif-empty">No visit data yet.</td></tr>`;
+    return;
+  }
+
+  host.innerHTML = visits.map(row => {
+    const visit = row.visit;
+    const weight = getwellVisitWeight(visit);
+
+    return `
+      <tr>
+        <td>${escapeHtml(visit.visit || "Visit")}</td>
+        <td>${escapeHtml(getwellShortVisitDate(row.dateKey, true))}</td>
+        <td>${weight ? `${getwellFormatMetric(weight.value, 1)} kg` : EM_DASH}</td>
+        <td>${progressMetricCell(visit, "BMI")}</td>
+        <td>${progressMetricCell(visit, "Body Fat")}</td>
+        <td>${progressMetricCell(visit, "Muscle Mass")}</td>
+      </tr>`;
+  }).join("");
+}
+
 function renderFiles(){
   const files=[];
   (p.visits||[]).forEach(v=>{
@@ -1242,6 +1453,16 @@ function refresh(){
     <td><button class="secondary" style="padding:7px 9px" onclick="openClaimModal('${escapeHtml(c.id)}')">Edit</button></td></tr>
   `).join("")||`<tr><td colspan="5" class="notif-empty">No claims recorded.</td></tr>`;
 
+  /* The progress charts are rebuilt from the freshly re-read
+     patient on every refresh(), which is what makes an added,
+     edited or deleted visit show up immediately, and what makes
+     a page reload or a re-login redraw them from the Google
+     Sheets-backed data. */
+  getwellChartPointOut();   /* never leave a tooltip floating over a redraw */
+  renderWeightProgress();
+  renderBodyCompositionProgress();
+  renderVisitProgressTable();
+
   renderBodyComposition();
   renderFiles();
   renderAppointments();
@@ -1266,13 +1487,47 @@ document.getElementById("root").innerHTML=shell("Patient Profile","patients",`
 
   <div class="card"><div class="card-head"><div><h2>Program Financial Summary</h2><p>Automatically calculated from visits and claims.</p></div></div><div class="card-body"><div class="finance-grid" id="finance"></div><div class="breakdown" id="breakdown"></div></div></div>
 
+  <!-- ===============================================================
+       WEIGHT PROGRESS / BODY COMPOSITION PROGRESS
+
+       Always visible, directly under the patient's information, so
+       opening a patient shows that patient's own progress straight
+       away. Both charts are built from this patient's visits only.
+  ================================================================ -->
+
+  <section class="card progress-card" id="progress-weight" style="margin-top:14px">
+    <div class="card-head">
+      <div><h2>Weight Progress</h2><p>Weight recorded at each visit</p></div>
+    </div>
+    <div class="card-body" id="weightProgress"></div>
+  </section>
+
+  <section class="card progress-card" id="progress-composition" style="margin-top:14px">
+    <div class="card-head">
+      <div><h2>Body Composition Progress</h2><p>Arboleaf measurements recorded at each visit</p></div>
+    </div>
+    <div class="card-body" id="bodyCompositionProgress"></div>
+  </section>
+
+  <section class="card progress-card" id="progress-visits" style="margin-top:14px">
+    <div class="card-head">
+      <div><h2>Visit-by-Visit History</h2><p>Every point on the charts above comes from one of these visits.</p></div>
+    </div>
+    <div class="table-wrap">
+      <table class="table compact">
+        <thead><tr><th>Visit</th><th>Date</th><th>Weight</th><th>BMI</th><th>Body Fat</th><th>Muscle Mass</th></tr></thead>
+        <tbody id="visitProgressRows"></tbody>
+      </table>
+    </div>
+  </section>
+
   <div class="patient-tabs">
     <button class="active" onclick="showSection('overview',this)">Overview</button>
     <button onclick="showSection('visits',this)">Visits</button>
     <button onclick="showSection('composition',this)">Body Composition</button>
-    <button onclick="showSection('files',this)">Files & Photos</button>
     <button onclick="showSection('appointments',this)">Appointments</button>
-    <button onclick="showSection('claims',this)">Panel Claims</button>
+    <button data-tab="claims" onclick="showSection('claims',this)">Panel Claims</button>
+    <button onclick="showSection('files',this)">Files & Photos</button>
   </div>
 
   <section id="sec-overview" class="card"><div class="card-head"><div><h2>Recent Visits</h2><p>Edit any past visit using the same form as Add Visit.</p></div><button class="primary" onclick="openAddVisit()">＋ Add Visit</button></div><div id="overviewVisits"></div></section>
@@ -1281,11 +1536,11 @@ document.getElementById("root").innerHTML=shell("Patient Profile","patients",`
 
   <section id="sec-composition" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Body Composition</h2><p>Arboleaf metrics parsed from uploaded visit PDFs.</p></div></div><div id="composition" class="card-body"></div></section>
 
-  <section id="sec-files" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Files & Photos</h2><p>Files and photos attached to visits.</p></div></div><div id="secFilesContent"></div></section>
-
   <section id="sec-appointments" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Appointments</h2><p>Appointment history for this patient.</p></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Time</th><th>Type</th><th>Doctor</th><th>Status</th><th>Notes</th></tr></thead><tbody id="patientAppointmentRows"></tbody></table></div></section>
 
   <section id="sec-claims" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Panel Claims</h2><p>Split claims can be entered on any date, including dates when the patient did not attend.</p></div><button class="primary" onclick="openClaimModal()">＋ Add Claim</button></div><div class="card-body"><div class="finance-grid" id="claimSummary"></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Claim Date</th><th>Related Visit</th><th>Claim Amount</th><th>Notes</th><th></th></tr></thead><tbody id="claimRows"></tbody></table></div></section>
+
+  <section id="sec-files" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Files & Photos</h2><p>Files and photos attached to visits.</p></div></div><div id="secFilesContent"></div></section>
 `);
 
 const secFilesContent=document.getElementById("secFilesContent");
@@ -1312,6 +1567,35 @@ getwellOnDataUpdated(() => {
   refresh();
 });
 
+
+/* =========================================================
+   RESPONSIVE CHART REDRAW
+
+   The progress charts pick their viewBox from the window
+   width (phone / tablet / desktop) so the axis labels stay
+   readable. Only a change of band redraws them, so dragging a
+   window edge does not re-render on every pixel, and rotating
+   a phone does.
+
+   Nothing else on the page is touched, and no data is read
+   or written here.
+========================================================= */
+
+let progressChartBand = getwellChartBand();
+let progressChartResizeTimer = null;
+
+window.addEventListener("resize", () => {
+  clearTimeout(progressChartResizeTimer);
+  progressChartResizeTimer = setTimeout(() => {
+    const band = getwellChartBand();
+    if(band === progressChartBand) return;
+    progressChartBand = band;
+    getwellChartPointOut();
+    renderWeightProgress();
+    renderBodyCompositionProgress();
+  }, 160);
+});
+
 /* A Settings change alters the Visit Type and charge dropdowns
    the visit form builds, so re-render those lists too. */
 getwellOnSettingsUpdated(() => {
@@ -1321,7 +1605,7 @@ getwellOnSettingsUpdated(() => {
 
 if(params.get("openClaim")==="1"){
   setTimeout(()=>{
-    showSection("claims",document.querySelector(".patient-tabs button:last-child"));
+    showSection("claims",document.querySelector('.patient-tabs button[data-tab="claims"]'));
     openClaimModal();
   },150);
 }

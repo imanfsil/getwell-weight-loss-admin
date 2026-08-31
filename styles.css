@@ -2817,3 +2817,258 @@ html[data-theme="dark"] .main-dash{
 @media (max-width: 480px){
   .breakdown{grid-template-columns:1fr;}
 }
+
+/* =========================================================
+   PATIENT PROGRESS CHARTS
+   ---------------------------------------------------------
+   Weight Progress and Body Composition Progress on the
+   patient profile, plus the clinic-level Programme Overview
+   tiles that replaced the old averaged dashboard chart.
+
+   Same design language as the rest of the app: Poppins,
+   white cards, --border hairlines, --ink-blue series. Every
+   colour is taken from an existing variable so the dark
+   theme follows automatically.
+========================================================= */
+
+/* --- Dashboard: clinic-level summary (no chart) --- */
+
+.prog-summary-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.prog-explainer{
+  margin:12px 0 0;
+  font-size:10px;
+  line-height:16px;
+  color:var(--muted);
+}
+
+/* --- Patient profile: summary stat row --- */
+
+.progress-card .card-body{padding:18px}
+
+.progress-summary{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+  margin-bottom:6px;
+}
+
+.progress-stat{
+  border:1px solid var(--border-light);
+  border-radius:12px;
+  padding:12px 14px;
+  background:var(--surface);
+  min-width:0;
+}
+
+.progress-stat .label{
+  font-size:10px;
+  color:var(--muted);
+}
+
+.progress-stat .value{
+  font-size:19px;
+  font-weight:700;
+  margin-top:4px;
+  line-height:1.2;
+}
+
+.progress-stat .value.good{color:var(--green)}
+.progress-stat .value.warn{color:var(--orange)}
+
+.progress-stat .note{
+  font-size:9.5px;
+  color:var(--muted);
+  margin-top:4px;
+  line-height:14px;
+}
+
+.progress-note{
+  margin:8px 0 0;
+  font-size:10px;
+  line-height:16px;
+  color:var(--muted);
+}
+
+/* --- Metric selector --- */
+
+.metric-picker{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  flex-wrap:wrap;
+  margin-bottom:4px;
+}
+
+.metric-picker label{
+  font-size:10px;
+  font-weight:600;
+  color:var(--muted);
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+
+.metric-select{
+  height:34px;
+  min-width:180px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  background:var(--card);
+  color:var(--navy);
+  font-family:inherit;
+  font-size:11px;
+  font-weight:600;
+  padding:0 10px;
+  outline:0;
+}
+
+.metric-current{
+  font-size:10px;
+  font-weight:600;
+  color:var(--ink-blue,#2563EB);
+  background:var(--surface);
+  border:1px solid var(--border-light);
+  border-radius:999px;
+  padding:5px 10px;
+}
+
+/* --- The chart itself --- */
+
+.gw-chart-wrap{
+  width:100%;
+  margin:12px 0 2px;
+  overflow:hidden;
+}
+
+.gw-chart{
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:340px;
+  overflow:visible;
+}
+
+.gw-chart .gw-grid{stroke:var(--border-light);stroke-width:1}
+.gw-chart .gw-axis-line{stroke:var(--border);stroke-width:1}
+
+/* Sized in viewBox units, handed down from
+   getwellChartLayout() so labels stay legible on a phone. */
+.gw-chart .gw-axis-text{
+  fill:var(--muted);
+  font-size:var(--gw-axis-size,10px);
+  font-family:Poppins,Arial,sans-serif;
+}
+
+.gw-chart .gw-axis-title{
+  fill:var(--muted);
+  font-size:var(--gw-title-size,10.5px);
+  font-weight:600;
+  font-family:Poppins,Arial,sans-serif;
+}
+
+.gw-chart .gw-series-area{fill:url(#gwProgressFill);stroke:none}
+
+.gw-chart .gw-series-line{
+  fill:none;
+  stroke:var(--ink-blue,#2563EB);
+  stroke-width:2.4;
+  stroke-linejoin:round;
+  stroke-linecap:round;
+}
+
+.gw-chart .gw-dot{
+  fill:var(--card,#fff);
+  stroke:var(--ink-blue,#2563EB);
+  stroke-width:2.2;
+  transition:r .12s ease;
+}
+
+.gw-chart .gw-dot-hit{
+  fill:transparent;
+  stroke:none;
+  cursor:pointer;
+  outline:none;
+}
+
+/* The hit circle is painted after the visible dot, so the
+   enlargement is driven from the group, not a sibling. */
+.gw-chart .gw-point:hover .gw-dot,
+.gw-chart .gw-point:focus-within .gw-dot{r:6.5}
+
+.gw-chart .gw-reference{
+  stroke:var(--green);
+  stroke-width:1.6;
+  stroke-dasharray:6 5;
+  opacity:.85;
+}
+
+.gw-chart .gw-reference-text{
+  fill:var(--green);
+  font-size:var(--gw-axis-size,10px);
+  font-weight:600;
+  font-family:Poppins,Arial,sans-serif;
+}
+
+/* --- Hover tooltip (one shared node on <body>) --- */
+
+.gw-chart-tooltip{
+  position:fixed;
+  z-index:120;
+  display:none;
+  flex-direction:column;
+  gap:2px;
+  min-width:120px;
+  padding:8px 10px;
+  border-radius:9px;
+  background:var(--navy);
+  color:#fff;
+  font-family:Poppins,Arial,sans-serif;
+  font-size:10px;
+  line-height:15px;
+  box-shadow:0 12px 30px rgba(15,23,42,.24);
+  pointer-events:none;
+}
+
+.gw-chart-tooltip.show{display:flex}
+
+.gw-chart-tooltip-title{opacity:.78}
+
+.gw-chart-tooltip-value{
+  font-size:13px;
+  font-weight:700;
+}
+
+.gw-chart-tooltip-note{opacity:.7}
+
+html[data-theme="dark"] .gw-chart-tooltip{
+  background:#F8FAFC;
+  color:#0D1424;
+  box-shadow:0 12px 30px rgba(0,0,0,.45);
+}
+
+html[data-theme="dark"] .gw-chart .gw-dot{fill:#151E30}
+html[data-theme="dark"] .progress-stat{background:#151E30;border-color:#334155}
+html[data-theme="dark"] .metric-select{background:#101827;border-color:#3B4A61;color:#F8FAFC}
+html[data-theme="dark"] .metric-current{background:#151E30;border-color:#334155;color:#60A5FA}
+
+/* --- Smaller screens --- */
+
+@media (max-width:1100px){
+  .progress-summary{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+@media (max-width:760px){
+  .progress-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .prog-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .gw-chart{max-height:none}
+  .metric-select{min-width:0;flex:1}
+}
+
+@media (max-width:440px){
+  .progress-summary{grid-template-columns:1fr}
+  .progress-stat .value{font-size:17px}
+}
