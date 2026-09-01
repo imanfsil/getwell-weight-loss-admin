@@ -1444,10 +1444,11 @@ function renderBodyCompositionProgress(metricName){
 
 
 /*
-  The visit-by-visit table under the charts. It exists to make
-  it obvious that the lines above are drawn from real visits:
-  every plotted point has a row here. A metric that was never
-  recorded shows an em dash, never a zero.
+  The visit-by-visit table, shown in the Visits tab. It exists
+  to make it obvious that the lines on the Body Composition
+  charts are drawn from real visits: every plotted point has a
+  row here. A metric that was never recorded shows an em dash,
+  never a zero.
 */
 function renderVisitProgressTable(){
   const host = document.getElementById("visitProgressRows");
@@ -2310,14 +2311,25 @@ function refresh(){
     </div>`;
   }).join("")||`<div class="notif-empty">No visits.</div>`;
 
-  visitRows.innerHTML=sortedVisits.map(row=>{
-    const v=row.visit;
-    return `
-    <tr><td>${escapeHtml(getwellShortVisitDate(row.dateKey,true))}</td><td>${escapeHtml(row.label)}</td><td>${escapeHtml(v.type||"—")}</td>
-    <td>${escapeHtml(v.injection||v.charges?.find(c=>c.category==="Injection")?.itemName||"—")}</td>
-    <td>${escapeHtml(v.weight||"—")}</td><td>${money(visitTotal(v))}</td><td>${escapeHtml(v.status||"Completed")}</td>
-    <td><button class="secondary" style="padding:7px 9px" onclick="openEditVisit('${escapeHtml(v.id)}')">Edit</button></td></tr>`;
-  }).join("")||`<tr><td colspan="8" class="notif-empty">No visits.</td></tr>`;
+  /*
+    The Visits tab now shows the Visit-by-Visit History table
+    (rendered by renderVisitProgressTable) instead of the older
+    "Visit History" table this block filled, so <tbody id="visitRows">
+    is no longer in the page. The renderer is kept, guarded on the
+    element existing, so nothing is lost if that table is ever put
+    back on a page.
+  */
+  const visitRowsHost=document.getElementById("visitRows");
+  if(visitRowsHost){
+    visitRowsHost.innerHTML=sortedVisits.map(row=>{
+      const v=row.visit;
+      return `
+      <tr><td>${escapeHtml(getwellShortVisitDate(row.dateKey,true))}</td><td>${escapeHtml(row.label)}</td><td>${escapeHtml(v.type||"—")}</td>
+      <td>${escapeHtml(v.injection||v.charges?.find(c=>c.category==="Injection")?.itemName||"—")}</td>
+      <td>${escapeHtml(v.weight||"—")}</td><td>${money(visitTotal(v))}</td><td>${escapeHtml(v.status||"Completed")}</td>
+      <td><button class="secondary" style="padding:7px 9px" onclick="openEditVisit('${escapeHtml(v.id)}')">Edit</button></td></tr>`;
+    }).join("")||`<tr><td colspan="8" class="notif-empty">No visits.</td></tr>`;
+  }
 
   const claimBalance=f.balance;
   claimSummary.innerHTML=`<div class="finance-card"><div class="label">GRAND TOTAL</div><div class="value">${money(f.grand)}</div></div>
@@ -2367,59 +2379,6 @@ document.getElementById("root").innerHTML=shell("Patient Profile","patients",`
 
   <div class="card"><div class="card-head"><div><h2>Program Financial Summary</h2><p>Automatically calculated from visits and claims.</p></div></div><div class="card-body"><div class="finance-grid" id="finance"></div><div class="breakdown" id="breakdown"></div></div></div>
 
-  <!-- ===============================================================
-       WEIGHT PROGRESS / BODY COMPOSITION PROGRESS
-
-       Always visible, directly under the patient's information, so
-       opening a patient shows that patient's own progress straight
-       away. Both charts are built from this patient's visits only.
-  ================================================================ -->
-
-  <div class="section-band">
-    <h2>Body Composition</h2>
-    <p>Weight progress, Arboleaf measurements, visit comparison and the progress report — all built from this patient's own visits.</p>
-  </div>
-
-  <section class="card progress-card" id="progress-weight" style="margin-top:14px">
-    <div class="card-head">
-      <div><h2>Weight Progress</h2><p>Weight recorded at each visit</p></div>
-    </div>
-    <div class="card-body" id="weightProgress"></div>
-  </section>
-
-  <section class="card progress-card" id="progress-composition" style="margin-top:14px">
-    <div class="card-head">
-      <div><h2>Body Composition Progress</h2><p>Arboleaf measurements recorded at each visit</p></div>
-    </div>
-    <div class="card-body" id="bodyCompositionProgress"></div>
-  </section>
-
-  <section class="card progress-card" id="progress-compare" style="margin-top:14px">
-    <div class="card-head">
-      <div>
-        <h2>Compare 2 Visits</h2>
-        <p>Pick any two visits — they do not have to be next to each other, and the order does not matter.</p>
-      </div>
-    </div>
-    <div class="card-body" id="visitCompare"></div>
-  </section>
-
-  <section class="card progress-card" id="progress-visits" style="margin-top:14px">
-    <div class="card-head">
-      <div><h2>Visit-by-Visit History</h2><p>Oldest first. Every point on the charts above comes from one of these visits.</p></div>
-      <button class="secondary" onclick="openAddVisit()">＋ Add Visit</button>
-    </div>
-    <div class="table-wrap">
-      <table class="table compact">
-        <thead><tr>
-          <th>Visit</th><th>Date</th><th>Weight (kg)</th><th>BMI</th>
-          <th>Body Fat (%)</th><th>Skeletal Muscle (kg)</th><th>Arboleaf</th><th></th>
-        </tr></thead>
-        <tbody id="visitProgressRows"></tbody>
-      </table>
-    </div>
-  </section>
-
   <div class="patient-tabs">
     <button class="active" onclick="showSection('overview',this)">Overview</button>
     <button onclick="showSection('visits',this)">Visits</button>
@@ -2431,9 +2390,69 @@ document.getElementById("root").innerHTML=shell("Patient Profile","patients",`
 
   <section id="sec-overview" class="card"><div class="card-head"><div><h2>Recent Visits</h2><p>Edit any past visit using the same form as Add Visit.</p></div><button class="primary" onclick="openAddVisit()">＋ Add Visit</button></div><div id="overviewVisits"></div></section>
 
-  <section id="sec-visits" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Visit History</h2><p>Full visit editing is available.</p></div><button class="primary" onclick="openAddVisit()">＋ Add Visit</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Visit</th><th>Type</th><th>Injection</th><th>Weight</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody id="visitRows"></tbody></table></div></section>
+  <!-- ===============================================================
+       VISITS TAB
 
-  <section id="sec-composition" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Body Composition</h2><p>Arboleaf metrics parsed from uploaded visit PDFs.</p></div></div><div id="composition" class="card-body"></div></section>
+       Holds the Visit-by-Visit History that used to sit on the
+       main profile page. Same component, same data, same Edit
+       and Add Visit buttons -- only its location changed. It
+       replaces the old "Visit History" table that duplicated it,
+       so this tab now has a single visit table.
+  ================================================================ -->
+  <section id="sec-visits" style="display:none">
+    <section class="card progress-card" id="progress-visits" style="margin-top:14px">
+      <div class="card-head">
+        <div><h2>Visit-by-Visit History</h2><p>Oldest first. Every point on the Body Composition charts comes from one of these visits.</p></div>
+        <button class="secondary" onclick="openAddVisit()">＋ Add Visit</button>
+      </div>
+      <div class="table-wrap">
+        <table class="table compact">
+          <thead><tr>
+            <th>Visit</th><th>Date</th><th>Weight (kg)</th><th>BMI</th>
+            <th>Body Fat (%)</th><th>Skeletal Muscle (kg)</th><th>Arboleaf</th><th></th>
+          </tr></thead>
+          <tbody id="visitProgressRows"></tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+  <!-- ===============================================================
+       BODY COMPOSITION TAB
+
+       Weight Progress, Body Composition Progress and Compare 2
+       Visits were moved here from the main profile page. The
+       components, their charts, their calculations and the
+       progress report are unchanged -- only their location.
+  ================================================================ -->
+  <section id="sec-composition" style="display:none">
+    <div class="section-band" style="margin-top:14px">
+      <h2>Body Composition</h2>
+      <p>Weight progress, Arboleaf measurements, visit comparison and the progress report — all built from this patient's own visits.</p>
+    </div>
+    <section class="card progress-card" id="progress-weight" style="margin-top:14px">
+      <div class="card-head">
+        <div><h2>Weight Progress</h2><p>Weight recorded at each visit</p></div>
+      </div>
+      <div class="card-body" id="weightProgress"></div>
+    </section>
+    <section class="card progress-card" id="progress-composition" style="margin-top:14px">
+      <div class="card-head">
+        <div><h2>Body Composition Progress</h2><p>Arboleaf measurements recorded at each visit</p></div>
+      </div>
+      <div class="card-body" id="bodyCompositionProgress"></div>
+    </section>
+    <section class="card progress-card" id="progress-compare" style="margin-top:14px">
+      <div class="card-head">
+        <div>
+          <h2>Compare 2 Visits</h2>
+          <p>Pick any two visits — they do not have to be next to each other, and the order does not matter.</p>
+        </div>
+      </div>
+      <div class="card-body" id="visitCompare"></div>
+    </section>
+    <section class="card" style="margin-top:14px"><div class="card-head"><div><h2>Arboleaf Measurements</h2><p>Arboleaf metrics parsed from uploaded visit PDFs.</p></div></div><div id="composition" class="card-body"></div></section>
+  </section>
 
   <section id="sec-appointments" class="card" style="display:none;margin-top:14px"><div class="card-head"><div><h2>Appointments</h2><p>Appointment history for this patient.</p></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Time</th><th>Type</th><th>Doctor</th><th>Status</th><th>Notes</th></tr></thead><tbody id="patientAppointmentRows"></tbody></table></div></section>
 
