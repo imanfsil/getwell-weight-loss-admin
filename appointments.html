@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Appointments | Getwell</title>
-<link rel="stylesheet" href="styles.css?v=20260831-bodycomp">
-<script src="app.js?v=20260831-bodycomp"></script>
+<link rel="stylesheet" href="styles.css?v=20260903-nextexpected">
+<script src="app.js?v=20260903-nextexpected"></script>
 <style>
 #appointmentModal.modal-wrap{display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:rgba(17,24,39,.48);pointer-events:none;}
 #appointmentModal.modal-wrap.show{display:flex!important;pointer-events:auto!important;}
@@ -109,9 +109,58 @@
   </div>
 </div>
 
+<!-- =======================================================
+     NEXT EXPECTED VISIT MODAL
+
+     Edits the FOLLOW-UP EXPECTATION only. It never creates,
+     edits or deletes an appointment, so "Upcoming Appointment"
+     in the table beside it is completely unaffected.
+======================================================== -->
+<div class="modal-wrap" id="nextExpectedModal">
+  <div class="modal" style="width:min(460px,96vw)">
+    <div class="modal-head">
+      <div>
+        <h2>Edit Next Expected Visit</h2>
+        <p id="nextExpectedModalSub">Set the follow-up date for this patient.</p>
+      </div>
+      <button class="modal-close" type="button" aria-label="Close" onclick="closeNextExpectedModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Patient</label>
+          <input id="nextExpectedPatientName" readonly>
+        </div>
+        <div class="form-group">
+          <label>Last Visit</label>
+          <input id="nextExpectedLastVisit" readonly>
+        </div>
+        <div class="form-group">
+          <label>System Calculated</label>
+          <input id="nextExpectedAuto" readonly>
+        </div>
+        <div class="form-group full">
+          <label>Next Expected Date</label>
+          <input id="nextExpectedInput" type="date">
+        </div>
+      </div>
+      <div class="row-sub" style="margin-top:12px">
+        Saving marks this date as <strong>Confirmed</strong>. A confirmed date stays
+        Confirmed if it is rescheduled again later. This does not create or change
+        an appointment.
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="secondary" type="button" onclick="closeNextExpectedModal()">Cancel</button>
+      <button class="primary" type="button" id="saveNextExpectedButton">Save Date</button>
+    </div>
+  </div>
+</div>
+
 <script>
 let editingAppointmentId = null;
 let activeFollowUpRecordId = null;
+let activeNextExpectedPatientId = null;
 
 function getFollowUpDefaultMessage(){
   return getwellFollowUpSettings().messageTemplate;
@@ -153,7 +202,9 @@ function openFollowUpModal(patientId){
   document.getElementById("followUpPatientPhone").value = record.phone || "No phone number";
   document.getElementById("followUpStatus").value = record.status || "";
   document.getElementById("followUpLastVisit").value = record.lastVisit || "—";
-  document.getElementById("followUpNextExpected").value = record.nextExpectedVisit || "—";
+  document.getElementById("followUpNextExpected").value = record.nextExpectedVisit
+    ? record.nextExpectedVisit + " \u00B7 " + (record.nextExpectedStatusLabel || "Expected")
+    : "\u2014";
   document.getElementById("followUpDaysSince").value = record.daysSinceLastVisit === null ? "—" : String(record.daysSinceLastVisit);
   const message = document.getElementById("followUpMessage");
   if(message) message.value = getFollowUpDefaultMessage();
@@ -203,6 +254,89 @@ async function copyFollowUpMessage(){
   }
 }
 
+/* =========================================================
+   NEXT EXPECTED VISIT  (editable, then Confirmed)
+
+   The date shown in the table is the automatic
+   last visit + interval calculation until a staff member
+   confirms a date of their own. From then on the confirmed
+   date is shown and the row is labelled Confirmed, and it
+   stays Confirmed however many times it is rescheduled.
+
+   The write goes through getwellSaveNextExpectedDate() ->
+   upsertPatient() -> saveStore(), which is the existing
+   verified-write path: the table is only updated after
+   Google Sheets has confirmed the row.
+========================================================= */
+
+function openNextExpectedModal(patientId){
+  const record = getwellFollowUpRecords().find(item => String(item.id) === String(patientId));
+  if(!record) return;
+
+  activeNextExpectedPatientId = record.id;
+
+  document.getElementById("nextExpectedPatientName").value =
+    [record.name || "", record.id || ""].filter(Boolean).join(" \u00B7 ");
+  document.getElementById("nextExpectedLastVisit").value = record.lastVisit || "\u2014";
+  document.getElementById("nextExpectedAuto").value = record.nextExpectedAutomatic || "\u2014";
+
+  const input = document.getElementById("nextExpectedInput");
+  if(input) input.value = getwellDateKey(record.nextExpectedVisit) || "";
+
+  const sub = document.getElementById("nextExpectedModalSub");
+  if(sub){
+    sub.textContent = record.nextExpectedConfirmed
+      ? "This date is already confirmed. Rescheduling it keeps it Confirmed."
+      : "Choose the date the patient confirmed. Saving marks it Confirmed.";
+  }
+
+  document.getElementById("nextExpectedModal").classList.add("show");
+  setTimeout(() => input?.focus(), 50);
+}
+
+function closeNextExpectedModal(){
+  document.getElementById("nextExpectedModal")?.classList.remove("show");
+  activeNextExpectedPatientId = null;
+}
+
+/* Async so the Google Sheets write completes before the table
+   re-renders, matching Save Appointment. */
+async function saveNextExpectedDate(){
+  const patientId = activeNextExpectedPatientId;
+  if(!patientId) return;
+
+  const value = document.getElementById("nextExpectedInput")?.value || "";
+  if(!value){
+    getwellNotify("Please choose a date.", "error");
+    return;
+  }
+
+  const patient = getPatient(patientId);
+  const button  = document.getElementById("saveNextExpectedButton");
+  if(button){ button.disabled = true; button.textContent = "Saving\u2026"; }
+
+  const saveResult = await getwellSaveNextExpectedDate(patientId, value);
+
+  if(button){ button.disabled = false; button.textContent = "Save Date"; }
+
+  getwellLogActivity(
+    "Edit",
+    "Next Expected",
+    `${patientId} \u00B7 ${patient?.name || ""}`.trim(),
+    `${value} \u00B7 Confirmed`
+  );
+
+  const refresh = () => renderAppointments(document.getElementById("appointmentSearch")?.value || "");
+
+  if(!getwellAnnounceSave(saveResult, `Next expected visit confirmed for ${value} in Google Sheets.`)){
+    refresh();
+    return;
+  }
+
+  closeNextExpectedModal();
+  refresh();
+}
+
 function renderFollowUpManagement(){
   const records = getwellFollowUpRecords();
   const dueDays = getwellFollowUpSettings().dueAfterDays;
@@ -247,7 +381,18 @@ function renderFollowUpManagement(){
         </td>
         <td><span class="follow-up-phone">${escapeHtml(record.phone||"—")}</span></td>
         <td>${escapeHtml(record.lastVisit||"—")}</td>
-        <td>${escapeHtml(record.nextExpectedVisit||"—")}</td>
+        <td>
+          <div class="next-expected">
+            <div class="next-expected-line">
+              <span class="next-expected-date">${escapeHtml(record.nextExpectedVisit||"—")}</span>
+              <button class="next-expected-edit" type="button"
+                title="Edit next expected date"
+                aria-label="Edit next expected date"
+                onclick="openNextExpectedModal('${escapeHtml(record.id)}')">&#9998;</button>
+            </div>
+            <span class="next-expected-flag ${record.nextExpectedConfirmed?"confirmed":"expected"}">${record.nextExpectedConfirmed?"Confirmed":"Expected"}</span>
+          </div>
+        </td>
         <td>${nextAppt ? `${escapeHtml(nextAppt.date||"")} ${escapeHtml(nextAppt.time||"")}`.trim() : "None scheduled"}</td>
         <td><span class="follow-up-days ${record.level==='overdue'||record.level==='danger'?'overdue':record.level==='due'?'due':''}">${escapeHtml(timing)}</span></td>
         <td><span class="badge ${record.programmeStatus==="Active"?"green":"gray"}">${escapeHtml(record.programmeStatus||"")}</span></td>
@@ -563,6 +708,9 @@ window.closeFollowUpModal = closeFollowUpModal;
 window.resetFollowUpMessage = resetFollowUpMessage;
 window.copyFollowUpNumber = copyFollowUpNumber;
 window.copyFollowUpMessage = copyFollowUpMessage;
+window.openNextExpectedModal = openNextExpectedModal;
+window.closeNextExpectedModal = closeNextExpectedModal;
+window.saveNextExpectedDate = saveNextExpectedDate;
 
 const addAppointmentButton = document.getElementById("addAppointmentButton");
 const closeAppointmentTop = document.getElementById("closeAppointmentTop");
@@ -579,6 +727,9 @@ const copyFollowUpNumberButton=document.getElementById("copyFollowUpNumberButton
 const copyFollowUpMessageButton=document.getElementById("copyFollowUpMessageButton");
 if(copyFollowUpNumberButton) copyFollowUpNumberButton.addEventListener("click",copyFollowUpNumber);
 if(copyFollowUpMessageButton) copyFollowUpMessageButton.addEventListener("click",copyFollowUpMessage);
+
+const saveNextExpectedButton=document.getElementById("saveNextExpectedButton");
+if(saveNextExpectedButton) saveNextExpectedButton.addEventListener("click",saveNextExpectedDate);
 
 renderAppointmentFormOptions();
 renderAppointments();

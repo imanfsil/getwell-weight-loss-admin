@@ -3706,3 +3706,34 @@ html[data-theme="dark"] .section-band h2{color:#F8FAFC}
   .compare-report{width:100%}
   .arb-grid{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
 }
+
+/* =========================================================
+   NEXT EXPECTED — EDITABLE DATE + CONFIRMED / EXPECTED FLAG
+   ---------------------------------------------------------
+   New classes only. Nothing above this block is modified, so
+   every existing page, table, colour and spacing is untouched.
+========================================================= */
+.next-expected{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.next-expected-line{display:inline-flex;align-items:center;gap:6px}
+.next-expected-date{font-size:11px;font-weight:600}
+.next-expected-edit{
+  border:1px solid var(--border);
+  background:var(--card);
+  width:22px;height:22px;padding:0;line-height:1;
+  border-radius:6px;font-size:11px;cursor:pointer;color:var(--muted);
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:background .15s ease,border-color .15s ease,color .15s ease;
+}
+.next-expected-edit:hover{background:#EAF2FF;border-color:#C7DFFF;color:#1D4ED8}
+.next-expected-flag{
+  display:inline-flex;align-items:center;
+  padding:3px 7px;border-radius:999px;
+  font-size:9.5px;font-weight:600;
+  border:1px solid transparent;white-space:nowrap;
+}
+.next-expected-flag.expected{color:#475569;background:#F1F5F9;border-color:#E2E8F0}
+.next-expected-flag.confirmed{color:#15803D;background:#ECFDF5;border-color:#A7F3D0}
+html[data-theme="dark"] .next-expected-edit{background:#151E30;border-color:#3B4A61;color:#CBD5E1}
+html[data-theme="dark"] .next-expected-edit:hover{background:#15365C;border-color:#2F65A0;color:#93C5FD}
+html[data-theme="dark"] .next-expected-flag.expected{color:#D1D9E4;background:#26344A;border-color:#3B4A61}
+html[data-theme="dark"] .next-expected-flag.confirmed{color:#86EFAC;background:#102A1A;border-color:#1F5133}

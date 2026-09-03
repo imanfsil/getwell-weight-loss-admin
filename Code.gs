@@ -67,7 +67,7 @@
   makes "the deployment is behind the code" a visible error
   rather than a silent one.
 */
-var GETWELL_BACKEND_VERSION = "2026-08-31.verified-writes.3";
+var GETWELL_BACKEND_VERSION = "2026-09-03.next-expected.1";
 
 var GETWELL_DRIVE_FOLDER = "Getwell Patient Files";
 
@@ -107,7 +107,35 @@ var HEADERS = {
       in Google Drive, exactly like visit photos, because a
       Sheets cell holds at most 50,000 characters.
     */
-    "ProfilePhotoDriveID","ProfilePhotoUrl"
+    "ProfilePhotoDriveID","ProfilePhotoUrl",
+
+    /*
+      NEXT EXPECTED VISIT OVERRIDE — added 2026-09.
+
+      Appended AFTER ProfilePhotoUrl for the same reason the
+      photo columns were appended after UpdatedAt: every column
+      already in the sheet keeps its exact position, and not one
+      existing row has to be rewritten.
+
+      getSheetContext() adds these two headers to the right of
+      whatever the sheet already has the first time it runs, so
+      an existing spreadsheet gains them without setupGetwell()
+      being re-run and without any data being moved.
+
+      Rows written before this change read back with both values
+      empty. The web app treats that as "no staff override yet"
+      and keeps using its automatic last-visit + interval
+      calculation, exactly as before. NOTHING is reset and no
+      existing patient is marked Confirmed.
+
+        NextExpectedDate    "YYYY-MM-DD", the date staff chose
+        NextExpectedStatus  "" or "confirmed"
+
+      These describe the FOLLOW-UP EXPECTATION only. The booked
+      appointment lives in the Appointments sheet and is not
+      touched by either column.
+    */
+    "NextExpectedDate","NextExpectedStatus"
   ],
   Appointments: [
     "AppointmentID","PatientID","Date","Time","Doctor","Type","Status",
@@ -159,7 +187,7 @@ var HEADERS = {
   earlier version of this script.
 */
 var DATE_COLUMNS = {
-  Patients:     ["DOB","StartDate"],
+  Patients:     ["DOB","StartDate","NextExpectedDate"],
   Appointments: ["Date"],
   Visits:       ["Date"],
   Claims:       ["ClaimDate"]
@@ -883,6 +911,12 @@ function buildStore(){
       doctor:              toText(row.Doctor),
       photoDriveId:        toText(row.ProfilePhotoDriveID),
       photoUrl:            toText(row.ProfilePhotoUrl),
+
+      /* Empty on every row saved before the columns existed,
+         which the web app reads as "use the automatic date". */
+      nextExpectedDate:    toDateKey(row.NextExpectedDate),
+      nextExpectedStatus:  toText(row.NextExpectedStatus),
+
       visits:              visitsByPatient[patientId] || [],
       appointments:        appointmentsByPatient[patientId] || [],
       claims:              claimsByPatient[patientId] || [],
@@ -977,7 +1011,14 @@ function saveStoreToSheets(data){
       /* Pointers only. patient.photoLocal is a device-only
          fallback and is never written to the sheet. */
       ProfilePhotoDriveID: toText(patient.photoDriveId),
-      ProfilePhotoUrl:     toText(patient.photoUrl)
+      ProfilePhotoUrl:     toText(patient.photoUrl),
+
+      /* Staff override on the follow-up date. An unset override
+         writes two empty cells, which is exactly what the row
+         already holds, so upsertRows() counts the row as
+         unchanged and does not rewrite it. */
+      NextExpectedDate:    toDateKey(patient.nextExpectedDate),
+      NextExpectedStatus:  toText(patient.nextExpectedStatus)
     });
 
     (patient.appointments || []).forEach(function(appointment){

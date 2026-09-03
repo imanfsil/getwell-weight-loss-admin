@@ -188,6 +188,9 @@ function getwellNormalizeStoreDates(data){
 
     fix(patient, "dob");
     fix(patient, "startDate");
+    /* Optional. Absent on every record saved before this build,
+       and fix() leaves an absent field alone. */
+    fix(patient, "nextExpectedDate");
 
     (patient.visits || []).forEach(visit => {
       if(!visit) return;
@@ -1049,6 +1052,148 @@ function getwellFollowUpSettings(){
   };
 }
 
+/* =========================================================
+   NEXT EXPECTED VISIT  (automatic date + staff override)
+   ---------------------------------------------------------
+   TWO SEPARATE CONCEPTS, DELIBERATELY KEPT APART
+
+     1. NEXT EXPECTED   - the follow-up date. Normally
+        calculated as  last visit + the configured interval
+        (5 days / 7 days). Staff may override it when the
+        patient names a different day.
+
+     2. UPCOMING APPOINTMENT - the real booked appointment
+        row in patient.appointments. NOTHING in this section
+        reads or writes it. Editing Next Expected can never
+        touch an appointment, and booking an appointment can
+        never touch Next Expected.
+
+   PERSISTENCE
+   ---------------------------------------------------------
+   The override lives on the patient record in two new
+   fields, so it goes to Google Sheets through the same
+   verified-write path as every other patient field and comes
+   back on the next read:
+
+     patient.nextExpectedDate    "YYYY-MM-DD"
+     patient.nextExpectedStatus  "" | "confirmed"
+
+   Both are OPTIONAL. A patient row saved before this build
+   reads back with both empty, which means "no override" and
+   the automatic calculation is used exactly as before. No
+   existing record is rewritten, reset or marked Confirmed.
+
+   ONCE CONFIRMED, ALWAYS CONFIRMED
+   ---------------------------------------------------------
+   nextExpectedStatus is only ever set, never cleared, and the
+   automatic calculation never writes over a confirmed date.
+   Recording a new visit therefore cannot silently drag a
+   staff-confirmed date back to an expected one.
+========================================================= */
+
+const GETWELL_NEXT_EXPECTED_CONFIRMED = "confirmed";
+
+
+/* The staff override on a patient, or an empty one. */
+function getwellPatientNextExpectedOverride(patient){
+  const date = getwellDateKey(patient && patient.nextExpectedDate);
+  const status = String((patient && patient.nextExpectedStatus) || "")
+    .trim()
+    .toLowerCase();
+
+  return {
+    date,
+    confirmed: !!date && status === GETWELL_NEXT_EXPECTED_CONFIRMED
+  };
+}
+
+
+/*
+  The Next Expected date for a patient, together with the
+  automatic value it was calculated from and whether staff
+  have confirmed it. lastVisitDate and intervalDays are
+  optional; they are passed in by getwellFollowUpRecords()
+  which has already worked them out.
+*/
+function getwellPatientNextExpected(patient, lastVisitDate, intervalDays){
+  const config = getwellFollowUpSettings();
+
+  const last = lastVisitDate === undefined
+    ? (latestVisit(patient || {}) || {}).dateKey || ""
+    : lastVisitDate;
+
+  const days = Number(intervalDays) > 0 ? Number(intervalDays) : config.defaultDays;
+
+  /* UNCHANGED automatic calculation. */
+  const automatic = getwellSuggestedFollowUpDate(last, days);
+
+  const override = getwellPatientNextExpectedOverride(patient);
+
+  return {
+    automatic,
+    date: override.confirmed ? override.date : automatic,
+    confirmed: override.confirmed,
+    status: override.confirmed ? "Confirmed" : "Expected"
+  };
+}
+
+
+/*
+  Records a staff-chosen Next Expected date and marks it
+  Confirmed, then saves the patient through the existing
+  verified-write path. Resolves with the saveStore() result,
+  so the caller can refuse to update the table unless Google
+  Sheets confirmed the write.
+
+  Nothing else on the patient is touched - appointments,
+  visits, charges and claims are all left exactly as they
+  were.
+*/
+function getwellSaveNextExpectedDate(patientId, dateValue){
+  const dateKey = getwellDateKey(dateValue);
+
+  if(!dateKey){
+    return Promise.resolve({ok:false, error:"Please choose a valid date."});
+  }
+
+  const data = store();
+  const patient = (data.patients || []).find(
+    item => item && String(item.id) === String(patientId)
+  );
+
+  if(!patient){
+    return Promise.resolve({ok:false, error:"Patient not found."});
+  }
+
+  patient.nextExpectedDate = dateKey;
+  /* Set, never cleared: a confirmed date stays confirmed even
+     when it is rescheduled again later. */
+  patient.nextExpectedStatus = GETWELL_NEXT_EXPECTED_CONFIRMED;
+
+  return upsertPatient(patient).then(result => {
+    /*
+      A deployment older than the two Next Expected columns
+      answers ok:true and verifies the PatientID, because the
+      row really was written -- it simply drops the two fields
+      it does not know about. Saying nothing here would be the
+      exact "it said saved but the sheet does not have it"
+      failure this build exists to prevent.
+    */
+    if(result && result.ok !== false && !getwellBackendSupportsNextExpected()){
+      getwellNotify(
+        "The confirmed date is on this device but the Google Apps Script " +
+        "deployment is older than these columns. Re-paste Code.gs, run " +
+        "setupGetwell(), then Deploy \u2192 Manage deployments \u2192 edit \u2192 " +
+        "Version: New version, and save the date again.",
+        "error"
+      );
+      return {ok:false, error:"The Apps Script deployment cannot store the Next Expected columns yet."};
+    }
+    return result;
+  });
+}
+
+
 function getwellFollowUpRecords(){
   const config = getwellFollowUpSettings();
   const today = getwellTodayKey();
@@ -1065,7 +1210,14 @@ function getwellFollowUpRecords(){
         return null;
       }
 
-      const nextExpectedVisit = getwellSuggestedFollowUpDate(lastVisitDate, config.defaultDays);
+      /* Automatic calculation, unchanged, plus the staff
+         override when one has been confirmed. */
+      const nextExpected = getwellPatientNextExpected(
+        patient,
+        lastVisitDate,
+        config.defaultDays
+      );
+      const nextExpectedVisit = nextExpected.date;
 
       const upcomingAppointment = (patient.appointments || [])
         .filter(a =>
@@ -1102,6 +1254,9 @@ function getwellFollowUpRecords(){
         patient,
         lastVisit: lastVisitDate,
         nextExpectedVisit,
+        nextExpectedAutomatic: nextExpected.automatic,
+        nextExpectedConfirmed: nextExpected.confirmed,
+        nextExpectedStatusLabel: nextExpected.status,
         daysSinceLastVisit,
         daysOverdue: Math.max(0, daysSinceLastVisit - config.overdueAfterDays),
         upcomingAppointment,
@@ -1228,7 +1383,7 @@ const GETWELL_UNCONFIRMED_KEY = "GETWELL_UNCONFIRMED_V1";
 /* The Code.gs contract this build expects. A deployment that does
    not report a version at all is older than the verified-write
    backend and cannot prove that a visit reached the sheet. */
-const GETWELL_REQUIRED_BACKEND = "2026-08-31.verified-writes.3";
+const GETWELL_REQUIRED_BACKEND = "2026-09-03.next-expected.1";
 
 const GETWELL_RECORD_KEYS =
   ["patients","appointments","visits","charges","claims","files"];
@@ -1656,6 +1811,7 @@ function getwellRemoteSave(data){
 
       getwellRecordSyncStatus(true);
       getwellMarkConfirmed(expected);
+      if(payload.version) getwellNoteBackendVersion(payload.version);
 
       return {
         ok:true,
@@ -1956,9 +2112,13 @@ function getwellCanonicalPatient(patient){
     ...getwellSyncPick(
       patient,
       ["id","name","initials","status","panelProvider","otherPanelName","panelStatus",
-       "panelSuspensionNote","phone","gender","height","doctor","photoDriveId","photoUrl"],
+       "panelSuspensionNote","phone","gender","height","doctor","photoDriveId","photoUrl",
+       /* Staff override on the follow-up date. Included so that a
+          confirmation made on another computer is recognised as a
+          real change instead of being ignored by the merge. */
+       "nextExpectedStatus"],
       ["startingWeight","currentWeight","goalWeight"],
-      ["dob","startDate"]
+      ["dob","startDate","nextExpectedDate"]
     ),
 
     visits: getwellSyncSorted(patient.visits, visit => ({
@@ -2480,7 +2640,28 @@ function getwellStartRemoteSync(){
 
 let getwellBackendWarned = false;
 
+/* The version string the live Apps Script deployment last
+   reported. "" means nothing has answered yet. */
+let getwellBackendVersionSeen = "";
+
+
+/*
+  Does the deployment currently answering know about the two
+  Next Expected columns?
+
+  "" (nothing has answered yet) is treated as supported, so a
+  page that has not synced yet never raises a false alarm.
+*/
+function getwellBackendSupportsNextExpected(){
+  if(!getwellBackendVersionSeen) return true;
+  if(getwellBackendVersionSeen === GETWELL_REQUIRED_BACKEND) return true;
+  return getwellBackendVersionSeen.indexOf("next-expected") >= 0;
+}
+
+
 function getwellNoteBackendVersion(version){
+  if(version) getwellBackendVersionSeen = String(version);
+
   if(getwellBackendWarned) return;
 
   if(!version){
@@ -2497,7 +2678,9 @@ function getwellNoteBackendVersion(version){
     getwellBackendWarned = true;
     console.warn(
       "[Getwell] Backend version " + version +
-      " differs from the expected " + GETWELL_REQUIRED_BACKEND + "."
+      " differs from the expected " + GETWELL_REQUIRED_BACKEND + ". " +
+      "Existing data is unaffected, but a confirmed Next Expected date " +
+      "cannot be stored until Code.gs is re-pasted and re-deployed as a New version."
     );
   }
 }

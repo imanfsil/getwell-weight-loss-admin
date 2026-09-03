@@ -394,3 +394,75 @@ The patient financial summary now includes **Total Miscellaneous**, calculated f
 
 
 Financial summary update: Total Miscellaneous is calculated from visit charges in the Additional category and is displayed as a fifth breakdown card. The breakdown uses a responsive 5-column layout on desktop and wraps on smaller screens.
+
+## 2026-09-03 — Editable "Next Expected" with a Confirmed status
+
+### What changed
+
+The **Next Expected** column on the Appointments page was read-only
+and always showed `last visit + follow-up interval`. Staff had no way
+to record a date a patient had actually agreed to.
+
+That automatic calculation is unchanged. What is new is that a staff
+member can override it, and the override is marked **Confirmed**.
+
+| | Before | After |
+|---|---|---|
+| Date | `2026-10-28` | `2026-10-30` |
+| Label | Expected | Confirmed |
+
+### How it works
+
+Two **optional** fields were added to the patient record:
+
+| Field | Sheet column | Values |
+|---|---|---|
+| `patient.nextExpectedDate` | `NextExpectedDate` | `"YYYY-MM-DD"` or empty |
+| `patient.nextExpectedStatus` | `NextExpectedStatus` | `"confirmed"` or empty |
+
+`getwellPatientNextExpected()` in `app.js` is the single place that
+decides which date is shown:
+
+* no override → the automatic date, labelled **Expected**
+* `nextExpectedStatus === "confirmed"` → `nextExpectedDate`, labelled **Confirmed**
+
+`nextExpectedStatus` is only ever **set**, never cleared, so a date
+that has been confirmed stays Confirmed however many times it is
+later rescheduled. The automatic calculation never writes over a
+confirmed date, so recording a new visit cannot silently drag a
+staff-confirmed date back to an expected one.
+
+### Backward compatibility
+
+The two sheet columns are appended to the right of `ProfilePhotoUrl`.
+`getSheetContext()` in `Code.gs` already adds any canonical column the
+sheet does not have yet, to the right of everything already present, so
+an existing spreadsheet gains them without a single existing column
+moving and without any row being rewritten. A patient row saved before
+this change reads back with both cells empty, which means "no override"
+— it keeps its automatic date and is **not** marked Confirmed.
+
+### Not to be confused with Upcoming Appointment
+
+They are separate and stay separate:
+
+* **Next Expected** — the follow-up expectation, on the patient record.
+* **Upcoming Appointment** — a real booked row in `patient.appointments`.
+
+`getwellSaveNextExpectedDate()` touches neither `patient.appointments`
+nor `patient.visits`, and nothing in the appointment flow writes the
+two Next Expected fields.
+
+### Persistence
+
+Editing the date goes through the existing verified-write path —
+`getwellSaveNextExpectedDate()` → `upsertPatient()` → `saveStore()` →
+`getwellRemoteSave()` — so the table is only updated after Google Sheets
+has read the row back and confirmed it. `localStorage` remains a cache
+and an outbox, never the record of truth.
+
+If the deployed Apps Script is older than these columns it will answer
+`ok:true` while quietly dropping the two fields. The front end detects
+that from the backend version string and reports the save as failed
+rather than pretending it worked. **Re-paste `Code.gs`, run
+`setupGetwell()`, and re-deploy as a New version.**

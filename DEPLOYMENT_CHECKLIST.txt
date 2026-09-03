@@ -1,5 +1,5 @@
 GETWELL WEIGHT LOSS ADMIN — SAFE GOOGLE SHEETS DEPLOYMENT
-Build: 2026-08-31.verified-writes.3
+Build: 2026-09-03.next-expected.1
 
 IMPORTANT: Google Sheets is the permanent data store. This build never clears the Patients, Visits, Claims, Charges, Appointments or Files tabs during a normal save. It updates/creates records by stable ID and verifies the IDs after writing.
 
@@ -18,7 +18,7 @@ IMPORTANT: Google Sheets is the permanent data store. This build never clears th
 11. Push the whole project folder to GitHub, including the updated Code.gs and app.js.
 12. Test the deployment in a browser:
    YOUR_EXEC_URL?action=diagnose
-   The JSON must show version 2026-08-31.verified-writes.3.
+   The JSON must show version 2026-09-03.next-expected.1.
 13. Open the web app and refresh. The backend-version warning should be gone.
 14. Before real clinic use, create one test patient and one test visit. Confirm both rows appear in Google Sheets. Then edit the visit and save again; it should update the same VisitID rather than create a duplicate.
 
@@ -27,5 +27,18 @@ DO NOT:
 - Do not delete/recreate the Google Sheet to fix deployment issues.
 - Do not manually clear the Patients/Visits tabs.
 - Do not create a second deployment URL unless necessary.
+
+EDITABLE "NEXT EXPECTED" (2026-09-03)
+
+This build adds two OPTIONAL columns to the existing Patients tab:
+
+   NextExpectedDate     the follow-up date a staff member confirmed, "YYYY-MM-DD"
+   NextExpectedStatus   "" (system-calculated) or "confirmed" (staff-confirmed)
+
+They are appended to the RIGHT of ProfilePhotoUrl the first time the new Code.gs runs. No existing column moves, no existing row is rewritten and no existing patient is marked Confirmed. Rows that predate the change read back with both cells empty, which the app treats as "use the automatic last visit + interval calculation", exactly as before.
+
+Step 4 (running setupGetwell) adds the two headers, but they are also added automatically on the first read or save, so nothing is lost if it is skipped.
+
+UNTIL the new Code.gs is deployed, editing a Next Expected date will report an error saying the deployment cannot store it yet. Everything else keeps working normally, and no existing data is affected.
 
 If a save fails, the frontend keeps the local copy in its outbox and tells the user that Google Sheets has NOT confirmed the save. It does not claim success.
