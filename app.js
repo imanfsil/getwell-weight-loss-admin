@@ -4885,7 +4885,19 @@ function getwellNavItems(){
 
     {group:"MANAGEMENT", key:"panel",    icon:"🏥", label:"Panel",    href:"panel.html",    feature:"panel"},
     {group:"MANAGEMENT", key:"reports",  icon:"📊", label:"Reports",  href:"reports.html",  feature:"reports"},
-    {group:"MANAGEMENT", key:"settings", icon:"⚙️", label:"Settings", href:"settings.html", feature:null}
+    {group:"MANAGEMENT", key:"settings", icon:"⚙️", label:"Settings", href:"settings.html", feature:null},
+
+    /*
+      IMPORT — added 2026-09 for the historical Excel workbook.
+
+      A normal page like any other, appended AFTER Settings so that
+      no existing link changes position. It writes through
+      upsertPatient() -> saveStore(), the same verified Google
+      Sheets path every other screen uses, and it creates no second
+      database. Remove this one line to take the link out of the
+      sidebar; nothing else depends on it.
+    */
+    {group:"MANAGEMENT", key:"import", icon:"📥", label:"Import", href:"import.html", feature:null}
   ]
   .filter(item => !item.feature || getwellFeatureEnabled(item.feature));
 

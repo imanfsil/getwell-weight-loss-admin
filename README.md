@@ -466,3 +466,94 @@ If the deployed Apps Script is older than these columns it will answer
 that from the backend version string and reports the save as failed
 rather than pretending it worked. **Re-paste `Code.gs`, run
 `setupGetwell()`, and re-deploy as a New version.**
+
+## 2026-09-05 — Excel history import
+
+The historical workbook *GW M2 & R3 COST* is loaded through a new
+page, `import.html`, fed by a generated data file, `import-data.js`.
+Two files were touched: `app.js` gained one sidebar entry, and the
+`?v=` cache-busting stamp on every page moved to
+`20260905-excel-import` so browsers actually pick up the new
+`app.js`. Nothing else in the application changed.
+
+### Why a page and not a script
+
+Google Sheets is the database. A record only exists once
+`verifyIds()` has read its ID back off a row, and that check lives
+in the browser. So the import runs where every other write runs —
+through `upsertPatient()` → `saveStore()` → `getwellRemoteSave()`.
+There is no second storage path and no bulk back door.
+
+### What the import writes
+
+| Workbook column | Becomes |
+|---|---|
+| VISIT DATE | the visit's date, and the claim date |
+| INVOICE | the **Visit Total** |
+| CLAIMED | a **Panel Claim** on the patient |
+| INJECTION | *ignored* |
+| GRAND TOTAL / TOTAL CLAIMED / BALANCE | *ignored* — the app computes its own |
+
+The workbook does not say how an invoice splits between medication,
+consultation and injection, and `visitTotal()` is the sum of a
+visit's charges. So the whole amount goes onto **one** charge line
+named *"Imported invoice total — breakdown not yet entered"*. The
+visit therefore shows the right total immediately, and the line is
+an ordinary charge: open the visit, split it, delete the
+placeholder. Nothing is read-only and no breakdown was invented.
+
+`CLAIMED` deliberately does **not** go into the visit's Panel /
+Self-Pay fields. A claim can exist with no invoice, an invoice with
+no claim, and the two amounts routinely differ, so claims are their
+own records — 211 of the imported claims have no invoice on their
+row.
+
+### Running it twice is safe
+
+Every imported visit and claim carries a stable key in its Notes,
+e.g. `[XL41-R10-V]` — workbook patient 41, sheet row 10, Visit.
+Notes round-trip to the Sheet, so the key survives sync, a browser
+reset and a different computer. The importer reads those keys back
+out of the store before it plans anything, so a second run has
+nothing to do. Two legitimate visits on the same date are *not*
+collapsed — they have different keys.
+
+### Existing patients
+
+A workbook name that matches a patient already in the system is
+never created again and never overwritten. It is listed under
+*Possible duplicates* and nothing happens to it unless you tick its
+box, and even then only visits and claims whose key is absent are
+appended. Existing personal details, visits, claims and patient IDs
+are not read, rewritten or renumbered.
+
+### ID allocation
+
+`getwellNextVisitId()` and friends re-parse the whole store on
+every call to find the highest number in use — correct for one
+visit typed at a desk, unworkable for ~1,900 of them, and the
+patient allocator would also hand the same `GW-XXXX` to two
+patients inside one unsaved chunk. `makeAllocator()` in
+`import.html` finds the highest number once per chunk from the
+working copy and continues the same series, using the same
+prefixes, widths and Settings-driven patient format. The IDs are
+indistinguishable from ones the forms produce, and
+`getwellAdvancePatientNumber()` is called exactly as
+`patients.html` calls it.
+
+### Chunking
+
+`saveStore()` posts the whole store, so the import is applied eight
+patients at a time and each chunk is verified against Google Sheets
+before the next starts. A chunk that fails stops the run and says
+why; everything already verified stays saved, and its keys make the
+re-run skip it.
+
+### Dates
+
+Roughly half the visit dates had already been parsed by Excel, some
+of them reading a typed `DD/MM` as `MM/DD`. Each one was resolved
+against that patient's own visit chronology: 378 were corrected
+with proof, 21 were confirmed already correct, and 78 that
+chronology could not separate were flagged rather than silently
+decided. `IMPORT_REPORT.md` lists every single one.

@@ -1,0 +1,609 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Import Excel History | Getwell</title><link rel="stylesheet" href="styles.css?v=20260905-excel-import"><script src="app.js?v=20260905-excel-import"></script><script src="import-data.js?v=20260905-excel-import"></script><style>
+.imp-flags{font-size:12px;color:#b45309}
+.imp-muted{color:#6b7280}
+.imp-pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.imp-new{background:#dcfce7;color:#166534}
+.imp-dupe{background:#fef3c7;color:#92400e}
+.imp-done{background:#e0e7ff;color:#3730a3}
+.imp-log{max-height:320px;overflow:auto;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;background:#0f172a;color:#e2e8f0;padding:12px;border-radius:10px;white-space:pre-wrap}
+.imp-scroll{max-height:360px;overflow:auto}
+</style></head><body><div id="root"></div>
+<script>
+/* =========================================================
+   IMPORT — EXCEL HISTORY
+
+   A one-off, re-runnable loader for the historical workbook
+   "GW M2 & R3 COST". It does not introduce a second database
+   and it does not touch a single existing record.
+
+   How it stays safe:
+
+     * Every write goes through upsertPatient() -> saveStore()
+       -> getwellRemoteSave(), the SAME verified Google Sheets
+       path the rest of the application uses. Imported records
+       are ordinary records; nothing about them is read-only.
+
+     * Every imported visit and claim carries a stable key in
+       its Notes, e.g. [XL41-R43-V]. Notes round-trip to the
+       Sheet, so the key survives sync, another computer and a
+       browser reset. Before writing anything the importer
+       reads those keys back out of the store, so running the
+       import twice adds nothing the second time.
+
+     * A patient whose name already exists is NEVER created
+       again and NEVER overwritten. It is held back for your
+       decision, and even when you allow it, only visits and
+       claims whose key is absent are appended — existing
+       personal details, visits, claims and IDs are untouched.
+
+     * Nothing is invented. Fields the workbook does not
+       contain (IC, phone, DOB, weights, doctor) are left
+       blank for you to fill in.
+========================================================= */
+
+const IMPORT_DS = window.GETWELL_IMPORT_DATASET || {patients:[]};
+
+/* The Excel INVOICE amount has no breakdown in the workbook, and
+   visitTotal() in this application is the sum of a visit's charges.
+   So the whole amount goes on ONE clearly-labelled charge line and
+   the visit shows the correct Visit Total straight away. Split it
+   into Medication / Consultation / Injection later with the normal
+   charge editor and delete this line — nothing here is special. */
+const IMPORT_CHARGE_LABEL = "Imported invoice total — breakdown not yet entered";
+
+const nameKey = value =>
+  String(value || "").toUpperCase().replace(/[^A-Z0-9]+/g, " ").trim();
+
+const keyTag = key => "[" + key + "]";
+
+const impMoney = n =>
+  "RM " + Number(n || 0).toLocaleString("en-MY", {minimumFractionDigits:2, maximumFractionDigits:2});
+
+
+/* ---------------------------------------------------------
+   WHAT IS ALREADY THERE
+--------------------------------------------------------- */
+
+function readExistingKeys(){
+  const found = new Set();
+  const scan = text => {
+    const hits = String(text || "").match(/\[XL[A-Za-z0-9_-]+\]/g) || [];
+    hits.forEach(hit => found.add(hit.slice(1, -1)));
+  };
+  (store().patients || []).forEach(patient => {
+    (patient.visits || []).forEach(visit => {
+      scan(visit.notes);
+      (visit.charges || []).forEach(charge => scan(charge.notes));
+    });
+    (patient.claims || []).forEach(claim => scan(claim.notes));
+  });
+  return found;
+}
+
+function indexExistingPatients(){
+  const index = new Map();
+  (store().patients || []).forEach(patient => {
+    const key = nameKey(patient.name);
+    if(!key) return;
+    if(!index.has(key)) index.set(key, []);
+    index.get(key).push(patient);
+  });
+  return index;
+}
+
+
+/* ---------------------------------------------------------
+   THE PLAN  (a dry run — nothing is written here)
+--------------------------------------------------------- */
+
+let PLAN = null;
+
+/* Which possible-duplicate patients the user has agreed to append to.
+   Held outside PLAN so that re-rendering the screen (which rebuilds
+   the plan from the live store) cannot silently forget a decision. */
+const ALLOWED = new Set();
+
+function buildPlan(){
+  const done = readExistingKeys();
+  const byName = indexExistingPatients();
+
+  const plan = {
+    create: [], duplicate: [], nothingToDo: [],
+    totals: {visits:0, claims:0, alreadyImported:0}
+  };
+
+  IMPORT_DS.patients.forEach(source => {
+    const visits = source.visits.filter(v => !done.has(v.key));
+    const claims = source.claims.filter(c => !done.has(c.key));
+    plan.totals.alreadyImported +=
+      (source.visits.length - visits.length) + (source.claims.length - claims.length);
+
+    const matches = byName.get(nameKey(source.name)) || [];
+    const entry = {source, visits, claims, matches};
+
+    if(matches.length){
+      /* Requirement: never auto-duplicate and never auto-overwrite. */
+      entry.allow = ALLOWED.has(nameKey(source.name));
+      plan.duplicate.push(entry);
+    }else if(!visits.length && !claims.length && !source.visits.length && !source.claims.length){
+      /* A workbook block with a name but no visit table at all.
+         Still a real patient — still registered. */
+      plan.create.push(entry);
+    }else if(!visits.length && !claims.length){
+      plan.nothingToDo.push(entry);
+    }else{
+      plan.create.push(entry);
+    }
+
+    plan.totals.visits += visits.length;
+    plan.totals.claims += claims.length;
+  });
+
+  PLAN = plan;
+  return plan;
+}
+
+
+/* ---------------------------------------------------------
+   ID ALLOCATION
+
+   getwellNextVisitId(), getwellNextClaimId() and
+   getwellAllocatePatientId() each re-read and re-parse the whole
+   store to find the highest number in use. That is right for a
+   receptionist adding one visit and hopeless for ~1,900 of them,
+   and the patient allocator would also hand the same GW-XXXX to
+   two patients inside one unsaved chunk.
+
+   So the highest number in use is found ONCE per chunk, from the
+   working copy of the store, and the series continues from there
+   using exactly the same prefixes, widths and Settings-driven
+   patient format the application uses everywhere else. The IDs
+   produced are indistinguishable from ones the forms produce.
+--------------------------------------------------------- */
+
+function makeAllocator(data){
+  const highest = (prefix, collect) => {
+    const pattern = new RegExp("^" + prefix + "(\\d+)$", "i");
+    let top = 0;
+    (data.patients || []).forEach(patient => {
+      (collect(patient) || []).forEach(item => {
+        const hit = String((item && item.id) || "").match(pattern);
+        if(hit) top = Math.max(top, Number(hit[1]) || 0);
+      });
+    });
+    return top;
+  };
+
+  let visit = highest("VIS-", patient => patient.visits);
+  let claim = highest("CLM-", patient => patient.claims);
+
+  const config = getwellPatientIdSettings();
+  const escaped = config.prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const patientPattern = new RegExp("^" + escaped + "(\\d+)$", "i");
+  let patientTop = 0;
+  (data.patients || []).forEach(patient => {
+    const hit = String(patient.id || "").match(patientPattern);
+    if(hit) patientTop = Math.max(patientTop, Number(hit[1]) || 0);
+  });
+  let patientNext = Math.max(config.nextNumber, patientTop + 1) - 1;
+
+  return {
+    visitId:  () => "VIS-" + String(++visit).padStart(6, "0"),
+    claimId:  () => "CLM-" + String(++claim).padStart(6, "0"),
+    patient:  () => {
+      const number = ++patientNext;
+      return {id: getwellFormatPatientId(number), number};
+    }
+  };
+}
+
+
+/* ---------------------------------------------------------
+   RECORD BUILDERS
+
+   These produce exactly the shapes patient-profile.html
+   produces, so an imported record opens, edits, saves and
+   deletes through the existing screens with no special case.
+--------------------------------------------------------- */
+
+function buildVisit(ids, row){
+  const note = "Imported from the Excel workbook, sheet row " + row.sheetRow +
+               (row.note ? " · " + row.note : "") + " " + keyTag(row.key);
+
+  const charge = {
+    id: "CH-" + row.key,
+    category: "Additional",
+    itemId: "",
+    itemName: IMPORT_CHARGE_LABEL,
+    price: Number(row.amount) || 0,
+    notes: keyTag(row.key)
+  };
+
+  return {
+    id: ids.visitId(),
+    dateKey: getwellDateKey(row.date),
+    visit: "",
+    type: getwellDefaultVisitType(),
+    weight: "—",
+    invoiceReference: "",
+    injection: "",
+    dose: "",
+    medication: "",
+    additionalTreatment: "",
+    otherName: IMPORT_CHARGE_LABEL,
+    notes: note,
+    pdfName: "",
+    pdfFile: null,
+    arboleafText: "",
+    arboleafMetrics: {},
+    photos: [],
+    charges: [charge],
+    status: "Completed",
+    billing: {
+      injection:  {price:0, notes:""},
+      medication: {price:0, notes:""},
+      treatment:  {price:0, notes:""},
+      other:      {price:Number(row.amount) || 0, notes:""},
+      /* The workbook's CLAIMED figure is a PANEL CLAIM, not a
+         per-visit panel allocation, so these stay at zero. */
+      panel: 0,
+      selfPay: 0
+    }
+  };
+}
+
+function buildClaim(ids, row, visitId){
+  return {
+    id: ids.claimId(),
+    amount: Number(row.amount) || 0,
+    claimDate: getwellDateKey(row.date),
+    visitId: visitId || "",
+    notes: "Imported from the Excel workbook, sheet row " + row.sheetRow +
+           (row.note ? " · " + row.note : "") + " " + keyTag(row.key)
+  };
+}
+
+function buildPatient(allocation, source){
+  const initials = String(source.name || "")
+    .split(/\s+/).map(part => part[0] || "").join("").slice(0,2).toUpperCase();
+
+  return {
+    id: allocation.id,
+    name: source.name,
+    initials,
+    status: getwellDefaultPatientStatus(),
+    panelProvider: source.panelProvider
+      ? normalizePanelType(source.panelProvider)
+      : "",
+    otherPanelName: source.otherPanelName || "",
+    panelStatus: "Active",
+    panelSuspensionNote: "",
+    /* Not in the workbook. Left blank on purpose — never invented. */
+    phone: "", dob: "", gender: "", height: "",
+    startingWeight: 0, currentWeight: 0, goalWeight: 0,
+    startDate: (source.visits[0] && source.visits[0].date) || "",
+    doctor: "",
+    visits: [], claims: [], appointments: [], measurements: []
+  };
+}
+
+/* Appends the outstanding rows to a patient object in memory.
+   Existing visits and claims on that object are never read,
+   rewritten or reordered by this function. */
+function applyRows(ids, patient, entry){
+  if(!Array.isArray(patient.visits)) patient.visits = [];
+  if(!Array.isArray(patient.claims)) patient.claims = [];
+
+  const madeByRow = new Map();
+
+  entry.visits.forEach(row => {
+    const visit = buildVisit(ids, row);
+    patient.visits.push(visit);
+    madeByRow.set(row.sheetRow, visit.id);
+  });
+
+  entry.claims.forEach(row => {
+    /* A claim is linked to the visit from the SAME workbook row when
+       one exists. A claim with no invoice simply has no visit — which
+       the workbook contains, and which is valid. */
+    patient.claims.push(buildClaim(ids, row, madeByRow.get(row.sheetRow)));
+  });
+
+  if(entry.visits.length && typeof getwellRenumberVisits === "function"){
+    getwellRenumberVisits(patient);
+    (patient.visits || []).forEach(visit => {
+      if(typeof getwellVisitLabel === "function"){
+        visit.visit = getwellVisitLabel(patient, visit);
+      }
+    });
+  }
+
+  return patient;
+}
+
+
+/* ---------------------------------------------------------
+   COMMIT
+
+   saveStore() posts the whole store, so the import is applied
+   in chunks and each chunk is VERIFIED against Google Sheets
+   before the next one starts. A chunk that fails stops the run
+   with the reason; everything already verified stays saved and
+   its keys make a re-run skip it.
+--------------------------------------------------------- */
+
+let RUNNING = false;
+
+/* The run log lives here, not in the DOM, so re-rendering the plan
+   after an import does not throw away the record of what was
+   written. */
+let LOG = [];
+
+function paintLog(){
+  const box = document.getElementById("impLog");
+  if(!box) return;
+  box.textContent = LOG.length ? LOG.join("\n") : "Ready.";
+  box.scrollTop = box.scrollHeight;
+}
+
+function logLine(text){
+  LOG.push(text);
+  paintLog();
+}
+
+async function runImport(){
+  if(RUNNING) return;
+  if(!getwellRemoteConfigured()){
+    alert("Google Sheets is not configured, so nothing can be saved permanently. Set GETWELL_SHEETS_API_URL in app.js first.");
+    return;
+  }
+
+  const queue = [
+    ...PLAN.create.map(entry => ({entry, mode:"create"})),
+    ...PLAN.duplicate.filter(entry => entry.allow).map(entry => ({entry, mode:"append"}))
+  ];
+
+  if(!queue.length){
+    alert("There is nothing outstanding to import.");
+    return;
+  }
+
+  if(!confirm(
+    "Import " + queue.length + " patient(s) into Google Sheets?\n\n" +
+    "Existing patients, visits and claims are not modified."
+  )) return;
+
+  RUNNING = true;
+  const button = document.getElementById("impRun");
+  if(button){ button.disabled = true; button.textContent = "Importing…"; }
+
+  const CHUNK = 8;
+  let savedPatients = 0, savedVisits = 0, savedClaims = 0, failed = null;
+
+  for(let i = 0; i < queue.length && !failed; i += CHUNK){
+    const slice = queue.slice(i, i + CHUNK);
+    const data = store();
+    const ids  = makeAllocator(data);
+
+    const touched = [];
+    slice.forEach(job => {
+      let patient;
+      if(job.mode === "append"){
+        patient = data.patients.find(candidate => candidate.id === job.entry.matches[0].id);
+        if(!patient) return;
+      }else{
+        const allocation = ids.patient();
+        patient = buildPatient(allocation, job.entry.source);
+        /* Keep the Settings counter in step, exactly as
+           patients.html does after it creates a patient. */
+        getwellAdvancePatientNumber(allocation.number);
+        data.patients.push(patient);
+      }
+      applyRows(ids, patient, job.entry);
+      getwellStampRecord(patient);
+      touched.push({patient, job});
+    });
+
+    const result = await saveStore(data);
+
+    if(!result || !result.ok){
+      failed = (result && result.error) || "Google Sheets did not confirm the write.";
+      logLine("STOPPED at patient " + (i + 1) + ": " + failed);
+      break;
+    }
+
+    touched.forEach(({patient, job}) => {
+      savedPatients += 1;
+      savedVisits += job.entry.visits.length;
+      savedClaims += job.entry.claims.length;
+      logLine(
+        (job.mode === "append" ? "appended to " : "created ") +
+        patient.id + "  " + patient.name +
+        "  (" + job.entry.visits.length + " visits, " + job.entry.claims.length + " claims)"
+      );
+    });
+  }
+
+  RUNNING = false;
+  if(button){ button.disabled = false; button.textContent = "Import now"; }
+
+  logLine("");
+  logLine("Patients written : " + savedPatients);
+  logLine("Visits written   : " + savedVisits);
+  logLine("Claims written   : " + savedClaims);
+  logLine(failed
+    ? "FINISHED WITH AN ERROR — everything listed above is verified in Google Sheets. Fix the error and press Import again; the records above will be skipped."
+    : "FINISHED — every record above was read back off a row in Google Sheets.");
+
+  getwellNotify(
+    failed ? "Import stopped: " + failed
+           : "Imported " + savedPatients + " patients into Google Sheets.",
+    failed ? "error" : "success"
+  );
+
+  render();
+}
+
+
+/* ---------------------------------------------------------
+   SCREEN
+--------------------------------------------------------- */
+
+function rememberDecision(entry, allowed){
+  const key = nameKey(entry.source.name);
+  entry.allow = allowed;
+  if(allowed) ALLOWED.add(key); else ALLOWED.delete(key);
+}
+
+function toggleDuplicate(index, allowed){
+  if(PLAN.duplicate[index]) rememberDecision(PLAN.duplicate[index], allowed);
+  renderCounts();
+}
+
+function setAllDuplicates(allowed){
+  PLAN.duplicate.forEach(entry => rememberDecision(entry, allowed));
+  render();
+}
+
+function renderCounts(){
+  const el = document.getElementById("impSelected");
+  if(!el) return;
+  const chosen = PLAN.duplicate.filter(entry => entry.allow).length;
+  el.textContent = String(PLAN.create.length + chosen);
+}
+
+function flagText(rows){
+  const flags = rows.flatMap(row => row.flags || []);
+  return flags.length ? [...new Set(flags)].join("; ") : "";
+}
+
+function planRow(entry, index, kind){
+  const source = entry.source;
+  const flags = flagText([...entry.visits, ...entry.claims]);
+  const panel = source.panelProvider
+    ? escapeHtml(source.panelProvider) + (source.panelReview ? ' <span class="imp-flags">check</span>' : "")
+    : '<span class="imp-flags">not stated — left blank</span>';
+
+  const pick = kind === "duplicate"
+    ? '<td><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" ' +
+        (entry.allow ? "checked " : "") +
+        'onchange="toggleDuplicate(' + index + ', this.checked)"> add history</label></td>'
+    : "";
+
+  const matched = kind === "duplicate"
+    ? "<td>" + entry.matches.map(m => escapeHtml(m.id + " · " + (m.name || ""))).join("<br>") + "</td>"
+    : "";
+
+  return "<tr>" +
+    "<td>" + (source.seq == null ? '<span class="imp-flags">no number</span>' : source.seq) + "</td>" +
+    "<td><strong>" + escapeHtml(source.name) + "</strong>" +
+      (source.headerNote ? '<br><span class="imp-muted" style="font-size:12px">' + escapeHtml(source.headerNote) + "</span>" : "") +
+    "</td>" +
+    "<td>" + panel + "</td>" +
+    matched +
+    "<td>" + entry.visits.length + "</td>" +
+    "<td>" + entry.claims.length + "</td>" +
+    "<td>" + impMoney(entry.visits.reduce((s, r) => s + (+r.amount || 0), 0)) + "</td>" +
+    "<td>" + impMoney(entry.claims.reduce((s, r) => s + (+r.amount || 0), 0)) + "</td>" +
+    '<td class="imp-flags">' + escapeHtml(flags) + "</td>" +
+    pick +
+  "</tr>";
+}
+
+function render(){
+  buildPlan();
+
+  const totalVisits = IMPORT_DS.patients.reduce((s, p) => s + p.visits.length, 0);
+  const totalClaims = IMPORT_DS.patients.reduce((s, p) => s + p.claims.length, 0);
+
+  const kpi = (label, value, sub) =>
+    '<div class="kpi"><div class="kpi-main"><div class="kpi-label">' + label +
+    '</div><div class="kpi-value">' + value + '</div>' +
+    (sub ? '<div class="kpi-sub">' + sub + "</div>" : "") + "</div></div>";
+
+  const createTable =
+    '<div class="table-wrap imp-scroll"><table class="table"><thead><tr>' +
+    "<th>#</th><th>Patient</th><th>Panel</th><th>Visits</th><th>Claims</th>" +
+    "<th>Invoiced</th><th>Claimed</th><th>Notes</th>" +
+    "</tr></thead><tbody>" +
+    (PLAN.create.length
+      ? PLAN.create.map((entry, i) => planRow(entry, i, "create")).join("")
+      : '<tr><td colspan="8" class="imp-muted">Nothing outstanding.</td></tr>') +
+    "</tbody></table></div>";
+
+  const dupeTable =
+    '<div class="table-wrap imp-scroll"><table class="table"><thead><tr>' +
+    "<th>#</th><th>Workbook name</th><th>Panel</th><th>Already in the system</th>" +
+    "<th>Visits</th><th>Claims</th><th>Invoiced</th><th>Claimed</th><th>Notes</th><th>Decision</th>" +
+    "</tr></thead><tbody>" +
+    (PLAN.duplicate.length
+      ? PLAN.duplicate.map((entry, i) => planRow(entry, i, "duplicate")).join("")
+      : '<tr><td colspan="10" class="imp-muted">No name in the workbook matches a patient already in the system.</td></tr>') +
+    "</tbody></table></div>";
+
+  const body = `
+    <div class="page-head">
+      <div>
+        <h1 style="margin:0">Import Excel history</h1>
+        <p class="imp-muted" style="margin:4px 0 0">
+          Source: ${escapeHtml(IMPORT_DS.source || "workbook")} ·
+          prepared ${escapeHtml(IMPORT_DS.generated || "")} ·
+          writes through the same verified Google Sheets path as every other screen.
+        </p>
+      </div>
+      <button id="impRun" class="primary" type="button" onclick="runImport()">Import now</button>
+    </div>
+
+    <div class="kpi-grid">
+      ${kpi("In the workbook", IMPORT_DS.patients.length, totalVisits + " visits · " + totalClaims + " claims")}
+      ${kpi("New patients", PLAN.create.length, "will be created")}
+      ${kpi("Name already exists", PLAN.duplicate.length, "held for your decision")}
+      ${kpi("Already imported", PLAN.totals.alreadyImported, "will be skipped")}
+    </div>
+
+    <div class="card" style="margin-bottom:15px"><div class="card-body">
+      <p style="margin:0 0 8px"><strong>What pressing Import does</strong></p>
+      <ul style="margin:0 0 4px 18px;line-height:1.7">
+        <li>Creates <strong id="impSelected">${PLAN.create.length}</strong> patient(s) and appends their visits and panel claims.</li>
+        <li>Each visit carries the workbook's <strong>INVOICE</strong> as its Visit Total, on one editable charge line named
+            “${escapeHtml(IMPORT_CHARGE_LABEL)}”. No breakdown is invented.</li>
+        <li>Each <strong>CLAIMED</strong> figure becomes a Panel Claim, including the ${
+              IMPORT_DS.patients.reduce((s,p)=>s+p.claims.filter(c=>!c.hasInvoice).length,0)
+            } claims that have no invoice.</li>
+        <li>The workbook's INJECTION column and its GRAND TOTAL / TOTAL CLAIMED / BALANCE rows are not imported.</li>
+        <li>Nothing already in the system is edited, renumbered or deleted.</li>
+      </ul>
+    </div></div>
+
+    <div class="card" style="margin-bottom:15px">
+      <div class="card-head"><div><h2>New patients</h2>
+        <p>No patient with this name exists yet, so each one is created with a fresh GW-XXXX ID.</p></div></div>
+      ${createTable}
+    </div>
+
+    <div class="card" style="margin-bottom:15px">
+      <div class="card-head">
+        <div><h2>Possible duplicates</h2>
+          <p>These workbook names match a patient already in the system. Nothing happens to them unless you tick a box —
+             and ticking one only <em>adds</em> the missing visits and claims. Existing details are never changed.</p></div>
+        <div style="display:flex;gap:8px">
+          <button class="secondary" type="button" onclick="setAllDuplicates(true)">Tick all</button>
+          <button class="secondary" type="button" onclick="setAllDuplicates(false)">Untick all</button>
+        </div>
+      </div>
+      ${dupeTable}
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><h2>Run log</h2><p>Every patient confirmed on a row in Google Sheets.</p></div></div>
+      <div class="card-body"><div class="imp-log" id="impLog"></div></div>
+    </div>
+  `;
+
+  document.getElementById("root").innerHTML = shell("Import", "import", body);
+  renderCounts();
+  paintLog();
+}
+
+render();
+</script></body></html>
