@@ -605,3 +605,40 @@ visit as new.
 Verified against a replica of the live data: 116 patients created, 5
 matched and appended to, 68 records correctly skipped as already
 present, 0 duplicates, 0 ambiguous. Re-running adds nothing.
+
+## 2026-09-05 — build .3: a new browser showed 0 patients
+
+### The symptom
+
+Open the app on a machine that has never used it — a colleague's PC,
+a phone, an incognito window — and the dashboard read **0 patients**
+while Google Sheets held 121. Opening it again later sometimes fixed
+itself, which made it look intermittent.
+
+### The cause
+
+`getwellRemoteRead()` gave the Apps Script read **15 seconds**. That
+was ample when the sheet held five patients. The store is now about a
+megabyte of JSONP, and an Apps Script deployment that has been idle
+cold-starts, so the opening read frequently took longer than fifteen
+seconds. The read was abandoned, the merge never ran, and the page sat
+on an empty cache. `localStorage` is a cache, not the database, so an
+empty cache with no successful read looks exactly like an empty clinic.
+
+Worse, the opening pull happened **once**. If that one attempt lost the
+race, nothing else ran until the next 30-second poll — and on a phone,
+where background timers are throttled, much longer than that.
+
+### The fix
+
+| Piece | Before | After |
+|---|---|---|
+| JSONP read timeout | 15s | 60s — longer than any cold start seen, still bounded so a dead backend fails rather than hangs |
+| Opening pull | one attempt at 150ms | a ladder at 150ms, 4s, 10s, 20s and 35s, stopping the moment a read succeeds |
+| `getwellFirstSyncDone` | — | new flag; the ladder stops on the first success so a working page never re-reads needlessly |
+
+Nothing else changed: the same merge, the same outbox, the same
+verified-write path, no polling behaviour altered, no UI touched.
+
+`GETWELL_SHEETS_API_URL` now points at the current deployment
+(`AKfycbyDpt0e…`), so older deployments can be retired.

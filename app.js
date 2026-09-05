@@ -1369,7 +1369,7 @@ function getwellReportSettings(){
 ========================================================= */
 
 const GETWELL_SHEETS_API_URL =
-  "https://script.google.com/macros/s/AKfycbzDmENAQ9QQnXK_olP-cEiB9UhFrAY9_nIdtRwIad12qjDCnee8LhXvJbdtYD2P9-CTFg/exec";
+  "https://script.google.com/macros/s/AKfycbyDpt0e0YhGAigVKcyD7cdxLhsDEE9zXkUMfKBnBZFImcmQkCJoeTRQzJ6-lHJnkxoqgw/exec";
 
 const GETWELL_REMOTE_POLL_MS = 30000;
 const GETWELL_REMOTE_SAVE_KEY = "GETWELL_REMOTE_LAST_SAVE";
@@ -1389,6 +1389,12 @@ const GETWELL_RECORD_KEYS =
   ["patients","appointments","visits","charges","claims","files"];
 
 let getwellSyncInFlight = false;
+
+/* True once Google Sheets has answered a read successfully in this
+   page. Until then the app is showing an empty cache, not an empty
+   clinic, so the opening pull is retried quickly instead of waiting
+   a full polling interval. */
+let getwellFirstSyncDone = false;
 
 
 function getwellRemoteConfigured(){
@@ -1568,7 +1574,22 @@ function getwellRemoteRead(callback){
 
   document.head.appendChild(script);
 
-  setTimeout(() => done(null), 15000);
+  /*
+    ROOT CAUSE OF "A NEW BROWSER SHOWS 0 PATIENTS"
+
+    This was 15 seconds. A Google Apps Script deployment that has
+    been idle cold-starts, and the whole store is now around a
+    megabyte of JSONP, so the first read after opening the app
+    routinely took longer than that. The read was abandoned, the
+    merge never ran, and the dashboard sat at 0 until some later
+    poll happened to succeed -- which reads exactly like "the app
+    is blank" to whoever just opened it.
+
+    Sixty seconds is longer than any cold start observed and still
+    bounded, so a genuinely unreachable backend still fails rather
+    than hanging forever.
+  */
+  setTimeout(() => done(null), 60000);
 }
 
 
@@ -2494,6 +2515,7 @@ function getwellSyncRemoteStore(){
     }
 
     getwellRecordSyncStatus(true);
+    getwellFirstSyncDone = true;
     getwellNoteBackendVersion(payload.version);
 
     const remote=payload.data;
@@ -2609,8 +2631,19 @@ function getwellStartRemoteSync(){
   if(!getwellRemoteSyncHooksInstalled){
     getwellRemoteSyncHooksInstalled = true;
 
-    /* Pull immediately when the page opens. */
-    setTimeout(() => getwellSyncRemoteStore(), 150);
+    /*
+      Pull immediately when the page opens, then keep retrying on a
+      short ladder until the FIRST read succeeds. A single attempt
+      was not enough: if it fell foul of a cold start the screen
+      stayed empty for a whole polling interval, and on a phone,
+      whose background timers are throttled, for much longer.
+    */
+    const openingPull = (delay) => setTimeout(() => {
+      if(getwellFirstSyncDone) return;
+      getwellSyncRemoteStore();
+    }, delay);
+
+    [150, 4000, 10000, 20000, 35000].forEach(openingPull);
 
     /* Pull periodically so another device's changes appear. */
     getwellRemoteSyncTimer = setInterval(
