@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Import Excel History | Getwell</title><link rel="stylesheet" href="styles.css?v=20260905-excel-import"><script src="app.js?v=20260905-excel-import"></script><script src="import-data.js?v=20260905-excel-import"></script><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Import Excel History | Getwell</title><link rel="stylesheet" href="styles.css?v=20260905-excel-import-2"><script src="app.js?v=20260905-excel-import-2"></script><script src="import-data.js?v=20260905-excel-import-2"></script><style>
 .imp-flags{font-size:12px;color:#b45309}
 .imp-muted{color:#6b7280}
 .imp-pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
@@ -51,8 +51,77 @@ const IMPORT_DS = window.GETWELL_IMPORT_DATASET || {patients:[]};
    charge editor and delete this line — nothing here is special. */
 const IMPORT_CHARGE_LABEL = "Imported invoice total — breakdown not yet entered";
 
-const nameKey = value =>
-  String(value || "").toUpperCase().replace(/[^A-Z0-9]+/g, " ").trim();
+/* NAME MATCHING
+
+   The workbook records short names ("MAHMOOD SALLEHUDDIN"); the
+   application holds the full legal name ("MAHMOOD SALLEHUDDIN
+   AL-RAZI BIN RAZI"). Matching on the exact string therefore misses
+   patients who are already in the system and creates a duplicate of
+   every one of them — which is exactly what happened on the first
+   run. A workbook name now matches when it is the same name, when
+   it is the beginning of the full name, or when every one of its
+   words appears in the full name in order. */
+
+const nameWords = value =>
+  String(value || "").toUpperCase().replace(/[^A-Z0-9]+/g, " ").trim().split(" ").filter(Boolean);
+
+const nameKey = value => nameWords(value).join(" ");
+
+function matchExistingPatients(workbookName, patients){
+  const wanted = nameWords(workbookName);
+  const wantedKey = wanted.join(" ");
+  const hits = [];
+
+  patients.forEach(patient => {
+    const held = nameWords(patient.name);
+    const heldKey = held.join(" ");
+
+    if(heldKey === wantedKey){
+      hits.push({patient, how:"same name"});
+      return;
+    }
+    if(heldKey.startsWith(wantedKey + " ")){
+      hits.push({patient, how:"the workbook name is the start of the full name"});
+      return;
+    }
+    let seen = 0;
+    held.forEach(word => { if(word === wanted[seen]) seen++; });
+    if(seen === wanted.length && wanted.length >= 2){
+      hits.push({patient, how:"every word of the workbook name appears in the full name"});
+    }
+  });
+
+  return hits;
+}
+
+
+/* RECORD MATCHING
+
+   The five patients already in the system were typed in by hand, so
+   their visits carry no import key. A workbook visit is treated as
+   already present when the patient holds a visit on the same day for
+   the same total; a claim, when the amount and claim date match.
+   Dates are compared through getwellDateKey() because rows written
+   before the date-only fix hold a full UTC timestamp
+   ("2025-11-12T16:00:00.000Z" is 13 November in GMT+8). */
+
+function existingRecordCounts(patient){
+  const visits = new Map();
+  const claims = new Map();
+
+  (patient.visits || []).forEach(visit => {
+    const total = (visit.charges || []).reduce((sum, c) => sum + (Number(c.price) || 0), 0);
+    const key = getwellDateKey(visit.dateKey) + "|" + total.toFixed(2);
+    visits.set(key, (visits.get(key) || 0) + 1);
+  });
+
+  (patient.claims || []).forEach(claim => {
+    const key = getwellDateKey(claim.claimDate) + "|" + (Number(claim.amount) || 0).toFixed(2);
+    claims.set(key, (claims.get(key) || 0) + 1);
+  });
+
+  return {visits, claims};
+}
 
 const keyTag = key => "[" + key + "]";
 
@@ -80,17 +149,6 @@ function readExistingKeys(){
   return found;
 }
 
-function indexExistingPatients(){
-  const index = new Map();
-  (store().patients || []).forEach(patient => {
-    const key = nameKey(patient.name);
-    if(!key) return;
-    if(!index.has(key)) index.set(key, []);
-    index.get(key).push(patient);
-  });
-  return index;
-}
-
 
 /* ---------------------------------------------------------
    THE PLAN  (a dry run — nothing is written here)
@@ -105,38 +163,74 @@ const ALLOWED = new Set();
 
 function buildPlan(){
   const done = readExistingKeys();
-  const byName = indexExistingPatients();
+  const patients = store().patients || [];
 
   const plan = {
-    create: [], duplicate: [], nothingToDo: [],
-    totals: {visits:0, claims:0, alreadyImported:0}
+    create: [], duplicate: [], nothingToDo: [], ambiguous: [],
+    totals: {visits:0, claims:0, alreadyImported:0, skippedAsPresent:0}
   };
 
   IMPORT_DS.patients.forEach(source => {
-    const visits = source.visits.filter(v => !done.has(v.key));
-    const claims = source.claims.filter(c => !done.has(c.key));
+    let visits = source.visits.filter(v => !done.has(v.key));
+    let claims = source.claims.filter(c => !done.has(c.key));
     plan.totals.alreadyImported +=
       (source.visits.length - visits.length) + (source.claims.length - claims.length);
 
-    const matches = byName.get(nameKey(source.name)) || [];
-    const entry = {source, visits, claims, matches};
+    const hits = matchExistingPatients(source.name, patients);
 
-    if(matches.length){
-      /* Requirement: never auto-duplicate and never auto-overwrite. */
-      entry.allow = ALLOWED.has(nameKey(source.name));
-      plan.duplicate.push(entry);
-    }else if(!visits.length && !claims.length && !source.visits.length && !source.claims.length){
-      /* A workbook block with a name but no visit table at all.
-         Still a real patient — still registered. */
-      plan.create.push(entry);
-    }else if(!visits.length && !claims.length){
-      plan.nothingToDo.push(entry);
-    }else{
-      plan.create.push(entry);
+    if(hits.length > 1){
+      plan.ambiguous.push({source, hits});
+      return;
+    }
+
+    if(hits.length === 1){
+      const held = existingRecordCounts(hits[0].patient);
+      let skipped = 0;
+
+      visits = visits.filter(v => {
+        const key = v.date + "|" + Number(v.amount).toFixed(2);
+        if(held.visits.get(key) > 0){
+          held.visits.set(key, held.visits.get(key) - 1);
+          skipped++;
+          return false;
+        }
+        return true;
+      });
+
+      claims = claims.filter(c => {
+        const key = c.date + "|" + Number(c.amount).toFixed(2);
+        if(held.claims.get(key) > 0){
+          held.claims.set(key, held.claims.get(key) - 1);
+          skipped++;
+          return false;
+        }
+        return true;
+      });
+
+      plan.totals.skippedAsPresent += skipped;
+      plan.totals.visits += visits.length;
+      plan.totals.claims += claims.length;
+
+      /* Appending cannot overwrite anything: only records the patient
+         does not already hold are added, and no field on the patient
+         is touched. So a confident single match defaults to ON, and
+         you can still untick it. */
+      plan.duplicate.push({
+        source, visits, claims, skipped,
+        matches:[hits[0].patient], how:hits[0].how,
+        allow: !ALLOWED.has(nameKey(source.name) + ":off")
+      });
+      return;
     }
 
     plan.totals.visits += visits.length;
     plan.totals.claims += claims.length;
+
+    if(!visits.length && !claims.length && (source.visits.length || source.claims.length)){
+      plan.nothingToDo.push({source, visits, claims, matches:[]});
+    }else{
+      plan.create.push({source, visits, claims, matches:[]});
+    }
   });
 
   PLAN = plan;
@@ -360,7 +454,8 @@ async function runImport(){
 
   const queue = [
     ...PLAN.create.map(entry => ({entry, mode:"create"})),
-    ...PLAN.duplicate.filter(entry => entry.allow).map(entry => ({entry, mode:"append"}))
+    ...PLAN.duplicate.filter(entry => entry.allow && (entry.visits.length || entry.claims.length))
+                     .map(entry => ({entry, mode:"append"}))
   ];
 
   if(!queue.length){
@@ -450,9 +545,9 @@ async function runImport(){
 --------------------------------------------------------- */
 
 function rememberDecision(entry, allowed){
-  const key = nameKey(entry.source.name);
+  const key = nameKey(entry.source.name) + ":off";
   entry.allow = allowed;
-  if(allowed) ALLOWED.add(key); else ALLOWED.delete(key);
+  if(allowed) ALLOWED.delete(key); else ALLOWED.add(key);
 }
 
 function toggleDuplicate(index, allowed){
@@ -491,7 +586,9 @@ function planRow(entry, index, kind){
     : "";
 
   const matched = kind === "duplicate"
-    ? "<td>" + entry.matches.map(m => escapeHtml(m.id + " · " + (m.name || ""))).join("<br>") + "</td>"
+    ? "<td>" + entry.matches.map(m => escapeHtml(m.id + " · " + (m.name || ""))).join("<br>") +
+      '<br><span class="imp-muted" style="font-size:12px">' + escapeHtml(entry.how || "") + "</span></td>" +
+      "<td>" + (entry.skipped ? entry.skipped + " already there" : "—") + "</td>"
     : "";
 
   return "<tr>" +
@@ -533,12 +630,12 @@ function render(){
 
   const dupeTable =
     '<div class="table-wrap imp-scroll"><table class="table"><thead><tr>' +
-    "<th>#</th><th>Workbook name</th><th>Panel</th><th>Already in the system</th>" +
-    "<th>Visits</th><th>Claims</th><th>Invoiced</th><th>Claimed</th><th>Notes</th><th>Decision</th>" +
+    "<th>#</th><th>Workbook name</th><th>Panel</th><th>Already in the system</th><th>Skipped</th>" +
+    "<th>Add visits</th><th>Add claims</th><th>Invoiced</th><th>Claimed</th><th>Notes</th><th>Decision</th>" +
     "</tr></thead><tbody>" +
     (PLAN.duplicate.length
       ? PLAN.duplicate.map((entry, i) => planRow(entry, i, "duplicate")).join("")
-      : '<tr><td colspan="10" class="imp-muted">No name in the workbook matches a patient already in the system.</td></tr>') +
+      : '<tr><td colspan="11" class="imp-muted">No name in the workbook matches a patient already in the system.</td></tr>') +
     "</tbody></table></div>";
 
   const body = `
@@ -557,14 +654,15 @@ function render(){
     <div class="kpi-grid">
       ${kpi("In the workbook", IMPORT_DS.patients.length, totalVisits + " visits · " + totalClaims + " claims")}
       ${kpi("New patients", PLAN.create.length, "will be created")}
-      ${kpi("Name already exists", PLAN.duplicate.length, "held for your decision")}
+      ${kpi("Matched to existing", PLAN.duplicate.length, PLAN.totals.skippedAsPresent + " records already there")}
       ${kpi("Already imported", PLAN.totals.alreadyImported, "will be skipped")}
     </div>
 
     <div class="card" style="margin-bottom:15px"><div class="card-body">
       <p style="margin:0 0 8px"><strong>What pressing Import does</strong></p>
       <ul style="margin:0 0 4px 18px;line-height:1.7">
-        <li>Creates <strong id="impSelected">${PLAN.create.length}</strong> patient(s) and appends their visits and panel claims.</li>
+        <li>Creates <strong id="impSelected">${PLAN.create.length}</strong> new patient(s), and adds the missing history to
+            ${PLAN.duplicate.length} patient(s) already in the system without duplicating them.</li>
         <li>Each visit carries the workbook's <strong>INVOICE</strong> as its Visit Total, on one editable charge line named
             “${escapeHtml(IMPORT_CHARGE_LABEL)}”. No breakdown is invented.</li>
         <li>Each <strong>CLAIMED</strong> figure becomes a Panel Claim, including the ${
@@ -583,9 +681,10 @@ function render(){
 
     <div class="card" style="margin-bottom:15px">
       <div class="card-head">
-        <div><h2>Possible duplicates</h2>
-          <p>These workbook names match a patient already in the system. Nothing happens to them unless you tick a box —
-             and ticking one only <em>adds</em> the missing visits and claims. Existing details are never changed.</p></div>
+        <div><h2>Already in the system</h2>
+          <p>These workbook names match a patient the app already holds, so <strong>no second record is created</strong>.
+             Only visits and claims the patient does not already have are added — anything already there is skipped,
+             and no existing detail, visit, claim or ID is altered. Untick any row you disagree with.</p></div>
         <div style="display:flex;gap:8px">
           <button class="secondary" type="button" onclick="setAllDuplicates(true)">Tick all</button>
           <button class="secondary" type="button" onclick="setAllDuplicates(false)">Untick all</button>
@@ -593,6 +692,16 @@ function render(){
       </div>
       ${dupeTable}
     </div>
+
+    ${PLAN.ambiguous.length ? `
+    <div class="card" style="margin-bottom:15px">
+      <div class="card-head"><div><h2>Needs your decision</h2>
+        <p>These workbook names match more than one patient, so nothing is imported for them.</p></div></div>
+      <div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Workbook name</th><th>Candidates</th></tr></thead><tbody>
+      ${PLAN.ambiguous.map(a => "<tr><td>" + a.source.seq + "</td><td>" + escapeHtml(a.source.name) + "</td><td>" +
+        a.hits.map(h => escapeHtml(h.patient.id + " · " + h.patient.name)).join("<br>") + "</td></tr>").join("")}
+      </tbody></table></div>
+    </div>` : ""}
 
     <div class="card">
       <div class="card-head"><div><h2>Run log</h2><p>Every patient confirmed on a row in Google Sheets.</p></div></div>

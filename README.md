@@ -557,3 +557,51 @@ against that patient's own visit chronology: 378 were corrected
 with proof, 21 were confirmed already correct, and 78 that
 chronology could not separate were flagged rather than silently
 decided. `IMPORT_REPORT.md` lists every single one.
+
+## 2026-09-05 — import fix (build .2)
+
+Two defects in build .1, both found against the live Sheet.
+
+### 1. The backend was never deployed
+
+`Code.gs` lives inside the Apps Script project, not on GitHub Pages.
+Uploading the ZIP updated the frontend only, so the deployed backend
+was still the old `doPost()` that answers a save with
+`{ok:true, savedAt:...}` and no `verified` map. `getwellVerifyRemoteSave()`
+correctly refuses to call that a successful write, so **every** save
+failed — the import and any visit typed in by hand. The fix is a
+deployment step, not a code change: paste `Code.gs`, run
+`setupGetwell()`, deploy a new version.
+
+`GETWELL_SHEETS_API_URL` in `app.js` now points at the redeployed
+endpoint. A *new* deployment gets a new `/exec` URL; editing the
+existing deployment instead would have kept the old one.
+
+### 2. Name matching created duplicates of existing patients
+
+The workbook holds short names, the app holds full legal names:
+
+| App | Workbook |
+|---|---|
+| MAHMOOD SALLEHUDDIN AL-RAZI BIN RAZI | 1. MAHMOOD SALLEHUDDIN |
+| FARAH NABILAH BINTI MOHD ZOLKAFLY | 2. FARAH NABILAH |
+
+Matching on the exact string missed all five patients already in the
+system and would have created a duplicate of each. `matchExistingPatients()`
+now also matches when the workbook name is the start of the full name,
+or when every word of it appears in the full name in order. More than
+one candidate is never guessed at — it is listed under *Needs your
+decision* and skipped.
+
+Those five patients were typed in by hand, so their visits carry no
+import key. `existingRecordCounts()` therefore also treats a workbook
+visit as already present when the patient holds a visit on the same day
+for the same total, and a claim when the date and amount match. Dates
+go through `getwellDateKey()` on both sides, because rows written before
+the date-only fix hold a full UTC timestamp — `2025-11-12T16:00:00.000Z`
+is 13 November in GMT+8, and comparing the raw strings reports every
+visit as new.
+
+Verified against a replica of the live data: 116 patients created, 5
+matched and appended to, 68 records correctly skipped as already
+present, 0 duplicates, 0 ambiguous. Re-running adds nothing.

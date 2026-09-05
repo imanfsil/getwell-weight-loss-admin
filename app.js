@@ -1369,7 +1369,7 @@ function getwellReportSettings(){
 ========================================================= */
 
 const GETWELL_SHEETS_API_URL =
-  "https://script.google.com/macros/s/AKfycbwCAUk-c4fV3Ny7SfY2x3mWity4W8MKxJwlajxdFdUOaDAjFP7lgtb17_BbOXWlGT8kSg/exec";
+  "https://script.google.com/macros/s/AKfycbzDmENAQ9QQnXK_olP-cEiB9UhFrAY9_nIdtRwIad12qjDCnee8LhXvJbdtYD2P9-CTFg/exec";
 
 const GETWELL_REMOTE_POLL_MS = 30000;
 const GETWELL_REMOTE_SAVE_KEY = "GETWELL_REMOTE_LAST_SAVE";
